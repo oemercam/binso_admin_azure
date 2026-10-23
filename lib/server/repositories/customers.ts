@@ -42,8 +42,9 @@ function addressParts(input:Partial<CustomerInput>,current:Record<string,unknown
 const statusToDb=(value:string)=>/inaktiv|inactive/i.test(value)?'inactive':'active';
 export async function listCustomers(session:SessionUser,filters="order=name.asc"){return withTenant(session.organizationId,session.userId,client=>listApiBusiness(client,session,'customers',filters))}
 /** Exact identifiers only; candidate review never exposes another tenant. */
+export function customerIdentity(input:Partial<CustomerInput>){return {uid:(input.uid??'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(MWST|TVA|IVA)$/,''),email:(input.email??'').trim().toLowerCase(),name:(input.name??'').trim().replace(/\s+/g,' ').toLowerCase()};}
 export async function customerDuplicates(client:PoolClient,organizationId:string,input:Partial<CustomerInput>,excludeId=''){
- const uid=(input.uid??'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(MWST|TVA|IVA)$/,''),email=(input.email??'').trim().toLowerCase(),name=(input.name??'').trim().replace(/\s+/g,' ').toLowerCase();
+ const {uid,email,name}=customerIdentity(input);
  if(!uid&&!email&&name.length<2)return [];
  return (await client.query(`select id,customer_no,name,email from customers c where organization_id=$1 and archived_at is null and id::text<>$5 and (
   ($2<>'' and regexp_replace(regexp_replace(upper(coalesce(c.uid,'')),'[^A-Z0-9]','','g'),'(MWST|TVA|IVA)$','')=$2)
@@ -51,7 +52,29 @@ export async function customerDuplicates(client:PoolClient,organizationId:string
   or (length($4)>=2 and regexp_replace(lower(trim(c.name)),'[[:space:]]+',' ','g')=$4)) order by customer_no,id limit 5`,[organizationId,uid,email,name,excludeId])).rows;
 }
 export async function findCustomerDuplicates(session:SessionUser,input:Partial<CustomerInput>,excludeId=''){return withTenant(session.organizationId,session.userId,c=>customerDuplicates(c,session.organizationId,input,excludeId))}
-export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey=""){input=customerInput(input as unknown as Record<string,unknown>) as CustomerInput;return withTenant(organizationId,userId,async client=>{const write=async()=>{
+export async function archivedCustomers(session:SessionUser,query:string,offset:number){
+ return withTenant(session.organizationId,session.userId,async c=>{
+  const items=(await c.query("select c.id,c.customer_no,c.name,c.status,c.archived_at,c.updated_at::text revision,c.merged_into_customer_id,(target.archived_at is not null) merge_target_archived,count(*) over()::int total from customers c left join customers target on target.organization_id=c.organization_id and target.id=c.merged_into_customer_id where c.organization_id=$1 and c.archived_at is not null and ($2='' or c.name ilike $2 escape '\\' or c.customer_no ilike $2 escape '\\') order by c.archived_at desc,c.id limit 50 offset $3",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':'',offset])).rows;
+  const total=items.length?Number(items[0].total):Number((await c.query("select count(*)::int total from customers where organization_id=$1 and archived_at is not null and ($2='' or name ilike $2 escape '\\' or customer_no ilike $2 escape '\\')",[session.organizationId,query?'%'+query.replace(/[\\%_]/g,'\\$&')+'%':''])).rows[0].total);
+  return {items:items.map(({total:_total,...row})=>row),total};
+ });
+}
+/** Restore the same identity only. No reassignment, overwrites or cascade restore. */
+export async function restoreCustomer(session:SessionUser,id:string,revision:string){
+ return withTenant(session.organizationId,session.userId,async c=>{
+  await c.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[session.organizationId+':customer-create']);
+  const current=(await c.query('select *,updated_at::text revision from customers where organization_id=$1 and id::text=$2 for update',[session.organizationId,id])).rows[0];
+  if(!current)throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');
+  if(current.merged_into_customer_id)throw new ApiError(409,'customer_merged','Dieser Kunde wurde zusammengeführt. Bitte den Zielkunden verwenden.');
+  if(!current.archived_at)return {id:current.id,restored:false};
+  if(current.revision!==revision)throw new ApiError(409,'customer_changed','Der Kunde wurde geändert. Bitte die Ansicht aktualisieren.');
+  if((await customerDuplicates(c,session.organizationId,current,id)).length)throw new ApiError(409,'customer_duplicate','Eine mögliche Dublette ist vorhanden. Bitte die Kundendaten zuerst prüfen.');
+  await c.query('update customers set archived_at=null,updated_at=now() where organization_id=$1 and id=$2',[session.organizationId,current.id]);
+  await audit(c,{organizationId:session.organizationId,userId:session.userId,action:'customer.restored',entityType:'customer',entityId:current.id});
+  return {id:current.id,restored:true};
+ });
+}
+export async function createCustomer(organizationId:string,userId:string,input:CustomerInput,requestKey="",transactionClient?:PoolClient){input=customerInput(input as unknown as Record<string,unknown>) as CustomerInput;const execute=async(client:PoolClient)=>{const write=async()=>{
  await client.query('select pg_advisory_xact_lock(hashtextextended($1,0))',[organizationId+':customer-create']);
  if(!input.allowDuplicate&&(await customerDuplicates(client,organizationId,input)).length)throw new ApiError(409,'customer_duplicate','Mögliche Dublette gefunden. Bitte bestehende Kunden prüfen oder die separate Erfassung bestätigen.');
  const paymentDays=input.paymentDays??Number((await client.query('select payment_terms_days from organizations where id=$1',[organizationId])).rows[0]?.payment_terms_days??30);customerInput({paymentDays},true);
@@ -64,7 +87,7 @@ export async function createCustomer(organizationId:string,userId:string,input:C
  await client.query(`insert into customer_contacts(organization_id,customer_id,first_name,last_name,name,email,phone,is_primary,external_id) values($1,$2::uuid,$3,$4,$5,$6,$7,true,$8)`,[organizationId,id,input.contactFirstName,input.contactLastName,input.contact,input.email||null,input.phone||null,randomUUID()]);
  await audit(client,{organizationId,userId,action:'customer.created',entityType:'customer',entityId:id});return (await client.query(`select ${columns} from customers where organization_id=$1 and id=$2`,[organizationId,id])).rows[0];
 };return requestKey?idempotentBusiness(client,{organizationId,userId,operation:'customer.create',key:requestKey,body:input},write):write();
-})}
+};return transactionClient?execute(transactionClient):withTenant(organizationId,userId,execute)}
 export async function updateCustomer(organizationId:string,userId:string,id:string,input:Partial<CustomerInput>){return withTenant(organizationId,userId,async client=>{
  const current=(await client.query('select * from customers where id=$1 and organization_id=$2 and archived_at is null for update',[id,organizationId])).rows[0];if(!current)return null;
  if(input.customerType!==undefined&&input.customerType!==current.customer_type)throw new ApiError(400,'customer_type_immutable','Der Kundentyp kann hier nicht geändert werden.');

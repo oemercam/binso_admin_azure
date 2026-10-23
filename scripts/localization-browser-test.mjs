@@ -1,3 +1,5 @@
+import {verifyConsentRejection} from './privacy-consent-browser.mjs';
+import {verifyLanguagePreference} from './language-preference-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
@@ -29,11 +31,11 @@ try{
    // the same error outside that reload phase fatal; retain cancellation evidence.
    if(reloading&&error.message.includes('_rsc=')&&error.message.includes('due to access control checks.'))cancelledReloadPrefetches.push(error.message);
    else faults.push(error.message);
-  });return next};
+  });next.on('console',message=>{if(/hydration|hydrated|server rendered HTML|react\.dev\/errors\/\d+/i.test(message.text()))faults.push('React hydration/runtime: '+message.text());});return next};
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
-  const consent=page.locator('.privacy-consent-layer');if(await consent.isVisible()){await consent.getByRole('button',{name:text('Nur notwendige',locale),exact:true}).click();await consent.waitFor({state:'hidden'});}
+  await verifyConsentRejection(page,text,locale);
   const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
   await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
@@ -59,7 +61,8 @@ try{
     await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
    }
   }
-  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches});await context.close();
+  await verifyLanguagePreference(page,{base,locale,text});
+  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches,profilePreference:'failure, pending lock, confirmation, reload and account-menu storage verified'});await context.close();
  }
  await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill();await uiAuth.close()}

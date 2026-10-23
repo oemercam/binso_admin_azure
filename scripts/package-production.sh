@@ -9,6 +9,7 @@ cp -R .next/standalone/. deploy/app/
 rm -rf deploy/runtime
 mkdir -p deploy/runtime
 cp package.json pnpm-lock.yaml pnpm-workspace.yaml deploy/runtime/
+node scripts/package-patches.mjs deploy/runtime
 pnpm --dir deploy/runtime install --prod --frozen-lockfile --config.node-linker=hoisted
 rm -rf deploy/app/node_modules
 mv deploy/runtime/node_modules deploy/app/node_modules

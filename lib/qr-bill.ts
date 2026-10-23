@@ -7,17 +7,21 @@ export function validSwissIban(value:unknown):boolean{
  const iban=normalizeIban(value);
  return /^(CH|LI)\d{2}[A-Z0-9]{17}$/.test(iban)&&isIBANValid(iban);
 }
-export function invoicePaymentIssue(company:Record<string,unknown>):string|null{
- const account=normalizeIban(company.qr_iban||company.iban);
- if(!account)return "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen.";
- if(!validSwissIban(account))return "Bitte eine gültige Schweizer oder Liechtensteiner IBAN für die QR-Rechnung erfassen.";
- if(!String(company.legal_name||company.name||"").trim()||!company.street||!company.postal_code||!company.city)return "Bitte die vollständige Firmenadresse unter Einstellungen → Firma erfassen.";
- for(const [value,max] of [[company.legal_name||company.name,70],[company.street,70],[company.building_number,16],[company.postal_code,16],[company.city,35]] as Array<[unknown,number]>){
-  if(String(value??"").length>max)return "Bitte die Firmenadresse für den QR-Zahlteil prüfen: Ein Adressfeld ist zu lang.";
- }
- if(!/^[A-Z]{2}$/.test(String(company.country_code||"CH")))return "Bitte einen gültigen Ländercode in der Firmenadresse erfassen.";
- return null;
+export type InvoicePaymentRequirement={field:'name'|'legalName'|'street'|'postalCode'|'city'|'countryCode'|'iban'|'qrIban';message:string};
+const qrTextAllowed=/^[\u0020-\u007e\u00a0-\u017f\u0218-\u021b\u20ac]*$/u;
+/** Same canonical rules for setup/preflight, form feedback and final issuance. */
+export function invoicePaymentRequirements(company:Record<string,unknown>):InvoicePaymentRequirement[]{
+ const issues:InvoicePaymentRequirement[]=[],account=normalizeIban(company.qr_iban||company.iban),bankField=company.qr_iban?'qrIban':'iban';
+ if(!account)issues.push({field:bankField,message:"Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen."});
+ else if(!validSwissIban(account))issues.push({field:bankField,message:"Bitte eine gültige Schweizer oder Liechtensteiner IBAN für die QR-Rechnung erfassen."});
+ const name=company.legal_name||company.name,nameField=company.legal_name?'legalName':'name';
+ for(const [value,field] of [[name,nameField],[company.street,'street'],[company.postal_code,'postalCode'],[company.city,'city']] as Array<[unknown,InvoicePaymentRequirement['field']]>)if(!String(value??'').trim())issues.push({field,message:"Bitte die vollständige Firmenadresse unter Einstellungen → Firma erfassen."});
+ for(const [value,max,field] of [[name,70,nameField],[company.street,70,'street'],[company.building_number,16,'street'],[company.postal_code,16,'postalCode'],[company.city,35,'city']] as Array<[unknown,number,InvoicePaymentRequirement['field']]>)if(String(value??'').length>max)issues.push({field,message:"Bitte die Firmenadresse für den QR-Zahlteil prüfen: Ein Adressfeld ist zu lang."});
+ if(!/^[A-Z]{2}$/.test(String(company.country_code||'CH')))issues.push({field:'countryCode',message:"Bitte einen gültigen Ländercode in der Firmenadresse erfassen."});
+ for(const [value,field] of [[name,nameField],[company.street,'street'],[company.building_number,'street'],[company.postal_code,'postalCode'],[company.city,'city']] as Array<[unknown,InvoicePaymentRequirement['field']]>)if(!qrTextAllowed.test(String(value??'')))issues.push({field,message:'Die QR-Zahlungsdaten enthalten nicht unterstützte Zeichen. Bitte Adresse und Referenz prüfen.'});
+ return issues;
 }
+export function invoicePaymentIssue(company:Record<string,unknown>):string|null{return invoicePaymentRequirements(company)[0]?.message??null;}
 export function createQrBillData(company:Record<string,unknown>,document:{reference?:string;number:string;total:number;currency?:string;debtor?:Record<string,unknown>}):Data{
  const issue=invoicePaymentIssue(company);if(issue)throw new Error(issue);
  const account=qrPaymentAccount(company,document.currency);
@@ -40,7 +44,7 @@ export function createQrBillData(company:Record<string,unknown>,document:{refere
  const street=String(person?.street||person?.address||""),parts=!person?.building_number?street.match(/^(.*\S)\s+(\d+[A-Za-z]?(?:[-/]\d+[A-Za-z]?)?)$/):null;
  const debtor=person&&person.name&&(person.street||person.address)&&(person.postal_code||person.zip)&&person.city?{name:String(person.name),address:parts?.[1]||street,buildingNumber:String(person.building_number||parts?.[2]||""),zip:String(person.postal_code||person.zip),city:String(person.city),country:debtorCountry}:undefined;
  const textValues=[company.legal_name||company.name,company.street,company.building_number,company.postal_code,company.city,document.number,...Object.values(debtor??{})];
- if(textValues.some(value=>!/^[\u0020-\u007e\u00a0-\u017f\u0218-\u021b\u20ac]*$/u.test(String(value??''))))throw new Error('Die QR-Zahlungsdaten enthalten nicht unterstützte Zeichen. Bitte Adresse und Referenz prüfen.');
+ if(textValues.some(value=>!qrTextAllowed.test(String(value??''))))throw new Error('Die QR-Zahlungsdaten enthalten nicht unterstützte Zeichen. Bitte Adresse und Referenz prüfen.');
  return {debtor,creditor:{account,name:String(company.legal_name||company.name),address:String(company.street),buildingNumber:String(company.building_number||""),zip:String(company.postal_code),city:String(company.city),country:String(company.country_code||"CH")},amount:Math.round(document.total*100)/100,currency:document.currency==='EUR'?'EUR':'CHF',message:document.number,reference};
 }
 

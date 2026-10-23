@@ -1,6 +1,7 @@
 "use client";
 
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useLocale} from "@/lib/client/locale";
+import {localeTags} from '@/lib/locales/config';
 import { Children, Fragment, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import Link from "next/link";
@@ -90,7 +91,8 @@ export function MetricTiles({ children, columns=4, desktopOnly=false }: { childr
 }
 
 export function MetricTile({ label, value, hint, currency }: { label: ReactNode; value: ReactNode; hint?:string; currency?:string; compactMoney?:boolean }) {
-  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
+  const {locale}=useLocale();
+  return <Metric label={label} value={currency&&typeof value==='number'?<span className="metric-money"><span className="metric-money-currency">{currency}</span>{" "}<span>{value.toLocaleString(localeTags[locale],{minimumFractionDigits:2,maximumFractionDigits:2})}</span></span>:value} hint={hint}/>;
 }
 
 /** Open workspace sections share page spacing without adding nested card chrome. */

@@ -1,4 +1,5 @@
-import {financialModuleUrl} from "./data-test-modules.mjs";
+import {expensePaymentModuleUrl} from './data-test-modules.mjs';
+import {financialModuleUrl,documentAmountSqlModuleUrl} from "./data-test-modules.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 import ts from 'typescript';
@@ -27,6 +28,8 @@ console.log('Finance and operator permission matrix passed.');
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 let businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','');
 const businessDependencies={
+ '@/lib/expense-payment':expensePaymentModuleUrl,
+ '../document-amount-sql':documentAmountSqlModuleUrl,
  '../business-idempotency':moduleUrl('export async function idempotentBusiness(c,input,write){return write()}'),
  '../audit':moduleUrl('export async function audit(){}'),
  '../http':moduleUrl('export class ApiError extends Error {}'),
@@ -34,10 +37,11 @@ const businessDependencies={
  '@/lib/financial-status':financialModuleUrl,
  '@/lib/qr-bill':moduleUrl('export const invoicePaymentIssue=()=>null'),
 };
-for(const [specifier,url] of Object.entries(businessDependencies))businessSource=businessSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url));
+for(const [specifier,url] of Object.entries(businessDependencies))businessSource=businessSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));
 const businessUrl=moduleUrl(ts.transpileModule(businessSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText);
 const searchContractUrl=moduleUrl(ts.transpileModule(await fs.readFile('lib/search.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText);
 const dependencies={
+ '@/lib/expense-payment':expensePaymentModuleUrl,
  '@/lib/server/session':moduleUrl('export async function requireSession(){return {organizationId:"tenant",userId:"member",role:"member"}}'),
  '@/lib/permissions':permissionsUrl,
  '@/lib/server/http':moduleUrl('export const json=value=>value;export const apiError=error=>{throw error}'),
@@ -48,7 +52,7 @@ const dependencies={
  '@/lib/search':searchContractUrl,
 };
 let searchSource=await fs.readFile('app/api/search/route.ts','utf8');
-for(const [specifier,url] of Object.entries(dependencies))searchSource=searchSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url));
+for(const [specifier,url] of Object.entries(dependencies))searchSource=searchSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url)).replaceAll("'"+specifier+"'",JSON.stringify(url));
 const handler=await import(moduleUrl(ts.transpileModule(searchSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
 const results=await handler.GET({nextUrl:new URL('https://example.invalid/api/search?q=Probe')});
 assert.deepEqual(results.items.map(item=>item.href),['/spesen/own']);
@@ -61,7 +65,7 @@ for(const path of ['app/api/expenses/route.ts','app/api/expenses/[id]/route.ts']
   const databaseUrl=moduleUrl(`export async function requireTenantFeature(){return {role:globalThis.__expenseRole}} export async function tenantList(){return []} export async function tenantListPage(){return {items:[],total:0}} export async function tenantInsert(){globalThis.__expenseWrites++;return [{id:'expense'}]} export async function tenantUpdate(){globalThis.__expenseWrites++;return [{id:'expense'}]}`);
   const httpUrl=moduleUrl(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=(v)=>typeof v==='string'?v:'';export const readJson=async r=>r.body;export const json=(data,status=200)=>({data,status});export const apiError=e=>({status:e.status??500,data:{error:e.code}});`);
   let expenseSource=await fs.readFile(path,'utf8');
-  expenseSource=expenseSource.replaceAll('"@/lib/server/http"',JSON.stringify(httpUrl)).replaceAll('"@/lib/server/database"',JSON.stringify(databaseUrl));
+  expenseSource=expenseSource.replaceAll("'@/lib/expense-payment'",JSON.stringify(expensePaymentModuleUrl)).replaceAll('"@/lib/server/http"',JSON.stringify(httpUrl)).replaceAll('"@/lib/server/database"',JSON.stringify(databaseUrl));
   const expense=await import(moduleUrl(ts.transpileModule(expenseSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
   for(const status of ['approved','rejected']){
    globalThis.__expenseWrites=0;

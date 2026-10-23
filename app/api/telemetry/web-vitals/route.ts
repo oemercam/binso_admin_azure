@@ -1,15 +1,14 @@
 import { NextRequest } from "next/server";
-import { apiError, cleanText, json, readJson } from "@/lib/server/http";
+import { apiError, json, readJson } from "@/lib/server/http";
 import { enforceRateLimit } from "@/lib/server/rate-limit";
 import { query } from "@/lib/server/db";
-type Body={name?:unknown;value?:unknown;rating?:unknown;route?:unknown};
-const metrics=new Set(["CLS","FCP","INP","LCP","TTFB"]);const ratings=new Set(["good","needs-improvement","poor"]);
+import {validWebVital} from '@/lib/web-vitals';
 export async function POST(request:NextRequest){
  try{
   await enforceRateLimit(request,"web-vitals",120,60_000);
-  const body=await readJson<Body>(request,2048);const metric=cleanText(body.name,8).toUpperCase();const value=Number(body.value);const rating=cleanText(body.rating,32);const route=cleanText(body.route,160);
-  if(!metrics.has(metric)||!Number.isFinite(value)||value<0||!ratings.has(rating)||!route.startsWith("/"))return json({ok:false},400);
-  await query("insert into web_vitals(metric,value,rating,route,created_at) values($1,$2,$3,$4,now())",[metric,value,rating,route]);
+  const body=await readJson<unknown>(request,2048);
+  if(!validWebVital(body))return json({ok:false},400);
+  await query("insert into web_vitals(metric,value,rating,route,created_at) values($1,$2,$3,$4,now())",[body.name,body.value,body.rating,body.route]);
   return json({ok:true},202);
  }catch(error){return apiError(error);}
 }

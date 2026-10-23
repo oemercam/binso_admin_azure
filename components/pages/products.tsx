@@ -1,6 +1,7 @@
 "use client";
 import {domainConfig} from "@/config/domain";
-import {LocalizedText} from "@/lib/client/locale";
+import {LocalizedText,useLocale,useTranslation} from "@/lib/client/locale";
+import {localeTags} from "@/lib/locales/config";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {useProcessDraft} from "../use-process-draft";
@@ -29,6 +30,7 @@ export function ProductsPage() {
 }
 
 export function ProductForm({ existing = false, productId }: { existing?: boolean; productId?: string }) {
+  const {locale}=useLocale(),translateUnit=useTranslation();
   const router=useRouter(),params=useSearchParams();
   const returnTo=existing?"/produkte":safeAppPath(params.get("returnTo"),"/produkte");
 
@@ -107,8 +109,8 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
         {!editingRecord?<dl className="detail-list">
-          <div><dt><LocalizedText>{"Verkaufspreis"}</LocalizedText></dt><dd>{withPriceUnit(formatCurrency(price,"CHF"),unit)}</dd></div>
-          <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%")}</dd></div>
+          <div><dt><LocalizedText>{"Verkaufspreis"}</LocalizedText></dt><dd>{withPriceUnit(formatCurrency(price,"CHF",localeTags[locale]),unit,translateUnit)}</dd></div>
+          <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%",localeTags[locale])}</dd></div>
           {sku&&<div><dt><LocalizedText>{"Artikelnummer"}</LocalizedText></dt><dd>{sku}</dd></div>}
           {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText>{description}</LocalizedText></dd></div>}
         </dl>:<FormSheet workspace label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two"><Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder={type==="Produkt"?"z. B. Bürostuhl":"z. B. IT-Beratung"}/></Field>

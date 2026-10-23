@@ -5,6 +5,7 @@ import { authorize } from '@/lib/server/rbac';
 import {tenantListPage} from '@/lib/server/database';
 import {idempotentBusiness} from '@/lib/server/business-idempotency';
 import { withTenant } from '@/lib/server/db';
+import {audit} from '@/lib/server/audit';
 import { ApiError,apiError,assertSameOrigin,cleanText,json,readJson } from '@/lib/server/http';
 export async function GET(request:NextRequest){
  try{return json(await tenantListPage('support_tickets',request.nextUrl.searchParams,'updated_at.desc',request.nextUrl.searchParams.get('id')?{id:request.nextUrl.searchParams.get('id')!}:{}))}catch(e){return apiError(e)}
@@ -21,7 +22,8 @@ export async function POST(request:NextRequest){
   const key=request.headers.get('idempotency-key')?.trim()??'';
   const item=await withTenant(s.organizationId,s.userId,async c=>{const write=async()=>{
    const id=randomUUID();const number=await c.query<{case_number:string}>("select 'SUP-' || extract(year from now() at time zone 'Europe/Zurich')::text || '-' || case when n<10000 then lpad(n::text,4,'0') else n::text end as case_number from (select nextval('support_case_number_seq') as n) numbering");const r=await c.query("insert into support_cases(id,organization_id,case_number,created_by_user_id,category,subject,status,description,priority,browser,build_version) values($1,$2,$3,$4,$5,$6,'open',$7,$8,$9,$10) returning id,case_number,subject,status",[id,s.organizationId,number.rows[0].case_number,s.userId,category,subject,message,priority,request.headers.get("user-agent")?.slice(0,500)??null,process.env.BINSO_BUILD_SHA??null]);
-   await c.query("insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)",[id,s.userId,message]);return r.rows[0];
+   await c.query("insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3)",[id,s.userId,message]);
+   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'support.created',entityType:'support_case',entityId:id,metadata:{category,priority}});return r.rows[0];
   };return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.create',key,body:{subject,message,category,priority}},write):write();});return json({item},201);
  }catch(e){return apiError(e)}
 }

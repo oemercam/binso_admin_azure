@@ -1,0 +1,70 @@
+import {writeTestOutput} from './test-output.mjs';
+import assert from 'node:assert/strict';
+import {randomUUID,createHash} from 'node:crypto';
+import fs from 'node:fs';
+import {NextRequest} from 'next/server.js';
+export async function verifyMinuteAllocations({load,db,transaction,org,other,act,request,setAuditFailure,fixture:f}){
+ const {calculateDocument}=load('lib/money.ts');
+ const line=(minutes,price='130.00',extra={})=>({quantity:minutes,unit_price:price,vat_rate:'8.10',price_base_quantity:60,...extra});
+ for(const [minutes,expected] of [[1,['2.17','0.18','2.35']],[61,['132.17','10.71','142.88']],[120,['260.00','21.06','281.06']]]){const n=calculateDocument([line(minutes)],'CHF');assert.deepEqual([n.subtotal,n.vat,n.total],expected);}
+ assert.equal(calculateDocument(Array.from({length:60},()=>line(1,'0.01')),'CHF').subtotal,'0.01','No rounding each minute before summing');
+ const discounted=calculateDocument([line(61,'130.00',{discount:{kind:'percent',value:10}})],'CHF',{kind:'percent',value:5});assert.equal(discounted.total,'122.15');
+ assert.equal(calculateDocument([line(61,'130.00',{tax_exempt:true,vat_rate:0})],'EUR').total,'132.17');
+ for(const basis of [0,2,60.5,'60',false])assert.throws(()=>calculateDocument([line(1,'130.00',{price_base_quantity:basis})],'CHF'),RangeError);
+ const ordinary={quantity:2,unit_price:50,vat_rate:8.1};assert.deepEqual(calculateDocument([ordinary],'CHF'),calculateDocument([{...ordinary,price_base_quantity:1}],'CHF'),'Legacy calculation shape and results unchanged');
+ const sessions=(await db.query('select id,user_id,organization_id from auth_sessions')).rows;
+ const as=(role,organizationId=org,extra={})=>{const userId='employee-dossier-'+(organizationId===other?'foreign':role);return act(role,organizationId,{userId,name:'Synthetic minute actor',sessionId:sessions.find(s=>s.user_id===userId&&s.organization_id===organizationId)?.id,...extra});};
+ const route=load('app/api/documents/route.ts'),detail=load('app/api/documents/[number]/route.ts'),billing=load('app/api/time-entries/billing/route.ts');
+ const body=(minutes,extra={})=>({kind:'invoice',customerId:f.customer,issueDate:'2026-10-22',dueDate:'2026-11-22',vatRate:8.1,currency:'CHF',calculationRevision:1,items:[{description:'Synthetic minute service',unit:'min',quantity:minutes,unitPrice:130,vatRate:8.1,priceBaseQuantity:60,timeAllocations:[{timeEntryId:f.entryId,minutes,priceSourceId:f.saleSource.id}]}],...extra});
+ const create=(b,key=randomUUID())=>route.POST(request(b,key));
+ const read=number=>detail.GET(new NextRequest('https://employee.invalid/api/documents/'+number),{params:Promise.resolve({number})});
+ const update=(item,b,key=randomUUID())=>detail.PATCH(request({...b,number:item.number,expectedUpdatedAt:item.document_revision},key,'PATCH'),{params:Promise.resolve({number:item.number})});
+ const discard=(item,key=randomUUID())=>detail.DELETE(request({expectedUpdatedAt:item.document_revision},key,'DELETE'),{params:Promise.resolve({number:item.number})});
+ const pick=()=>billing.GET(new NextRequest('https://employee.invalid/api/time-entries/billing?minuteAllocations=1&ids='+f.entryId));
+ const reserved=async()=>Number((await db.query('select coalesce(sum(allocated_minutes),0)::int n from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2',[org,f.entryId])).rows[0].n);
+ as('owner');let response=await pick();assert.equal(response.status,200);assert.equal((await response.json()).items[0].remaining_minutes,120);
+ const preview=load('app/api/documents/preview/route.ts');
+ const previewBody={kind:'Rechnung',date:'2026-10-22',due:'30',customerId:f.customer,currency:'CHF',output:'calculation',positions:[{description:'Synthetic minute service',unit:'min',quantity:'61',price:'130.00',vatRate:'8.1',priceBaseQuantity:60,timeAllocations:[{timeEntryId:f.entryId,minutes:61,priceSourceId:f.saleSource.id}]}]};
+ response=await preview.POST(request(previewBody));assert.equal(response.status,200,await response.clone().text());assert.equal((await response.json()).calculation.total,'142.88');assert.equal(await reserved(),0,'Preview never reserves or issues');
+ const key=randomUUID(),firstBody=body(61);response=await create(firstBody,key);assert.equal(response.status,201,await response.clone().text());let a=(await response.json()).item;assert.equal(a.status,'draft');assert.equal(Number(a.subtotal),132.17);assert.equal(Number(a.vat_amount),10.71);assert.equal(Number(a.total),142.88);assert.equal(a.items[0].price_base_quantity,60);assert.deepEqual(a.items[0].time_entry_ids,[]);assert.equal(a.items[0].time_allocations[0].minutes,61);assert.equal(a.calculation.lines[0].base.denominator,'6');
+ assert.equal((await (await create(firstBody,key)).json()).item.id,a.id);assert.equal(await reserved(),61);assert.equal((await (await pick()).json()).items[0].remaining_minutes,59);
+ assert.equal((await create(body(60))).status,409,'Another invoice cannot reserve more than remaining minutes');assert.equal(await reserved(),61);
+ for(const change of [{quantity:62},{unitPrice:131},{priceBaseQuantity:1},{vatRate:2.6},{timeAllocations:[{timeEntryId:f.entryId,minutes:1.5,priceSourceId:f.saleSource.id}]},{timeAllocations:[{timeEntryId:f.entryId,minutes:1,priceSourceId:randomUUID()}]}]){const bad=body(61);Object.assign(bad.items[0],change);assert.ok([400,409].includes((await create(bad)).status));assert.equal(await reserved(),61);}
+ assert.equal((await create(body(1,{currency:'EUR'}))).status,409,'No silent currency conversion');
+ const duplicate=body(1);duplicate.items.push({...duplicate.items[0]});assert.equal((await create(duplicate)).status,409,'Same source twice in one invoice is rejected');
+ response=await create(body(59));assert.equal(response.status,201,await response.clone().text());const b=(await response.json()).item;assert.equal(await reserved(),120);assert.deepEqual((await (await pick()).json()).items,[]);
+ const editable=await billing.GET(new NextRequest('https://employee.invalid/api/time-entries/billing?'+new URLSearchParams({minuteAllocations:'1',ids:f.entryId,draft:a.number})));assert.equal((await editable.json()).items[0].remaining_minutes,61,'Editing counts its own draft reservation, without releasing other drafts');
+ response=await update(a,body(30));assert.equal(response.status,200,await response.clone().text());a=(await response.json()).item;assert.equal(await reserved(),89);assert.equal(Number(a.total),70.27);
+ const auditKey=randomUUID();setAuditFailure(true);assert.equal((await update(a,body(61),auditKey)).status,500);setAuditFailure(false);assert.equal(await reserved(),89,'Failed replacement restores old minute reservations');response=await update(a,body(61),auditKey);assert.equal(response.status,200,await response.clone().text());a=(await response.json()).item;assert.equal(await reserved(),120);
+ const discardKey=randomUUID();assert.equal((await discard(a,discardKey)).status,200);assert.equal((await discard(a,discardKey)).status,200);assert.equal(await reserved(),59);assert.equal((await read(a.number)).status,404);assert.ok((await db.query('select archived_at from invoices where id=$1',[a.id])).rows[0].archived_at,'Discard keeps a controlled archive rather than erasing proof');
+ response=await create(body(61));assert.equal(response.status,201,await response.clone().text());const c=(await response.json()).item;assert.equal(await reserved(),120);
+ await db.query("update organizations set name='Synthetic minute issuer',legal_name='',street='Hauptstrasse',postal_code='3000',city='Bern',country_code='CH',iban='CH9300762011623852957',qr_iban='' where id=$1",[org]);
+ await db.query("update customers set address='Teststrasse 1',zip='3000',city='Bern',country='CH' where organization_id=$1 and id=$2",[org,f.customer]);
+ const status=load('app/api/documents/[number]/status/route.ts'),transition=(number,action)=>status.POST(request({action}),{params:Promise.resolve({number})});
+ response=await transition(c.number,'issue');assert.equal(response.status,200,await response.clone().text());assert.equal(await reserved(),120,'Issue does not double-reserve');
+ const issuedCapacity=await billing.GET(new NextRequest('https://employee.invalid/api/time-entries/billing?'+new URLSearchParams({minuteAllocations:'1',ids:f.entryId,draft:c.number})));assert.deepEqual((await issuedCapacity.json()).items,[],'Issued invoice numbers never credit back reserved minutes');
+ const frozen=(await db.query('select pdf,pdf_sha256 from invoice_versions where organization_id=$1 and invoice_id=$2',[org,c.id])).rows[0];assert.ok(frozen.pdf.length>1000);assert.equal(createHash('sha256').update(frozen.pdf).digest('hex'),frozen.pdf_sha256);fs.mkdirSync('../evidence',{recursive:true});await writeTestOutput('../evidence/v26-minute-issued.pdf',Buffer.from(frozen.pdf));
+ assert.equal((await update({...c,document_revision:(await (await read(c.number)).json()).item.document_revision},body(1))).status,409);
+ assert.equal((await discard({...c,document_revision:(await (await read(c.number)).json()).item.document_revision})).status,409);
+ const allocation=(await db.query('select invoice_line_id from invoice_line_time_entries where organization_id=$1 and time_entry_id=$2 and allocated_minutes=61',[org,f.entryId])).rows[0];
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>x.query('delete from invoice_line_time_entries where organization_id=$1 and invoice_line_id=$2',[org,allocation.invoice_line_id])),e=>e.code==='42501','Issued allocation cannot be released by direct SQL');
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>x.query('update invoice_line_time_entries set allocated_minutes=1 where organization_id=$1 and invoice_line_id=$2',[org,allocation.invoice_line_id])),e=>e.code==='42501');
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>x.query('update invoice_lines set unit_price=1 where organization_id=$1 and id=$2',[org,allocation.invoice_line_id])),e=>e.code==='42501');
+ response=await transition(c.number,'cancel');assert.equal(response.status,200,await response.clone().text());assert.equal(await reserved(),120,'Cancellation retains quantity until a separately reviewed correction');assert.equal((await create(body(1))).status,409);
+ assert.equal(createHash('sha256').update((await db.query('select pdf from invoice_versions where organization_id=$1 and invoice_id=$2',[org,c.id])).rows[0].pdf).digest('hex'),frozen.pdf_sha256,'Issued PDF bytes remain unchanged after cancellation');
+ // An audit outage on discard must restore both the draft and every reservation.
+ const currentB=(await (await read(b.number)).json()).item;setAuditFailure(true);assert.equal((await discard(currentB)).status,500);setAuditFailure(false);assert.equal(await reserved(),120);assert.equal((await read(b.number)).status,200);
+ for(const role of ['project_manager','manager','reader','member','hr']){as(role);assert.equal((await create(body(1))).status,403);assert.equal((await discard(currentB)).status,403);}
+ as('owner',other);const foreignCustomer=(await db.query('select id from customers where organization_id=$1 order by id limit 1',[other])).rows[0].id;assert.equal((await create(body(1,{customerId:foreignCustomer}))).status,409,'A visible own customer cannot authorize a foreign time source');assert.equal((await discard(currentB)).status,404);
+ as('owner',org,{organizationStatus:'read_only'});assert.equal((await discard(currentB)).status,403);
+ as('finance');assert.equal((await discard(currentB)).status,200);assert.equal(await reserved(),61);response=await create(body(59));assert.equal(response.status,201,await response.clone().text());const financeDraft=(await response.json()).item;assert.equal(financeDraft.status,'draft');assert.equal(await reserved(),120,'Finance can reserve a valid remainder without payroll rights');
+ as('owner');
+ const insertExtra=async(x,price=130)=>{const added=(await x.query("insert into invoice_lines(organization_id,external_id,invoice_id,sort_order,description,quantity,unit,unit_price,vat_rate,price_base_quantity) values($1,$2,$3,2,'Synthetic raw minute guard',1,'min',$4,8.1,60) returning id",[org,randomUUID(),financeDraft.id,price])).rows[0];return x.query('insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id,allocated_minutes,price_source_id) values($1,$2,$3,1,$4)',[org,added.id,f.entryId,f.saleSource.id]);};
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>insertExtra(x)),e=>e.code==='23514'&&e.constraint==='time_minutes_available','Database enforces capacity independently of API checks');
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>insertExtra(x,131)),e=>e.code==='23514','Database compares the confirmed price independently');
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>insertExtra(x),{isolation:'repeatable read'}),e=>e.code==='40001','Unsupported write snapshots fail closed instead of permitting stale capacity reads');
+ const financeLine=(await db.query('select id from invoice_lines where organization_id=$1 and invoice_id=$2',[org,financeDraft.id])).rows[0].id;
+ await assert.rejects(()=>transaction(org,'employee-dossier-owner',x=>x.query('update invoice_lines set quantity=58 where organization_id=$1 and id=$2',[org,financeLine])),e=>e.code==='23514','Deferred constraint prevents mismatched quantity after link creation');
+ assert.equal(await reserved(),120);
+ console.log('Minute allocations: actual APIs/runtime RLS, exact 1/61/120-minute and discount math, draft/partial/replay/reservation/overflow/replacement/audit rollback, controlled discard/release, real issuance and immutable PDF, cancelled/issued retention, direct SQL history protection and role/tenant boundaries passed. Native overlapping-transaction execution and rendered device acceptance remain open.');
+}

@@ -6,13 +6,13 @@ import type {PoolClient} from 'pg';
 import {withPlatform,withTenant} from './db';
 import {env} from './env';
 import {ApiError} from './http';
-import {verifyPassword} from './password';
 import {verifyTotp} from './totp';
 import {decryptSecret,encryptSecret} from './crypto';
 import {audit} from './audit';
 import {mailLayout,sendMail} from './email';
 import {createSession,endDemoSession,type SessionUser} from './session';
 import {registrationHandoff} from './registration';
+import {requireFreshAuthentication} from './fresh-authentication';
 
 const cookieName='binso_passkey';
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex');
@@ -29,11 +29,10 @@ export function passkeyRelyingParty(){
  if(url.protocol!=='https:'&&!(env.appMode!=='production'&&url.protocol==='http:'&&url.hostname==='localhost'))throw new ApiError(503,'passkey_unavailable','Passkeys benötigen eine sichere konfigurierte Herkunft.');
  return {origin:url.origin,rpID:url.hostname};
 }
-async function freshFactor(c:PoolClient,s:SessionUser,password:unknown,code:unknown){
+async function freshFactor(c:PoolClient,s:SessionUser){
  const user=(await c.query<AuthRow>(`select u.* from app_users u join auth_sessions a on a.user_id=u.id
-  where u.id=$1 and u.status='active' and a.id=$2 and a.organization_id=$3 and a.expires_at>now() for update of u,a`,[s.userId,s.sessionId,s.organizationId])).rows[0];
- if(!user||!user.email_verified_at||!user.mfa_enabled||!user.mfa_secret_enc)throw new ApiError(403,'strong_factor_required','Bitte zuerst den Authenticator einrichten.');
- if(!user.password_hash||typeof password!=='string'||password.length>512||!await verifyPassword(password,user.password_hash)||typeof code!=='string'||!/^\d{6}$/.test(code)||!verifyTotp(decryptSecret(user.mfa_secret_enc),code))throw new ApiError(403,'reauth_required','Aktuelles Passwort und Authenticator-Code sind erforderlich.');
+  where u.id=$1 and u.status='active' and a.id=$2 and a.organization_id=$3 and a.expires_at>now() and a.step_up_at>now()-interval '5 minutes' and a.step_up_at<=now() for update of u,a`,[s.userId,s.sessionId,s.organizationId])).rows[0];
+ if(!user||!user.email_verified_at)throw new ApiError(403,'fresh_authentication_required','Bitte bestätige diese sicherheitsrelevante Aktion erneut.');
  return user;
 }
 async function challengeCookie(token:string){(await cookies()).set(cookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/api/auth/passkeys',maxAge:300});}
@@ -61,11 +60,11 @@ async function deliverNotice(s:SessionUser,event:string){
  return status;
 }
 export async function listPasskeys(s:SessionUser){return withTenant(s.organizationId,s.userId,async c=>(await c.query('select credential_id as id,label,created_at,last_used_at from auth_passkeys where user_id=$1 and organization_id=$2 and revoked_at is null order by created_at',[s.userId,s.organizationId])).rows);}
-export async function beginPasskeyRegistration(s:SessionUser,password:unknown,code:unknown,label:unknown){
+export async function beginPasskeyRegistration(s:SessionUser,_password:unknown,_code:unknown,label:unknown){
  if(s.isDemo)throw new ApiError(403,'demo_security_unavailable','Passkeys sind im Testzugang deaktiviert.');
  const {rpID}=passkeyRelyingParty();
  const prepared=await withTenant(s.organizationId,s.userId,async c=>{
-  const user=await freshFactor(c,s,password,code),keys=(await c.query('select credential_id from auth_passkeys where user_id=$1 and revoked_at is null',[s.userId])).rows;
+  const user=await freshFactor(c,s),keys=(await c.query('select credential_id from auth_passkeys where user_id=$1 and revoked_at is null',[s.userId])).rows;
   const options=await generateRegistrationOptions({rpName:'Binso One',rpID,userName:user.email,userID:new Uint8Array(createHash('sha256').update(user.id).digest()),attestationType:'none',authenticatorSelection:{residentKey:'required',userVerification:'required'},excludeCredentials:keys.map(k=>({id:k.credential_id})),supportedAlgorithmIDs:[-7,-257]});
   const token=randomBytes(32).toString('base64url'),name=typeof label==='string'?label.trim().slice(0,100):'';
   await c.query('delete from auth_passkey_challenges where user_id=$1 and purpose=$2',[s.userId,'register']);
@@ -74,6 +73,7 @@ export async function beginPasskeyRegistration(s:SessionUser,password:unknown,co
  });await challengeCookie(prepared.token);return prepared.options;
 }
 export async function finishPasskeyRegistration(s:SessionUser,response:RegistrationResponseJSON){
+ await requireFreshAuthentication(s);
  const challenge=await takeChallenge('register',s),{origin,rpID}=passkeyRelyingParty();
  const checked=await verifyRegistrationResponse({response,expectedChallenge:challenge.challenge,expectedOrigin:origin,expectedRPID:rpID,requireUserVerification:true,supportedAlgorithmIDs:[-7,-257]}).catch(()=>{throw new ApiError(400,'passkey_invalid','Der Passkey konnte nicht bestätigt werden.');});
  if(!checked.verified)throw new ApiError(400,'passkey_invalid','Der Passkey konnte nicht bestätigt werden.');
@@ -82,17 +82,19 @@ export async function finishPasskeyRegistration(s:SessionUser,response:Registrat
   if(!user||!snapshotMatches(user,challenge.auth_snapshot))throw new ApiError(403,'auth_state_changed','Bitte die Sicherheitsprüfung erneut durchführen.');
   const {credential,credentialDeviceType,credentialBackedUp}=checked.registrationInfo;
   await c.query('insert into auth_passkeys(credential_id,user_id,organization_id,public_key,counter,label,transports,device_type,backed_up) values($1,$2,$3,$4,$5,$6,$7,$8,$9)',[credential.id,s.userId,s.organizationId,Buffer.from(credential.publicKey),credential.counter,challenge.label,credential.transports??[],credentialDeviceType,credentialBackedUp]);
+  await c.query('update auth_sessions set step_up_at=null where id=$1',[s.sessionId]);
   return recordNotice(c,s,'added');
  });return {ok:true,notice:await deliverNotice(s,event)};
 }
-export async function removePasskey(s:SessionUser,id:unknown,password:unknown,code:unknown){
+export async function removePasskey(s:SessionUser,id:unknown,_password:unknown,_code:unknown){
  if(s.isDemo)throw new ApiError(403,'demo_security_unavailable','Passkeys sind im Testzugang deaktiviert.');
  if(typeof id!=='string'||id.length>2048)throw new ApiError(400,'passkey_invalid','Ungültiger Passkey.');
  const event=await withTenant(s.organizationId,s.userId,async c=>{
-  await freshFactor(c,s,password,code);
+  await freshFactor(c,s);
   const changed=await c.query('update auth_passkeys set revoked_at=now() where credential_id=$1 and user_id=$2 and organization_id=$3 and revoked_at is null returning credential_id',[id,s.userId,s.organizationId]);
   if(!changed.rowCount)throw new ApiError(404,'passkey_missing','Passkey nicht gefunden.');
   await c.query('delete from auth_sessions where user_id=$1 and id<>$2',[s.userId,s.sessionId]);
+  await c.query('update auth_sessions set step_up_at=null where id=$1',[s.sessionId]);
   await c.query('delete from auth_passkey_challenges where user_id=$1',[s.userId]);
   return recordNotice(c,s,'removed');
  });return {ok:true,notice:await deliverNotice(s,event)};

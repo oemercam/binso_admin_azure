@@ -4,6 +4,8 @@ import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {moduleUrl} from './data-test-modules.mjs';
 const permissions=moduleUrl(await fs.readFile('lib/permissions.ts','utf8'));
+const {notificationGroups}=await import(moduleUrl(await fs.readFile('lib/notification-groups.ts','utf8')));
+assert.deepEqual(notificationGroups([{created_at:'2026-03-29T22:15:00Z'},{created_at:'2026-03-29T12:00:00Z'}],new Date('2026-03-29T22:30:00Z')).map(group=>group.label),['Heute','Gestern'],'Swiss calendar groups remain correct across the 23-hour DST day');
 const repo=await import(moduleUrl((await fs.readFile('lib/server/repositories/notifications.ts','utf8')).replace("import 'server-only';",'').replace("'@/lib/permissions'",JSON.stringify(permissions))));
 const db=new PGlite({extensions:{pgcrypto}});
 const org='00000000-0000-4000-8000-000000000071',other='00000000-0000-4000-8000-000000000072';
@@ -36,5 +38,7 @@ try{
  await assert.rejects(()=>asUser('receipt-a',c=>c.query('insert into notification_reads values($1,$2,$3,now())',[org,personal,'receipt-b'])),e=>e.code==='42501','RLS prevents writing another user receipt');
  await assert.rejects(()=>asUser('receipt-b',c=>c.query('insert into notification_reads values($1,$2,$3,now())',[org,personal,'receipt-b'])),e=>e.code==='42501','RLS prevents receipts for another user personal notification');
  assert.equal((await asUser('receipt-b',(c,s)=>repo.notificationList(c,s),'time_only')).length,0,'Time-only does not expose shared notifications');
+ await db.query("insert into in_app_notifications(organization_id,kind,title,body,href) values($1,'system','Private finance','Synthetic','/finanzen/analyse')",[org]);
+ assert.equal((await list('receipt-a')).some(item=>item.href==='/finanzen/analyse'),false,'A general member cannot receive finance notification content even before rendering');
  console.log('Notification receipts: migrated schema, real restricted RLS, two-user shared/read-all isolation, personal legacy reads, replay and cross-user/tenant denial passed.');
 }finally{await db.close();}

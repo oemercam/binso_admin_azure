@@ -340,7 +340,7 @@ jobs:
           SIDECAR="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
           if [ "$SIDECAR" = true ]; then echo '::error::The approved development scope does not authorize a permanent scanner sidecar.'; exit 1; fi
           SETTINGS_FILE="$(mktemp)"
-          BINSO_RUNTIME_URL="$RUNTIME_URL" BINSO_SETTINGS_FILE="$SETTINGS_FILE" node --input-type=module -e 'import fs from "node:fs";import {readScope} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync(process.env.BINSO_SETTINGS_FILE,JSON.stringify({DATABASE_URL:process.env.BINSO_RUNTIME_URL,BINSO_RELEASE_PROFILE:scope.id,BINSO_FILE_ACCESS_MODE:scope.fileAccessMode,BINSO_SCANNER_SIDECAR:"false",FILE_SCAN_SOCKET:""}),{mode:0o600});'
+          BINSO_RUNTIME_URL="$RUNTIME_URL" BINSO_SETTINGS_FILE="$SETTINGS_FILE" node --input-type=module -e 'import fs from "node:fs";import {readScope} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync(process.env.BINSO_SETTINGS_FILE,JSON.stringify({DATABASE_URL:process.env.BINSO_RUNTIME_URL,BINSO_RELEASE_PROFILE:scope.id,BINSO_FILE_ACCESS_MODE:"clean-only",BINSO_SCANNER_SIDECAR:"false",FILE_SCAN_SOCKET:""}),{mode:0o600});'
           echo "BINSO_DEV_SETTINGS_FILE=$SETTINGS_FILE" >> "$GITHUB_ENV"
           unset RUNTIME_URL
 
@@ -367,7 +367,7 @@ jobs:
           test -s "$BINSO_DEV_SETTINGS_FILE"
           trap 'rm -f "$BINSO_DEV_SETTINGS_FILE"' EXIT
           az webapp config appsettings set -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --settings "@$BINSO_DEV_SETTINGS_FILE" --output none
-          echo 'Verified binso_runtime connection and explicit development file access configured; no scan verdict changed.'
+          echo 'Verified binso_runtime connection and clean-only file access configured; no scan verdict changed.'
 
       - name: Wait for deployed worker
         shell: bash

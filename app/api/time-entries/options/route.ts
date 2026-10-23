@@ -3,10 +3,12 @@ import {requireSession} from '@/lib/server/session';
 import {authorize} from '@/lib/server/rbac';
 import {withTenant} from '@/lib/server/db';
 import {ApiError,apiError,json} from '@/lib/server/http';
+import {externalTimeOptions} from '@/lib/server/repositories/external-time';
 /** Assignment-bounded picker; never exposes customer dossiers, prices or totals. */
 export async function GET(request:NextRequest){try{
  const s=await requireSession();authorize(s,'time:read');
  const p=request.nextUrl.searchParams,kind=p.get('kind'),q=(p.get('q')??'').trim(),id=(p.get('id')??'').replace(/^eq\./,''),customer=(p.get('customer_id')??p.get('customerId')??'').replace(/^eq\./,'');
+ if(kind==='external')return json(await withTenant(s.organizationId,s.userId,c=>externalTimeOptions(c,s,p),{snapshot:true}));
  const limit=Number(p.get('limit')??50),offset=Number(p.get('offset')??0);
  if(!['customers','projects'].includes(kind??'')||q.length>200||!Number.isInteger(limit)||limit<1||limit>50||!Number.isInteger(offset)||offset<0||offset>100000)throw new ApiError(400,'picker_invalid','Ungültige Auswahl.');
  return json(await withTenant(s.organizationId,s.userId,async c=>{

@@ -116,7 +116,6 @@
 .optional-details>div{padding-bottom:var(--field-group-gap)}
 .line-head{color:var(--color-muted);font-size:var(--type-metadata)}
 .line-head span:nth-child(n+2){text-align:right}
-.line-remove{width:32px;height:32px;display:grid;place-items:center;border:0;background:transparent}
 .optional-row{padding-top:10px;border-top:1px solid var(--color-line)}
 .time-layout{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:32px;container-type:inline-size}
 .time-section{min-width:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}

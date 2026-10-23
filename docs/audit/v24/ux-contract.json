@@ -139,20 +139,20 @@
       "scope": ".button",
       "requirement": "font-size: var(--button-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--button-font-size) und deren Root-Definition var(--type-control); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--button-font-size) und deren Root-Definition 15px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
-      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+      "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert var(--type-control). Visuelle Abnahme bleibt offen."
     },
     {
       "id": "UX24-STYLE-004",
       "scope": ".button",
       "requirement": "font-weight: var(--button-font-weight); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-weight: var(--button-font-weight) und deren Root-Definition 400; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-weight: var(--button-font-weight) und deren Root-Definition 600; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
-      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+      "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert 400. Visuelle Abnahme bleibt offen."
     },
     {
       "id": "UX24-STYLE-005",
@@ -209,10 +209,10 @@
       "scope": ".page-head h1",
       "requirement": "line-height: var(--page-heading-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--page-heading-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--page-heading-line-height) und deren Root-Definition 1.3; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
-      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+      "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert 1.5. Visuelle Abnahme bleibt offen."
     },
     {
       "id": "UX24-STYLE-011",
@@ -239,10 +239,10 @@
       "scope": ".page-head p",
       "requirement": "line-height: var(--body-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--body-line-height) und deren Root-Definition 1.45; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--body-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
-      "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
+      "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert 1.45. Visuelle Abnahme bleibt offen."
     },
     {
       "id": "UX24-STYLE-014",
@@ -359,7 +359,7 @@
       "context": "",
       "property": "font-size",
       "token": "--button-font-size",
-      "value": "var(--type-control)"
+      "value": "15px"
     },
     {
       "id": "UX24-STYLE-004",
@@ -368,7 +368,7 @@
       "context": "",
       "property": "font-weight",
       "token": "--button-font-weight",
-      "value": "400"
+      "value": "600"
     },
     {
       "id": "UX24-STYLE-005",
@@ -422,7 +422,7 @@
       "context": "",
       "property": "line-height",
       "token": "--page-heading-line-height",
-      "value": "1.5"
+      "value": "1.3"
     },
     {
       "id": "UX24-STYLE-011",
@@ -449,7 +449,7 @@
       "context": "",
       "property": "line-height",
       "token": "--body-line-height",
-      "value": "1.45"
+      "value": "1.5"
     },
     {
       "id": "UX24-STYLE-014",

@@ -15,6 +15,15 @@ const require=createRequire(import.meta.url);
 const qrSource=(await fs.readFile('lib/qr-bill.ts','utf8')).replace('"swissqrbill/utils"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/utils')).href));
 const qrCompiled=ts.transpileModule(qrSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
 const qr=await import('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'));
+const completeIssuer={name:'Issuer AG',street:'Hauptstrasse',postal_code:'3000',city:'Bern',iban:'CH9300762011623852957'};
+assert.deepEqual(qr.invoicePaymentRequirements(completeIssuer),[]);
+for(const [key,field] of [['name','name'],['street','street'],['postal_code','postalCode'],['city','city']])assert.ok(qr.invoicePaymentRequirements({...completeIssuer,[key]:'   '}).some(issue=>issue.field===field),'Whitespace is not a completed required field: '+field);
+assert.ok(qr.invoicePaymentRequirements({...completeIssuer,legal_name:'X'.repeat(71)}).some(issue=>issue.field==='legalName'));
+assert.ok(qr.invoicePaymentRequirements({...completeIssuer,country_code:'CHE'}).some(issue=>issue.field==='countryCode'));
+assert.ok(qr.invoicePaymentRequirements({...completeIssuer,iban:'invalid'}).some(issue=>issue.field==='iban'));
+assert.ok(qr.invoicePaymentRequirements({...completeIssuer,city:'😀'}).some(issue=>issue.field==='city'));
+assert.throws(()=>qr.createQrBillData({...completeIssuer,city:'😀'},{number:'R1',total:1}),/nicht unterstützte/,'Preflight and actual QR reject the same unsupported text');
+assert.equal(qr.createQrBillData(completeIssuer,{number:'R1',total:1}).amount,1,'A legitimate QR still renders');
 const source=await fs.readFile('components/documents.tsx','utf8');
 const ast=ts.createSourceFile('documents.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
 const draft={number:'RE-2026-019',customer:'Acme AG',date:'2026-10-01',due:'30',vatRate:'8.1',currency:'CHF',note:'',status:'sent',positions:[{id:'one',description:'IT-Beratung',quantity:'2',price:'100',unit:'Stunde',vatRate:'8.1'}]};
@@ -26,8 +35,12 @@ assert.ok(!/export function (InvoicePreview|OfferPreview)/.test(source),'Unused 
 const pdfFinancial=financialModuleUrl;
 const pdfModuleSource=(await fs.readFile('lib/server/document-pdf.ts','utf8')).replace('import "server-only";','').replace('"@/lib/locales"',JSON.stringify(await localeTestModuleUrl())).replace('"@/lib/qr-bill"',JSON.stringify('data:text/javascript;base64,'+Buffer.from(qrCompiled).toString('base64'))).replace('"@/lib/financial-status"',JSON.stringify(pdfFinancial)).replace('"pdfkit"',JSON.stringify(pathToFileURL(require.resolve('pdfkit')).href)).replace('"swissqrbill/pdf"',JSON.stringify(pathToFileURL(require.resolve('swissqrbill/pdf')).href));
 const pdfModuleJs=ts.transpileModule(pdfModuleSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
-const {documentPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
+const {documentPdf,reportPdf}=await import('data:text/javascript;base64,'+Buffer.from(pdfModuleJs).toString('base64'));
 const {getDocument}=await import('pdfjs-dist/legacy/build/pdf.mjs');
+const longReport=await getDocument({data:new Uint8Array(await reportPdf([['Datum · Kunde · Auftrag','Mitarbeiter · Tätigkeit','Dauer'],['2026-10-01\nSynthetic company','A'.repeat(1900)+' END_REPORT_MARKER','198:00']],{title:'Time report',company:'Synthetic fixture',locale:'en',variant:'time'})),isEvalSupported:false}).promise;
+assert.ok(longReport.numPages>1,'Long activities must continue across report pages');
+let reportText='';for(let n=1;n<=longReport.numPages;n++){const page=await longReport.getPage(n),text=await page.getTextContent();for(const item of text.items){if('str' in item){reportText+=item.str;assert.ok(item.transform[5]>=20&&item.transform[5]<=page.view[3]-20,'Report content stays inside the page');}}}
+assert.ok(reportText.includes('END_REPORT_MARKER'),'Final activity text must not be clipped at a page boundary');assert.ok(reportText.includes('198:00'),'Monthly hours remain visible');await longReport.destroy();
 // Execute the tenant-scoped asset resolver with the real image converter.
 globalThis.__logoPolicy={};
 const policySource=(await fs.readFile('lib/server/file-access.ts','utf8')).replace('import "server-only";','').replace('"./env"',JSON.stringify('data:text/javascript,export const env={get releaseProfile(){return globalThis.__logoPolicy.releaseProfile},get fileAccessMode(){return globalThis.__logoPolicy.fileAccessMode},get fileScanSocket(){return globalThis.__logoPolicy.fileScanSocket}}'));
@@ -48,7 +61,7 @@ const logo=await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'/api/file
 assert.equal(logo.subarray(1,4).toString(),'PNG');const queried=logoQueries;
 assert.equal(await documentLogo(logoClient,'asset-tenant',{}, {logo_url:'https://untrusted.example.invalid/logo.png'}),undefined);assert.equal(logoQueries,queried,'Arbitrary URLs never fetch');
 assert.equal(await documentLogo({query:async()=>({rows:[]})},'different-tenant',{}, {logo_url:'/api/files/00000000-0000-4000-8000-000000000001/download'}),undefined);
-const data={number:'RE-QR-QA',kind:'invoice',status:'sent',currency:'CHF',total:216.2,subtotal:200,vat_amount:16.2,paid_amount:100,issue_date:'2026-10-01',due_date:'2026-10-31',customer:{name:'Acme AG',street:'Bahnhofstrasse 123',postal_code:'8001',city:'Zürich'},items:[{description:'IT-Beratung',quantity:2,unit:'Stunde',unit_price:100,line_total:200,vat_rate:8.1}]};
+const data={number:'RE-QR-QA',document_snapshot:{layout_revision:7},kind:'invoice',status:'sent',currency:'CHF',total:216.2,subtotal:200,vat_amount:16.2,paid_amount:100,issue_date:'2026-10-01',due_date:'2026-10-31',customer:{name:'Acme AG',street:'Bahnhofstrasse 123',postal_code:'8001',city:'Zürich'},items:[{description:'IT-Beratung',quantity:2,unit:'Stunde',unit_price:100,line_total:200,vat_rate:8.1}]};
 async function inspectPdf(document,logo){
  const bytes=await documentPdf(document,company.raw,logo);assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
  const pdf=await getDocument({data:new Uint8Array(bytes),isEvalSupported:false}).promise;
@@ -58,6 +71,10 @@ async function inspectPdf(document,logo){
 const withLogo=await inspectPdf(data,logo);assert.ok(withLogo.bytes.toString('latin1').includes('/Subtype /Image'),'Normalized company logo is embedded');
 const generated=await inspectPdf(data),text=generated.pages.join(' ');
 for(const value of ['IT-Beratung','Individuelle Rechnungseinleitung','Individueller Rechnungsabschluss','31.10.2026','216.20','116.20','Zahlteil','Empfangsschein'])assert.ok(text.includes(value),value);
+const qrDocument=await getDocument({data:new Uint8Array(generated.bytes),isEvalSupported:false}).promise;
+const qrPage=await qrDocument.getPage(qrDocument.numPages),qrItems=(await qrPage.getTextContent()).items.filter(item=>item.str?.trim());
+assert.ok(qrItems.length>0);for(const item of qrItems)assert.ok(item.transform[5]<105*72/25.4+5,'The area above the 105mm QR slip stays empty');
+await qrDocument.destroy();
 assert.equal(generated.pages.length,2,'Short payable invoice has a dedicated QR page');assert.ok(!generated.pages[0].includes('Empfangsschein'));assert.ok(generated.pages[1].includes('Empfangsschein'));
 for(const status of ['paid','cancelled','draft']){const result=await inspectPdf({...data,status});assert.ok(!result.pages.join(' ').includes('Empfangsschein'),status+' has no payable QR slip');}
 const invalid=await inspectPdf({...data,status:'sent',currency:'USD'});assert.equal(invalid.pages.length,1);assert.ok(invalid.pages[0].includes('QR-Zahlteil nicht verfügbar'));
@@ -65,7 +82,7 @@ const unusual=await inspectPdf({...data,items:[{...data.items[0],description:'La
 const snap=await inspectPdf({...data,document_snapshot:{version:1,intro:'Persistierte individuelle Einleitung',closing:'Persistierter Abschluss'},issuer_snapshot:{...company.raw,legal_name:'Historische Firma AG'},customer_snapshot:{...data.customer,name:'Historischer Kunde AG'},payment_snapshot:{iban:company.raw.iban}});
 assert.ok(snap.pages[0].includes('Historische Firma AG'));assert.ok(snap.pages[0].includes('Historischer Kunde AG'));assert.ok(snap.pages[0].includes('Persistierte individuelle Einleitung'));assert.ok(!snap.pages[0].includes('Individuelle Rechnungseinleitung'));
 const creditedPdf=await inspectPdf({...data,credit_amount:16.2,status:'partial'});const creditedText=creditedPdf.pages.join(' ');
-assert.ok(creditedText.includes('Gutschriften: CHF 16.20'));assert.ok(creditedText.includes('Offener Betrag: CHF 100.00'),'QR payable amount reflects the credit-adjusted receivable');assert.ok(!creditedPdf.pages.at(-1).includes('116.20'));
+assert.ok(creditedText.includes('Gutschriften: CHF 16.20'));assert.ok(creditedPdf.pages.at(-1).includes('100.00'),'The actual QR slip amount reflects the credit-adjusted receivable');assert.ok(!creditedPdf.pages.at(-1).includes('116.20'));
 const refundedPdf=await inspectPdf({...data,paid_amount:216.2,credit_amount:100,refund_amount:100});const refundedText=refundedPdf.pages.join(' ');
 assert.ok(refundedText.includes('Rückerstattungen: CHF 100.00'));assert.ok(refundedText.includes('Ausgeglichen'));assert.ok(!refundedText.includes('Empfangsschein'));assert.ok(!refundedText.includes('Offen: CHF 0.00'));
 for(const [locale,title,paymentTitle] of [['fr','FACTURE','INFORMATIONS DE PAIEMENT'],['it','FATTURA','INFORMAZIONI DI PAGAMENTO'],['en','INVOICE','PAYMENT INFORMATION']]){
@@ -112,14 +129,22 @@ if(process.env.BINSO_BILLING_SAMPLE_DIR){
 }
 
 const financial=await import(financialModuleUrl);
-const {documentTotals}=await import(moneyModuleUrl);
-const readNodes=new Set(['DocumentReadView','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate','documentPresentation']);
-const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView};';
+const {documentTotals,calculateDocument:calculateForRead}=await import(moneyModuleUrl);
+const readNodes=new Set(['documentPreviewPayload','calculateDraft','decimalInput','cleanDiscount','lineAmount','DocumentTotals','documentPayload','invoiceDueIso','DocumentReadView','remoteDraftFromItem','useDocumentTotals','numberValue','money','dateOnly','isoToSwiss','invoiceDueDate','documentPresentation']);
+const readFragment=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&readNodes.has(node.name?.text)).map(node=>node.getText(ast)).join('\n')+'\nexport {DocumentReadView,remoteDraftFromItem,documentPresentation,calculateDraft,documentPayload,documentPreviewPayload};';
 const readCompiled=ts.transpileModule(readFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const readExports={};
-Function('require','exports','useState','Button','useMemo','Status','Link','financialStatus','financialStatusLabels','documentTotals','openAmount','resolveCustomer','MetricTiles','MetricTile','DetailDisclosure','SectionTitle',readCompiled)(require,readExports,React.useState,({ariaLabel})=>React.createElement('button',{'aria-label':ariaLabel}),callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusLabels,documentTotals,financial.openAmount,(await import(moduleUrl(await fs.readFile('lib/customer-identity.ts','utf8')))).resolveCustomer,({children})=>React.createElement('div',null,children),({label,value})=>React.createElement('div',null,label,React.createElement('strong',null,value)),({label,children})=>React.createElement('details',null,React.createElement('summary',null,label),children),({title})=>React.createElement('h2',null,title));
+Function('require','exports','useState','Button','useMemo','Status','Link','financialStatus','financialStatusText','financialStatusTone','documentTotals','openAmount','resolveCustomer','MetricTiles','MetricTile','DetailDisclosure','SectionTitle','customerCredit','invoiceStatusAxes','deliveryLabel','calculateDocument',readCompiled)(require,readExports,React.useState,({ariaLabel})=>React.createElement('button',{'aria-label':ariaLabel}),callback=>callback(),({children})=>React.createElement('span',null,children),({children,href})=>React.createElement('a',{href},children),financial.financialStatus,financial.financialStatusText,financial.financialStatusTone,documentTotals,financial.openAmount,(await import(moduleUrl(await fs.readFile('lib/customer-identity.ts','utf8')))).resolveCustomer,({children})=>React.createElement('div',null,children),({label,value})=>React.createElement('div',null,label,React.createElement('strong',null,value)),({label,children})=>React.createElement('details',null,React.createElement('summary',null,label),children),({title})=>React.createElement('h2',null,title),financial.customerCredit,financial.invoiceStatusAxes,(await import(moduleUrl(await fs.readFile('lib/offer-activity.ts','utf8')))).deliveryLabel,calculateForRead);
+for(const validUntil of [null,'2099-12-31','2020-01-01']){
+ const stored={kind:'offer',status:'sent',issue_date:'2020-01-01',valid_until:validUntil,items:[],total:100};
+ const mapped=readExports.remoteDraftFromItem(stored,'Angebot');
+ assert.equal(mapped.due,validUntil??'','Missing validity must not be fabricated from the issue date');
+ assert.equal(readExports.documentPresentation('Angebot',mapped,100).displayStatus,financial.financialStatus(stored),'List/API and operational detail use the same actual validity, including missing and expired dates');
+}
 const paidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2,paidOn:'2026-10-06'},directory}));
 assert.ok(paidRead.includes('Rechnungsdatum'));assert.ok(paidRead.includes('Bezahlt am'));assert.ok(paidRead.includes('06.10.2026'));assert.ok(!paidRead.includes('Fällig am'));assert.ok(!paidRead.includes('Offener Betrag'));assert.equal((paidRead.match(/>Bezahlt</g)||[]).length,1,'The compact summary explicitly names its paid status');
+const overpaidRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:250},directory}));assert.ok(overpaidRead.includes('Kundenguthaben')&&overpaidRead.includes('CHF 33.80'),'Actual surplus is visible, independently of paid document status');
+const simultaneous=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'partial',date:'2000-01-01',total:216.2,paidAmount:100,deliveryStatus:'sent'},directory}));assert.ok(simultaneous.includes('Teilweise bezahlt')&&simultaneous.includes('Überfällig')&&simultaneous.includes('Ausgestellt'),'Payment and due state remain independently visible');assert.ok(simultaneous.includes('Vom Anbieter angenommen')&&!simultaneous.includes('Zugestellt'),'Provider acceptance is not a delivery confirmation');assert.ok(paidRead.includes('Kein Versandnachweis'),'No mail history must not become fabricated transport success');
 const unprovenPaid=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,status:'paid',total:216.2,paidAmount:216.2},directory}));assert.ok(!unprovenPaid.includes('Bezahlt am'),'No completion date is invented for legacy payments');
 const openRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:{...draft,date:'2099-10-01'},directory}));assert.ok(openRead.includes('Offener Betrag'));assert.ok(openRead.includes('Fällig am'));assert.ok(openRead.includes('document-mobile-price'));assert.ok(openRead.includes('× CHF 100.00'));
 for(const status of ['sent','partial']){
@@ -145,10 +170,12 @@ const listAst=ts.createSourceFile('document-list.tsx',listSource,ts.ScriptTarget
 const listFragment=listAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DocumentList').getText(listAst);
 const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const listExports={};
-Function('require','exports','RecordsView','RecordRow','financialStatus','financialStatusLabels','documentDateLabel','formatCurrency',listCompiled)(require,listExports,()=>null,()=>null,financial.financialStatus,financial.financialStatusLabels,financial.documentDateLabel,financial.formatCurrency);
+Function('require','exports','RecordsView','DocumentSummaryRow','financialStatus','financialStatusText','documentDateLabel','formatCurrency','openAmount','documentFilters','documentMatchesFilter',listCompiled)(require,listExports,()=>null,()=>null,financial.financialStatus,financial.financialStatusText,financial.documentDateLabel,financial.formatCurrency,financial.openAmount,financial.documentFilters,financial.documentMatchesFilter);
 const outstandingList=listExports.DocumentList({items:[],kind:'invoice',outstanding:true});
 assert.deepEqual(outstandingList.props.chips,['Alle','Überfällig']);assert.equal(outstandingList.props.emptyLabel('Alle'),'Keine offenen Rechnungen');
-assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Überfällig','Bezahlt','Storniert']);
+assert.deepEqual(listExports.DocumentList({items:[],kind:'invoice'}).props.chips,['Alle','Entwurf','Offen','Teilweise bezahlt','Überfällig','Heute fällig','Bezahlt','Überbezahlt','Gutgeschrieben','Storniert']);
+const partialItems=[{kind:'invoice',number:'RE-OVERDUE-PARTIAL',status:'sent',total:100,paid_amount:30,due_date:'2000-01-01'},{kind:'invoice',number:'RE-OVERDUE-UNPAID',status:'sent',total:100,paid_amount:0,due_date:'2000-01-01'}];const localList=listExports.DocumentList({items:partialItems,kind:'invoice'});assert.equal(localList.props.matchesStatus(localList.props.items[0],'Teilweise bezahlt'),true);assert.equal(localList.props.matchesStatus(localList.props.items[1],'Teilweise bezahlt'),false);assert.equal(localList.props.matchesStatus(localList.props.items[0],'Überfällig'),true);assert.equal(localList.props.matchesStatus(localList.props.items[0],'Alle'),undefined);
+const sameNumber=[{...partialItems[0],number:'SHARED',kind:'invoice'},{...partialItems[0],number:'SHARED',kind:'offer'}],typedList=listExports.DocumentList({items:sameNumber});for(let n=0;n<sameNumber.length;n++)assert.equal(typedList.props.children(typedList.props.items[n]).props.item,sameNumber[n],'The indexed row adapter retains document kind as well as number');
 console.log('Optional outstanding lists retain scoped filters; the full invoice list retains all main filters.');
 
 assert.throws(()=>qr.createQrBillData({...company.raw,name:'Firma 🚀'},{number:'RE-CHAR',total:100}),/Zeichen/);
@@ -177,3 +204,57 @@ console.log('QR debtor structured address, exact remaining amount, valid SCOR/in
 }
 
 assert.ok(!paidRead.includes("<button"),"Operational document content has no scattered PDF, copy or edit buttons; these actions belong to its existing menu");
+
+// Package 5: existing renderer consumes the persisted central result; no PDF arithmetic.
+const {calculateDocument}=await import(moneyModuleUrl);
+const discountLines=[{description:'Synthetic discount',quantity:2,unit_price:500,vat_rate:8.1,discount:{kind:'percent',value:10}}];
+const discountCalculation=calculateDocument(discountLines,'CHF',{kind:'percent',value:5});
+const discountPdf=await documentPdf({...data,status:'draft',paid_amount:0,total:Number(discountCalculation.total),subtotal:Number(discountCalculation.subtotal),vat_amount:Number(discountCalculation.vat),calculation:discountCalculation,items:discountLines.map((l,i)=>({...l,discount:discountCalculation.lines[i].discount,line_total:Number(discountCalculation.lines[i].net)}))},company.raw);
+const discountRendered=await getDocument({data:new Uint8Array(discountPdf),useSystemFonts:true}).promise;
+let discountText='';for(let i=1;i<=discountRendered.numPages;i++)discountText+=(await (await discountRendered.getPage(i)).getTextContent()).items.map(item=>item.str??'').join(' ');
+assert.match(discountText,/924.26/);assert.match(discountText,/69.26/);assert.match(discountText,/10.00/);assert.match(discountText,/5.00/);
+console.log('Central discount snapshot PDF: original unit price, both discount stages, tax group and authoritative total passed.');
+
+const uiDiscount=readExports.remoteDraftFromItem({...data,total:Number(discountCalculation.total),subtotal:Number(discountCalculation.subtotal),vat_amount:Number(discountCalculation.vat),calculation:discountCalculation,items:discountLines.map((l,i)=>({...l,id:'discount-'+i,position:i+1,line_total:discountCalculation.lines[i].net,discount:discountCalculation.lines[i].discount}))},'Rechnung');
+assert.equal(readExports.calculateDraft(uiDiscount).total,924.26);
+const uiPayload=readExports.documentPayload('Rechnung',uiDiscount);assert.deepEqual(uiPayload.discount,discountCalculation.discount);assert.deepEqual(uiPayload.items[0].discount,discountCalculation.lines[0].discount);
+const editedDiscount={...uiDiscount,total:undefined,subtotal:undefined,vat:undefined,calculation:undefined,discount:{kind:'none'}};assert.equal(readExports.calculateDraft(editedDiscount).total,972.90);
+assert.ok(readExports.calculateDraft({...editedDiscount,discount:{kind:'percent',value:'101'}}).error);
+assert.ok(readExports.calculateDraft({...editedDiscount,positions:[{...editedDiscount.positions[0],quantity:'invalid'}]}).error);
+console.log('Actual editor adapters: persisted discount hydration, payload, central preview parity, removal and invalid input passed.');
+
+const previewPayload=readExports.documentPreviewPayload('Rechnung',uiDiscount);assert.deepEqual(previewPayload.discount,uiPayload.discount);assert.equal(previewPayload.positions[0].vatRate,String(uiPayload.items[0].vatRate));
+const discountedIssued=await inspectPdf({...data,status:'sent',paid_amount:0,subtotal:Number(discountCalculation.subtotal),vat_amount:Number(discountCalculation.vat),total:Number(discountCalculation.total),calculation:discountCalculation,items:discountLines.map((l,i)=>({...l,discount:discountCalculation.lines[i].discount,line_total:Number(discountCalculation.lines[i].net)}))});
+assert.equal(discountedIssued.pages.length,2);assert.ok(discountedIssued.pages.at(-1).includes('924.26'));assert.ok(!discountedIssued.pages.at(-1).includes('1’081.00'));
+const discountedMulti=await inspectPdf({...data,status:'sent',paid_amount:0,subtotal:Number(discountCalculation.subtotal),vat_amount:Number(discountCalculation.vat),total:Number(discountCalculation.total),calculation:discountCalculation,items:[{...discountLines[0],description:'Discount pagination content '.repeat(400),discount:discountCalculation.lines[0].discount,line_total:855}]});
+assert.ok(discountedMulti.pages.length>2);assert.ok(discountedMulti.pages.at(-1).includes('924.26'));
+console.log('Discount preview/issued PDF/QR parity and multipage last-A4 QR amount passed.');
+
+// Actual client mapping/calculation/save/preview retain exact minute basis and immutable source IDs.
+const minuteMapped=readExports.remoteDraftFromItem({id:'minute-draft-id',number:'MIN-1',status:'draft',currency:'CHF',issue_date:'2026-10-22',due_date:'2026-11-21',items:[{id:'min',description:'Confirmed service',quantity:61,unit:'min',unit_price:130,vat_rate:8.1,price_base_quantity:60,time_allocations:[{time_entry_id:'time-source',minutes:61,price_source_id:'sale-source'}]}]},'Rechnung');
+const minuteDraft={...minuteMapped,total:undefined,subtotal:undefined,vat:undefined,calculation:undefined};
+assert.equal(readExports.calculateDraft(minuteDraft).total,142.88);
+const minuteSave=readExports.documentPayload('Rechnung',minuteDraft),minutePreview=readExports.documentPreviewPayload('Rechnung',minuteDraft);
+assert.equal(minuteSave.items[0].priceBaseQuantity,60);assert.deepEqual(minuteSave.items[0].timeAllocations,[{timeEntryId:'time-source',minutes:61,priceSourceId:'sale-source'}]);assert.equal(minutePreview.positions[0].priceBaseQuantity,60);assert.equal(minutePreview.positions[0].quantity,'61');
+for(const quantity of ['0','1.5','62'])assert.ok(readExports.calculateDraft({...minuteDraft,positions:[{...minuteDraft.positions[0],quantity}]}).error,'Client rejects invalid or unbound changed minutes');
+const partialMinute={...minuteDraft,positions:[{...minuteDraft.positions[0],quantity:'30',availableMinutes:61,timeAllocations:[{...minuteDraft.positions[0].timeAllocations[0],minutes:30}]}]};assert.equal(readExports.calculateDraft(partialMinute).total,70.27);assert.ok(readExports.calculateDraft({...partialMinute,positions:[{...partialMinute.positions[0],availableMinutes:29}]}).error);
+const minuteRead=renderToStaticMarkup(React.createElement(readExports.DocumentReadView,{type:'Rechnung',draft:minuteDraft,directory,canWrite:true}));assert.ok(minuteRead.includes('/ 60 min'));assert.ok(minuteRead.includes('142.88'));
+console.log('Minute UI: actual persisted mapping, central exact totals, save/preview provenance and basis, partial quantities, invalid/over-capacity denial and rendered hourly-price basis passed. Device/browser interaction remains separately required.');
+
+// Execute the existing editor's handlers with isolated hook/transport boundaries.
+const editorNode=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='DocumentEditor');
+let changedMinute=null,capacityPath='';
+const lineHelpers=await import(moduleUrl(await fs.readFile('lib/document-lines.ts','utf8')));
+const editorScope={require,exports:{},useState:v=>[v,()=>{}],useDocumentCompany:()=>({raw:{}}),useDocumentTotals:readExports.calculateDraft,calculateDraft:readExports.calculateDraft,documentPreviewPayload:readExports.documentPreviewPayload,resolveCustomer:()=>({id:'customer'}),useApiQuery:path=>{capacityPath=path;return {data:{items:[{id:'time-source',remaining_minutes:90}]},loading:false,error:null,refresh(){}}},decimalInput:v=>v.replace(',','.'),numberValue:Number,money:v=>Number(v).toFixed(2),lineAmount:(_i,c,index)=>Number(c?.lines[index]?.net??0),domainConfig:{vatRates:[0,2.6,8.1]},documentDefaults:()=>({due:'30'}),...lineHelpers};
+for(const component of ['LocalizedText','LocalizedElement','Field','Input','Select','DirectorySelect','ErrorState','Button','SectionTitle','Icon','ActionsMenu','ActionRow','DocumentTotals','FormSheet','FormActions','DiscountFields','Textarea'])editorScope[component]=component==='Input'?'input':component==='Select'?'select':component.toLowerCase();
+const editorCompiled=ts.transpileModule(editorNode.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText;
+const editorFn=Function(...Object.keys(editorScope),editorCompiled+';return DocumentEditor;')(...Object.values(editorScope));
+const editorTree=editorFn({type:'Rechnung',draft:minuteDraft,directory,onChange:value=>{changedMinute=value}});
+const nodes=[];function visitMinute(node){if(!node||typeof node!=='object')return;if(Array.isArray(node)){node.forEach(visitMinute);return;}nodes.push(node);visitMinute(node.props?.children);}visitMinute(editorTree);
+const quantityInput=nodes.find(n=>n.type==='input'&&n.props['aria-label']==='Menge');assert.ok(quantityInput);assert.equal(quantityInput.props.inputMode,'numeric');quantityInput.props.onChange({target:{value:'30'}});assert.equal(changedMinute.positions[0].timeAllocations[0].minutes,30);assert.equal(changedMinute.positions[0].availableMinutes,90);assert.equal(minuteDraft.positions[0].timeAllocations[0].minutes,61,'Editor never mutates the saved source');assert.equal(nodes.find(n=>n.type==='input'&&n.props['aria-label']==='Einzelpreis').props.readOnly,true);assert.equal(nodes.find(n=>n.type==='select'&&n.props['aria-label']==='Einheit').props.disabled,true);assert.ok(capacityPath.includes('draft=MIN-1'));
+const pageNode=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='DocumentPage');let discardArrow;function findDiscard(node){if(ts.isVariableDeclaration(node)&&node.name.getText(ast)==='discardDraft')discardArrow=node.initializer;ts.forEachChild(node,findDiscard);}findDiscard(pageNode);
+let deleted=0,failDiscard=true,discardedClear=0,discardError='',pushed='',sameKey='';
+const discardScope={documentActionPending:{current:false},documentSavePending:{current:false},canWrite:true,kind:'Rechnung',draft:{...minuteDraft,status:'draft',updatedAt:'revision1'},documentKey:'MIN-1',discardKey:{current:null},crypto:{randomUUID:()=> 'retry-discard-key'},setActionBusy(){},setActionError:v=>{discardError=v},apiDelete:async(path,body,options)=>{deleted++;assert.equal(path,'/api/documents/MIN-1');assert.equal(body.expectedUpdatedAt,'revision1');if(sameKey)assert.equal(options.idempotencyKey,sameKey);sameKey=options.idempotencyKey;if(failDiscard)throw Error('offline');return {item:{discarded:true}}},setDirty(){},recovery:{clear:()=>{discardedClear++}},setDiscardOpen(){},allowDraftNavigation(){},router:{push:path=>{pushed=path}}};
+const discardRun=Function(...Object.keys(discardScope),'return '+ts.transpileModule('const run='+discardArrow.getText(ast),{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText.replace(/^const run\s*=\s*/,'').trim().replace(/;$/,''))(...Object.values(discardScope));
+await discardRun();assert.equal(discardError,'offline');assert.equal(discardedClear,0);assert.equal(pushed,'');assert.equal(discardScope.documentActionPending.current,false);failDiscard=false;await discardRun();assert.equal(deleted,2);assert.equal(discardedClear,1);assert.equal(pushed,'/rechnungen');
+console.log('Minute editor handlers: integer allocation/available quantity, protected rate/unit, saved-source preservation and discard failure/retry with stable idempotency passed.');

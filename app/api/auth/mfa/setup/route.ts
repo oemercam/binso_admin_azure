@@ -1,3 +1,4 @@
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {NextRequest} from "next/server";
 import {generateTotpSecret} from "@/lib/server/totp";
 import {encryptSecret} from "@/lib/server/crypto";
@@ -14,6 +15,7 @@ export async function POST(request:NextRequest){
     await enforceRateLimit(request,"mfa-setup",5,15*60_000);
     const session=await getSession();
     if(!session||session.isDemo)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
+    await requireFreshAuthentication(session);
     const secret=generateTotpSecret();
     const expiresAt=new Date(Date.now()+15*60_000);
     const staged=await query("update app_users set mfa_pending_secret_enc=$1,mfa_pending_expires_at=$2,updated_at=now() where id=$3 and mfa_enabled=false and status='active' returning id",[encryptSecret(secret),expiresAt,session.userId]);

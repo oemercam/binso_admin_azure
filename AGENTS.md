@@ -29,7 +29,7 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
-- All creation/editing uses the existing FormSheet modal owner: bottom sheet on
+- Business creation/editing uses the existing FormSheet modal owner: bottom sheet on
   mobile, centered dialog on desktop; expanded editors retain a scrollable body
   and bottom actions. Stable labeled navigation, contextual
   headers follow ux-current-approval.md. Creation belongs to the common content
@@ -81,13 +81,39 @@ Module profiles restrict roles, never replace backend authorization, assignment
 scope or RLS. Public demo provisioning is closed; trusted isolated QA remains.
 No production migration, merge, deployment or native-store release is authorized.
 
+## Complete V25 master (21 October 2026)
+
+The byte-preserved docs/audit/v25-complete-master-20261021/source.md replaces the
+truncated prompt. Follow docs/architecture/v25-complete-master-20261021.md for
+implementation and evidence. Tenant MFA is voluntary for every tenant role;
+opted-in TOTP/recovery remains enforced at login. Critical mutations require a
+fresh session-bound password plus the enrolled factor, or session-bound email
+verification when no factor is enrolled. Preserve operator authentication, RBAC,
+RLS, revocation, audit and rate limits. Passkeys do not bypass an enrolled factor.
+Registration and optional initial company setup are full pages; ordinary business
+editors retain the existing FormSheet. Navigation and blue FAB remain frozen.
+A green test is not evidence of real mail delivery, a human read or device approval.
+New package merge, production migrations and deployment require exact-SHA approval.
+
+## Revision 7 (21 October 2026) — current complete source
+
+The byte-preserved docs/audit/v25-revision7/source.md supersedes earlier V25
+masters and addenda. All 56 chapters and P0/P1/P2 are binding; P3 is excluded.
+Use docs/architecture/v25-revision7.md and its generated requirement/route/state
+registers. Old implementation reports remain evidence, not competing authority.
+Retain navigation/FAB, server authorization, RLS and independent review rules.
+Existing green PR305 evidence does not qualify new Revision7 changes. No new
+package merge, production migrations or deployment without exact-SHA approval.
+Legal translations, real devices, domains and provider configuration need actual
+external evidence; do not present a generated register as executed acceptance.
+
 # Codex workflow and context (canonical project instructions)
 
 V25.5 follows the existing V25.4 handoff, never an assumed integrated Main.
 Use docs/architecture/v25-5-platform-lifecycle.md and its single traceability CSV.
 One identity/one active company, submitted-before-independent-time-approval and
-unchanged privileged TOTP remain server/DB boundaries. Passkeys do not silently
-replace privileged MFA. Keep unapproved PL-G/D gates open; no production actions.
+session-bound fresh authentication remain server/DB boundaries. The complete
+21 October master supersedes the former mandatory tenant-role TOTP rule. Keep unapproved PL-G/D gates open; no production actions.
 V25.5 expands the authorized-target exception to all roles and tariffs: show only
 permitted destinations, fewer than five allowed; preserve existing navigation
 material, icons, height, position and blue FAB. Historical references stay intact.
@@ -156,3 +182,35 @@ material, icons, height, position and blue FAB. Historical references stay intac
   agreed assignment. Productive interventions require explicit user authorization.
   Preserve existing workflow configuration and mandatory gates unless a change
   to those is itself authorized. A green check alone never authorizes production.
+
+## Current V26 implementation (22 October 2026)
+
+The user authorized implementing the packages from docs/architecture/v26-gap-and-packages.md
+locally on a separate feature branch, reusing the V25 foundation. The unchanged
+docs/architecture/v26-source/BINSO_ONE_V26_MODULAR_MASTERKONZEPT.md is the V26
+Revision3 business target. See docs/architecture/v26-module-contracts.md for
+module ownership and docs/architecture/v26-execution.md for actual progress.
+The current branch is feat/v26-modular-revision3, based on a64582c7, including
+the unpublished V25 IBAN fix 00bfe5ce. Do not overwrite the V25 branch or treat
+it as merged Main. Local commits per package; no pushes in this development
+block. Bundle relevant tests per coherent block; do not rerun full suites,
+builds or browser matrices after small edits. Relevant P0 authorization,
+RLS, audit rollback and integrity checks remain required. No per-package
+permission question when implementation is already authorized. Unanswered
+business decisions are not approval: new sensitive HR/payroll/family fields,
+commercial changes and unvalidated payroll stay closed. Existing tariffs,
+Identity, finance/document engines, mobile navigation and blue FAB remain.
+No merge, production migration, deployment, bank transfer, paid service or
+productive payroll without the separate applicable approval.
+
+## Confirmed V26 release and access decisions
+
+The user explicitly chose completing V26 before preparing its release. Preserve
+current prices and existing rights. New supplier/resource functions use the
+existing Business/Pro supplier module; payroll uses the existing Pro payroll
+module. No new paid add-ons or automatic subscription changes. The user approved
+explicit additional grants for new sensitive HR/family/payroll data: owner/admin
+roles do not inherit them automatically. Self-service payslips require a separate
+identity-bound policy. Implement these approved decisions without per-package
+confirmation; legal payroll validation and productive actions still need their
+actual evidence and applicable authorization.

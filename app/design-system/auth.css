@@ -11,11 +11,12 @@
   flex-direction:column;
   align-items:stretch;
 }
-.auth-card h1{margin:0 0 9px;font-size:var(--type-desktop-heading);line-height:1.5;font-weight:600;letter-spacing:-.7px}
+.auth-card h1{margin:0 0 9px;font-size:var(--type-large-heading);line-height:1.2;font-weight:600;letter-spacing:-.7px}
 .auth-inline-action{min-height:var(--touch);margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-metadata);font-weight:650;text-align:center;cursor:pointer}
 .auth-inline-action:hover{text-decoration:underline;text-underline-offset:3px}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:var(--type-control);line-height:1.55}
 .auth-card form{display:grid;gap:16px}
+.registration-progress{margin:0;color:var(--color-muted);font-size:var(--type-label);line-height:var(--body-line-height)}
 .auth-card label:has(>input[type="checkbox"]){display:grid;grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px;font-weight:400;line-height:1.5}
 .auth-card input[type="checkbox"]{width:18px;height:18px;min-height:0;padding:0;margin:1px 0 0;accent-color:var(--color-fg)}
 .auth-divider{margin:24px 0;border-top:1px solid var(--color-line);text-align:center;line-height:0}
@@ -27,18 +28,12 @@
 .auth-page{grid-template-columns:minmax(0,1fr);align-items:center}
 .auth-card{width:min(100%,440px);margin-inline:auto}
 .auth-card>.logo{margin-bottom:40px}
-.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:12px;--control-label-weight:400;--control-font:13px;--control-h:var(--access-control-height);--control-radius:5px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
+.auth-workspace.auth-page{--app-accent:var(--app-action-accent);--control-label-font:13px;--control-label-weight:500;--control-font:16px;--control-h:48px;--control-radius:12px;--control-border:var(--auth-control-border);--button-radius:5px;display:flex;flex-direction:column;align-items:stretch;padding:28px clamp(20px,4vw,64px);gap:16px;--button-height:var(--access-control-height)}
 .auth-workspace-header,.auth-workspace-footer{width:100%;max-width:1024px;margin-inline:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.auth-workspace-body{flex:none;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start;gap:65px;width:100%;max-width:970px;margin-inline:auto;padding-block:55px 65px}
-.auth-workspace-intro{min-width:0;max-width:474px;padding-top:15px}
-.auth-workspace-intro .eyebrow{display:block;font-size:var(--type-metadata);font-weight:400;text-transform:uppercase;line-height:1.5;margin-bottom:24px;color:var(--app-accent)}
-.auth-workspace-intro h2{font-size:var(--type-auth-display);font-weight:600;line-height:1.12;letter-spacing:-1.5px;margin:0 0 24px}
-.auth-workspace-intro p{color:var(--color-muted);line-height:1.8;font-size:var(--type-body);max-width:345px;margin-bottom:29px}
-.auth-workspace-intro ul{display:grid;gap:18px;padding:0;margin:0 0 36px;list-style:none}
-.auth-workspace-intro li{display:flex;align-items:center;gap:12px;font-size:var(--type-label)}
-.auth-workspace-intro li svg{color:var(--app-accent)}
-.auth-workspace-intro>.text-action{display:inline-flex;align-items:center;gap:8px;color:var(--app-accent);min-height:var(--touch)}
-.auth-workspace-body>.auth-card{width:100%;max-width:none;border-left:1px solid var(--color-line);padding:20px 0 10px 40px}
+.auth-workspace-body{flex:none;display:grid;grid-template-columns:minmax(0,440px);justify-content:center;align-items:start;gap:0;width:100%;max-width:1024px;margin-inline:auto;padding-block:55px 65px}
+.auth-workspace-body>.auth-card{width:100%;max-width:440px;border:0;padding:20px 0 10px}
+.auth-workspace[data-layout="message"] .auth-workspace-body{grid-template-columns:minmax(0,480px);justify-content:center}
+.auth-workspace[data-layout="message"] .auth-workspace-body>.auth-card{max-width:none;border:0;padding-inline:0}
 .auth-workspace-footer{font-size:var(--type-label);color:var(--color-muted);padding-top:20px;border-top:1px solid var(--color-line)}
 .auth-workspace-footer nav{display:flex;gap:20px;flex-wrap:wrap}
 .auth-options{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:var(--type-label)}
@@ -46,12 +41,8 @@
 .auth-options .form-link a,.auth-card .auth-bottom a{color:var(--app-accent)}
 .auth-passkey{display:grid}
 .auth-workspace .auth-card .auth-bottom{margin-top:25px;font-size:var(--type-label);text-align:left}
-.registration-sheet h3{margin:0 0 var(--heading-content-gap);font-size:var(--type-section)}
-.registration-sheet p{overflow-wrap:anywhere}
-.registration-summary{margin:0;display:grid;gap:var(--field-group-gap)}
-.registration-summary dt{color:var(--color-muted);font-size:var(--type-label)}
-.registration-summary dd{margin:0;overflow-wrap:anywhere}
-.registration-summary dd p:first-child{margin-top:0}
+.registration-page h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-section)}
+.registration-page p{overflow-wrap:anywhere}
 .registration-legal-links{display:flex;flex-wrap:wrap;gap:var(--field-group-gap)}
 .auth-workspace :focus-visible{outline-color:var(--app-accent)}
 .auth-workspace{
@@ -67,7 +58,7 @@
   }
 .auth-card{max-width:420px;padding-top:0}
 .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
-.auth-card h1{font-size:var(--type-mobile-heading);line-height:1.15}
+.auth-card h1{font-size:var(--type-large-heading);line-height:1.2}
 .auth-card>p{margin-bottom:24px;font-size:var(--type-control)}
 .auth-card input{font-size:var(--type-subheading)}
 .auth-card .button{width:100%}
@@ -75,7 +66,6 @@
 @media (max-width:1100px){
 .auth-workspace.auth-page{gap:40px;padding-inline:max(25px,var(--safe-left));padding-top:calc(22px + var(--safe-top));padding-bottom:calc(24px + var(--safe-bottom));--button-height:var(--access-control-height)}
 .auth-workspace-body{grid-template-columns:minmax(0,1fr);max-width:440px;padding-block:12px;align-items:start}
-.auth-workspace-intro{display:none}
 .auth-workspace-body>.auth-card{border:0;padding:0}
 .auth-workspace-header .logo{width:88px;height:28px}
 .auth-workspace-footer{flex-wrap:wrap}

@@ -5,6 +5,10 @@ import {styleBindingErrors,styleDescriptionErrors} from './ux-style-contract.mjs
 const contract=JSON.parse(fs.readFileSync('docs/audit/v24/ux-contract.json','utf8'));
 const catalog=inventory();
 const matrix=JSON.parse(fs.readFileSync('docs/audit/v24/page-matrix.json','utf8'));
+// V26 extends the frozen V24/V25 assignments without granting acceptance.
+const v26=JSON.parse(fs.readFileSync('docs/architecture/v26-route-additions.json','utf8')).routes;
+for(const row of v26){assert.equal(row.status,'nicht_abgenommen');assert.deepEqual(row.evidence,[]);matrix.pages.push({...row,status:'nicht geprüft'});}
+assert.equal(new Set(matrix.pages.map(row=>row.file)).size,matrix.pages.length,'No route assignment may be overridden');
 assert.deepEqual(matrix.pages.map(p=>p.file).sort(),catalog.routes.map(p=>p.file).sort(),'Every source page needs an explicit UX assignment');
 for(const page of matrix.pages){
  const actual=catalog.routes.find(r=>r.file===page.file);

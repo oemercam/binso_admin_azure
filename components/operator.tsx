@@ -1,5 +1,6 @@
 "use client";
-import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
+import {asLocale} from '@/lib/locales/config';
+import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
 import {LocaleSwitcher} from "./locale-switcher";
 import {RingChart} from "./statistics";
 import {formatDateTime} from "@/lib/display-format";
@@ -121,7 +122,10 @@ function useOperatorCustomers(){
 
 export function OperatorPage({ section = "", identity, role="platform_owner" }: { section?: string;identity?:{name:string;email:string}|null;role?:OperatorRole|"readonly" }) {
   const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();
-  const translate=useTranslation();
+  const translate=useTranslation(),{choose}=useLocale();
+  const preferences=useApiQuery<{item:{language:string|null}}>('/api/operator/preferences');
+  const appliedLanguage=useRef<string|null>(null),savedLanguage=preferences.data?.item?.language;
+  useEffect(()=>{if(!savedLanguage)return;const next=asLocale(savedLanguage);if(appliedLanguage.current===next)return;appliedLanguage.current=next;choose(next)},[savedLanguage,choose]);
   const key = section.split("/")[0] || "";
   const detail = section.split("/")[1] || "";
   const title = useMemo(() => operatorNav.find(([slug]) => slug === key)?.[1] ?? "Dashboard", [key]);
@@ -149,7 +153,7 @@ export function OperatorPage({ section = "", identity, role="platform_owner" }: 
       </>} actionClassName="operator-user" actions={<>{false}<Link prefetch={false} className="icon-button operator-home-link" href="/dashboard" aria-label="Zur App"><Icon name="home" size={18}/></Link><LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={()=>{setMobileMore(false);setAccountOpen(true)}}><Avatar name={identity?.name} identity={identity?.email}/></LocalizedElement></>}/>
 
       <div className="operator-page-head"><PageHeading leading={detail?<Button href={"/operator/"+key} variant="ghost" className="icon-button desktop-back" icon="back" ariaLabel={key==="tickets"?"Zur Ticketliste":"Zur Kundenliste"}/>:undefined} title={detail ? (key === "tickets" ? "Ticketdetails" : key === "kunden" ? "Kundendetails" : title) : title} description={operatorSubtitle(key, detail)} action={canCreate?<CreateAction label={key==="sperrungen"?"Einschränkung erstellen":"Ankündigung erstellen"} onClick={()=>setCreateOpen(true)}/>:undefined}/></div>
-      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b><LocalizedText verbatim={!!identity?.name}>{identity?.name||"One Admin"}</LocalizedText></b><small><LocalizedText>{identity?.email||"Administration"}</LocalizedText></small></div></div><LocaleSwitcher/><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState><LocalizedText>{logoutError}</LocalizedText></ErrorState>}</div></HeaderPanel>}
+      {accountOpen&&<HeaderPanel kind="account" label="Konto" onClose={()=>setAccountOpen(false)} headerSelector=".operator-app-header" backgroundSelector=".operator-sidebar,.operator-main > :not(.operator-app-header)"><div className="account-sheet"><div className="account-sheet-profile"><Avatar size="large"/><div><b><LocalizedText verbatim={!!identity?.name}>{identity?.name||"One Admin"}</LocalizedText></b><small><LocalizedText>{identity?.email||"Administration"}</LocalizedText></small></div></div><LocaleSwitcher persist="operator"/><div className="action-list"><ActionRow href="/dashboard" icon="home" title="Zum Kundenportal" description="Binso One öffnen" onClick={()=>setAccountOpen(false)}/><ActionRow icon="logout" title="Abmelden" disabled={logoutBusy} onClick={()=>void logout()}/></div>{logoutError&&<ErrorState><LocalizedText>{logoutError}</LocalizedText></ErrorState>}</div></HeaderPanel>}
 
       <MobileDock><LocalizedElement as="nav" className="operator-mobile-nav" aria-label="Operator Navigation">
         {operatorNav.filter(([slug])=>["","tickets","kunden","monitoring"].includes(slug)).map(([slug,label,icon])=><Link aria-label={translate(slug===""?"Start":slug==="monitoring"?"Status":label)+(slug===""||slug==="monitoring"?" · "+translate(label):"")} title={translate(label)} aria-current={slug===key?"page":undefined} className={slug===key?"active":""} href={slug ? `/operator/${slug}` : "/operator"} key={slug}><Icon name={icon} size={19}/><span>{slug===""?<LocalizedText>{"Start"}</LocalizedText>:slug==="monitoring"?<LocalizedText>{"Status"}</LocalizedText>:<LocalizedText>{label}</LocalizedText>}</span></Link>)}

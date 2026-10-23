@@ -180,8 +180,8 @@ export function EmptyState({title,description}:{title:string;description?:string
   return <div className="empty-state" data-empty-state="compact" role="status"><p><LocalizedText>{title}</LocalizedText></p>{description&&<p><LocalizedText>{description}</LocalizedText></p>}</div>;
 }
 
-export function Toggle({ checked = false, label, onChange,disabled=false }: { checked?: boolean; label: string; onChange?: () => void;disabled?:boolean }) {
-  return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onChange}><span/></LocalizedElement>;
+export function Toggle({ checked = false, label, labelledBy, onChange,disabled=false,busy=false }: { checked?: boolean; label: string;labelledBy?:string; onChange?: () => void;disabled?:boolean;busy?:boolean }) {
+  return <LocalizedElement as="button" className={`toggle ${checked ? "is-on" : ""}`} disabled={disabled||busy} aria-busy={busy||undefined} type="button" role="switch" aria-checked={checked} aria-labelledby={labelledBy} aria-label={labelledBy?undefined:label} onClick={onChange}><span/></LocalizedElement>;
 }
 
 export function Toast({ title, text, tone = "success",inline=false,actionLabel,onAction }: { title: string; text?: string; tone?: "success" | "danger" | "info";inline?:boolean;actionLabel?:string;onAction?:()=>void }) {

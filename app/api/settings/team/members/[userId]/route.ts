@@ -1,3 +1,4 @@
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {audit} from "@/lib/server/audit";
 import {NextRequest} from "next/server";
 import {ApiError,apiError,assertSameOrigin,cleanText,json,readJson} from "@/lib/server/http";
@@ -6,7 +7,7 @@ import {authorize} from "@/lib/server/rbac";
 import {withTenant} from "@/lib/server/db";
 const roles=new Set(["admin","finance","hr","project_manager","manager","member","reader"]);
 export async function PATCH(request:NextRequest,{params}:{params:Promise<{userId:string}>}){try{
- assertSameOrigin(request);const s=await requireSession();authorize(s,"users:manage");
+ assertSameOrigin(request);const s=await requireSession();authorize(s,"users:manage");await requireFreshAuthentication(s);
  const {userId}=await params,b=await readJson<{action?:unknown;role?:unknown;moduleProfile?:unknown}>(request,4096);
  if(b.action!==undefined&&b.action!=='deactivate')throw new ApiError(400,'action_invalid','Ungültige Aktion.');
  const item=await withTenant(s.organizationId,s.userId,async c=>{

@@ -1,3 +1,4 @@
+import {randomUUID} from 'node:crypto';
 import { NextRequest, NextResponse } from "next/server";
 
 export const jsonHeaders = {
@@ -75,6 +76,7 @@ export function apiError(error:unknown){
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
   if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error&&error.constraint==='monthly_time_no_overlap')return json({error:'time_overlap',message:'Für diesen Mitarbeiter und Kunden bestehen bereits Zeiten im gewählten Monat. Einzelzeiten und Monatsrapport dürfen sich nicht überschneiden.'},409);
+  if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error&&error.constraint==='time_minutes_available')return json({error:'time_minutes_reserved',message:'Die gewählten Minuten sind bereits reserviert. Bitte die Restmenge neu laden.'},409);
   const databaseErrors:Record<string,{status:number;code:string;message:string}>={
     '42501':{status:403,code:'forbidden',message:'Für diesen Vorgang fehlt eine gültige Berechtigung oder Zuordnung.'},
     '23505':{status:409,code:'duplicate_record',message:'Dieser Datensatz besteht bereits.'},
@@ -90,8 +92,9 @@ export function apiError(error:unknown){
   };
   const mapped=databaseErrors[code];
   if(mapped)return json({error:mapped.code,message:mapped.message},mapped.status);
-  console.error("Unhandled API error",{category:error instanceof Error?error.name:"unknown"});
-  return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden."},500);
+  const correlationId=randomUUID();
+  console.error("Unhandled API error",{category:error instanceof Error?error.name:"unknown",correlationId});
+  return json({error:"internal_error",message:"Die Anfrage konnte nicht verarbeitet werden.",correlationId},500,{"X-Correlation-ID":correlationId});
 }
 
 export function cleanText(value:unknown,max=200){

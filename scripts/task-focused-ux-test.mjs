@@ -105,10 +105,11 @@ console.log('Company/customer draft defaults, explicit zeroes, invalid values an
 {
  class Element{constructor(name,children=[]){this.name=name;this.children=children;this.inert=false;}contains(target){return this===target||this.children.some(child=>child.contains(target));}}
  const app=new Element('app'),dialogA=new Element('a'),layerA=new Element('layer-a',[dialogA]),dialogB=new Element('b'),layerB=new Element('layer-b',[dialogB]);
- const doc={body:{children:[app,layerA]}};
+ const script=new Element('script');script.tagName='SCRIPT';const style=new Element('style');style.tagName='STYLE';
+ const doc={body:{children:[app,layerA,script,style]}};
  const body=ts.transpileModule(await readFunction('components/use-dialog-focus.ts',['lockDialogBackground']),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
  const lock=Function('backgroundLocks','document','HTMLElement',body+';return lockDialogBackground;')(new Map(),doc,Element);
- const releaseA=lock(dialogA);assert.equal(app.inert,true);assert.equal(layerA.inert,false);doc.body.children.push(layerB);const releaseB=lock(dialogB);assert.equal(layerA.inert,true);releaseA();assert.equal(app.inert,true,'Closing a parent cannot expose the page under its child');releaseB();assert.equal(app.inert,false);assert.equal(layerA.inert,false);
+ const releaseA=lock(dialogA);assert.equal(script.inert,false,'Executable SSR metadata is never mutated by the accessibility lock');assert.equal(style.inert,false,'Styles are not focusable background');assert.equal(app.inert,true);assert.equal(layerA.inert,false);doc.body.children.push(layerB);const releaseB=lock(dialogB);assert.equal(layerA.inert,true);releaseA();assert.equal(app.inert,true,'Closing a parent cannot expose the page under its child');releaseB();assert.equal(app.inert,false);assert.equal(layerA.inert,false);
  app.inert=true;const release=lock(dialogA);release();assert.equal(app.inert,true,'Pre-existing inert state is retained');
  console.log('Modal background ownership: nested dialogs, out-of-order close and pre-existing inert state passed.');
 }
@@ -155,6 +156,8 @@ assert.equal(pageOrientation('/kunden/one',false,'reader'),undefined,'Record det
 const listQueries=await import(moduleUrl(await fs.readFile('lib/business-list-query.ts','utf8')));
 const publicQuery=listQueries.businessListQuery('documents',new URLSearchParams({customer_id:'eq.customer-a',id:'eq.invoice-a',display_status:'open',untrusted:'ignore'}));
 assert.equal(publicQuery.get('customer_id'),'eq.customer-a');assert.equal(publicQuery.get('id'),'eq.invoice-a');assert.equal(publicQuery.get('display_status'),'eq.open');assert.equal(publicQuery.has('untrusted'),false);
+const independentPayment=listQueries.businessListQuery('documents',new URLSearchParams({payment_status:'partial',due_status:'eq.overdue',payment_candidates:'1'}));assert.equal(independentPayment.get('payment_status'),'eq.partial');assert.equal(independentPayment.get('due_status'),'eq.overdue');assert.equal(independentPayment.get('payment_candidates'),'1');
+assert.equal(listQueries.businessListQuery('customers',new URLSearchParams({payment_status:'partial',payment_candidates:'1'})).has('payment_status'),false,'Invoice-only filters cannot leak into other directories');
 assert.equal(listQueries.businessListQuery('expenses',new URLSearchParams({employee_id:'attacker',review:'1'}),'created_at.desc',{employee_id:'route-owned'}).get('employee_id'),'eq.route-owned','Route-owned scope overrides query input');
 assert.equal(listQueries.businessListQuery('customers',new URLSearchParams({id:'eq.saved-customer'})).get('id'),'eq.saved-customer','A selected ID survives a reload beyond the loaded page');
 

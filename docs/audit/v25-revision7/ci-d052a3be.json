@@ -1,0 +1,52 @@
+{
+  "commit": "d052a3be539a0cf358f550a54eecb33e7c0451f2",
+  "sourceDigest": "dddf66c6b614d9bd077720f3f3d70329de69714c46446f394accaf932eea3e19",
+  "sourceVerification": "ci-d052a3be-source.json",
+  "run": 39715830625,
+  "artifact": 12398949551,
+  "zipSha256": "bc825beeff63618fae4512895daba89faac09001f41bef47d0b102478a5858f6",
+  "reportSha256": "89b6821e0a221c47239dc6f5f0dff55dbbc0ae8ae55af7fde0afc9e23c7fe15f",
+  "activeClauses": 573,
+  "coverage": 613,
+  "statuses": {
+    "passed": 8,
+    "partial": 21,
+    "review-required": 580,
+    "not-tested": 3,
+    "manual-required": 1
+  },
+  "failedChecks": 0,
+  "measuredRoutes": 76,
+  "routes": 78,
+  "measurements": 6825,
+  "unmeasured": [
+    "/dev/ux-lab",
+    "/operator/wallboard"
+  ],
+  "compliant": false,
+  "developmentRelease": {
+    "profile": "development-20261012",
+    "ready": true,
+    "productionAcceptance": false,
+    "blockers": [],
+    "deferredProductionEvidence": [
+      "trusted-live-scanner-and-existing-file-rescan",
+      "complete-432-requirement-approval",
+      "named-pixel-and-physical-pwa-approval",
+      "full-ingress-spoof-proof",
+      "runtime-performance-and-historical-domain-review",
+      "alarm-delivery-proof"
+    ]
+  },
+  "blockers": [
+    "Revision7 clause-level review and complete current route/role/state acceptance remain open; historical V22 records are traceability only",
+    "Physical installed iOS/Android PWA and OS keyboard unavailable",
+    "All route/state/role combinations have not yet been individually instrumented",
+    "Visual baseline requires reviewed same-commit capture; no auto-update",
+    "React component attribution is static reachability + selector mount; no React fiber identity claim"
+  ],
+  "measurementMeaning": "Legacy measurements counts route assignments, not distinct files or independent clause approvals.",
+  "routeMeasurementAssignments": 6825,
+  "distinctAssignedMeasurementFiles": 5993,
+  "acceptedMeasurementFiles": 6001
+}

@@ -6,6 +6,7 @@ import {query,withTransaction} from "@/lib/server/db";
 import {ApiError} from "@/lib/server/http";
 import {env} from "@/lib/server/env";
 import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
+import {requireFreshAuthentication} from './fresh-authentication';
 
 export type SessionUser={
  moduleProfile?:import('@/lib/permissions').ModuleProfile;
@@ -93,14 +94,12 @@ export async function getSession():Promise<SessionUser|null>{
  return session;
 }
 
-export async function requireSession(options:{allowMfaEnrollment?:boolean}={}){
+export async function requireSession(options:{allowMfaEnrollment?:boolean;freshAuthentication?:boolean}={}){
  if((await maintenanceState()).enabled)throw new ApiError(503,"maintenance","Binso One wird gewartet");
  const session=await getSession();
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
- const privileged=["owner","admin","finance"].includes(session.role);
- if(privileged&&!session.mfaEnabled&&!options.allowMfaEnrollment){
-   const {ApiError}=await import("@/lib/server/http");
-   throw new ApiError(403,"mfa_enrollment_required","Für dieses Konto muss zuerst die Authenticator-App eingerichtet werden.");
- }
- return session;
+ // TOTP is voluntary under the 21 October master. Sensitive mutations invoke
+ // the session-bound fresh proof explicitly; ordinary access retains RBAC/RLS.
+  if(options.freshAuthentication)await requireFreshAuthentication(session);
+  return session;
 }

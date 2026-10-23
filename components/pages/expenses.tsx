@@ -1,15 +1,18 @@
 "use client";
 
+import {expenseClaimStatus,isExpensePaymentKind,type ExpensePaymentKind} from '@/lib/expense-payment';
 import {DirectorySelect} from "../directory-select";
 import {fileSelectionError} from '@/lib/file-selection';
 import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
-import {LocalizedText} from "@/lib/client/locale";
+import {LocalizedText,useLocale} from "@/lib/client/locale";
+import {localeTags} from "@/lib/locales";
+import {formatTimestampDate} from "@/lib/display-format";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import {ActionSheet,FormSheet} from "../binso-ux";
 
-import { businessDate } from "@/lib/financial-status";
+import { businessDate,formatCurrency,formatDate } from "@/lib/financial-status";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -32,6 +35,7 @@ export function ExpensesPage() {
 }
 
 export function ExpenseForm({ existing = false, expenseId }: { existing?: boolean; expenseId?: string }) {
+ const {locale}=useLocale();
   const router=useRouter();
   const searchParams=useSearchParams();
   const returnTo=safeAppPath(searchParams.get("returnTo"),"/spesen");
@@ -43,6 +47,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const [category,setCategory]=useState(existing?"Reise":"Reise");
   const [amount,setAmount]=useState("");
   const [currency,setCurrency]=useState("CHF");
+  const [paymentKind,setPaymentKind]=useState<ExpensePaymentKind>("unknown");
   const [vatRate,setVatRate]=useState("8.1");
   const [merchant,setMerchant]=useState("");
   const [description,setDescription]=useState("");
@@ -56,6 +61,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
   const customersQuery=useApiQuery<{items:Array<{id:string;name:string}>}>("/api/customers");
   const expenseCustomers=customersQuery.data?.items??[];
   const [reimbursedAt,setReimbursedAt]=useState<string|null>(null),[reimbursementRef,setReimbursementRef]=useState("");
+  const [reimbursementDate,setReimbursementDate]=useState("");
   const [invoicedId,setInvoicedId]=useState<string|null>(null);
   const canFinanceExpense=["owner","admin","finance"].includes(role);
   const [createdExpenseId,setCreatedExpenseId]=useState(expenseId??"");
@@ -81,11 +87,12 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     if(editedExpense||!expenseQuery.data)return;
     const item=expenseQuery.data.item??expenseQuery.data.items?.[0];if(!item)return;
     let active=true;queueMicrotask(()=>{if(!active)return;
-        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??""));setExpenseCustomer(String(item.customer_id??""));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??""));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);
+        setPersistedExpenseStatus(String(item.status));setPerson(String(item.employee_id??""));setExpenseCustomer(String(item.customer_id??""));setExpenseBillable(item.billable===true);setReimbursedAt(item.reimbursed_at?String(item.reimbursed_at):null);setReimbursementRef(String(item.reimbursement_reference??""));setReimbursementDate(String(item.reimbursement_paid_on??"").slice(0,10));setInvoicedId(item.invoiced_invoice_id?String(item.invoiced_invoice_id):null);
         setDate(String(item.expense_date??"").slice(0,10));
         setCategory(({travel:"Reise",expense:"Verpflegung",material:"Material",other:"Sonstiges"} as Record<string,string>)[String(item.category)]??String(item.category??"Reise"));
         setAmount(Number(item.amount??0).toFixed(2));
         setCurrency(String(item.currency??"CHF"));
+        setPaymentKind(isExpensePaymentKind(item.payment_kind)?item.payment_kind:"unknown");
         setVatRate(String(item.vat_rate??"8.1"));
         setMerchant(String(item.merchant??""));
         setDescription(String(item.description??""));
@@ -94,10 +101,10 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     });return()=>{active=false};
   },[editedExpense,expenseQuery.data]);
 
-  const expenseDraft={person,date,category,amount,currency,vatRate,merchant,description,status,expenseCustomer,expenseBillable,createdExpenseId,requestKey:expenseReplayKey};
+  const expenseDraft={person,date,category,amount,currency,paymentKind,vatRate,merchant,description,status,expenseCustomer,expenseBillable,createdExpenseId,requestKey:expenseReplayKey};
   const expenseRecovery=useProcessDraft({process:"expense:create",value:expenseDraft,dirty:editedExpense,enabled:!existing&&!savedExpense,onRestore:value=>{
     if(!value||[value.person,value.date,value.category,value.amount,value.currency,value.vatRate,value.merchant,value.description,value.status,value.expenseCustomer,value.createdExpenseId,value.requestKey].some(field=>typeof field!=="string"||field.length>4000)||typeof value.expenseBillable!=="boolean")return;
-    setPerson(value.person);setDate(value.date);setCategory(value.category);setAmount(value.amount);setCurrency(value.currency);setVatRate(value.vatRate);setMerchant(value.merchant);setDescription(value.description);setStatus(value.status);setExpenseCustomer(value.expenseCustomer);setExpenseBillable(value.expenseBillable);setCreatedExpenseId(value.createdExpenseId);expenseRequestKey.current=value.requestKey;setExpenseReplayKey(value.requestKey);setEditedExpense(true);
+    setPaymentKind(isExpensePaymentKind(value.paymentKind)?value.paymentKind:"unknown");setPerson(value.person);setDate(value.date);setCategory(value.category);setAmount(value.amount);setCurrency(value.currency);setVatRate(value.vatRate);setMerchant(value.merchant);setDescription(value.description);setStatus(value.status);setExpenseCustomer(value.expenseCustomer);setExpenseBillable(value.expenseBillable);setCreatedExpenseId(value.createdExpenseId);expenseRequestKey.current=value.requestKey;setExpenseReplayKey(value.requestKey);setEditedExpense(true);
   }});
   const scanReceipt=async(file:File|null)=>{
     if(receiptScanPending.current||expenseMutationPending.current||lockedExpense||!file)return;
@@ -121,7 +128,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     if(!Number.isFinite(value)||value<=0){setToast("Bitte einen gültigen Betrag erfassen.");window.setTimeout(()=>setToast(null),2200);return;}
     const statusMap:Record<string,string>={Entwurf:"draft",Eingereicht:"submitted",Genehmigt:"approved",Abgelehnt:"rejected"};
     expenseMutationPending.current=true;setExpenseBusy(true);try{
-      const payload={customerId:expenseCustomer,billable:expenseBillable,employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:reviewStatus??statusMap[status]??"submitted"};
+      const payload={paymentKind,customerId:expenseCustomer,billable:expenseBillable,employeeId:person,merchant:merchant.trim()||description.trim()||category,expenseDate:date,category,amount:value,currency,vatRate:Number(vatRate),description,status:reviewStatus??statusMap[status]??"submitted"};
       let targetExpenseId=expenseId??createdExpenseId;let receiptUploaded=false;
       {
         if(targetExpenseId){
@@ -152,7 +159,8 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     }
   };
 
-  const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
+  const recordReimbursement=async()=>{if(expenseMutationPending.current||!expenseId)return;expenseMutationPending.current=true;setExpenseBusy(true);try{const r=await apiPost<{item:{reimbursed_at:string}}>('/api/expenses/'+encodeURIComponent(expenseId)+'/reimbursement',{reference:reimbursementRef,paidOn:reimbursementDate,amount,currency});setReimbursedAt(r.item.reimbursed_at);setReimbursementOpen(false);setToast('Erstattung erfasst.')}catch(e){setToast(e instanceof Error?e.message:'Erstattung konnte nicht erfasst werden.')}finally{expenseMutationPending.current=false;setExpenseBusy(false)}};
+  const paymentLabels:Record<ExpensePaymentKind,string>={unknown:"Zahlungsart ungeklärt",private:"Privat bezahlt",company_card:"Firmenkarte",company_direct:"Direkt durch die Firma bezahlt"};
   const selectedEmployee=availableEmployees.find(item=>item.id===person);
   const storedEmployee=expenseQuery.data?.item?.employee as {first_name?:string;last_name?:string}|undefined;
   const employeeLabel=selectedEmployee?[selectedEmployee.first_name,selectedEmployee.last_name].filter(Boolean).join(" "):[storedEmployee?.first_name,storedEmployee?.last_name].filter(Boolean).join(" ")||"Ohne Mitarbeiter";
@@ -166,13 +174,14 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
       {(!existing||editingExpense)&&!lockedExpense&&<><Button requiresWrite variant="upload" icon="upload" className={`receipt-upload ${scanState==="scanning"?"is-scanning":""}`} disabled={expenseBusy||scanState==="scanning"} onClick={()=>document.getElementById("expense-receipt-upload")?.click()}><b><LocalizedText verbatim={scanState!=="scanning"&&!!receiptFile}>{scanState==="scanning"?"Beleg wird erkannt…":receiptFile?receiptFile.name:"Beleg fotografieren"}</LocalizedText></b><small><LocalizedText>{scanState==="done"?`Erkannt${scanConfidence!==null?` · ${Math.round(scanConfidence*100)}% Sicherheit`:""} – Angaben prüfen`:scanState==="error"?"Erkennung nicht möglich – manuell erfassen":"Kamera oder Datei verwenden · Angaben werden automatisch vorausgefüllt"}</LocalizedText></small></Button><Input id="expense-receipt-upload" hidden disabled={expenseBusy||scanState==="scanning"} type="file" capture="environment" accept="image/png,image/jpeg,image/webp,application/pdf" onChange={e=>{const file=e.target.files?.[0]??null;e.target.value="";void scanReceipt(file)}}/></>}
       <div className="form-page">
         {expenseFiles.length>0&&<section><SectionTitle title="Quittungen"/><div className="compact-list">{expenseFiles.map(f=><a key={f.id} href={'/api/files/'+f.id+'/download'}><span>{f.fileName}</span><Icon name="file"/></a>)}</div></section>}
-        {existing&&!editingExpense?<section className="expense-summary"><h2>{merchant}</h2><strong className="expense-summary-amount">{new Intl.NumberFormat('de-CH',{style:'currency',currency}).format(Number(amount))}</strong><p>{date.split('-').reverse().join('.')} · {category}</p>{description&&description!==merchant&&<p>{description}</p>}<details><summary><LocalizedText>{"Details"}</LocalizedText></summary><p>{employeeLabel}</p>{expenseCustomer&&<Link href={'/kunden/'+encodeURIComponent(expenseCustomer)}>{expenseCustomers.find(item=>item.id===expenseCustomer)?.name??'Kunde'}</Link>}{reimbursedAt&&<p><LocalizedText>{"Erstattet am "}</LocalizedText>{new Date(reimbursedAt).toLocaleDateString('de-CH')}</p>}</details></section>:<><fieldset disabled={lockedExpense||expenseBusy||scanState==="scanning"} className="form-grid two form-fieldset">
+        {existing&&!editingExpense?<section className="expense-summary"><h2>{merchant}</h2><strong className="expense-summary-amount">{formatCurrency(Number(amount),currency,localeTags[locale])}</strong><p>{formatDate(date,localeTags[locale])} · {category}</p>{description&&description!==merchant&&<p>{description}</p>}<details><summary><LocalizedText>{"Details"}</LocalizedText></summary><p>{employeeLabel}</p><p><LocalizedText>{paymentLabels[paymentKind]}</LocalizedText></p>{expenseCustomer&&<Link href={'/kunden/'+encodeURIComponent(expenseCustomer)}>{expenseCustomers.find(item=>item.id===expenseCustomer)?.name??<LocalizedText>Kunde</LocalizedText>}</Link>}{reimbursedAt&&<p><LocalizedText>{"Erstattet am "}</LocalizedText>{formatTimestampDate(reimbursementDate||reimbursedAt,localeTags[locale])}</p>}</details></section>:<><fieldset disabled={lockedExpense||expenseBusy||scanState==="scanning"} className="form-grid two form-fieldset">
           <Field label="Händler"><Input value={merchant} onChange={e=>setMerchant(e.target.value)} placeholder="Wird aus dem Beleg erkannt"/></Field>
           <Field label="Mitarbeiter"><Select value={person} onChange={e=>setPerson(e.target.value)}><option value=""><LocalizedText>{"Keine Zuordnung"}</LocalizedText></option>{availableEmployees.map(item=><option key={item.id} value={item.id}>{item.first_name} {item.last_name}</option>)}</Select></Field>
           <Field label="Datum"><Input type="date" value={date} onChange={e=>setDate(e.target.value)}/></Field>
           <Field label="Kategorie"><Select value={category} onChange={e=>setCategory(e.target.value)}><option value={"Reise"}><LocalizedText>{"Reise"}</LocalizedText></option><option value={"Verpflegung"}><LocalizedText>{"Verpflegung"}</LocalizedText></option><option value={"Material"}><LocalizedText>{"Material"}</LocalizedText></option><option value={"Sonstiges"}><LocalizedText>{"Sonstiges"}</LocalizedText></option></Select></Field>
           <Field label="Betrag"><Input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0.00"/></Field>
           <Field label="Währung"><Select value={currency} onChange={e=>setCurrency(e.target.value)}><option value={"CHF"}><LocalizedText>{"CHF"}</LocalizedText></option><option value={"EUR"}><LocalizedText>{"EUR"}</LocalizedText></option></Select></Field>
+          <Field label="Bezahlt mit"><Select value={paymentKind} onChange={e=>{if(isExpensePaymentKind(e.target.value))setPaymentKind(e.target.value)}}>{Object.entries(paymentLabels).map(([value,label])=><option key={value} value={value}><LocalizedText>{label}</LocalizedText></option>)}</Select></Field>
           <Field label="MwSt."><Select value={vatRate} onChange={e=>setVatRate(e.target.value)}><option value="8.1">8.1%</option><option value="2.6">2.6%</option><option value="0">0%</option></Select></Field>
           {existing&&<Field label="Status"><Select value={status} onChange={e=>setStatus(e.target.value)}><option value={"Entwurf"}><LocalizedText>{"Entwurf"}</LocalizedText></option><option value={"Eingereicht"}><LocalizedText>{"Eingereicht"}</LocalizedText></option>{(canApproveExpense||status==="Genehmigt")&&<option value={"Genehmigt"} disabled={!canApproveExpense}><LocalizedText>{"Genehmigt"}</LocalizedText></option>}{(canApproveExpense||status==="Abgelehnt")&&<option value={"Abgelehnt"} disabled={!canApproveExpense}><LocalizedText>{"Abgelehnt"}</LocalizedText></option>}</Select></Field>}
           <Field label="Weiterverrechnen"><Select value={expenseBillable?'yes':'no'} onChange={e=>setExpenseBillable(e.target.value==='yes')}><option value="no"><LocalizedText>{"Nicht weiterverrechnen"}</LocalizedText></option><option value="yes"><LocalizedText>{"An Kunden weiterverrechnen"}</LocalizedText></option></Select></Field>
@@ -181,12 +190,12 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
         </fieldset>
         </>}
       </div>
-      {existing&&<ActionSheet label="Spesenaktionen" open={expenseActions} onClose={()=>setExpenseActions(false)}><section className="context-action-group">{canApproveExpense&&persistedExpenseStatus==="submitted"&&<><Button requiresWrite disabled={expenseBusy} onClick={()=>void save("approved")}><LocalizedText>{"Genehmigen"}</LocalizedText></Button><Button requiresWrite variant="secondary" disabled={expenseBusy} onClick={()=>void save("rejected")}><LocalizedText>{"Ablehnen"}</LocalizedText></Button></>}{!lockedExpense&&(expenseQuery.data?.item?.created_by_user_id===sessionQuery.data?.user?.id||["owner","admin"].includes(role))&&<Button requiresWrite variant="secondary" icon="edit" onClick={()=>{setExpenseActions(false);setEditingExpense(true)}}><LocalizedText>{canApproveExpense?"Prüfen":"Bearbeiten"}</LocalizedText></Button>}{lockedExpense&&<p><LocalizedText>{"Genehmigte Spesen sind gesperrt."}</LocalizedText></p>}{reimbursedAt?<p><LocalizedText>{"Erstattet am "}</LocalizedText>{new Date(reimbursedAt).toLocaleDateString('de-CH')} · {reimbursementRef}</p>:lockedExpense&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary"><LocalizedText>{"Weiterverrechnen"}</LocalizedText></Button>}{invoicedId&&<p><LocalizedText>{"Bereits einer Rechnung zugeordnet."}</LocalizedText></p>}<Link href="/spesen"><Icon name="card"/><span><b><LocalizedText>{"Alle Spesen"}</LocalizedText></b><small><LocalizedText>{"Zur Spesenübersicht"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link></section></ActionSheet>}
+      {existing&&<ActionSheet label="Spesenaktionen" open={expenseActions} onClose={()=>setExpenseActions(false)}><section className="context-action-group">{canApproveExpense&&persistedExpenseStatus==="submitted"&&<><Button requiresWrite disabled={expenseBusy} onClick={()=>void save("approved")}><LocalizedText>{"Genehmigen"}</LocalizedText></Button><Button requiresWrite variant="secondary" disabled={expenseBusy} onClick={()=>void save("rejected")}><LocalizedText>{"Ablehnen"}</LocalizedText></Button></>}{!lockedExpense&&(expenseQuery.data?.item?.created_by_user_id===sessionQuery.data?.user?.id||["owner","admin"].includes(role))&&<Button requiresWrite variant="secondary" icon="edit" onClick={()=>{setExpenseActions(false);setEditingExpense(true)}}><LocalizedText>{canApproveExpense?"Prüfen":"Bearbeiten"}</LocalizedText></Button>}{lockedExpense&&<p><LocalizedText>{"Genehmigte Spesen sind gesperrt."}</LocalizedText></p>}{reimbursedAt?<p><LocalizedText>{"Erstattet am "}</LocalizedText>{formatTimestampDate(reimbursedAt,localeTags[locale])} · {reimbursementRef}</p>:expenseClaimStatus(paymentKind,persistedExpenseStatus,reimbursedAt)==="eligible"&&canFinanceExpense&&<Button variant="secondary" onClick={()=>setReimbursementOpen(true)}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button>}{lockedExpense&&canFinanceExpense&&expenseBillable&&expenseCustomer&&!invoicedId&&<Button href={'/rechnungen/neu?expenses='+encodeURIComponent(expenseId??'')} variant="secondary"><LocalizedText>{"Weiterverrechnen"}</LocalizedText></Button>}{invoicedId&&<p><LocalizedText>{"Bereits einer Rechnung zugeordnet."}</LocalizedText></p>}<Link href="/spesen"><Icon name="card"/><span><b><LocalizedText>{"Alle Spesen"}</LocalizedText></b><small><LocalizedText>{"Zur Spesenübersicht"}</LocalizedText></small></span><Icon name="arrow" size={15}/></Link></section></ActionSheet>}
     </div>
   </>;
   return <AppShell titleIsUserContent={false} editing={!existing||editingExpense} unsavedChanges={existing&&editedExpense&&!savedExpense} title={existing?"Spese":"Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : undefined} active="spesen" backHref={returnTo} backLabel="Spesen" actions={existing&&!editingExpense?<Button variant="ghost" icon="more" ariaLabel="Spesenaktionen" onClick={()=>setExpenseActions(true)}/>:undefined}>
     {existing&&!editingExpense?workspace:<FormSheet workspace label={existing?"Spese bearbeiten":"Spese erfassen"} description="Beleg fotografieren oder Datei auswählen." open onClose={close} busy={expenseBusy||scanState==="scanning"} dirty={editedExpense&&!savedExpense} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}><LocalizedText>{existing?"Speichern":"Einreichen"}</LocalizedText></Button></>}>{workspace}</FormSheet>}
-    {reimbursementOpen&&<FormSheet label={"Erfolgte Erstattung erfassen"} description={"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst."} open={true} onClose={()=>setReimbursementOpen(false)} busy={expenseBusy} className={""} layerClassName={""} ariaLabel={"Erstattung erfassen"}><Field label="Zahlungsreferenz"><Input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><FormActions sheet><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={expenseBusy||!reimbursementRef.trim()} onClick={()=>void recordReimbursement()}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button></FormActions></FormSheet>}
+    {reimbursementOpen&&<FormSheet label={"Erfolgte Erstattung erfassen"} description={"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst."} open={true} onClose={()=>setReimbursementOpen(false)} busy={expenseBusy} className={""} layerClassName={""} ariaLabel={"Erstattung erfassen"}><p>{formatCurrency(Number(amount),currency,localeTags[locale])}</p><Field label="Tatsächliches Zahlungsdatum"><Input type="date" max={businessDate()} value={reimbursementDate} onChange={e=>setReimbursementDate(e.target.value)}/></Field><Field label="Zahlungsreferenz"><Input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><FormActions sheet><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={expenseBusy||!reimbursementRef.trim()||!reimbursementDate} onClick={()=>void recordReimbursement()}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button></FormActions></FormSheet>}
     {existing&&toast&&<Toast title={toast} tone={["Spese und Beleg gespeichert.","Spese gespeichert.","Spese eingereicht.","Erstattung erfasst."].includes(toast)?"success":"danger"}/>}
   </AppShell>;
 }

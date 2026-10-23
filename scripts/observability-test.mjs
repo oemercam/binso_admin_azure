@@ -4,6 +4,10 @@ import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {moduleUrl} from './data-test-modules.mjs';
 const modelUrl=moduleUrl(await fs.readFile('lib/observability/model.ts','utf8'));
+const {validWebVital}=await import(moduleUrl(await fs.readFile('lib/web-vitals.ts','utf8')));
+const validVital={name:'INP',value:100,rating:'good',route:'/dashboard'};
+for(const name of ['CLS','FCP','INP','LCP','TTFB'])assert.equal(validWebVital({...validVital,name}),true);
+for(const patch of [{name:'FID'},{name:'unknown'},{value:-1},{value:null},{value:'100'},{value:Infinity},{rating:'unknown'},{route:'//outside.invalid'},{route:'/go?token=private'},{route:'/go#private'}])assert.equal(validWebVital({...validVital,...patch}),false);
 const {effectiveMetric,evaluateAlarms,overallHealth}=await import(modelUrl);
 const at='2026-10-11T12:00:00Z',now=Date.parse(at);
 const metric={id:'failed',value:1,measuredAt:at,state:'critical',dataState:'fresh'};
@@ -51,6 +55,47 @@ try{
  const support=await monitoringSnapshot('platform_support');
  for(const id of ['payments','subscriptions','past_due','billing_failed','audit_events']){assert.equal(find(support,id).value,null);assert.equal(find(support,id).dataState,'no_permission',id);}
  assert.ok(!JSON.stringify(owner).includes('fixture@invalid.test'),'No recipients or payloads');
+ // The live document sender uses document_deliveries, not mail_outbox.
+ // Preserve unknown outcomes and count only stale in-flight claims.
+ for(const [index,status,age,tenant] of [
+  [0,'not_attempted','1 minute',org],[1,'uncertain','1 minute',org],
+  [2,'failed','1 minute',org],[3,'sending','6 minutes',org],
+  [4,'sending','1 minute',org],[5,'sent','6 minutes',org],
+  [6,'not_attempted','6 minutes',demo],[7,'uncertain','6 minutes',demo],
+  [8,'sending','6 minutes',demo],
+ ]){
+  await db.query("select set_config('app.organization_id',$1,false)",[tenant]);
+  await db.query("insert into document_deliveries(organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,created_at) values($1,'invoice',gen_random_uuid(),'private-document@fixture.invalid',$2,$3,'fixture',now()-$4::interval)",[tenant,status,'obs-document-'+index,age]);
+ }
+ await db.query("select set_config('app.organization_id','',false),set_config('app.platform_operator','false',false)");
+ assert.equal((await db.query('select count(*)::int n from document_deliveries')).rows[0].n,0,'No tenant/platform context cannot read dispatch history');
+ await db.query("select set_config('app.organization_id',$1,false)",[org]);
+ assert.equal((await db.query('select count(*)::int n from document_deliveries')).rows[0].n,6,'Tenant sees its own history only');
+ assert.equal((await db.query('select count(*)::int n from document_deliveries where organization_id=$1',[demo])).rows[0].n,0,'Foreign delivery history remains hidden');
+ await db.query("select set_config('app.organization_id','',false),set_config('app.platform_operator','true',false)");
+ assert.equal((await db.query("update document_deliveries set status='sent' where request_key='obs-document-2' returning id")).rows.length,0,'Platform read scope cannot alter delivery outcomes');
+ const documents=await monitoringSnapshot('platform_owner');
+ assert.equal(find(documents,'mail_failed').value,2,'Both ledgers feed the existing failure alarm; demo document failures excluded');
+ assert.equal(find(documents,'mail_uncertain').value,2,'Historical failed documents remain unknown, never definitely failed or delivered');
+ assert.equal(find(documents,'mail_stuck').value,1,'Only document claims older than five minutes count');
+ assert.equal(documents.alarms.find(a=>a.id==='mail-uncertain').state,'warning');
+ assert.equal(documents.alarms.find(a=>a.id==='mail-stuck').state,'warning');
+ assert.equal(find(documents,'mail_failed').source,'mail_outbox + document_deliveries');
+ assert.ok(!JSON.stringify(documents).includes('private-document@fixture.invalid'),'Document recipients remain private');
+ assert.equal((await db.query("select status from document_deliveries where request_key='obs-document-2'")).rows[0].status,'failed','Monitoring never changes a delivery state');
+ const supportDocuments=await monitoringSnapshot('platform_support');
+ assert.equal(find(supportDocuments,'mail_uncertain').value,2,'Existing permitted aggregate remains visible');
+ assert.equal(find(supportDocuments,'billing_failed').dataState,'no_permission');
+ await db.query("select set_config('app.organization_id',$1,false)",[org]);
+ await db.query("insert into document_deliveries(organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,created_at,completed_at,purpose,reminder_stage,balance_amount,payment_deadline) select organization_id,kind,document_id,recipient,'sent','obs-document-other-purpose','fixture',now(),now(),'reminder',1,100,current_date+10 from document_deliveries where request_key='obs-document-0'");
+ assert.equal(find(await monitoringSnapshot('platform_owner'),'mail_failed').value,2,'Another dispatch purpose cannot hide the failed document attempt');
+ await db.query("insert into document_deliveries(organization_id,kind,document_id,recipient,status,request_key,created_by_user_id,created_at,completed_at,purpose) select organization_id,kind,document_id,recipient,'sent','obs-document-recovery','fixture',now(),now(),purpose from document_deliveries where request_key='obs-document-0'");
+ assert.equal(find(await monitoringSnapshot('platform_owner'),'mail_failed').value,1,'Later confirmed same-document/recipient/purpose acceptance resolves the definitely unattempted alert without rewriting history');
+ for(const tenant of [org,demo]){
+  await db.query("select set_config('app.organization_id',$1,false)",[tenant]);
+  await db.query("delete from document_deliveries where request_key like 'obs-document-%'");
+ }
+ await db.query("select set_config('app.organization_id','',false)");
  await db.query("update mail_outbox set status='accepted' where deduplication_key='obs-failed'");
  assert.equal((await monitoringSnapshot('platform_owner')).alarms.find(a=>a.id==='mail-failed').state,'healthy','Recovery only after new measurement');
  globalThis.observabilityDatabase=()=>{throw Error('Synthetic database unavailable with secret');};

@@ -1,0 +1,1038 @@
+{
+  "baseline": "26dc1ffc7bf61a4058deba8b25b0271e1dc5dad1",
+  "entries": {
+    "R7-19-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-19-002": {
+      "sourceTextSha256": "d6473927da5ad582a8fd1b57fb78c38df8528d1f6b575a2d45e7fad0a241078c",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
+    },
+    "R7-20-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-38-009": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-38-021": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-39-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-002": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-44-003": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-49-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-50-001": {
+      "status": "teilweise_implementiert",
+      "test": "Actual server-rendered notification settings and shared switch:5 unique names in4 languages, referenced IDs, no stale concatenated aria-label, both checked states, busy/disabled and button semantics passed. Typecheck, changed lint and unchanged navigation contract passed.",
+      "visualComparison": "Interactive failure/pending/keyboard/reload browser cases added; current execution and visual/device acceptance pending.",
+      "blocker": "Current complete CI, all setting families and actual device/assistive-technology acceptance remain open.",
+      "sourceTextSha256": "6c55cb7e4c3e9e1afaac6dc9b3e78444f858097913a988a38867dbde83d3a94e",
+      "implementation": "Existing switch uses visible translated channel/topic labels through aria-labelledby; confirmed-state persistence, native keyboard, busy/disabled and safe fallback naming retained.",
+      "sourceReferences": [
+        "components/ui.tsx",
+        "components/pages/settings.tsx",
+        "app/api/settings/notifications/route.ts"
+      ]
+    },
+    "R7-51-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-53-001": {
+      "status": "teilweise_implementiert",
+      "test": "Gezielte Prüfungen: registration-test, profile-image-test, document-presentation-test, pdf-gestures-test, migration-test; letzter Datenbanklauf bestanden.",
+      "visualComparison": "Ausstehend am aktuellen Revision7-Stand",
+      "blocker": "Vollständige Klauselabnahme und reale Geräte fehlen; nicht als vollständig bestanden werten."
+    },
+    "R7-51-003": {
+      "sourceTextSha256": "bbf9d022efa18e16af01f8415c3868514d0c8b0fff42d2bfd1c5261abf074f4d",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer Consent-Owner mit drei gleichgewichteten Optionen, Toggles und nun mindestens44px Aktionen auch auf Desktop.",
+      "sourceReferences": [
+        "components/privacy-consent.tsx",
+        "app/design-system/marketing.css",
+        "scripts/privacy-consent-browser.mjs"
+      ],
+      "test": "Vier echte lokale Desktopfälle DE/FR/IT/EN: je44px, gleiche Farben/Font/Gewicht, gespeicherte Ablehnung bestanden. Vorhandene Lifecycle-/Widerrufstests bleiben.",
+      "visualComparison": "Gezielte lokale tatsächliche Geometrie; vollständige Browser-/PWA-/Provider- und Rechtsabnahme offen.",
+      "blocker": "Aktuelle gebündelte Browserqualifikation sowie juristischer und tatsächlicher Provider-Nachweis offen."
+    },
+    "R7-51-004": {
+      "sourceTextSha256": "a51b9e66005adcc0f6a7c0a5a72a47125f9c59a4b7630740e5080ece616a3df2",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-51-005": {
+      "sourceTextSha256": "1819c54a9545ee190866a82249216df61e73825b6fed840c1be1f1cb98364514",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-51-006": {
+      "sourceTextSha256": "5bb4ff42ce6300e49fd365af8075ac6abc558b0989b80b031e8e55070858c872",
+      "status": "teilweise_implementiert",
+      "test": "scripts/web-vitals-consent-test.mjs bestanden; Typecheck und gezielter ESLint bestanden; Speicherinventar docs/audit/v25-revision7/browser-storage.md.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Laufzeit-Netzwerknachweis und juristische Einordnung sowie reale PWA-Abnahme offen."
+    },
+    "R7-53-002": {
+      "sourceTextSha256": "4f9939b23d79938e99a0251926b87d275b3d8537fbffc75847562d68291cd787",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-003": {
+      "sourceTextSha256": "f36accf4d062b348a545ca2fbfb3561e6114407ecc7197e43e89a6b7afe41cca",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-004": {
+      "sourceTextSha256": "c493481f448ae20c04228248c477516844d8ed43526cbe4da3c84b43434b877e",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-53-005": {
+      "sourceTextSha256": "a996d30dfe613c3ef9ed7e9c5e7e6768364163dcf103b0a80b597cae6c107386",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs bestanden: tatsächliche Ticketanlage, Reply-Idempotenz, Reopen, Mandantenfilter und Audit. Keine separate Live-Chat-Infrastruktur erzeugt.",
+      "visualComparison": "Noch kein vollständiger Referenzvergleich auf aktuellem Head.",
+      "blocker": "Vollständige Support-Admin-/Benachrichtigungs- und Geräteabnahme offen."
+    },
+    "R7-43-001": {
+      "sourceTextSha256": "de7fb8d78f6a7833257d2532b9223302f630e8e89a4e5af07fc24e74f807c80d",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-002": {
+      "sourceTextSha256": "01e592cfef11fe3a4de63c810e30ecb14dcb92433c39b0bb1ea42ade6830f571",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-003": {
+      "sourceTextSha256": "f6da52b94b9d5892f10c7ce01e0a566abba59129e9a04a498f03115ea771c1a3",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-004": {
+      "sourceTextSha256": "820af352f27eff887d409d75f0064d6595b3d64ff2f66714c75c73b0c54acfe9",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-005": {
+      "sourceTextSha256": "f302ab3455d23e2aebfe9abae1f0a0d6df43760952623f1aed3d6d29964f57a5",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-006": {
+      "sourceTextSha256": "6ecb4c46add005e12b9fd770019d9c146e009fd74b8837a636b403fb0fa91dfc",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-007": {
+      "sourceTextSha256": "bc7772c96d2717be2536167bb81490adec1b421da39c4d04857d428128b15e1a",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-008": {
+      "sourceTextSha256": "7f9bbd76986aca52fc679aa689867d8aef58f62d3cfe6998887a3f2a30202252",
+      "status": "teilweise_implementiert",
+      "implementation": "Existing aggregate report now includes offer status/count/volume by currency and issue-date cohort, canonical sum-then-round VAT and expiry, explicit accepted/declined decision denominator; retains cash/invoices/expense categories. Informational recorded invoice net/VAT/gross before credits added; gross-only credit notes shown separately with explicit uncertainty and no inferred tax adjustment. Includes archived issued records, excludes draft/cancelled/future records.",
+      "sourceReferences": [
+        "lib/server/repositories/reports.ts",
+        "lib/server/repositories/finance.ts",
+        "lib/report-export.ts",
+        "components/pages/reports.tsx"
+      ],
+      "test": "Actual migrated DB and canonical document-list parity, role/tenant/Start, temporal and fractional-VAT negative cases passed. Migrated VAT-report positive/negative amount/date/archive/role/plan/tenant and CSV disclaimer cases passed.",
+      "visualComparison": "New report UI browser cases added, not yet visually accepted.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-009": {
+      "sourceTextSha256": "42e62a1191149d38124c2ec17ff6b4f8a576d13c97857a1fb5c4991c81e6c109",
+      "status": "teilweise_implementiert",
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "sourceReferences": [
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
+      ]
+    },
+    "R7-43-010": {
+      "sourceTextSha256": "0552792c3e70b8398014cbad280b9ab5f4a38f0029269ff39fc2c93c626abd83",
+      "status": "teilweise_implementiert",
+      "test": "Reale migrierte DB-/PDF-Tests für Replay, Hash, Ersteller/Mandant/Rolle/Tarif, Ablauf und Unveränderlichkeit bestanden. Native HTTP- und neue Snapshot-Browserfälle ergänzt, aktuelle CI ausstehend.",
+      "visualComparison": "Lokale gemeinsame PDF-Zoom-/Containmentprüfung einschliesslich CSS-Negativfall bestanden; Report-Seiten-/Geräteabnahme weiterhin offen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise.",
+      "implementation": "Gemeinsame Berichtsprojektion/PDF-Erzeugung und unveränderliche private Berichtskopie mit Ablauf, Scope-Revalidierung, Idempotenz und SHA-256. Vorschau und Download verwenden dieselben Bytes.",
+      "sourceReferences": [
+        "lib/server/report-document.ts",
+        "lib/server/report-exports.ts",
+        "database/migrations/0072_report_export_snapshots.sql",
+        "components/report-actions.tsx"
+      ]
+    },
+    "R7-43-011": {
+      "sourceTextSha256": "64670a893224a459fbe16930ea9fb8aaac8283883b6332de151acc3e38535082",
+      "status": "teilweise_implementiert",
+      "implementation": "Expliziter Berichtversand über bestehenden Graph-/MIME-/Mail-Outbox-Owner mit Empfänger, Betreff, Begleittext, originalem Snapshot-PDF und eigenem Versandprotokoll. Keine automatische Wiederholung; HTTP202 wird nur als Anbieterannahme bezeichnet.",
+      "sourceReferences": [
+        "lib/server/report-mail.ts",
+        "lib/server/email.ts",
+        "components/report-mail.tsx",
+        "app/api/reports/exports/[id]/send/route.ts",
+        "database/migrations/0073_report_mail_outbox.sql"
+      ],
+      "test": "Reale migrierte DB und echte PDF-Bytes mit isoliertem Transport: Anhangsgleichheit, HTML-Escaping, Replay/Konflikt, Nichtkonfiguration, Fehler/Unklarheit, Rollen/Mandanten/Read-only und Grössenlimit bestanden. Gemeinsamer echter Graph-MIME-Renderer separat bestanden. Neue UI-/native HTTP-Fälle noch nicht am aktuellen Stand in CI bestanden.",
+      "visualComparison": "Neue gemeinsame FormSheet-Komposition/Statusanzeige noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-012": {
+      "sourceTextSha256": "e649ea39ba7e878f166b5d1ce5b5b4c82701571f2c8ecfbfa3b0b60b5ca34fda",
+      "status": "teilweise_implementiert",
+      "implementation": "Befristete widerrufbare Report-Links mit 256-Bit-Fragment-Capability, verschlüsseltem Replay, enger RLS-Suche, Herausgeber-/Tarif-/Scope-Neuprüfung und Empfänger-Einmalcode vor PDF-Ausgabe. Kein GET-Effekt, kein öffentlicher Bericht vor Verifikation, kein neuer DB-Login oder Bypass.",
+      "sourceReferences": [
+        "lib/server/public-reports.ts",
+        "database/migrations/0074_report_recipient_shares.sql",
+        "components/report-share.tsx",
+        "components/public-report.tsx",
+        "app/api/public/report/route.ts"
+      ],
+      "test": "Reale migrierte DB mit binso_runtime: narrow lookup, keine breiten Reads/SQL-Writes, Original-PDF, Codeversand an feste Adresse, persistierte Fehlversuche/Sperre, Replay/Widerruf/Ablauf, Rollen-/Mandanten-/Herausgeberentzug, verschlüsselte Replay-Daten, unsicheres HTTP-Konfigurations-Rollback und sichtbare 20-Link-Grenze bestanden. Lokaler Edge-UI-Test mit synthetischer Code-API bestanden. Neue native HTTP-/private UI-Fälle in CI noch ausstehend.",
+      "visualComparison": "Öffentliche Oberfläche aus vorhandenem AuthWorkspace/PDF-Owner abgeleitet; lokaler DE/Light/390-Screenshot gesichtet, keine Original- oder Gerätefreigabe.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-013": {
+      "sourceTextSha256": "15f7661eab570ed043c71e3c706a0410c2c6c13d047b3ae0865ee8a45b8defac",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-014": {
+      "sourceTextSha256": "148a498f94308c524d0f9831394f3ac96f7473dc95dd43f8cc85eb2b06527e19",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-43-015": {
+      "sourceTextSha256": "42557c3e07a4fa7163c708ba6876b2f807abcece5e5ac748d232f8bfc5b46cb7",
+      "status": "teilweise_implementiert",
+      "test": "scripts/migration-test.mjs und document-presentation-test.mjs: echte PDF/CSV, beschränkte Zeitrapporte, explizite Feldprojektion und Rollen-/Filter-/Übergrössengrenzen; Finanzsummary vorhanden.",
+      "visualComparison": "Aktueller Zeitrapport-Dialog noch nicht visuell abgenommen.",
+      "blocker": "Angebots-/informative MwSt.-Auswertung, privater Mail-/Link-Backend und begrenzte Retention sind implementiert. Historische Gutschriften enthalten keine belastbare Steueraufteilung; keine vollständige Steuerdeklaration behaupten. Produktive Retention-Scopes, echte Providerzustellung, rechtliche/fachliche und reale Geräteabnahme bleiben offen. CI a9b7e1fc qualifiziert nur diesen historischen Quellstand; geänderte Quellen benötigen neue Nachweise."
+    },
+    "R7-19-014": {
+      "sourceTextSha256": "1f1598905505184582da4c1297c8e5cd406b404074ad8a88276fe8075b66817f",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
+    },
+    "R7-19-015": {
+      "sourceTextSha256": "daa7867b056fa4438a1348db9568a7df1a0ce55377961e0b39a8a37b854991f6",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer einspaltiger Identity-Owner, Passkey vor Passwort; unabhängige abgeleitete HTML-Referenz vorhanden.",
+      "sourceReferences": [
+        "components/auth-workspace.tsx",
+        "app/login/page.tsx",
+        "docs/audit/v25-revision7/identity-reference.html"
+      ],
+      "test": "Lokale echte Edge-Renders 320/390/768/1440px: zentrierte 440px-Maximalspalte, 28px-Titel,48px-/16px-Eingaben, Passkey-Reihenfolge bestanden; scripts/identity-reference-browser.mjs.",
+      "visualComparison": "Ist/Referenz bei gleichen Breiten gerendert; Screens320/1440 gesichtet. Abgeleitet, keine zusätzliche Original-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige Browser-/Dark-/Assistive-Technology-Abnahme und reale Geräte fehlen."
+    },
+    "R7-19-006": {
+      "sourceTextSha256": "60d34016f5974edc6dc78fb3a3b319b568e32d6e42593086b1aa741c47eae719",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer erster Font-Preload in RootLayout und unabhängigem Root-Fehlerzustand; bestehendes optionales, selbst gehostetes Inter bleibt ohne späten Austausch.",
+      "sourceReferences": [
+        "components/font-preload.tsx",
+        "app/layout.tsx",
+        "app/global-error.tsx",
+        "app/design-system/theme.css",
+        "docs/audit/v25-revision7/font-proof-20261021.json"
+      ],
+      "test": "Tatsächliche lokale Glyphenmessung: vorher Segoe trotz Inter-loaded; nachher Inter. Verzögerter Font bleibt stabiler Systemfallback,0 gemessener CLS-Zuwachs. Reale Serif-Override-Negativprüfung und Root-Fehler-SSR bestanden. Neue CI-Prüfung integriert.",
+      "visualComparison": "CI-Ist/abgeleitete Referenz390/1440 gesichtet; Schriftabweichung gefunden und lokal korrigiert. Keine pauschale Pixel-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige CI-/WebKit-/Geräte-/Fallback- und visuelle Gesamtabnahme offen."
+    },
+    "R7-19-013": {
+      "sourceTextSha256": "a173e9be35785bf53cc6f20768809e6a0977813086dba03f80552c43a9c0a6d6",
+      "status": "teilweise_implementiert",
+      "implementation": "Gemeinsamer erster Font-Preload in RootLayout und unabhängigem Root-Fehlerzustand; bestehendes optionales, selbst gehostetes Inter bleibt ohne späten Austausch.",
+      "sourceReferences": [
+        "components/font-preload.tsx",
+        "app/layout.tsx",
+        "app/global-error.tsx",
+        "app/design-system/theme.css",
+        "docs/audit/v25-revision7/font-proof-20261021.json"
+      ],
+      "test": "Tatsächliche lokale Glyphenmessung: vorher Segoe trotz Inter-loaded; nachher Inter. Verzögerter Font bleibt stabiler Systemfallback,0 gemessener CLS-Zuwachs. Reale Serif-Override-Negativprüfung und Root-Fehler-SSR bestanden. Neue CI-Prüfung integriert.",
+      "visualComparison": "CI-Ist/abgeleitete Referenz390/1440 gesichtet; Schriftabweichung gefunden und lokal korrigiert. Keine pauschale Pixel-/Gerätefreigabe.",
+      "blocker": "Aktuelle vollständige CI-/WebKit-/Geräte-/Fallback- und visuelle Gesamtabnahme offen."
+    },
+    "R7-54-006": {
+      "sourceTextSha256": "da3cffb25db9697c8ab54537c22ce8f25e0c522b12ab466affd6274df76901cc",
+      "status": "teilweise_implementiert",
+      "implementation": "Bestehende Error-Boundaries und consentgebundene Messung; nun begrenzte serverseitige Support-UUID im Client erhalten und getrennt lokalisiert.",
+      "sourceReferences": [
+        "lib/server/http.ts",
+        "lib/client/backend.ts",
+        "lib/client/locale.tsx"
+      ],
+      "test": "Client positive/negative Header-/Body-/UUID-/Statusprüfungen, tatsächliche SSR-Ausgabe DE/FR/IT/EN, Verbatim-Schutz, Typecheck/Lint bestanden.",
+      "visualComparison": "Supportreferenz ist noch nicht über alle Fehlerseiten/Geräte visuell abgenommen.",
+      "blocker": "Vollständige Accessibility-, Offline-/Reconnect- und physische Geräteabnahme offen."
+    },
+    "R7-39-008": {
+      "sourceTextSha256": "bd21d16bf7bdc6f4b66b4e322c4fd2e0f30c9d6f86c5c88bffbe540714b2a91f",
+      "status": "teilweise_implementiert",
+      "implementation": "Strenge Upload-Antwort vor Erfolgsbroadcast; explizite Übernahme eines eigenen nach Rescan sauberen Avatars mit Referenzvergleich und ohne doppelte Auditierung.",
+      "sourceReferences": [
+        "lib/client/backend.ts",
+        "components/pages/settings.tsx",
+        "app/api/files/[id]/route.ts"
+      ],
+      "test": "Isolierte Datenbank-/Routenprüfung inklusive tatsächlichem512px-Download, Pending/Rejected/Foreign/Stale/Replay bestanden; Client-Receipt-Negativfälle und Typecheck/Lint bestanden.",
+      "visualComparison": "Neue Übernahmeaktion im vorhandenen Branding-Browserfall ergänzt, Ausführung in CI offen.",
+      "blocker": "Ursprünglicher produktiver Avatarfehler weiterhin nicht live reproduziert; native HTTP-/Browser-/Geräteabnahme offen. Pending-Verweis nur in laufender Ansicht, kein neuer persistierter Uploadentwurf."
+    },
+    "R7-52-003": {
+      "sourceTextSha256": "8657a03bc65a45d4d00e1e474e40d7d82a39f475182155161eb8e08d901ffa49",
+      "status": "teilweise_implementiert",
+      "implementation": "Vorhandener LegalPage-Owner um Inhaltsverzeichnis und stabile Anker ergänzt; bestehende Kontakt-ID, Textinhalte und Versionsdaten erhalten.",
+      "sourceReferences": [
+        "components/legal-page.tsx",
+        "app/design-system/marketing.css",
+        "docs/audit/v25-revision7/legal-review.md"
+      ],
+      "test": "Tatsächliche SSR-Tests aller5 Rechtsseiten in4 UI-Sprachen;4 lokale Keyboard-/URL-/Fokus-/Overflow-Fälle Hell/Dunkel320/1440 bestanden.",
+      "visualComparison": "Technische Browsernachweise vorhanden; keine juristische Übersetzungs-/Inhaltsfreigabe.",
+      "blocker": "Gemischte/unvollständige rechtliche Sprachfassungen, Demo-Textdrift und externe Vertrags-/Providerprüfung offen."
+    },
+    "R7-49-006": {
+      "sourceTextSha256": "6e6e3491a9422175587cacbf44bdf75ac92fa31e52ead8f6ef19ac542d69a4b4",
+      "status": "teilweise_implementiert",
+      "implementation": "Mandanten-Kontomenü und Spracheinstellungen verwenden denselben bestätigten Profil-Speicherweg mit Pending-Sperre, Fehler und unverändertem bestätigtem Wert bei Fehlern. Öffentliche Sprachwahl bleibt lokal. Abonnementdaten verwenden gewählte Zahlen-/Datums-/Währungsformate. Operator-Präferenz separat über aktive eigene Operator-Identität, nullable language-Spalte und unveränderte Entra-/Rollenprüfung implementiert (Migration0071).",
+      "sourceReferences": [
+        "components/locale-switcher.tsx",
+        "components/header-panel-content.tsx",
+        "components/pages/settings.tsx",
+        "lib/client/language-preference.ts",
+        "lib/client/use-language-preference.ts",
+        "app/api/operator/preferences/route.ts",
+        "components/operator.tsx",
+        "database/migrations/0071_operator_language_preference.sql"
+      ],
+      "test": "Reale Client-Transporttests für4 Sprachen, fehlerhafte/mismatched Antworten ohne Erfolgsbroadcast,503 und Sessionwechsel bestanden. Browserfälle für Fehler/Pending/Reload/Avatar-Menü ergänzt, noch nicht am neuen Stand ausgeführt. Reale migrierte DB-Prüfung für alle5 Operator-Rollen,4 Sprachen, Eigenidentität, identisches Replay ohne doppeltes Audit, ungültige Zusatzfelder, fremde Origin, Sperrstatus und Audit-Rollback bestanden. Native HTTP-Sitzungsgrenze und neue Browserfälle stehen in aktueller CI aus.",
+      "visualComparison": "Bestehendes gemeinsames Auswahl-Layout erhalten; aktuelle erweiterte Browserabnahme ausstehend.",
+      "blocker": "Aktuelle vollständige Browser-/Geräteabnahme, tatsächlicher Entra-/Gerätewechsel-Nachweis und vollständiger fachlicher Sprachreview bleiben offen."
+    },
+    "R7-54-004": {
+      "sourceTextSha256": "beb278fa30561ad0ff7133fc82732af801386ebda78f58e68514a1629507db19",
+      "status": "nicht_abgenommen",
+      "implementation": "Vorhandene private Draft-Wiederherstellung behält Prozesswerte und Replay-Kennung, Session-/Mandantenwechsel verwerfen private Eingaben. Kein neuer Cache und keine Timer-Neuimplementierung.",
+      "sourceReferences": [
+        "components/use-process-draft.ts",
+        "scripts/process-draft-test.mjs"
+      ],
+      "test": "Quality39765711852: vorhandene Draft-Recovery-, Kontext-/Session-Fence- und sichere Browser-Storage-Verträge bestanden; sichere Editor-Persistenz im Paket6-Browser39765711820 erfolgreich.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert.",
+      "blocker": "Reale PWA-Hintergrund-/Tastatur-/Gerätewechsel und sämtliche Formulare sind damit nicht abschliessend abgenommen.",
+      "implementationStatus": "teilweise_belegt"
+    },
+    "R7-32-002": {
+      "implementation": "Dublettenwarnung und Archiv/Wiederherstellung vorhanden; explizite Vorschau und transaktionale Owner/Admin-Zusammenführung bislang unbenutzter Dubletten. Historische Belege und Zuordnungen blockieren.",
+      "sourceTextSha256": "996667cf7f2caa947b8f89ef2672d08158051f4287d0a2663e8a7269b59f0e1a",
+      "blocker": "Keine Gesamtabnahme; vollständige Browser-/Parallel-/Geräteprüfung und Integration offen. Geschäftlich verwendete Kunden bleiben kontrolliert gesperrt.",
+      "sourceReferences": [
+        "components/customer-merge.tsx",
+        "lib/server/repositories/customer-merge.ts",
+        "database/migrations/0075_controlled_customer_duplicates.sql",
+        "docs/audit/v25-revision7/customer-consolidation.md"
+      ],
+      "status": "teilweise_implementiert",
+      "test": "Isolierter Repository/API/RLS-Test sowie tatsächlicher PostgreSQL-Paralleltest im vollständigen Development-Lauf39697429990 auf a9b7e1fc bestanden; Browser-/Geräte-/Klauselabnahme nicht daraus ableiten.",
+      "visualComparison": "Gemeinsame vorhandene Komponenten verwendet; aktuelle gerenderte Abnahme offen."
+    },
+    "R7-49-002": {
+      "sourceTextSha256": "c48ed5723431e438ca20b6b00fb1895af71da875a47b726e4d13b95cbda2f949",
+      "status": "teilweise_implementiert",
+      "implementation": "Bestehende zentrale Sprachfoundation; tatsächliche Textgrenzen für gemeinsame Dropdown-Zustände, lokale Optionslabels und Angebotsversionen/Datumswerte ergänzt. Rohes JSX wird zusätzlich auf fehlende Übersetzungsgrenzen geprüft. Öffentliche statische API-Fehlermeldungen, zusätzliche Bedienlabels und beide datengesteuerten Desktop-Navigationstabellen besitzen kontrollierte Katalogabdeckung; Spesen nutzen aktive Locale-Formatter und unveränderte Kundennamen.",
+      "sourceReferences": [
+        "components/select-control.tsx",
+        "components/offer-history.tsx",
+        "components/public-offer.tsx",
+        "lib/financial-status.ts",
+        "scripts/localization-coverage-test.mjs",
+        "docs/audit/v25-revision7/select-localization.md",
+        "components/pages/expenses.tsx",
+        "lib/display-format.ts",
+        "lib/locales/messages.json"
+      ],
+      "test": "Echte Vier-Sprachen-Renderer, statische API-/JSX-/Navigationstabellen-Abdeckung, API-Verweigerungen, Benutzertextschutz, zivile und Zeitpunkt-Datumsgrenzen, Typecheck und Lint bestanden. 7bc770a4: Quality, CodeQL und Full Development39691829176 mit beiden funktionalen Browserjobs und allen sechs Responsive-Jobs erfolgreich. Folgekorrekturen und vollständige Label-Sichtbarkeitsassertion benötigen aktuellen Browserlauf.",
+      "visualComparison": "Tatsächliche WebKit-Screens EN/Hell/390, FR/Dunkel/390 und IT/Hell/1440 aus7bc770a4 gesichtet. Neue abgeleitete Dialogfälle, keine Originalfreigabe. Sichtbarer fehlender dynamischer Gruppentitel korrigiert; vollständige App-/Rollen-/Sprachabnahme offen.",
+      "blocker": "Keine vollständige App-/Rollen-/Sprachabnahme. Dynamische Meldungen, vollständiger Kreuzvergleich und finanzielle/juristische Fach- sowie Geräteabnahme bleiben offen."
+    },
+    "R7-47-003": {
+      "sourceTextSha256": "afe85e1ef9a63d08874ae9b91213ef3dcd6725e9fe24aed3798bb836f8d0ed4f",
+      "status": "teilweise_implementiert",
+      "implementation": "Zentrale redundante Desktop-Arbeitsbereich/Breadcrumb-Zeile samt ausschliesslich zugehörigen CSS-Regeln entfernt. Seitentitel bleibt im Inhalt; gemeinsame Suche, Benachrichtigungen, Avatar und Sidebar-Toggle bleiben erhalten. Keine Mobile-/FAB-Änderung.",
+      "sourceReferences": [
+        "components/app-shell.tsx",
+        "app/design-system/layout.css",
+        "scripts/compliance/measure.mjs",
+        "scripts/compliance/measure-browser-test.mjs"
+      ],
+      "test": "Echte lokale Edge/Chromium-Messung: normaler Header besteht; Breadcrumb mit Link, ohne Link und unzulässige Aktionen scheitern. Unveränderter Navigations-/Rechte-/Icon-/Geometrievertrag besteht. Aktuelle tatsächliche App-Browserfälle und vollständige Breiten-/Geräteabnahme offen.",
+      "visualComparison": "Auslöser: tatsächlicher italienischer WebKit-Desktop-Screen7bc770a4 widerspricht Kapitel47. Aktuelle Nachher-Browseraufnahme steht aus.",
+      "blocker": "Vollständige aktuelle Header-/Popover-/Zoom-/Geräteabnahme und übrige Klauselbedingungen nicht aus dieser gezielten Korrektur ableiten."
+    },
+    "R7-14-005": {
+      "sourceTextSha256": "30089178853a0d23a9e85637ee65520c3fb43df7da162d771ba8b737afec27c8",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Vollständige fachliche/visuelle/Geräteabnahme fehlt. Der Wortlaut dieser Klausel fordert keinen garantierten Hintergrund-Mailkanal; dessen Fehlen wird nicht als nachgewiesene Funktionslücke dieser Klausel gewertet. Kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-34-005": {
+      "sourceTextSha256": "73880bf8c0debcc2a4ee30490768edcb4697297bdf15cd94266ffa0991e05ab1",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-50-005": {
+      "sourceTextSha256": "0fa2223a556616b01ab952a0ecf71e72339e17f8fafba16229841846aa7d25d1",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Persönliche versions-/benutzer-/mandantengebundene In-App-Erinnerung mit explizitem Opt-in, Datumsvalidierung, Vorschau, Verlauf, Rollen/RLS, atomarer Benachrichtigung und Audit implementiert. Ausführung beim Öffnen der Benachrichtigungen, kein garantierter Hintergrund-Mailversand.",
+      "sourceReferences": [
+        "components/offer-followup.tsx",
+        "lib/server/offer-followups.ts",
+        "database/migrations/0077_personal_offer_followups.sql",
+        "scripts/offer-followup-contract.mjs",
+        "docs/audit/v25-revision7/offer-followups.md"
+      ],
+      "test": "Aktuelle gezielte lokale Prüfungen sowie Full Development39715830625 auf d052a3be bestanden: tatsächlicher isolierter Migrationstest, native PostgreSQL-RLS-Rolle und sechs physische parallele Prozessoren, Chromium/WebKit mit Opt-in, Fehlererhalt, Wiederholen, Verlauf, Entfernen und abgelaufenem Gegenfall. Keine echte Mail oder Produktion verwendet.",
+      "visualComparison": "Bestehende gemeinsame FormSheet-/DetailDisclosure-/ActionRow-Owner verwendet. Aktuelle gerenderte Abnahme offen, kein neuer Originalscreen behauptet.",
+      "blocker": "Garantierter Hintergrund-Mailversand, echte Providerzustellung sowie vollständige fachliche/visuelle/Geräteabnahme fehlen; kein Produktivlauf oder Versand ausgeführt."
+    },
+    "R7-06-003": {
+      "sourceTextSha256": "348fff27ece7bb924f40153eab3b238e7e886985e28066a4f482fd5ad6722ac2",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Angebotsentscheidungs-, Empfänger-/Mitarbeiter- und private Mitarbeiterrückantwortmails verwenden die bestehende dauerhafte Mail-Outbox. Entscheidung/Antwort und Auftrag sind atomar; sichere Wiederaufnahme derselben Anfrage nur bei queued/definitiv fehlgeschlagen, keine Wiederholung von accepted/sending/uncertain. Aktuelle Mitarbeiterpräferenzen, Mitgliedschaften und verifizierte tenantgebundene Reply-To werden geprüft. Echter Provider-Zustell-/Bounce-/Signaturvertrag, DNS und unbeaufsichtigte Betriebsanbindung bleiben nicht nachgewiesen.",
+      "sourceReferences": [
+        "lib/server/public-offers.ts",
+        "lib/server/mail-identity.ts",
+        "app/api/documents/[number]/versions/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "database/migrations/0081_offer_response_mail_outbox.sql",
+        "scripts/offer-response-mail-contract.mjs",
+        "scripts/postgres-parallel-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-06-004": {
+      "sourceTextSha256": "f9b165c0f21cbfb49b32c42602762c65163658ad4d736cd62656885c18704f1f",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-06-005": {
+      "sourceTextSha256": "144c47e45ffaf0d47347109d01741b412a8efb6d4f1cd09e2681a4684b2c1a87",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-35-003": {
+      "sourceTextSha256": "16d425bf832868462bbed0e15222ab8ca625257335f659b37435518a5622ecf0",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Angebotsentscheidungs-, Empfänger-/Mitarbeiter- und private Mitarbeiterrückantwortmails verwenden die bestehende dauerhafte Mail-Outbox. Entscheidung/Antwort und Auftrag sind atomar; sichere Wiederaufnahme derselben Anfrage nur bei queued/definitiv fehlgeschlagen, keine Wiederholung von accepted/sending/uncertain. Aktuelle Mitarbeiterpräferenzen, Mitgliedschaften und verifizierte tenantgebundene Reply-To werden geprüft. Echter Provider-Zustell-/Bounce-/Signaturvertrag, DNS und unbeaufsichtigte Betriebsanbindung bleiben nicht nachgewiesen.",
+      "sourceReferences": [
+        "lib/server/public-offers.ts",
+        "lib/server/mail-identity.ts",
+        "app/api/documents/[number]/versions/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "database/migrations/0081_offer_response_mail_outbox.sql",
+        "scripts/offer-response-mail-contract.mjs",
+        "scripts/postgres-parallel-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-36-003": {
+      "sourceTextSha256": "d8df29dbb13203c22dac7c8067c417f2242b94adb45a6b1c1d79a2f7d81b3106",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehender serverseitiger Mail-/Dokumentweg um dauerhafte Unterscheidung zwischen bestätigtem Nichtversand und unklarem Transportausgang ergänzt. Auch neue Kennungen und konkurrierende Dokumentmutationen bleiben bei ungeklärtem Ausgang gesperrt; historische failed-Werte werden nicht automatisch freigegeben.",
+      "sourceReferences": [
+        "app/api/documents/[number]/send/route.ts",
+        "lib/server/document-process.ts",
+        "lib/server/offer-revisions.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/credit-notes.ts",
+        "database/migrations/0078_document_delivery_outcomes.sql",
+        "scripts/migration-test.mjs",
+        "docs/audit/v25-revision7/document-delivery-outcomes.md"
+      ],
+      "test": "Isolierter tatsächlicher Migrationstest mit positivem Versand, Replay, neuem Schlüssel bei unklarem/historischem Fehler, fehlendem Provider ohne Transport, explizitem neuem Versand nach Einrichtung und Zahlungsänderung bestanden; zusätzliche aktuelle Gesamt-CI erforderlich.",
+      "visualComparison": "Gemeinsame History-Beschriftung erweitert; aktuelle gerenderte Abnahme offen.",
+      "blocker": "Echte Zustell-/Bounce-Nachweise, authentifizierte Provider-Ereignisse und kontrollierter Auflösungsweg für unklare historische Versände bleiben offen. Keine produktive Migration oder Kundenmail ausgeführt."
+    },
+    "R7-30-001": {
+      "sourceTextSha256": "6323bd3939a48b3d70311a5af9a62a13dd4a9a7a4874c3cf06b5ed3b54af8d3d",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-31-012": {
+      "sourceTextSha256": "f7f49d5dd0c0b1edb643652712d4d25dd45c47c0cb1532ad39f60b752e02756d",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-002": {
+      "sourceTextSha256": "83433a4ba1b5b9397cd91edc7379875a64ed3afa81b3e0ab3b01e9f06b775267",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-003": {
+      "sourceTextSha256": "23a1e790bde1084c725f167199b44aded6ad37184b326e2dcbfd85ae6a7d7eb4",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-30-006": {
+      "sourceTextSha256": "3787243dd02f7370e677975d7a522ca18d7175b3a131c59d1922f9f8d4c16748",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Rechnungsachsen Dokument/Zahlung/Fälligkeit zentral in JavaScript und SQL; tatsächlicher letzter Versandnachweis getrennt. Ausdrücklich bestätigte echte Überzahlung mit vierfacher Saldenbindung, bestehendem Guthaben/Refund, Idempotenz/Audit/RLS; kontextgerechte Angebotsbezeichnung. Siehe invoice-settlement.md; keine pauschale Abnahme anderer Fachmodelle oder externer Zustellung.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/server/repositories/business-api.ts",
+        "app/api/payments/route.ts",
+        "components/pages/payments.tsx",
+        "components/documents.tsx",
+        "docs/audit/v25-revision7/invoice-settlement.md"
+      ],
+      "test": "Aktueller1567eff4-Full-Development39726655822 erfolgreich: native HTTP-Acht-Rollen-/RLS-/Sechs-Verbindungsfälle, SQL/JS-Statusparität, Audit-Rollback/Replay/Refund/Cash, aktuelle Chromium-/WebKit-Interaktionen; Lint/Typecheck, PDF/Statistik/Locale und alle bestehenden Gates.",
+      "visualComparison": "Aktuelle gerenderte Chromium-/WebKit-Messungen an1567eff4; keine vollständige individuelle Original-/Sprach-/physische Gerätefreigabe.",
+      "blocker": "Individuelle Klausel-/Fachabnahme, reale Geräte, weitere Fachmodell-Statusachsen und verifizierter Zustellkanal offen. Keine Produktionsmigration freigegeben."
+    },
+    "R7-05-008": {
+      "sourceTextSha256": "a19b8c4f0dcc04f49c8bd66c779e100c10c036a145026f72efbe8eabe2131d98",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Nachgewiesene Implementierungslücke: Kunden besitzen discount, aber der aktuelle gemeinsame Positions-/Summen-/PDF-Datenfluss enthält keinen ausdrücklichen Dokumentrabatt. Bestehende MwSt.-/Rundungs-/Historientests sind kein Rabattnachweis. Rabattbasis, Persistenz, Vorschau/PDF und unveränderliche Historie müssen gemeinsam ergänzt werden; nicht einfach Kundenpreise still verändern.",
+      "sourceReferences": [
+        "lib/document-lines.ts",
+        "lib/money.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/server/repositories/customers.ts",
+        "lib/server/document-pdf.ts",
+        "components/documents.tsx"
+      ],
+      "blocker": "Implementierbare Code-/Datenflusslücke; keine externe Freigabe als vorgeschobener Blocker. Gezielte positive/negative Berechnungs- und Historiennachweise noch erforderlich."
+    },
+    "R7-29-001": {
+      "sourceTextSha256": "9a8508511147cb777ccf3a47244c3e48b11e675df1bc977dee1dfc41c860097b",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Optionale rollenbezogene Einrichtungshilfe mit Pflicht/Empfohlen/Optional, Fortschritt, persönlichen RLS-geschützten Anzeigeeinstellungen und bestätigtem Toggle. Bankdaten sind für Ausstellung erforderlich, nicht für Entwurf oder Nutzung der Plattform.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs"
+      ],
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-29-002": {
+      "sourceTextSha256": "dc3bb2dd5d7dc185f212a9ec19da0ce36776e138de4c00087021d60b0a87b298",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Gemeinsamer serverseitiger Rechnungs-Readiness-Service nutzt denselben QR-Validator wie finale Ausstellung; fehlende Angaben erhalten erlaubte feste Feldziele und sichere Rückkehr zum bestehenden Entwurf. Kein automatisches Ausstellen nach Einstellungsänderung. Weitere Aktionsfamilien nicht pauschal damit abgenommen.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
+        "components/documents.tsx",
+        "components/pages/settings.tsx",
+        "components/document-settings.tsx"
+      ],
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-39-007": {
+      "sourceTextSha256": "554a3d8c4f7fc7a0185a711279d59de8625ec7ff9f5a09c4fbf6536fd9756705",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "implementation": "Dateiauswahl zeigt zuerst lokale quadratische/kreisförmige Vorschau über gemeinsamen Avatar-Owner. Erst Bestätigung startet den bestehenden autorisierten Upload. Abbruch ohne POST, Quarantäne/Fälle erhalten Altbild, sichere Normalisierung unverändert. Reale Geräte-/Persistenzabnahme weiterhin offen.",
+      "sourceReferences": [
+        "components/avatar-upload.tsx",
+        "components/avatar.tsx",
+        "components/pages/settings.tsx",
+        "lib/server/profile-image.ts",
+        "scripts/ux-regression-test.mjs",
+        "scripts/ux-browser-test.mjs"
+      ],
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-28-014": {
+      "sourceTextSha256": "dc1dc3cceef35586b1a4cc756ebb3af33849d96fb8bf48fd1ef075e65a21a587",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "test": "Gezielte Codepfadprüfung am006f0c3b; vorhandene erfolgreiche Tests werden nicht als Nachweis der genannten fehlenden Funktion umgedeutet.",
+      "visualComparison": "Keine vollständige aktuelle visuelle/physische Abnahme.",
+      "implementation": "Getrennte Plattformrollen und Entra-Identitätsbindung sind vorhanden. requireOperatorSession erzwingt im Produktivmodus dieselbe Entra-Identität/Rolle; diese Codeprüfung allein beweist keine phishingresistente Entra-Authentifizierungsstärke. Tatsächliche Conditional-Access-/Authentifizierungsrichtlinie wurde in dieser Fortsetzung nicht verifiziert.",
+      "sourceReferences": [
+        "lib/server/operator/entra.ts",
+        "lib/server/operator/session.ts",
+        "lib/server/operator/rbac.ts"
+      ],
+      "blocker": "Externer lesender Nachweis der tatsächlich zugewiesenen Entra-Authentifizierungsstärke und Ingress-Vertrauensgrenze fehlt. Keine Richtlinien-/Rollenänderung autorisiert."
+    },
+    "R7-29-003": {
+      "sourceTextSha256": "42b9d41c07d7a91efc06a89f8cd79b8376d1cb2fc369ccb33f3d335e012566ab",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "implementation": "Nachgewiesene UI-/Server-Abweichung behoben: Entwürfe dürfen bei fehlender Bankverbindung gespeichert werden. Echte Firmenladefehler blockieren weiterhin. Ausstellen bleibt serverseitig gesperrt; Vorprüfung ersetzt den finalen Guard nicht.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
+        "components/documents.tsx",
+        "lib/server/document-process.ts",
+        "scripts/ux-regression-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-29-004": {
+      "sourceTextSha256": "e98ddfaf350b2e27aefc7c557e22388ba2662c16f1bfce024021efa02672fda7",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Echter QR-Vertrag bleibt zentral; strukturierte Feldfehler und letzte serverseitige Validierung stimmen überein. Ungültiger Betrag/Referenz/Währung/Bank/Adresse darf keine QR-Ausstellung erlauben. Entwürfe bleiben möglich. Keine neue SIX-Zertifizierung behauptet.",
+      "sourceReferences": [
+        "lib/qr-bill.ts",
+        "lib/server/document-process.ts",
+        "scripts/document-presentation-test.mjs",
+        "scripts/business-readiness-contract.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-29-006": {
+      "sourceTextSha256": "ea874b5341bdbdd7b5056c019e02ec511bc7e82ee5d9b4c81a7da8b8c4fb9334",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "implementiert",
+      "implementation": "Finale Ausstellung validiert weiterhin unter Dokumentlock; direkte Mutation trotz fehlender Bankdaten wird im tatsächlichen Datenbankprozess verworfen. Eine positive lesende Vorprüfung erteilt keine zeitlich unbeschränkte Freigabe.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs",
+        "lib/server/document-process.ts"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-21-001": {
+      "sourceTextSha256": "83eee283877b003399f940e8dc6b70fa27354d052d430a018c1fb66d94bb0a71",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Einrichtungshilfe ergänzt; nicht als vollständige Abnahme aller Unternehmens-/Steuer-/Nummernkreisfelder deklarieren. Vorhandene automatische Nummernvergabe ist keine frei konfigurierbare Nummernkreismaske.",
+      "sourceReferences": [
+        "lib/server/business-readiness.ts",
+        "lib/action-readiness.ts",
+        "app/api/settings/readiness/route.ts",
+        "components/setup-guide.tsx",
+        "components/use-setup-field.ts",
+        "database/migrations/0080_personal_setup_preferences.sql",
+        "scripts/business-readiness-contract.mjs",
+        "scripts/business-readiness-browser.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-42-021": {
+      "sourceTextSha256": "feba701b246ecf9d2a321248b1294f4fca1ced93abd69c7358f665759b7cc667",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Die initiale Übersicht mit sichtbarer Einrichtungshilfe verbirgt belegbar leere Finanzkacheln sowie leere Rechnungsliste. Unvollständige/unbekannte Finanzdaten werden nicht als Null kaschiert; bestehende Zahlungen, Forderungen, Guthaben oder Historie bleiben sichtbar.",
+      "sourceReferences": [
+        "components/pages/dashboard.tsx",
+        "lib/cash-statistics.ts",
+        "scripts/data-foundation-test.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-47-011": {
+      "sourceTextSha256": "b5854e07fd2ea9f2e977f398131a596c329ab13aeb30c13f80f2bdcb396b5313",
+      "status": "teilweise_implementiert",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Vollständige Chromium-/WebKit-Planung um2560/3840px erweitert. Echte Browserzoom125/150/200%-Bedienung ist damit nicht bewiesen; weder Viewport noch deviceScaleFactor sind ein solcher Ersatz.",
+      "sourceReferences": [
+        "scripts/qa-plan.mjs",
+        "scripts/qa-plan-test.mjs",
+        "scripts/browser-shards.mjs"
+      ],
+      "test": "Lokale gezielte Regressionen bestanden; native PostgreSQL-/Browser-/Gesamt-CI dieses neuen Pakets noch ausstehend.",
+      "visualComparison": "Neue Ansichten sind aus bestehenden zentralen Komponenten abgeleitet; aktuelle Browser-/Referenzabnahme und reale Geräte noch offen.",
+      "blocker": "Keine Gesamt-, Produktions- oder Gerätefreigabe. Siehe setup-and-response-recovery.md und completion-review.md."
+    },
+    "R7-28-003": {
+      "sourceTextSha256": "84f17733b64eb6641e32d9b9269ef7fcf7f6e1ac6520c70e3ce2f8fb4efe7de6",
+      "status": "nicht_abgenommen",
+      "implementationStatus": "implementiert",
+      "implementation": "Gemeinsamer Login ermittelt aktive Mitgliedschaft und Rolle erst nach Passwortnachweis aus der Datenbank; keine vom Client gewählte Rolle. Auf diesem unveränderten Identity-Quellstand technisch geprüft.",
+      "sourceReferences": [
+        "app/api/auth/login/route.ts",
+        "lib/server/session.ts",
+        "scripts/api-tenant-postgres-test.mjs",
+        "scripts/registration-test.mjs"
+      ],
+      "test": "Quality39765711852 auf 38754fad7b2c1922653b725ad61d14de47cd6577: native HTTP-Prüfung aller acht Rollen, direkte Mandanten-IDs, Sessionablauf und eingeschränkte Runtime-Registrierung erfolgreich; vorhandene Codepfade unverändert.",
+      "blocker": "Keine umfassende Identity-/Gerätefreigabe aus dieser einzelnen Backend-Klausel ableiten.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert."
+    },
+    "R7-36-001": {
+      "sourceTextSha256": "2d1c6f87be682adea57dc37eafd0b3fbf5a1d175ec6f4cbf48c79289cd59126c",
+      "status": "nicht_abgenommen",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Begrenzte P0-Stichprobe: Login/Sitzung, Rechnungszahlungen, Dateidownload, Dokumentversand und Betreiber-Monitoring. Rollen/RLS, private Dateien, sichere Zustände und Audit sind belegt; die zusammengesetzte Sicherheitsklausel ist damit nicht vollständig abgenommen.",
+      "sourceReferences": [
+        "lib/server/session.ts",
+        "app/api/files/[id]/download/route.ts",
+        "app/api/documents/[number]/send/route.ts",
+        "app/api/operator/monitoring/route.ts"
+      ],
+      "test": "Quality39765711852: native Rollen-/Tenant-/Expiry-Gegenfälle, 158 anonyme Methoden, File- und Finanzintegrität sowie ClamAV-Gate erfolgreich. Neue Monitoring-Select-Policy separat mit observability-test geprüft.",
+      "blocker": "Nicht geprüfte Schreib-/Operatorpfade, reale Retention/Löschung und externes Secret-/Betriebsmanagement bleiben separate Nachweise.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert."
+    },
+    "R7-36-004": {
+      "sourceTextSha256": "dfb5300522013017374c3f5ee9b199308ee8ce487e30bf1af097b631d67ef89c",
+      "status": "nicht_abgenommen",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehendes Monitoring/Audit mit ehrlichen unbekannten Messwerten. Fast-Track ergänzt beide Versandledger in bestehenden Alarmen und nur lesenden Plattformzugriff. Keine Benachrichtigungsplattform oder automatische Versandklärung.",
+      "sourceReferences": [
+        "lib/server/observability.ts",
+        "lib/server/repositories/observability.ts",
+        "database/migrations/0083_document_delivery_monitoring.sql",
+        "scripts/observability-test.mjs",
+        "scripts/production-monitoring-check.sh"
+      ],
+      "test": "observability-test lokal erfolgreich: isolierte Migrationen, Tenant-/Read-only-Grenzen, Statusabbildung, Demoausschluss, Alarm/Recovery, fehlende DB und veraltete Messwerte. Externe Ressourcengruppe lesend geprüft.",
+      "blocker": "Keine Monitoring-Ressourcen im geprüften Produktions-Ressourcenkreis; freigegebene Alarmempfänger/Eskalation, tatsächlicher Restore, RPO/RTO und operativer Rollbacknachweis fehlen. Keine globale Ressourcenabwesenheit behauptet.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert."
+    },
+    "R7-38-038": {
+      "sourceTextSha256": "c2574d1599455479f586c17afdbc6a4353871555d85ae3130c953bf83e2fd5bc",
+      "status": "nicht_abgenommen",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Server-Autorisierung gezielt für fünf API-Bereiche bestätigt. Native positive und negative Rollen-/Tenant-Leseverträge sind vorhanden; keine neue vollständige Prüfung aller Schreibpfade.",
+      "sourceReferences": [
+        "scripts/api-tenant-postgres-test.mjs",
+        "scripts/api-auth-surface-test.mjs",
+        "lib/server/rbac.ts",
+        "lib/server/db.ts"
+      ],
+      "test": "Quality39765711852: private GET-Inventarprüfung über acht Rollen, 80 tatsächliche zulässige Create-Fälle, fremde Kunden-PATCH/DELETE, 24 Tenant-to-Operator-Mutationsverbote und Sessionablauf bestanden.",
+      "blocker": "Übrige Write-/Status-/Operator-Kombinationen bleiben ausserhalb dieser Stichprobe; neue Monitoring-Policy muss im aktuellen nativen CI mitlaufen.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert."
+    },
+    "R7-45-005": {
+      "sourceTextSha256": "95363ffeebb366e62931246b2a5bbe2501c9143ad42729a0700212a2c9a01f8b",
+      "status": "nicht_abgenommen",
+      "implementationStatus": "teilweise_belegt",
+      "implementation": "Bestehende Finanzprojektion trennt Rechnung/Teilzahlung/Fälligkeit, Gutschrift und tatsächliche Überzahlung/Refund. Kein Preis- oder Zahlungsverhalten im Fast-Track geändert.",
+      "sourceReferences": [
+        "lib/financial-status.ts",
+        "scripts/invoice-status-contract.mjs",
+        "scripts/invoice-overpayment-contract.mjs",
+        "scripts/migration-test.mjs"
+      ],
+      "test": "Quality39765711852: echte HTTP-Zahlungsrollen, falscher Mandant, stale/excess/precision/future negatives; sechs physische Replay-Verbindungen, Audit-Rollback, unverändertes Rechnungsvolumen. Aktueller gezielter migration-test zusätzlich erfolgreich.",
+      "blocker": "Vollständige fachliche Modulabnahme, historische Sonderdaten und alle Geldfluss-/Steuerkonstellationen werden nicht aus diesen einzelnen Verträgen abgeleitet.",
+      "visualComparison": "Keine neue visuelle Gesamtfreigabe; begrenzte Responsive-Stichprobe separat dokumentiert."
+    }
+  },
+  "tests": {
+    "scripts/registration-test.mjs": "passed (isolated PGlite)",
+    "scripts/profile-image-test.mjs": "passed",
+    "scripts/document-presentation-test.mjs": "passed",
+    "scripts/pdf-gestures-test.mjs": "passed",
+    "scripts/migration-test.mjs": "passed including transactional import, exact replay, invalid batch rollback, primary contact and foreign-parent denial",
+    "scripts/localization-coverage-test.mjs": "passed",
+    "scripts/localization-test.mjs": "passed",
+    "scripts/navigation-contract-test.mjs": "passed",
+    "scripts/data-lifecycle-schema-test.mjs": "passed",
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed",
+    "visual": "14 focused Chromium/Edge responsive/light/dark and four-language browser cases passed; no general visual approval",
+    "CI": "30aeca77 full run39654596838: build/checks/scanner and responsive2 lanes passed at last read; functional lanes failed on broad alert-count assertion including Next route announcer; responsive1 failed on further exact return URLs. Common strict localized route matcher now covers32 fixed destinations; next current qualification required.",
+    "scripts/ui-foundation-test.mjs": "passed",
+    "scripts/foundation-integration-test.mjs": "passed",
+    "scripts/import-table-test.mjs": "passed, including actual XLSX/conditional formatting, rejection paths and original CSV/XLSX row metadata",
+    "scripts/client-session-test.mjs": "passed including read-only POST/no false mutation/session fence",
+    "importBrowser": "blocked locally: native loopback QA PostgreSQL refused 127.0.0.1:5432; first client-only fixture was insufficient for SSR. Existing real UI-auth fixture now used, CI proof required.",
+    "importDependencyAudit": "passed; zero reported production advisories after scoped uuid fix",
+    "importBuild": "passed",
+    "scripts/customer-import-browser-test.mjs": "not executed successfully locally: real UI QA fixture requires native 127.0.0.1:5432, unavailable. Must pass existing Linux/PG CI; no auth bypass.",
+    "importLint": "passed for changed import code",
+    "identityReference": "Four actual local Chromium/Edge widths with self-hosted Inter loaded, passkey order and independent derived-reference geometry passed; no physical-device approval.",
+    "avatarActivation": "Isolated PostgreSQL/PGlite route/download/ownership/status/drift/replay passed; native HTTP and branding browser cases added, current CI execution pending.",
+    "consentTargets": "Four actual local desktop DE/FR/IT/EN cases passed with44px equivalent choices and persisted rejection.",
+    "consentPolicy": "Four actual local DE/FR/IT/EN browser cases passed: policy reachable without stored consent, reopen from footer, equal44px choices, inert restoration, rejection persisted, zero hydration/runtime warnings.",
+    "expenseCategories": "Actual isolated PostgreSQL/PGlite positive/negative route/CSV/bounds/authorization cases passed; browser extension awaits CI.",
+    "languagePreference": "Client transport positive/negative four-language receipt and session-fence cases passed; shared hook busy/error states and real browser cases added, current execution pending.",
+    "draftLanguage": "Actual scope/storage tests: four languages, exact source/user/tenant/role boundaries, latest legacy alias migration, original expiry, quota recovery and discard without resurrection passed; browser proof pending. CI30aeca77 progressed past restored offer contents/step through subsequent parent-back/discard; lane later failed on another strict unlocalized return URL.",
+    "operatorLanguage": "Actual migrated PostgreSQL/PGlite route tests passed for all5 operator roles; no new role grants or Entra changes. Migration0071 not applied to production.",
+    "fontGlyphUsage": "Actual local Edge CDP glyph usage before/after, real wrong-family override rejection, stable deliberately delayed fallback and zero measured layout shift passed. Root fallback SSR verified with actual shared preload component."
+  },
+  "externalBlockers": [
+    "Physical installed iOS/Android PWA, keyboard and assistive technology acceptance",
+    "Actual mail delivery/bounces and external client rendering",
+    "Qualified legal translations and financial/product acceptance",
+    "Approved domains/DNS/provider/push setup",
+    "Controlled real restore test",
+    "Exact-SHA integration, production-migration and deployment approval"
+  ],
+  "checks": {
+    "offerReports": "Actual isolated migrated DB/list precision and expiry parity, dates/archive/currency, HR denial, tenant-before/after, Start entitlement, CSV translation and explicit decision denominator passed. Native HTTP and interactive browser cases added; current execution pending.",
+    "invoiceTaxReport": "Actual migrated DB: issued/archive records, exact recorded components, separate currencies, gross-only credits on their own dates, draft/cancelled/future denial, role/tariff/tenant masking and translated CSV limitation passed. Native HTTP and actual UI cases added; current CI pending. No allocated credit tax/input tax/tax-return claim."
+  },
+  "integrationEvidence": {
+    "commit": "7bc770a43bc3215ae5dba956dbb617c56d391c5c",
+    "quality": {
+      "run": 39691340506,
+      "conclusion": "success"
+    },
+    "codeql": {
+      "run": 39691340507,
+      "conclusion": "success"
+    },
+    "fullDevelopment": {
+      "run": 39691829176,
+      "conclusion": "success",
+      "functionalBrowserJobs": 2,
+      "responsiveBrowserJobs": 6
+    },
+    "scope": "Development qualification including native PostgreSQL concurrency; not full Revision7 clause/role/device/visual acceptance. Subsequent source changes require new checks."
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "scope": "Actual local development login, Edge Chromium,390x780 DE/light; layout/glyph measurement and deliberate serif adversary, not physical-device, original-reference or complete acceptance.",
+  "sourceHashes": {
+    "scripts/font-delivery-browser.mjs": "b5c60dc24c2dba8c94327b88c804491cc0daa4d82718464271fb3d07d483f9f4",
+    "components/font-preload.tsx": "81e38c438da39729975c8c504fe2e7e9203000e9e399928d287e315775fd158b",
+    "app/layout.tsx": "fa88a7df4999c6e83cbb44ff01a152d6cb84b88644cb94a6c0266fdbf6fbc286"
+  },
+  "result": [
+    {
+      "delayed": false,
+      "actualFontsBefore": [
+        {
+          "familyName": "Segoe UI Semibold",
+          "postScriptName": "SegoeUI-Semibold",
+          "isCustomFont": false,
+          "glyphCount": 18
+        }
+      ],
+      "actualFontsAfter": [
+        {
+          "familyName": "Segoe UI Semibold",
+          "postScriptName": "SegoeUI-Semibold",
+          "isCustomFont": false,
+          "glyphCount": 18
+        }
+      ],
+      "warmFonts": [
+        {
+          "familyName": "Inter",
+          "postScriptName": "Inter-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 18
+        }
+      ],
+      "layoutShiftBefore": 0,
+      "layoutShiftAfter": 0,
+      "glyphInspection": "CDP actual glyph font usage"
+    },
+    {
+      "delayed": true,
+      "actualFontsBefore": [
+        {
+          "familyName": "Segoe UI Semibold",
+          "postScriptName": "SegoeUI-Semibold",
+          "isCustomFont": false,
+          "glyphCount": 18
+        }
+      ],
+      "actualFontsAfter": [
+        {
+          "familyName": "Segoe UI Semibold",
+          "postScriptName": "SegoeUI-Semibold",
+          "isCustomFont": false,
+          "glyphCount": 18
+        }
+      ],
+      "warmFonts": null,
+      "layoutShiftBefore": 0,
+      "layoutShiftAfter": 0,
+      "glyphInspection": "CDP actual glyph font usage"
+    }
+  ],
+  "images": [
+    {
+      "path": "evidence/revision7-font-layout/font-available.png",
+      "sha256": "b2522baa6060f0b9a8b77fe0cb6bae7deede0a40ffbf1cc6af3e456cef84daca"
+    },
+    {
+      "path": "evidence/revision7-font-layout/font-delayed-fallback.png",
+      "sha256": "f364478e61420c2766b8c3328db86617d3c898eed659937afbcfa95b4da8b657"
+    }
+  ],
+  "limitations": [
+    "Development badge visible only in this local dev capture",
+    "Cold optional fallback remains stable without late swap; warm actual glyphs use Inter",
+    "Existing early preload and negative wrong-family assertion retained",
+    "Linux CI re-execution required after measurement fix"
+  ]
+}

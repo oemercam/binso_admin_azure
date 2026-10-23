@@ -1,5 +1,23 @@
 import {projectStatusLabels} from './projects';
-export type ReportSummary={period:{from:string;to:string};asOf:string;customers:{total:string;added:string}|null;projects:Array<{status:string;count:string}>|null;time:{hours:string;billable_hours:string;invoiced_hours:string}|null;payments:Array<{currency:string;amount:string}>|null;expenses:Array<{currency:string;amount:string}>|null;employees:{total:string;active:string}|null};
+import {financialStatusLabels} from './financial-status';
+export type TimeReport={kind:'time';period:{from:string;to:string};asOf:string;totalMinutes:number;groupBy:'detail'|'customer'|'project'|'employee';groups:Array<{label:string;minutes:number;entries:number}>;items:Array<{date:string;customer:string;project:string;employee:string;activity:string;minutes:number;billable:boolean}>};
+const timeGroupLabel={detail:'Tätigkeit',customer:'Kunde',project:'Auftrag',employee:'Mitarbeiter'} as const;
+export function timeReportRows(data:TimeReport):string[][]{
+ if(data.groupBy!=='detail')return [[timeGroupLabel[data.groupBy],'Minuten','Einträge'],...data.groups.map(group=>[group.label,String(group.minutes),String(group.entries)])];
+ return [['Datum','Kunde','Auftrag','Mitarbeiter','Tätigkeit','Minuten','Verrechenbar'],...data.items.map(item=>[item.date,item.customer,item.project,item.employee,item.activity,String(item.minutes),item.billable?'Ja':'Nein'])];
+}
+export function timeReportPdfRows(data:TimeReport):string[][]{
+ const duration=(minutes:number)=>Math.floor(minutes/60)+':'+String(minutes%60).padStart(2,'0');
+ if(data.groupBy!=='detail')return [[timeGroupLabel[data.groupBy],'Einträge','Dauer'],['Zeitraum',data.period.from+' – '+data.period.to,''],['Stand',data.asOf,''],...data.groups.map(group=>[group.label,String(group.entries),duration(group.minutes)]),['Arbeitszeit','',duration(data.totalMinutes)]];
+ return [['Datum · Kunde · Auftrag','Mitarbeiter · Tätigkeit','Dauer'],['Zeitraum',data.period.from+' – '+data.period.to,''],['Stand',data.asOf,''],...data.items.map(item=>[[item.date,item.customer,item.project].filter(Boolean).join('\n'),[item.employee,item.activity].filter(Boolean).join('\n'),duration(item.minutes)]),['Arbeitszeit','',duration(data.totalMinutes)]];
+}
+export type InvoiceTaxReport=Array<{currency:string;invoiceCount:string;netBeforeCredits:string;vatBeforeCredits:string;grossBeforeCredits:string;unallocatedCreditCount:string;unallocatedCreditGross:string}>;
+export type ReportSummary={vat?:InvoiceTaxReport|null;offers?:Array<{currency:string;status:string;count:string;volume:string}>|null;expenseCategories?:Array<{currency:string;category:string;amount:string}>|null;invoices?:Array<{currency:string;invoiced:string;open:string;overdue:string;asOf:string}>|null;period:{from:string;to:string};asOf:string;customers:{total:string;added:string}|null;projects:Array<{status:string;count:string}>|null;time:{hours:string;billable_hours:string;invoiced_hours:string}|null;payments:Array<{currency:string;amount:string;refund_amount?:string;net_amount?:string}>|null;expenses:Array<{currency:string;amount:string}>|null;employees:{total:string;active:string}|null};
+/** A current decision-cohort ratio, never accepted divided by drafts/pending. */
+export function offerDecisionTotals(items:NonNullable<ReportSummary['offers']>){
+ let accepted=0,declined=0;for(const item of items){const count=Number(item.count);if(!Number.isSafeInteger(count)||count<0)throw new Error('Invalid report decision count');if(item.status==='accepted')accepted+=count;if(item.status==='declined')declined+=count;}
+ const total=accepted+declined;return {accepted,declined,total,rate:total?accepted/total*100:null};
+}
 /** Spreadsheet-safe text; decimal strings remain exact, including negative values. */
 export function reportCsv(rows:readonly (readonly unknown[])[]){
  const cell=(value:unknown)=>{let text=String(value??'');if((/^[\s\uFEFF]*[=+@-]/.test(text)||/^[\t\r\n]/.test(text))&&!/^[-+]?\d+(?:\.\d+)?$/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
@@ -9,9 +27,13 @@ export function reportRows(data:ReportSummary):string[][]{
  const rows:string[][]=[['Kennzahl','Wert','Einheit'],['Stand',data.asOf,''],['Zeitraum',data.period.from+' – '+data.period.to,'']];
  if(data.customers)rows.push(['Kunden gesamt',data.customers.total,''],['Neue Kunden',data.customers.added,'']);
  if(data.projects)for(const item of data.projects)rows.push(['Aufträge · '+(projectStatusLabels[item.status]??item.status),item.count,'']);
+ if(data.offers){for(const item of data.offers){const label=financialStatusLabels[item.status]??'Unbekannt';rows.push(['Angebote · '+label+' · '+item.currency,item.count,''],['Angebotsvolumen · '+label,item.volume,item.currency]);}const decisions=offerDecisionTotals(data.offers);if(decisions.rate!==null)rows.push(['Angenommene oder abgelehnte Angebote',String(decisions.total),''],['Annahmequote',decisions.rate.toFixed(1),'%']);}
+ if(data.vat?.length){rows.push(['MwSt.-Datenbasis','Rechnungswerte vor Gutschriften; keine Steuerdeklaration','']);for(const item of data.vat)rows.push(['Rechnungen · '+item.currency,item.invoiceCount,''],['Netto vor Gutschriften',item.netBeforeCredits,item.currency],['Ausgewiesene MwSt. vor Gutschriften',item.vatBeforeCredits,item.currency],['Brutto vor Gutschriften',item.grossBeforeCredits,item.currency],['Gutschriften ohne MwSt.-Zuordnung',item.unallocatedCreditGross,item.currency],['Nicht zugeordnete Gutschriften · '+item.currency,item.unallocatedCreditCount,'']);}
  if(data.time)rows.push(['Arbeitszeit',data.time.hours,'h'],['Verrechenbare Zeit',data.time.billable_hours,'h'],['Verrechnete Zeit',data.time.invoiced_hours,'h']);
- if(data.payments)for(const item of data.payments)rows.push(['Eingegangene Zahlungen',item.amount,item.currency]);
+ if(data.invoices)for(const item of data.invoices)rows.push(['Fakturiertes Volumen',item.invoiced,item.currency],['Offen',item.open,item.currency],['Überfällig',item.overdue,item.currency],['Forderungsstand',item.asOf,'']);
+ if(data.payments)for(const item of data.payments){rows.push(['Eingegangene Zahlungen',item.amount,item.currency]);if(item.refund_amount!==undefined)rows.push(['Rückerstattungen',item.refund_amount,item.currency]);if(item.net_amount!==undefined)rows.push(['Zahlungseingänge nach Rückerstattungen',item.net_amount,item.currency]);}
  if(data.expenses)for(const item of data.expenses)rows.push(['Erstattete Spesen',item.amount,item.currency]);
+ if(data.expenseCategories)for(const item of data.expenseCategories)rows.push(['Genehmigte Spesen nach Kategorie'+' · '+item.category,item.amount,item.currency]);
  if(data.employees)rows.push(['Mitarbeiter gesamt',data.employees.total,''],['Aktive Mitarbeiter',data.employees.active,'']);
  return rows;
 }

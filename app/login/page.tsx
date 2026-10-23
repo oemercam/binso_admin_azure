@@ -12,7 +12,7 @@ import {clearClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
 import {PasskeyLogin} from '@/components/passkey-login';
 
-type Stage="credentials"|"email"|"totp"|"verify";
+type Stage="credentials"|"totp"|"verify";
 
 export default function Login(){
   const pending=useRef(false);
@@ -29,7 +29,7 @@ export default function Login(){
     clearClientSession();
     const explicitNext=new URLSearchParams(window.location.search).get("next");
     const next=explicitNext?nextPath():safeAppPath(payload.next,nextPath());
-    window.location.replace(payload.mfaSetupRequired===true&&!next.startsWith("/einstellungen/sicherheit?setup=1")?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next);
+    window.location.replace(next);
   };
 
   const loginRequest=async(extra:Record<string,string>={})=>{
@@ -38,7 +38,8 @@ export default function Login(){
     if(response.status===202){
       setCode("");
       if(payload.requiresEmailVerification)setStage("verify");
-      else setStage(payload.mfaMethod==="totp"?"totp":"email");
+      else if(payload.mfaMethod==="totp")setStage("totp");
+      else throw new Error("Die Anmeldung konnte nicht eindeutig bestätigt werden.");
       return;
     }
     if(!response.ok){
@@ -62,7 +63,7 @@ export default function Login(){
         if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
         finish(payload);return;
       }
-      await loginRequest(stage==="totp"?{mfaCode:code}:{emailCode:code});
+      await loginRequest({mfaCode:code});
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
     finally{pending.current=false;setLoading(false);}
   };
@@ -71,13 +72,13 @@ export default function Login(){
     if(pending.current)return;pending.current=true;setLoading(true);setError("");
     try{
       if(stage==="verify"){const response=await fetch("/api/auth/resend-verification",{method:"POST",signal:AbortSignal.timeout(15000),headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});if(!response.ok)throw new Error("Code konnte nicht erneut gesendet werden.");}
-      else if(stage==="email")await loginRequest();
+
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht erneut gesendet werden.");}
     finally{pending.current=false;setLoading(false);}
   };
 
   if(stage!=="credentials")return <AuthWorkspace><section className="auth-card">
-    <h1><LocalizedText>{stage==="totp"?"Authenticator-Code":stage==="verify"?"E-Mail bestätigen":"Anmeldung bestätigen"}</LocalizedText></h1>
+    <h1><LocalizedText>{stage==="totp"?"Authenticator-Code":"E-Mail bestätigen"}</LocalizedText></h1>
     <p><LocalizedText>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</LocalizedText></p>
     <form onSubmit={submitCode}>
       <Field label={stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></Field>
@@ -89,15 +90,16 @@ export default function Login(){
   </section></AuthWorkspace>;
 
   return <AuthWorkspace><section className="auth-card">
-    <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText></h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
+    <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText>.</h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
+    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
+    <div className="auth-divider"><span><LocalizedText>{"oder"}</LocalizedText></span></div>
     <form onSubmit={submitCredentials}>
       <Field label="E-Mail"><Input required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="email" placeholder="name@firma.ch"/></Field>
       <Field label="Passwort"><PasswordInput required value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••"/></Field>
       <div className="auth-options"><label><Input type="checkbox" checked={rememberMe} onChange={event=>setRememberMe(event.target.checked)}/><LocalizedText>{"Angemeldet bleiben"}</LocalizedText></label><div className="form-link"><Link href="/passwort-vergessen"><LocalizedText>{"Passwort vergessen?"}</LocalizedText></Link></div></div>
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
-      <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Weiter"}</LocalizedText></Button>
+      <Button type="submit" disabled={loading}><LocalizedText>{loading?"Anmeldung läuft…":"Anmelden"}</LocalizedText></Button>
     </form>
-    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
     <p className="auth-bottom"><LocalizedText>{"Noch kein Konto? "}</LocalizedText><Link href="/registrieren"><LocalizedText>{"Konto erstellen"}</LocalizedText></Link></p>
   </section></AuthWorkspace>;
 }

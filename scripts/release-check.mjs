@@ -20,10 +20,10 @@ for(const legacy of ['CHF 19','CHF 49','CHF 89']){
   assert.ok(!home.includes(legacy)&&!pricing.includes(legacy),'Public pages must not contain legacy price '+legacy);
 }
 assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.map'),'Pricing page must use canonical trial and plan configuration');
-assert.ok(register.includes('RegistrationSheet'),'Registration must mount the shared sheet entry');
-const registrationSheet=await fs.readFile('components/registration/registration-sheet.tsx','utf8');
+assert.ok(register.includes('RegistrationPage'),'Registration must mount the shared full-page entry');
+const registrationSheet=await fs.readFile('components/registration/registration-page.tsx','utf8');
 assert.ok(registrationSheet.includes("search.get(\"plan\")")&&registrationSheet.includes("search.get(\"billing\")")&&registrationSheet.includes('billingCycle:context.billingCycle'),'Registration must preserve selected plan and billing cycle through the server context');
-assert.ok(loginRoute.includes('verifiedEmailNow||!emailCode'),'Login must issue a fresh login code after first email verification');
+assert.ok(loginRoute.includes('if(user.mfa_enabled)')&&!loginRoute.includes('purpose:"login"'),'Ordinary verified login must not add mandatory email MFA; opted-in TOTP remains enforced');
 assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
 assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');
 assert.ok(provisioningSource.includes('const expiresAt=null'),'Trial expiry must not start before first email verification');
@@ -83,7 +83,8 @@ assert.equal(packageJson.scripts['security:scan'],'pnpm audit --prod --audit-lev
 assert.equal(packageJson.scripts['security:scan:all'],'node scripts/full-security-audit.mjs','Full dependency audit must use the exact advisory gate');
 await fs.access('scripts/full-security-audit.mjs');
 const fullAuditGate=await readPageFile('scripts/full-security-audit.mjs','utf8');
-assert.ok(fullAuditGate.includes('GHSA-VFJ7-8CJW-P6XM'),'Full dependency audit may tolerate only the documented unresolved dev-tool advisory');
+assert.ok(fullAuditGate.includes('checkAdvisories(report)'),'Full dependency audit validates structured failures');
+assert.doesNotMatch(fullAuditGate,/Temporary exact|2026-10-24|GHSA-VFJ7/i,'Removed vulnerable dependency cannot retain its former audit exception');
 
 await import("./repository-cleanliness-check.mjs");
 

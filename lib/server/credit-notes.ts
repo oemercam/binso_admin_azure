@@ -22,7 +22,7 @@ export async function createCreditNote(c:PoolClient,s:SessionUser,number:string,
  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'invoice.credit',key,body:{number,amount:input.amount,reason}},async()=>{
   const {row,kind}=await lockDocument(c,s,number);
   if(kind!=='invoice'||['draft','cancelled'].includes(row.status))throw new ApiError(409,'invoice_invalid','Nur ausgestellte Rechnungen können gutgeschrieben werden.');
-  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status='sending'",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
+  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
   const today=businessDate();
   if(String(row.issue_date instanceof Date?row.issue_date.toISOString().slice(0,10):row.issue_date).slice(0,10)>today)throw new ApiError(409,'invoice_future','Die Rechnung ist noch nicht ausgestellt.');
   const credited=(await c.query('select coalesce(sum(amount),0) amount from credit_notes where organization_id=$1 and invoice_id=$2',[s.organizationId,row.id])).rows[0].amount;

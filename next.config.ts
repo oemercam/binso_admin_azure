@@ -38,6 +38,7 @@ const noStoreHeaders = [
 ];
 
 const sensitiveRoutes = [
+  "/angebot",
   "/dashboard/:path*",
   "/kunden/:path*",
   "/angebote/:path*",
@@ -48,6 +49,9 @@ const sensitiveRoutes = [
   "/zahlungen/:path*",
   "/produkte/:path*",
   "/mitarbeiter/:path*",
+  "/lieferanten/:path*",
+  "/abwesenheiten/:path*",
+  "/vertraege/:path*",
   "/spesen/:path*",
   "/zeit/:path*",
   "/support/:path*",
@@ -69,7 +73,7 @@ const sensitiveRoutes = [
 ];
 
 const nextConfig: NextConfig = {
-  serverExternalPackages:["pdfkit"],
+  serverExternalPackages:["pdfkit","exceljs"],
   outputFileTracingIncludes:{"/api/documents/**":["./public/fonts/pdf/*"]},
   reactStrictMode: true,
   env: { BINSO_BUILD_SHA: process.env.BINSO_BUILD_SHA ?? process.env.GITHUB_SHA ?? "development" },
@@ -82,6 +86,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
+       { source: "/angebot", headers: [{key:"Referrer-Policy",value:"no-referrer"}] },
       ...sensitiveRoutes.map((source) => ({ source, headers: noStoreHeaders })),
       {
         source: "/sw.js",

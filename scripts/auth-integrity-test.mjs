@@ -7,6 +7,7 @@ import ts from 'typescript';
 import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import pg from 'pg';
+import sharp from 'sharp';
 const native=process.argv.includes('--postgres');
 let db;
 if(native){
@@ -59,6 +60,9 @@ async function load(file,actualRoot=false){
  for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){
   const name=match[2];let resolved=adapters[name];
   if(!resolved&&(name.startsWith('@/')||name.startsWith('.'))){let dependency=name.startsWith('@/')?name.slice(2):path.join(path.dirname(file),name);if(!dependency.endsWith('.ts'))dependency+='.ts';resolved=await load(dependency);}
+  // Data URLs have no package resolution base. Keep the real installed package,
+  // including native Sharp decoding; do not replace it with an upload mock.
+  if(!resolved&&!name.startsWith('node:'))resolved=import.meta.resolve(name);
   if(resolved)source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(resolved)));
  }
  const result=uri(source);cache.set(file,result);return result;
@@ -79,12 +83,16 @@ try{
  const password='Synthetic-integrity-password-123',hash=await passwords.hashPassword(password),user='auth-integrity-fixture',org='00000000-0000-4000-8000-000000000099';
  await query("insert into app_users(id,email,display_name,status,password_hash,email_verified_at) values($1,'integrity@fixture.invalid','Synthetic Auth','active',$2,now())",[user,hash]);
  await query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'integrity@fixture.invalid','owner','active')",[org,user]);
+ const seedFreshSession=()=>query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at,step_up_at) values('00000000-0000-4000-8000-000000000081',$1,$2,'synthetic-current-proof',now()+interval '1 hour',now()) on conflict(id) do update set step_up_at=now(),expires_at=now()+interval '1 hour'",[user,org]);
  const setup=await import(await load('app/api/auth/mfa/setup/route.ts')),confirm=await import(await load('app/api/auth/mfa/confirm/route.ts'));
+ assert.equal((await setup.POST(req({}))).status,403,'Authenticator setup cannot bypass fresh authentication');
+ await seedFreshSession();
  const staged=await setup.POST(req({}));assert.equal(staged.status,200);const secret=(await staged.json()).secret;
  await query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at) values('00000000-0000-4000-8000-000000000082',$1,$2,'synthetic-token-hash',now()+interval '1 hour')",[user,org]);
  assert.equal((await confirm.POST(req({code:'nototp'}))).status,400);
  const enabled=await confirm.POST(req({code:totp.totp(secret)}));assert.equal(enabled.status,200);assert.ok(lockObserved,'Confirmation reads and verifies the locked pending factor');const recovery=(await enabled.json()).recoveryCodes;assert.equal(recovery.length,8);
- assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,0,'Other sessions revoked on enrollment');
+ assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,1,'Only the authenticated current session survives enrollment');
+ await seedFreshSession();
  const factor=(await query('select mfa_secret_enc from app_users where id=$1',[user])).rows[0].mfa_secret_enc;
  assert.equal((await setup.POST(req({}))).status,409,'Enabled factor cannot be replaced by setup');assert.equal((await confirm.POST(req({code:totp.totp(secret)}))).status,409,'Enabled factor cannot be replaced by confirm');assert.equal((await query('select mfa_secret_enc from app_users where id=$1',[user])).rows[0].mfa_secret_enc,factor);
  assert.equal(crypto.decryptSecret(factor),secret);
@@ -106,6 +114,7 @@ try{
  assert.equal(cookieSets,cookiesBeforeStaleLogin,'Rejected stale authentication never publishes a new session cookie');
  console.log(JSON.stringify({probe:'stale-login-after-committed-password-reset',status:staleLogin.status,persistedSessionsAfterReset:lateSessions,synthetic:true}));
  assert.equal((await login.POST(req({email:'integrity@fixture.invalid',password:thirdPassword,mfaCode:totp.totp(secret)}))).status,200,'Fresh credential proof still creates a real session');
+ await seedFreshSession();
  const finalToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
  const finalPassword='Synthetic-final-password-after-reset-012';
  const staleChange=await raceAfterRead(sql=>sql==='select password_hash from app_users where id=$1',()=>reset.PATCH(req({currentPassword:thirdPassword,password:'Synthetic-stale-password-must-not-win-345'})),async()=>assert.equal((await reset.PATCH(req({token:finalToken,password:finalPassword}))).status,200));
@@ -135,9 +144,16 @@ try{
  assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423,'Pending files cannot be downloaded');
  await query("update file_objects set scan_status='clean' where id=$1",[uploaded.id]);const clean=await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})});assert.equal(clean.status,200);assert.equal(await clean.text(),'synthetic bytes');
  await query("update file_objects set scan_status='rejected' where id=$1",[uploaded.id]);assert.equal((await download.GET(new Request('https://fixture.invalid'),{params:Promise.resolve({id:uploaded.id})})).status,423);
- const imageUpload=(purpose,key)=>{const form=new FormData();form.append('file',new File([Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000b49444154789c636000020000050001a5f645400000000049454e44ae426082','hex')],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ const imageBytes=await sharp({create:{width:4,height:4,channels:4,background:'#4477aa'}}).png().toBuffer();
+ const imageUpload=(purpose,key,bytes=imageBytes,crop)=>{const form=new FormData();form.append('file',new File([bytes],'synthetic.png',{type:'image/png'}));form.append('purpose',purpose);if(crop!==undefined)form.append('avatarCrop',JSON.stringify(crop));return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
+ assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-corrupt-image',Buffer.from('89504e470d0a1a0a','hex')))).status,400,'Signature-only PNG is not a decodable image');
  const branding=async()=>({logo:(await query('select logo_url from organizations where id=$1',[org])).rows[0].logo_url,avatar:(await query('select avatar_url from app_users where id=$1',[user])).rows[0].avatar_url});
  const initialBranding=await branding();
+ const scansBeforeCrop=globalThis.__integrity.scanCalls;
+ for(const crop of [null,{},[],{x:2,y:0,zoom:1},{x:0,y:0,zoom:0}])assert.equal((await files.POST(imageUpload('profile_avatar','invalid-crop-'+randomUUID(),imageBytes,crop))).status,400,'Invalid crop never reaches storage or the scanner');
+ const {limitsConfig}=await import(await load('config/limits.ts'));
+ assert.equal((await files.POST(imageUpload('profile_avatar','oversized-avatar-'+randomUUID(),Buffer.alloc(limitsConfig.maxFileUploadBytes+1)))).status,413,'Oversized avatar rejected before decoding');
+ assert.equal(globalThis.__integrity.scanCalls,scansBeforeCrop);assert.deepEqual(await branding(),initialBranding);
  const pendingLogo=await files.POST(imageUpload('company_logo','synthetic-pending-logo'));assert.equal(pendingLogo.status,201);const pendingLogoId=(await pendingLogo.json()).item.id;
  assert.equal((await files.POST(imageUpload('profile_avatar','synthetic-pending-avatar'))).status,201);assert.deepEqual(await branding(),initialBranding,'Quarantined images never replace existing branding');
  const beforeReject=(await query('select count(*)::int n from file_objects where organization_id=$1',[org])).rows[0].n;
@@ -198,6 +214,30 @@ try{
   assert.equal((await files.GET({nextUrl:new URL('https://fixture.invalid/api/files?customerId='+supportCases[0])})).status,403,'Forbidden relation filters are rejected before selecting files');
   assert.equal((await files.POST(supportUpload(supportCases[1],'support-other-user'))).status,404,'Time-only rejects another user case');
   assert.equal((await files.POST(supportUpload(supportCases[2],'support-other-tenant'))).status,404,'Time-only rejects another tenant case');
+
+  const removal=await import(await load('app/api/files/[id]/route.ts'));
+  const attachment=(await query("select id from file_objects where support_case_id=$1 order by created_at limit 1",[supportCases[0]])).rows[0].id;
+  const context={params:Promise.resolve({id:attachment})};
+  assert.equal((await removal.DELETE(new Request('https://fixture.invalid/api/files/invalid',{method:'DELETE'}),{params:Promise.resolve({id:'-'.repeat(36)})})).status,404,'Malformed UUID must be rejected before a database cast');
+  const removeRequest=()=>new Request('https://fixture.invalid/api/files/'+attachment,{method:'DELETE'});
+  globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',userId:'another-support-user'});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,403,'Another uploader cannot remove an attachment');
+  globalThis.__integrity.getSession=()=>({...supportSession(),organizationId:foreignOrg});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,404,'Foreign tenant cannot remove an attachment');
+  globalThis.__integrity.getSession=()=>({...supportSession(),role:'member',moduleProfile:'time_only'});
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,200,'Own permitted support attachment can be removed');
+  assert.equal((await removal.DELETE(removeRequest(),context)).status,200,'Repeated removal is idempotent');
+  assert.ok((await query('select archived_at from file_objects where id=$1',[attachment])).rows[0].archived_at);
+  assert.equal((await query('select count(*)::int n from file_contents where file_id=$1',[attachment])).rows[0].n,1,'Removal preserves retained file bytes');
+  assert.equal((await download.GET(removeRequest(),context)).status,404,'Archived attachment cannot be downloaded');
+  assert.ok(!(await (await files.GET({nextUrl:new URL('https://fixture.invalid/api/files')})).json()).items.some(item=>item.id===attachment),'Archived attachment is absent from active lists');
+  globalThis.__integrity.getSession=supportSession;
+  const archiveCustomer=(await query("insert into customers(organization_id,customer_no,external_id,name) values($1,$2,$2,'Synthetic archival customer') returning id",[org,'ARCH-'+randomUUID()])).rows[0].id;
+  const expense=(await query("insert into expenses(organization_id,customer_id,external_id,expense_date,description,category,status,created_by_user_id) values($1,$2,gen_random_uuid()::text,current_date,'Synthetic locked receipt','expense','approved',$3) returning id",[org,archiveCustomer,user])).rows[0].id;
+  const receipt=(await query("insert into file_objects(organization_id,object_key,original_name,content_type,size_bytes,sha256,scan_status,created_by,purpose,expense_id) values($1::uuid,$1::text||'/files/'||$2,'receipt.txt','text/plain',0,repeat('0',64),'clean',$3,'expense_receipt',$4) returning id",[org,randomUUID(),user,expense])).rows[0].id;
+  assert.equal((await removal.DELETE(removeRequest(),{params:Promise.resolve({id:receipt})})).status,409,'Approved expense evidence cannot be removed');
+  assert.equal((await query('select archived_at from file_objects where id=$1',[receipt])).rows[0].archived_at,null);
+  assert.equal((await removal.DELETE(removeRequest(),{params:Promise.resolve({id:pendingLogoId})})).status,403,'Branding cannot be removed through attachment API');
  }finally{globalThis.__integrity.getSession=supportSession;}
  console.log((native?'PostgreSQL physical parallel clients':'Isolated PGlite')+': auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial, standard/time-only support attachment boundaries and branding policy passed.');
 }finally{delete globalThis.__integrity;if(native)await db.end();else await db.close();}

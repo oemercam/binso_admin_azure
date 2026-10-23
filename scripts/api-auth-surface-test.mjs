@@ -7,7 +7,7 @@ const port=process.env.BINSO_AUTH_TEST_PORT??'3217',base='http://127.0.0.1:'+por
 const inventory=JSON.parse(await fs.readFile('docs/architecture/v21-3-data-inventory.json','utf8'));
 const publicPaths=new Set([
  '/api/auth/invitation','/api/auth/login','/api/auth/logout','/api/auth/password','/api/auth/recover','/api/auth/register','/api/auth/resend-verification','/api/auth/session','/api/auth/verify-email',
- '/api/billing/catalog','/api/billing/webhook','/api/health','/api/health/ready','/api/telemetry/web-vitals',
+ '/api/public/offer','/api/public/report','/api/billing/catalog','/api/billing/webhook','/api/health','/api/health/ready','/api/telemetry/web-vitals',
  '/api/demo/session','/api/operator/demo-session','/api/operator/logout','/api/operator/sso/callback',
 ]);
 // Passkey routes are dual-purpose: registration remains private and is probed
@@ -19,6 +19,17 @@ let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',
 try{
  for(let i=0;;i++){if(server.exitCode!==null)throw new Error('Isolated API server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>80)throw new Error('Isolated API server unavailable: '+logs);await new Promise(resolve=>setTimeout(resolve,250));}
  const results=[];
+ // The recipient endpoint is intentionally public, but still requires a valid
+ // capability for every action; no session or disabled assertion substitutes it.
+ assert.equal((await fetch(base+'/api/public/offer')).status,405,'GET never executes a public offer operation');
+ assert.equal((await fetch(base+'/api/public/report')).status,405,'GET never sends a report code or returns report bytes');
+ const report=await fetch(base+'/api/public/report',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify({token:'!'.repeat(43),action:'pdf',code:'123456',key:'synthetic-denied-report'})});assert.equal(report.status,410,'Invalid capability cannot expose report content');
+ for(const action of ['read','pdf','challenge','respond']){
+  const response=await fetch(base+'/api/public/offer',{method:'POST',headers:{origin:base,'content-type':'application/json'},body:JSON.stringify({token:'!'.repeat(43),action,decision:'accept',confirmed:true,code:'123456',requestKey:'synthetic-public-denial'})});
+  assert.equal(response.status,410,action+' rejects an invalid public capability before tenant access');
+  assert.equal((await response.json()).error,'offer_unavailable');
+ }
+
  for(const probe of probes){
   const response=await fetch(base+probe.path+(probe.path==='/api/demo/data'?'?collection=customers':''),{method:probe.method,redirect:'manual',headers:{origin:base,'content-type':'application/json','idempotency-key':'isolated-api-probe'},...(probe.method==='GET'?{}:{body:JSON.stringify({...(probe.path.startsWith('/api/auth/passkeys/')?{mode:'register',response:{id:'synthetic-registration-response'}}:{}),kind:'invoice',number:'RE-SYNTHETIC',customerName:'Synthetic customer',customerId:'00000000-0000-4000-8000-000000000001',items:[{description:'Synthetic',quantity:1,unitPrice:1,vatRate:0}],issueDate:'2026-10-09',dueDate:'2026-11-09',name:'Synthetic',unitPrice:1,vatRate:0,action:'start',amount:1,invoiceId:'00000000-0000-4000-8000-000000000001',paidOn:'2026-10-09',email:'api@fixture.invalid',role:'member',status:'draft'})}),signal:AbortSignal.timeout(15000)});
   const body=await response.text();results.push({...probe,status:response.status,...(probe.path.startsWith('/api/auth/passkeys/')?{mode:'register'}:{})});

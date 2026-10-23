@@ -67,9 +67,10 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
    const actions=[...el.querySelectorAll('button,a')].filter(visible);
    const kind=x=>x.matches('button.desktop-global-search[aria-label]')&&x.getAttribute('aria-label').trim()?'search':x.matches('button.desktop-notification-button')?'notification':x.matches('button.avatar-button')?'account':'unexpected';
    const roles=actions.map(kind),unexpected=actions.filter(x=>kind(x)==='unexpected');
-   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"],.workspace-location>a[href="/dashboard"]'));
+   const outside=[...el.closest('.desktop-appbar').querySelectorAll('button,a')].filter(visible).filter(x=>!el.contains(x)&&!x.matches('button.desktop-navigation-toggle[aria-controls="customer-desktop-navigation"]'));
    const validOrder=roles.join(',')==='search,notification,account';
-   add('LAY-003',validOrder&&!unexpected.length&&!outside.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),rects:actions.map(item)},'.desktop-appbar-actions');
+   const redundantLocation=[...el.closest('.desktop-appbar').querySelectorAll('.workspace-location')].filter(visible);
+   add('LAY-003',validOrder&&!unexpected.length&&!outside.length&&!redundantLocation.length?'passed':'failed',{visibleActions:actions.length,roles,unexpectedActions:[...unexpected,...outside].map(item),redundantLocation:redundantLocation.map(item),rects:actions.map(item)},'.desktop-appbar-actions');
   }
   for(const el of dialogs.filter(el=>el===activeDialog))add('SHT-001',within(rect(el),v)?'passed':'failed',{rect:rect(el),visualViewport:v},'[role=dialog],[role=alertdialog]');
   for(const el of all('.mobile-sticky-save,.filter-sheet-actions')){const c=getComputedStyle(el);if(['sticky','fixed'].includes(c.position)||el.closest('[role=dialog]')){const actions=[...el.querySelectorAll('button,a,input[type=submit]')].filter(a=>a.getClientRects().length&&getComputedStyle(a).visibility!=='hidden'&&getComputedStyle(a).display!=='none').map(rect);add('SHT-002',actions.length?actions.every(r=>within(r,v))?'passed':'failed':'not-tested',{container:rect(el),actions,visualViewport:v,criterion:'Actual action targets, not decorative edge-to-edge footer background'},'.mobile-sticky-save,.filter-sheet-actions');}}

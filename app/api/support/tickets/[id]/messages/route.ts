@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { requireSession } from '@/lib/server/session';
 import { authorize } from '@/lib/server/rbac';
 import { withTenant } from '@/lib/server/db';
+import {audit} from '@/lib/server/audit';
 import {idempotentBusiness} from '@/lib/server/business-idempotency';
 import { ApiError,apiError,assertSameOrigin,cleanText,json,readJson } from '@/lib/server/http';
 export async function GET(_request:NextRequest,{params}:{params:Promise<{id:string}>}){
@@ -14,7 +15,10 @@ export async function POST(request:NextRequest,{params}:{params:Promise<{id:stri
   const write=async()=>{
    const ticket=await c.query('select id,status from support_cases where organization_id=$1 and id::text=$2 for update',[s.organizationId,id]);if(!ticket.rowCount)throw new ApiError(404,'not_found','Ticket wurde nicht gefunden.');
    if(['resolved','closed'].includes(ticket.rows[0].status))throw new ApiError(409,'ticket_closed','Bitte das Ticket vor einer weiteren Antwort wieder öffnen.');
-   return (await c.query("insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3) returning id,author_type,message body,created_at",[ticket.rows[0].id,s.userId,message])).rows[0];
+   const reply=(await c.query("insert into support_messages(case_id,author_type,author_user_id,message) values($1,'customer',$2,$3) returning id,author_type,message body,created_at",[ticket.rows[0].id,s.userId,message])).rows[0];
+   await c.query('update support_cases set updated_at=now() where id=$1 and organization_id=$2',[ticket.rows[0].id,s.organizationId]);
+   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'support.reply.created',entityType:'support_case',entityId:ticket.rows[0].id,metadata:{messageId:reply.id}});
+   return reply;
   };
   const key=request.headers?.get('idempotency-key')?.trim()??'';
   return key?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'support.reply',key,body:{id,message}},write):write();

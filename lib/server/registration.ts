@@ -10,7 +10,7 @@ import {issueEmailCode} from "./email-otp";
 import {mailLayout,sendMail} from "./email";
 import {registrationText,type MailLocale} from "./mail-i18n";
 import {billingCycles,domainConfig,planIds,type BillingCycle,type PlanId} from "@/config/domain";
-import {tenantCan,type TenantRole} from "@/lib/permissions";
+import {type TenantRole} from "@/lib/permissions";
 import {legalConfig} from "@/config/legal";
 import {plans} from "@/lib/plans";
 
@@ -56,16 +56,14 @@ export async function sendRegistrationVerification(input:{email:string;userId:st
  }catch{return false;}
 }
 
-/** Existing MFA enrollment remains the first privileged step; company setup follows it. */
-export async function registrationHandoff(organizationId:string,role:TenantRole,mfaEnabled=false){
+/** Verified registration enters the workspace; company setup remains resumable. */
+export async function registrationHandoff(organizationId:string,_role:TenantRole,_mfaEnabled=false){
  const result=await withTransaction(async client=>{
   await client.query("select set_config('app.organization_id',$1,true)",[organizationId]);
   return client.query<{complete:boolean}>("select exists(select 1 from organization_milestones where organization_id=$1 and milestone='onboarding_completed') as complete",[organizationId]);
  });
  const onboardingComplete=result.rows[0]?.complete===true;
- const next=onboardingComplete||!tenantCan(role,"organization:write")?"/dashboard":"/einstellungen/firma?onboarding=1";
- const mfaSetupRequired=["owner","admin","finance"].includes(role)&&!mfaEnabled;
- return {onboardingComplete,mfaSetupRequired,next:mfaSetupRequired?`/einstellungen/sicherheit?setup=1&next=${encodeURIComponent(next)}`:next};
+ return {onboardingComplete,mfaSetupRequired:false,next:'/dashboard'};
 }
 
 export type VerifiedMember={organization_id:string;role:TenantRole;name:string;email_verified_at:Date|null;mfa_enabled:boolean;password_hash:string|null;mfa_secret_enc:string|null};

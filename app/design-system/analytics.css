@@ -21,10 +21,9 @@
 .metric-money{display:inline-flex;align-items:baseline;gap:6px}
 .bo-cash-overview{min-width:0;margin-block:26px}
 .bo-cash-overview>.metrics-grid{gap:26px 18px;margin-bottom:30px}
-.bo-overview-period{display:block;width:max-content;max-width:100%;margin-bottom:22px}
-.bo-overview-period select{border:0;padding-left:0;color:var(--color-muted);font-size:var(--type-label)}
 .bo-overview-bars{display:flex;align-items:flex-end;gap:10px;margin-block:18px;min-width:0}
 .bo-overview-bars>button{display:grid;gap:14px;flex:1;min-width:0;padding:0;border:0;background:transparent;color:var(--color-muted);text-align:center;font:inherit;cursor:pointer}
+.bo-overview-bars>button>small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bo-overview-bar-track{display:flex;align-items:flex-end;justify-content:center;height:90px;border-bottom:1px solid var(--color-line)}
 .bo-overview-bar-track>i{display:block;width:100%;height:var(--bar-value);background:var(--chart-overview);border-radius:var(--shape-kbd) var(--shape-kbd) 0 0}
 .bo-overview-bar-track>i[data-negative]{background:var(--chart-negative)}

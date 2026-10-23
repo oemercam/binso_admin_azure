@@ -1,14 +1,15 @@
 import {formatCurrency} from "./financial-status";
 /** Display-only helpers: never normalize persisted numeric values. */
-export function formatQuantity(value:unknown,unit:string){
+export function formatQuantity(value:unknown,unit:string,locale='de-CH'){
  const number=Number(value);
- return `${Number.isFinite(number)?number.toLocaleString("de-CH",{maximumFractionDigits:6}):String(value??"—")} ${unit}`;
+ return `${Number.isFinite(number)?number.toLocaleString(locale,{maximumFractionDigits:6}):String(value??"—")} ${unit}`;
 }
+const priceUnits:Record<string,string>={hour:"Std.",piece:"Stück",flat:"Pauschal",day:"Tag",month:"Monat",year:"Jahr",kg:"kg",m:"m",m2:"m²"};
 export function priceUnit(unit:unknown){
  const raw=String(unit??"");
- return ({hour:"Std.",piece:"Stück",flat:"Pauschal",day:"Tag",month:"Monat",year:"Jahr",kg:"kg",m:"m",m2:"m²"} as Record<string,string>)[raw]??raw;
+ return Object.hasOwn(priceUnits,raw)?priceUnits[raw]:raw;
 }
-export function withPriceUnit(price:string,unit:unknown){const label=priceUnit(unit);return label?`${price} / ${label}`:price}
+export function withPriceUnit(price:string,unit:unknown,translate:(label:string)=>string=label=>label){const label=priceUnit(unit);return label?`${price} / ${Object.hasOwn(priceUnits,String(unit??""))?translate(label):label}`:price}
 export function timeMetadata(description:unknown,project:unknown,person:unknown,date:string){
  return [...new Set([project,person,date].map(v=>String(v??"").trim()).filter(v=>v&&v!==String(description??"").trim()))].join(" · ");
 }
@@ -17,10 +18,13 @@ export function timeMetadata(description:unknown,project:unknown,person:unknown,
 export function formatHours(value:unknown){
  const hours=Number(value);return Number.isFinite(hours)?hours.toLocaleString("de-DE",{maximumFractionDigits:2})+" h":"—";
 }
-export function formatDateTime(value:unknown){
+function formatTimestamp(value:unknown,locale:string,withTime:boolean){
  const date=new Date(String(value??""));if(!Number.isFinite(date.getTime()))return "";
- return new Intl.DateTimeFormat("de-CH",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}).format(date);
+ return new Intl.DateTimeFormat(locale,withTime?{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"Europe/Zurich"}:{day:"2-digit",month:"2-digit",year:"numeric",timeZone:"Europe/Zurich"}).format(date);
 }
+export function formatDateTime(value:unknown,locale='de-CH'){return formatTimestamp(value,locale,true);}
+/** Actual timestamps use the Swiss business day; civil document dates do not. */
+export function formatTimestampDate(value:unknown,locale='de-CH'){return formatTimestamp(value,locale,false);}
 /** Chat day boundaries use the same Swiss business timezone as other timestamps. */
 export function messageDay(value:string){
  const date=new Date(value);if(!Number.isFinite(date.getTime()))return "";

@@ -19,7 +19,13 @@ export function useTranslation(){const {locale}=useLocale();return (value:string
 /** Only application copy is passed here; records, names and user messages stay untouched. */
 export function LocalizedText({children,verbatim=false}:{children:ReactNode;verbatim?:boolean}){
  const {locale}=useLocale();
- const render=(value:ReactNode):ReactNode=>typeof value==='string'?translateMessage(value,locale):Array.isArray(value)?value.map(render):value;
+ const render=(value:ReactNode):ReactNode=>{
+  if(typeof value==='string'){
+   const reference=value.match(/^([\s\S]*) · #([0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i);
+   return reference?[translateMessage(reference[1],locale),' · ',translateMessage('Referenz',locale),': ',reference[2]]:translateMessage(value,locale);
+  }
+  return Array.isArray(value)?value.map(render):value;
+ };
  return verbatim?children:render(children);
 }
 /** Native attribute localization keeps accessible names in the selected language. */

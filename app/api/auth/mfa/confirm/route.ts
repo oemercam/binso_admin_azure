@@ -1,3 +1,4 @@
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {audit} from "@/lib/server/audit";
 import {NextRequest} from "next/server";
 import {decryptSecret} from "@/lib/server/crypto";
@@ -15,6 +16,7 @@ export async function POST(request:NextRequest){
     await enforceRateLimit(request,"mfa-confirm",10,15*60_000);
     const session=await getSession();
     if(!session||session.isDemo)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
+    await requireFreshAuthentication(session);
     const body=asObject(await readJson(request,8192));
     const code=stringField(body,"code",{min:6,max:6});
     const recoveryCodes=await withTransaction(async client=>{
@@ -26,6 +28,7 @@ export async function POST(request:NextRequest){
       const codes=generateRecoveryCodes();
       await client.query(`update app_users set mfa_enabled=true,mfa_secret_enc=$1,recovery_code_hashes=$2::jsonb,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,updated_at=now() where id=$3`,[pending.mfa_pending_secret_enc,JSON.stringify(codes.map(hashRecoveryCode)),session.userId]);
       await client.query("delete from auth_sessions where user_id=$1 and id<>$2",[session.userId,session.sessionId]);
+      await client.query('update auth_sessions set step_up_at=null where id=$1',[session.sessionId]);
       await client.query("select set_config('app.organization_id',$1,true)",[session.organizationId]);
       await audit(client,{organizationId:session.organizationId,userId:session.userId,action:"auth.mfa_enrolled",entityType:"app_users",entityId:session.userId});
       return codes;

@@ -7,9 +7,10 @@ async function assertMobileAuthGeometry(page){
   const targets=[...document.querySelectorAll('.auth-options>label,.auth-inline-action,.auth-cancel')]
    .filter(node=>node.getClientRects().length)
    .map(node=>({tag:node.tagName,height:node.getBoundingClientRect().height}));
-  return {font:getComputedStyle(heading).fontSize,expected:getComputedStyle(heading).getPropertyValue('--type-mobile-heading').trim(),targets};
+  return {font:getComputedStyle(heading).fontSize,expected:getComputedStyle(heading).getPropertyValue('--type-large-heading').trim(),targets};
  });
- assert.equal(geometry.font,geometry.expected,'Auth heading uses the shared mobile heading token');
+ assert.equal(geometry.expected,'28px','Revision7 chapter19 fixes the auth headline at28px');
+ assert.equal(geometry.font,geometry.expected,'Auth heading uses the shared Revision7 auth headline token');
  assert.ok(geometry.targets.length>0,'The actual auth state must expose checked action targets');
  for(const target of geometry.targets)assert.ok(target.height>=44,'Auth touch target must be at least 44px: '+JSON.stringify(target));
 }
@@ -22,23 +23,29 @@ export async function verifyMobileLoginGeometry(page,{captureCode}={}){
  try{await assert.rejects(()=>assertMobileAuthGeometry(page),/Auth touch target must be at least 44px/);}
  finally{await regression.evaluate(node=>node.remove());}
  await assertMobileAuthGeometry(page);
+ const retiredHeading=await page.addStyleTag({content:'.auth-card h1{font-size:22px!important}'});
+ try{await assert.rejects(()=>assertMobileAuthGeometry(page),/Auth heading uses the shared Revision7 auth headline token/);}
+ finally{await retiredHeading.evaluate(node=>node.remove());}
+ await assertMobileAuthGeometry(page);
 
- let requests=0;
- const fixture=async route=>{requests++;await route.fulfill({status:202,contentType:'application/json',body:JSON.stringify({mfaMethod:'email'})});};
+ const originalUrl=page.url();let requests=0,mode='totp';
+ const fixture=async route=>{requests++;await route.fulfill({status:mode==='password'?200:202,contentType:'application/json',body:JSON.stringify(mode==='password'?{ok:true,next:'/dashboard'}:mode==='verify'?{requiresEmailVerification:true}:{mfaMethod:'totp'})});};
  await page.route('**/api/auth/login',fixture);
  try{
   await page.locator('.auth-card input[type="email"]').fill('auth-ux@example.invalid');
   await page.locator('.auth-card input[autocomplete="current-password"]').fill('Isolated-UX-Fixture-Only');
   await page.locator('.auth-card button[type="submit"]').click();
-  await page.getByRole('heading',{name:'Anmeldung bestätigen',exact:true}).waitFor();
-  assert.equal(await page.locator('.auth-inline-action').count(),2,'Code state retains resend and back actions');
+  await page.getByRole('heading',{name:'Authenticator-Code',exact:true}).waitFor();
+  assert.equal(await page.locator('.auth-inline-action').count(),1,'An enrolled authenticator has a back action, never an email-factor fallback');
   await assertMobileAuthGeometry(page);
-  if(captureCode)await captureCode();
+
   const back=page.getByRole('button',{name:'Zurück',exact:true});
   await back.focus();await page.keyboard.press('Enter');
   await page.locator('.auth-options>label').waitFor();
   await assertMobileAuthGeometry(page);
   assert.equal(requests,1,'Exactly one isolated credential request; no resend/test email');
+  mode='verify';await page.locator('.auth-card button[type="submit"]').click();await page.getByRole('heading',{name:'E-Mail bestätigen',exact:true}).waitFor();assert.equal(await page.locator('.auth-inline-action').count(),2,'Unverified registration retains resend and back actions');await assertMobileAuthGeometry(page);if(captureCode)await captureCode();await page.getByRole('button',{name:'Zurück',exact:true}).click();await page.locator('.auth-options>label').waitFor();assert.equal(requests,2);
+  mode='password';await page.locator('.auth-card button[type="submit"]').click();await page.waitForURL('**/dashboard');await page.waitForLoadState('networkidle');assert.equal(requests,3,'Verified ordinary password login reaches the workspace with one request and no email-MFA step');await page.goto(originalUrl);await page.locator('.auth-options>label').waitFor();await assertMobileAuthGeometry(page);
   await page.locator('.auth-card input[type="email"]').fill('');
   await page.locator('.auth-card input[autocomplete="current-password"]').fill('');
   await page.locator('.auth-card h1').click();

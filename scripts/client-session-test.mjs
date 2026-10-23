@@ -27,7 +27,7 @@ try{
  globalThis.fetch=async()=>{throw new DOMException('timeout','TimeoutError')};await assert.rejects(cache.readClientSession(),/Sitzungsprüfung dauert zu lange/);
  globalThis.fetch=async()=>new Response(JSON.stringify({authenticated:false}));assert.equal((await cache.readClientSession()).authenticated,false,'A failed check must be retryable');
  const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl)).replace('"./data-events"',JSON.stringify(eventsUrl));
- const backend=await import(moduleUrl(backendSource));
+ const backendUrl=moduleUrl(backendSource),backend=await import(backendUrl);
  assert.equal(backend.startDemoClientSession,undefined,'Demo provisioning is absent');
  assert.equal(backend.isProductionBackendEnabled(),true);
  local.setItem('binso.demo.session','1');local.setItem('binso.demo.database','1');
@@ -49,10 +49,15 @@ try{
  const get=route.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='GET').getText(route);
  const compiled=ts.transpileModule(get,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
  const exports={};const env={databaseUrl:'postgres://fixture'};
- Function('exports','getSession','getOrganizationPlan','cookies','json','env',compiled)(exports,async()=>null,async()=>'business',async()=>({get:()=>({value:'1'})}),value=>value,env);
+ let routeSession=null;
+ Function('exports','getSession','getOrganizationPlan','cookies','json','env',compiled)(exports,async()=>routeSession,async()=>'business',async()=>({get:()=>({value:'1'})}),value=>value,env);
  assert.equal((await exports.GET()).authenticated,false,'An expired database demo must never regain fake owner permissions through its marker cookie');
  env.databaseUrl='';assert.equal((await exports.GET()).authenticated,false,'No database and a forged preview cookie cannot authenticate');
  console.log('Expired database demo is unauthenticated; static cookie preview remains unauthenticated.');
+ routeSession={role:'owner',userId:'fixture',organizationId:'fixture-org',mfaEnabled:false};
+ assert.equal((await exports.GET()).security.enrollmentRequired,false,'21 October approval: owner workspace access does not require optional TOTP');
+ routeSession={...routeSession,mfaEnabled:true};assert.equal((await exports.GET()).security.enrollmentRequired,false,'Completed MFA is immediately reflected by the server');
+ routeSession={...routeSession,role:'member',mfaEnabled:false};assert.equal((await exports.GET()).security.enrollmentRequired,false,'Non-privileged users are not forced into the privileged gate');
  window.localStorage={removeItem(){throw new DOMException('blocked','SecurityError')},setItem(){throw new DOMException('blocked','SecurityError')}};
  assert.equal(backend.isProductionBackendEnabled(),true,'Blocked browser storage defers to authenticated server APIs');
  globalThis.fetch=async()=>new Response(JSON.stringify({ok:true}));await backend.logoutClientSession();assert.equal(cache.cachedClientSession(),null,'Blocked storage cannot prevent confirmed logout and the private-memory fence');window.localStorage=local;
@@ -60,6 +65,50 @@ try{
  const isolatedEvents=await import(moduleUrl((await fs.readFile('lib/client/data-events.ts','utf8')).replace("'./process-draft'",JSON.stringify(draftUrl)).replace("'./list-state'",JSON.stringify(listStateUrl))+'\n// blocked-broadcast-fixture'));
  assert.doesNotThrow(()=>isolatedEvents.resetClientData(false),'Blocked cross-tab channels cannot break in-memory invalidation');globalThis.BroadcastChannel=undefined;
  console.log('Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.');
+
+ const reference='6f81c519-5073-4f33-8b45-90bc4ad6157c';
+ globalThis.fetch=async()=>Response.json({error:'internal_error',message:'Die Anfrage konnte nicht verarbeitet werden.',correlationId:reference},{status:500,headers:{'X-Correlation-ID':reference}});
+ await assert.rejects(backend.apiGet('/api/test-reference'),error=>error.correlationId===reference&&error.message.endsWith(' · #'+reference),'Only matching bounded server reference is exposed');
+ for(const [payloadId,header,status] of [[reference,'different',500],[reference,reference,400],['private-token','private-token',500]]){
+  globalThis.fetch=async()=>Response.json({error:'internal_error',message:'Public error',correlationId:payloadId},{status,headers:{'X-Correlation-ID':header}});
+  await assert.rejects(backend.apiGet('/api/test-reference-negative'),error=>error.correlationId===undefined&&error.message==='Public error','No mismatched, business-error or arbitrary reference may reach the UI');
+ }
+ console.log('Support correlation: exact header/body agreement, UUID boundary and negative privacy cases passed.');
+
+ const avatarFile=new File(['synthetic binary; decoder tested separately'],'avatar.png',{type:'image/png'}),form=new FormData();form.append('file',avatarFile);form.append('purpose','profile_avatar');const imageKeys=[],imageEvents=await import(eventsUrl),imageId='6f81c519-5073-4f33-8b45-90bc4ad6157c';
+ const contractBefore=imageEvents.dataRevision(['/api/contracts/contract-one']);imageEvents.publishMutation('/api/files');assert.notEqual(imageEvents.dataRevision(['/api/contracts/contract-one']),contractBefore,'Document changes invalidate the contract manifest view');
+ const filesBefore=imageEvents.dataRevision(['/api/files']);imageEvents.publishMutation('/api/contracts/contract-one/status');assert.notEqual(imageEvents.dataRevision(['/api/files']),filesBefore,'Contract changes invalidate their attachment view');
+ for(const item of [{id:imageId,scanStatus:'clean'},{id:imageId,scanStatus:'unverified',available:true},{id:'not-an-id',scanStatus:'clean',available:true}]){
+  const before=imageEvents.dataRevision(['/api/files']);globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item},{status:201});};
+  await assert.rejects(backend.apiUpload('/api/files',form),error=>error.code==='invalid_response');assert.equal(imageEvents.dataRevision(['/api/files']),before,'Incomplete image receipts cannot broadcast a successful upload');
+ }
+ globalThis.fetch=async(path,options)=>{imageKeys.push(options.headers['Idempotency-Key']);return Response.json({item:{id:imageId,scanStatus:'clean',available:true}},{status:201});};assert.equal((await backend.apiUpload('/api/files',form)).item.available,true);assert.equal(new Set(imageKeys).size,1,'Explicit retry keeps the original upload identity');
+ form.set('avatarCrop',JSON.stringify({x:0,y:1,zoom:2}));await backend.apiUpload('/api/files',form);const cropKey=imageKeys.at(-1);assert.notEqual(cropKey,imageKeys[0],'A selected crop has its own upload identity');await backend.apiUpload('/api/files',form);assert.equal(imageKeys.at(-1),cropKey,'Retrying the same selected crop preserves its identity');form.set('avatarCrop',JSON.stringify({x:1,y:1,zoom:2}));await backend.apiUpload('/api/files',form);assert.notEqual(imageKeys.at(-1),cropKey,'Changing a crop cannot reuse a committed key for other pixels');
+ console.log('Image upload receipts: explicit availability/verdict/UUID contract before success and preserved retry identity passed.');
+ const mergeContract=await import(moduleUrl(await fs.readFile('lib/customer-merge.ts','utf8'))),mergeSource='0dcd8673-f466-4d52-9a81-a65455d6e986',mergeTarget='fedcedcb-ad50-4941-a078-c322dc471829';
+ const receipt={item:{merged:true,id:mergeTarget,sourceId:mergeSource,contactsMoved:1,activitiesMoved:0}};
+ for(const response of [null,{ok:true},{item:{...receipt.item,sourceId:mergeTarget}},{item:{...receipt.item,contactsMoved:-1}},{item:{...receipt.item,merged:false}}]){
+  const before=imageEvents.dataRevision(['/api/customers']);globalThis.fetch=async()=>Response.json(response);
+  await assert.rejects(backend.apiPost('/api/customers/merge',{}, {validate:value=>{if(!mergeContract.isCustomerMergeReceipt(value,mergeSource,mergeTarget))throw new backend.ClientApiError('Unconfirmed','invalid_response',502);}}),error=>error.code==='invalid_response');
+  assert.equal(imageEvents.dataRevision(['/api/customers']),before,'A malformed merge receipt cannot invalidate data as a successful mutation');
+ }
+ globalThis.fetch=async()=>Response.json(receipt);const mergeRevision=imageEvents.dataRevision(['/api/customers']);
+ assert.deepEqual(await backend.apiPost('/api/customers/merge',{}, {validate:value=>assert.ok(mergeContract.isCustomerMergeReceipt(value,mergeSource,mergeTarget))}),receipt);
+ assert.notEqual(imageEvents.dataRevision(['/api/customers']),mergeRevision,'A verified merge publishes its actual successful mutation');
+ console.log('Customer merge client receipts: exact identities, counts and completed result required before mutation publication.');
+ const languagePreference=await import(moduleUrl((await fs.readFile('lib/client/language-preference.ts','utf8')).replace("'./backend'",JSON.stringify(backendUrl))));
+ for(const locale of ['de','fr','it','en']){
+  for(const response of [null,{ok:true},{item:{language:'unexpected'}},{item:{language:locale+'-CH'}}]){
+   const before=imageEvents.dataRevision(['/api/settings/profile']);globalThis.fetch=async()=>Response.json(response);
+   await assert.rejects(languagePreference.persistLanguagePreference(locale),error=>error.code==='invalid_response');assert.equal(imageEvents.dataRevision(['/api/settings/profile']),before,'Unconfirmed preference never emits a successful profile mutation');
+  }
+  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/settings/profile');assert.equal(options.method,'PATCH');assert.deepEqual(JSON.parse(options.body),{language:locale});return Response.json({item:{language:locale}})};
+  assert.equal(await languagePreference.persistLanguagePreference(locale),locale);
+ }
+ for(const locale of ['de','fr','it','en']){globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/operator/preferences');assert.deepEqual(JSON.parse(options.body),{language:locale});return Response.json({item:{language:locale}})};assert.equal(await languagePreference.persistLanguagePreference(locale,'operator'),locale);}
+ globalThis.fetch=async()=>Response.json({message:'Storage unavailable'},{status:503});await assert.rejects(languagePreference.persistLanguagePreference('fr'),/Storage unavailable/);
+ let replyLanguage;globalThis.fetch=()=>new Promise(resolve=>{replyLanguage=resolve});const oldLanguage=languagePreference.persistLanguagePreference('it');cache.invalidateClientSession();replyLanguage(Response.json({item:{language:'it'}}));await assert.rejects(oldLanguage,error=>error.code==='session_changed','A response from the previous account cannot change language');
+ console.log('Language preference: exact confirmed profile storage, four languages, no false broadcasts and session-change fence passed.');
 
  const csvHeaders={'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="binso-fixture.csv"'};
  globalThis.fetch=async(path,options)=>{assert.equal(path,'/api/reports?format=csv');assert.equal(options.cache,'no-store');assert.equal(options.credentials,'same-origin');assert.equal(options.headers.Accept,'text/csv');return new Response('"Metric";"Value"\r\n', {headers:csvHeaders})};
@@ -71,5 +120,26 @@ try{
  let deliverExport;globalThis.fetch=()=>new Promise(resolve=>{deliverExport=resolve});const obsoleteExport=backend.apiGetFile('/api/reports?format=csv','text/csv');cache.invalidateClientSession();deliverExport(new Response('private old tenant CSV',{headers:csvHeaders}));await assert.rejects(obsoleteExport,error=>error.code==='session_changed');
  let body;globalThis.fetch=async()=>new Response(new ReadableStream({start(controller){body=controller}}),{headers:csvHeaders});const lateExport=backend.apiGetFile('/api/reports?format=csv','text/csv');await Promise.resolve();cache.invalidateClientSession();body.enqueue(new TextEncoder().encode('private late CSV'));body.close();await assert.rejects(lateExport,error=>error.code==='session_changed');
  console.log('File exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.');
+
+ window.setTimeout=setTimeout;window.clearTimeout=clearTimeout;
+ let proofRequest=null,attempts=0;
+ window.dispatchEvent=event=>{if(event.type==='binso-fresh-authentication')proofRequest=event.detail;};
+ globalThis.fetch=async()=>{attempts++;return attempts===1?new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403}):Response.json({ok:true})};
+ const protectedChange=backend.apiPatch('/api/settings/documents',{iban:'synthetic'});
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);
+ assert.ok(proofRequest);assert.equal(attempts,1,'A pre-mutation denial cannot retry until explicitly confirmed');
+ proofRequest.confirm();await protectedChange;assert.equal(attempts,2,'The explicitly confirmed mutation is retried exactly once');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;return new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403})};
+ const cancelledChange=backend.apiPatch('/api/settings/documents',{});const cancellation=assert.rejects(cancelledChange,error=>error.code==='fresh_authentication_cancelled');
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);assert.ok(proofRequest);proofRequest.cancel();await cancellation;assert.equal(attempts,1,'Cancellation never repeats a write');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;throw new Error('synthetic network outage')};await assert.rejects(backend.apiPatch('/api/settings/documents',{}),error=>error.code==='network_unavailable');assert.equal(attempts,1);assert.equal(proofRequest,null,'An uncertain transport failure is not a fresh-auth denial');
+ proofRequest=null;attempts=0;globalThis.fetch=async()=>{attempts++;return new Response(JSON.stringify({error:'fresh_authentication_required'}),{status:403})};
+ const staleChange=backend.apiPatch('/api/settings/documents',{iban:'old-tenant-synthetic'}),staleDenial=assert.rejects(staleChange,error=>error.code==='session_changed');
+ for(let i=0;i<20&&!proofRequest;i++)await new Promise(setImmediate);assert.ok(proofRequest);cache.invalidateClientSession();proofRequest.confirm();await staleDenial;assert.equal(attempts,1,'A session/tenant change during confirmation must prevent the write before replay');
+ const events=await import(eventsUrl),beforeProof=events.dataRevision([]);globalThis.fetch=async()=>Response.json({ok:true});await backend.apiPost('/api/auth/reauthenticate',{action:'confirm',password:'synthetic',code:'000000'});assert.equal(events.dataRevision([]),beforeProof,'A proof does not invalidate the original pending mutation identity fence');
+ const beforeReadPreview=events.dataRevision(['/api/customers']);globalThis.fetch=async(_path,options)=>{assert.equal(options.method,'POST');return Response.json({items:[]})};await backend.apiReadPost('/api/customers/import',{action:'preview',rows:[]});assert.equal(events.dataRevision(['/api/customers']),beforeReadPreview,'Read-only previews cannot broadcast fake customer mutations');
+ const previewForm=new FormData();previewForm.set('file',new File(['A,B\n1,2'],'synthetic.csv',{type:'text/csv'}));globalThis.fetch=async(_path,options)=>{assert.equal(options.body,previewForm);assert.equal(options.headers?.['Content-Type'],undefined,'Browser owns the multipart boundary');return Response.json({rows:[]})};await backend.apiReadPost('/api/customers/import',previewForm);
+ let resolvePreview;globalThis.fetch=()=>new Promise(resolve=>{resolvePreview=resolve});const pendingPreview=backend.apiReadPost('/api/customers/import',{action:'preview'}),stalePreview=assert.rejects(pendingPreview,error=>error.code==='session_changed');cache.invalidateClientSession();resolvePreview(Response.json({items:[{private:'old tenant'}]}));await stalePreview;
+ console.log('Fresh confirmation: explicit continuation only, one replay, cancellation and network denial without retry, and stable identity fence passed.');
 
 }finally{globalThis.BroadcastChannel=originalBroadcastChannel;globalThis.fetch=originalFetch;delete globalThis.window;delete globalThis.document;}

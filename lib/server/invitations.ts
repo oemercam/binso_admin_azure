@@ -13,15 +13,22 @@ import type {SessionUser} from "./session";
 
 /** Cross-tenant identity lookup is required for existing accounts. Every business
  * write still carries the authenticated tenant; no platform identity is exposed. */
-export async function inviteUser(s:SessionUser,email:string,role:string,key:string,moduleProfile:import("@/lib/permissions").ModuleProfile="standard"){
+export async function inviteUser(s:SessionUser,email:string,role:string,key:string,moduleProfile:import("@/lib/permissions").ModuleProfile="standard",replaceInvitationId:string|null=null){
  authorize(s,'users:manage');
  if(!['standard','time_only'].includes(moduleProfile)||moduleProfile==='time_only'&&role!=='member')throw new ApiError(400,'profile_invalid','Ungültiges Modulprofil.');
  if(s.isDemo)throw new ApiError(403,'demo_read_only','Einladungen sind in der Demo deaktiviert.');
  const prepared=await withPlatform(async c=>{
   await c.query("select set_config('app.organization_id',$1,true)",[s.organizationId]);
   await c.query("select set_config('app.user_id',$1,true)",[s.userId]);
-  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'invitation.create',key,body:{email,role,moduleProfile}},async()=>{
+  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:replaceInvitationId?'invitation.resend':'invitation.create',key,body:{email,role,moduleProfile,...(replaceInvitationId?{replaceInvitationId}:{})}},async()=>{
    await c.query('select id from organizations where id=$1 for update',[s.organizationId]);
+   if(replaceInvitationId){
+    const previous=(await c.query("select id,email,role,module_profile,status from organization_invitations where organization_id=$1 and id::text=$2 for update",[s.organizationId,replaceInvitationId])).rows[0];
+    if(!previous||previous.status!=='pending'||previous.email.toLowerCase()!==email.toLowerCase()||previous.role!==role||(previous.module_profile??'standard')!==moduleProfile)throw new ApiError(409,'invitation_changed','Diese Einladung wurde geändert oder ist nicht mehr offen.');
+    await c.query("update organization_invitations set status='revoked' where organization_id=$1 and id=$2",[s.organizationId,previous.id]);
+    await c.query("update auth_tokens set consumed_at=coalesce(consumed_at,now()) where organization_id=$1 and token_type='invitation' and metadata->>'invitation_id'=$2",[s.organizationId,previous.id]);
+    await c.query("update mail_outbox set status='cancelled',updated_at=now() where organization_id=$1 and kind='invitation' and entity_id=$2 and status in ('queued','failed')",[s.organizationId,previous.id]);
+   }
    const capacity=(await c.query("select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active')+(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) occupied from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1",[s.organizationId])).rows[0];
    const capacityPlan=canonicalPlanId(capacity?.plan);
    if(!capacity||!capacityPlan)throw new ApiError(409,'user_limit','Das Benutzerlimit konnte nicht geprüft werden.');
@@ -45,6 +52,7 @@ export async function inviteUser(s:SessionUser,email:string,role:string,key:stri
    const html=mailLayout('Einladung zu Binso One','<p>Du wurdest zu einem Binso One Firmenkonto eingeladen.</p>',{label:'Einladung annehmen',url});
    const outbox=(await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,'invitation',$3,$4,'Einladung zu Binso One',$5,$6,$7) returning id",[s.organizationId,'invitation:'+id,id,email,'Einladung annehmen: '+url,html,s.userId])).rows[0];
    await audit(c,{organizationId:s.organizationId,userId:s.userId,userName:s.name,action:'Einladung erstellt',entityType:'invitation',entityId:id,metadata:{role,moduleProfile,delivery:'queued'}});
+   if(replaceInvitationId)await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'invitation.resent',entityType:'invitation',entityId:id,metadata:{previousInvitationId:replaceInvitationId}});
    return {id,outboxId:String(outbox.id)};
   });
  });
@@ -68,4 +76,11 @@ export async function inviteUser(s:SessionUser,email:string,role:string,key:stri
  });
  if(!delivered)throw new ApiError(503,uncertain?'delivery_uncertain':'delivery_unavailable',uncertain?'Die Einladung ist gespeichert; der Versand konnte nicht sicher bestätigt werden. Bitte vor erneutem Versand prüfen.':'Die Einladung ist gespeichert, aber nicht versendet. Bitte die E-Mail-Verbindung prüfen und erneut versuchen.');
  return {ok:true,id:prepared.id};
+}
+
+export async function resendInvitation(s:SessionUser,id:string,key:string){
+ authorize(s,'users:manage');
+ const previous=await withTenant(s.organizationId,s.userId,async c=>(await c.query('select email,role,module_profile from organization_invitations where organization_id=$1 and id::text=$2',[s.organizationId,id])).rows[0]);
+ if(!previous)throw new ApiError(404,'not_found','Einladung wurde nicht gefunden.');
+ return inviteUser(s,previous.email,previous.role,key,previous.module_profile??'standard',id);
 }

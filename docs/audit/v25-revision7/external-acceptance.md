@@ -1,0 +1,22 @@
+# Externe Voraussetzungen und reale Abnahme
+
+Diese Liste ist von [noch offener Codearbeit](completion-review.md) getrennt.
+Ein unbekannter Betriebszustand bedeutet nicht, dass eine Ressource fehlt.
+Es wurden in dieser Fortsetzung keine produktiven Konfigurationen geändert.
+
+| Priorität | Tatsächlicher Code-/Testnachweis | Nicht nachgewiesen | Nächster autorisierbarer Schritt |
+| --- | --- | --- | --- |
+| P0 Mail | Serverseitiger Graph-Transport; `GRAPH_TENANT_ID`, `GRAPH_CLIENT_ID`, `GRAPH_CLIENT_SECRET`, `GRAPH_SENDER_USER_ID` sind deklarierte Konfigurationsnamen. Isolierte Tests unterscheiden Annahme und unklaren Ausgang. | Tatsächlich eingerichtete Werte/Rechte, Empfängerzustellung, SPF/DKIM/DMARC/TLS sowie verifizierter Zustell-/Bounce-Ereignisvertrag. Keine Secretwerte ausgeben. | Vorhandene Konfiguration lesend prüfen; konkreten Provider-Ereignisvertrag festlegen. Echte Testmail erst nach separater Freigabe. Dauerhafte Wiederaufnahme bestimmter Entscheidungsmails bleibt zusätzlich eigene Codearbeit. |
+| P0 Operator | Getrennte Plattformrollen; Entra-Tenant, Objekt und Rolle werden im Produktivmodus erneut an die Sitzung gebunden. | Tatsächlich zugewiesene phishingresistente Entra-Authentifizierungsstärke und wirksame Ingress-Vertrauensgrenze. `OPERATOR_ENTRA_TENANT_ID` allein beweist beides nicht. | Bestehende Conditional-Access-/Authentifizierungsrichtlinien und Easy-Auth-/Ingress-Zuordnung ausschliesslich lesend verifizieren. Keine neue Rolle oder Zustimmung. |
+| P0 Dateien | Inhaltsprüfung, begrenzte Bilddekodierung und Quarantäne; echtes isoliertes Scanner-Candidate-Gate. `FILE_SCAN_SOCKET` ist ein Konfigurationsname. | Produktive Scanner-Verbindung, tatsächliche bestehende Dateiprüfung und gemeldeter ursprünglicher Avatarfehler. HEIC/HEIF wird nicht als unterstützt behauptet. | Konkrete fehlgeschlagene Antwort/Korrelations-ID und vorhandene Scanner-Metadaten datensparsam lesen; keine echten Kundendateien ins QA übernehmen. |
+| P0 Backup | Readiness-/Metadatenprüfung und sichere lokale Migrations-/RLS-Tests sind vorhandene Teilnachweise. | Vollständiger kontrollierter Restore mit Daten- und Anwendungsnachweis. | Separat freigegebener isolierter Wiederherstellungstest mit bekanntem Ziel, Zugriff, Kostenrahmen und Lösch-/Rollbackplan. Kein Restore auf Produktion. |
+| P0 Recht | Bestehende versionierte Rechtsinhalte und technische TOC-/Locale-Steuerung bleiben erhalten. | Fachjuristische Prüfung realer Datenflüsse/Fristen/Subprozessoren und muttersprachliche juristische Fassungen. | Verantwortliche Rechts-/Fachprüfung der tatsächlichen Betriebsdaten. Keine ungeprüften generierten Vertragstexte veröffentlichen. |
+| P0/P1 Billing | Bestehende zentrale Preise/Entitlements, serverseitige Rollen, isolierte Stripe-Vertragsprüfungen. | Tatsächlich aktive Stripe-Preise, Webhookzustellung, Portal und korrekte produktive Steuer-/Zahlungskonfiguration. Deklarierte `STRIPE_*`-Variablen beweisen keine Einrichtung. | Bestehende Provider-Konfiguration lesend abgleichen; kein Kauf, keine Testbelastung und keine neue Providerkonfiguration ohne Freigabe. |
+| P1 Geräte | Chromium-/WebKit-CI, responsive Viewports und synthetische Tastatur-/Safe-Area-Fälle. | Reales iPhone Safari, installierte iOS-/Android-PWA, OS-Tastatur, Face ID/Touch ID und Assistenztechnik. | Dokumentierter Test auf tatsächlichen Geräten mit aktuellem qualifiziertem Commit. WebKit-Emulation nicht als physische Abnahme ausgeben. |
+| P1/P2 Retention | Begrenzte mandantengebundene Berichtskopien-Bereinigung ist implementiert und isoliert geprüft; Standard ohne explizite Scopes deaktiviert. | Freigegebene Environment-/Tenant-Zuordnung und echter produktiver Trockenlauf. | `REPORT_SNAPSHOT_RETENTION_ORGANIZATION_IDS`, `RETENTION_DRY_RUN`, Rechte und Migration getrennt freigeben; siehe [Retention-Vertrag](report-retention.md). |
+| P0 Integration | Bestehender Branch und Draft307, Quellhashbindung und verpflichtende CI-Gates. | Vollständige individuelle Klausel-/Fach-/Visualabnahme und exakte neue Produktionsfreigabe. | Zuerst eigene Implementierungs- und Abnahmelücken schliessen. Kein Ready, Merge, produktive Migration oder Deployment aus einem grünen Development-Lauf ableiten. |
+
+Vorgesehene Domains aus der Spezifikation sind keine verifizierten Live-Domains.
+DNS/MX, Secrets, Providerrechte, Entra-Richtlinien und produktive Infrastruktur
+bleiben unverändert. Keine zusätzlichen Ressourcen oder Berechtigungen wurden
+angelegt, keine Testmail oder produktive Zahlung ausgelöst.

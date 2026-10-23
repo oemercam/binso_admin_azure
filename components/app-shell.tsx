@@ -1,6 +1,7 @@
 "use client";
 
-import {LocalizedText,LocalizedElement,useTranslation} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
+import {asLocale} from '@/lib/locales';
 import {PageAccessContext} from "@/lib/client/page-access";
 import {tenantCanOpenPath,tenantCan,tenantCanCreateAt,permissionForModule,type ModuleProfile} from "@/lib/permissions";
 import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
@@ -21,7 +22,7 @@ import ConfirmDialog from "./confirm-dialog";
 import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction, QuickCreateAction } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, LoadingState, FormActions} from "./ui";
 import {useApiQuery,useDataRevision} from "@/lib/client/use-api-query";
-import { apiGet, apiPatch, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 import {SearchPanel,NotificationPanel,AccountPanel,type PanelNotification} from "./header-panel-content";
@@ -44,12 +45,15 @@ const desktopNav = [
   ["/finanzen","Finanzen","chart"],
   ["/berichte","Berichte","chart"],
   ["/mitarbeiter","Mitarbeiter","users"],
+  ["/abwesenheiten","Abwesenheiten","calendar"],
+  ["/lieferanten","Lieferanten","building"],
+  ["/vertraege","Verträge","file"],
 ] as const;
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
-  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter"]},
-  {label:"Finanzen",paths:["/zahlungen","/spesen","/finanzen","/berichte"]},
+  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter","/abwesenheiten"]},
+  {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/vertraege","/finanzen","/berichte"]},
 ];
 
 type NotificationItem=PanelNotification;
@@ -106,6 +110,7 @@ function AppShellFrame({
   const formActive=editing||pathname.endsWith("/neu");
   const chatActive=/^\/support\/[^/]+$/.test(pathname)&&!pathname.endsWith("/neu");
   const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean;moduleProfile:ModuleProfile}|null>(null);
+  const workspaceReady=!!access;
   const [accessRetry,setAccessRetry]=useState(0);
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
@@ -132,7 +137,8 @@ function AppShellFrame({
   const settingsWrite=pathname==='/einstellungen/team'?'users:manage':pathname==='/einstellungen/abonnement'?'billing:write':['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/zeiterfassung'].includes(pathname)?'organization:write':'organization:read';
   const personalSettings=pathname.startsWith('/einstellungen')&&!['/einstellungen/firma','/einstellungen/dokumente','/einstellungen/team','/einstellungen/abonnement','/einstellungen/zeiterfassung'].includes(pathname);
   const canWrite=!!access&&(!access.readOnly||personalSettings||active==='support')&&(access.moduleProfile==='time_only'&&personalSettings?canOpen(pathname):tenantCan(access.role,pathname.startsWith('/einstellungen')?settingsWrite:accessModule?permissionForModule(accessModule,'write')??'organization:read':active==='finanzen'?'accounting:write':'support:write',access.moduleProfile));
-  const pageAccess=useMemo(()=>({write:canWrite,canOpen}),[canWrite,canOpen]);
+  const hasPermission=useCallback((permission:Parameters<typeof tenantCan>[1])=>!!access&&tenantCan(access.role,permission,access.moduleProfile),[access]);
+  const pageAccess=useMemo(()=>({write:canWrite,canOpen,hasPermission}),[canWrite,canOpen,hasPermission]);
   const listControls=isValidElement<{children?:React.ReactNode}>(actions)&&actions.type===RecordsControls?actions:null;
   const visibleActions=listControls?listControls.props.children:actions;
   const contentCreate=isValidElement<{icon?:string}>(visibleActions)&&(visibleActions.type===CreateAction||visibleActions.type===QuickCreateAction||visibleActions.type===Button&&visibleActions.props.icon==="plus");
@@ -196,14 +202,16 @@ function AppShellFrame({
 
 
   const companyQuery=useApiQuery<{item:{name?:string}}>(canOpen("/einstellungen/firma")?"/api/settings/company":null);
-  const notificationQuery=useApiQuery<{items:NotificationItem[]}>("/api/notifications");
+  const notificationQuery=useApiQuery<{items:NotificationItem[]}>(workspaceReady?"/api/notifications":null);
   const notifications=notificationQuery.data?.items??[];
   const notificationsLoading=notificationQuery.loading;
   const [notificationMutationError,setNotificationsError]=useState<string|null>(null);
   const notificationsError=notificationMutationError??notificationQuery.error;
   const [notificationFilter,setNotificationFilter]=useState<"all"|"unread">("all");
-  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>("/api/settings/profile");
+  const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(workspaceReady?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
+  const {choose:chooseLocale}=useLocale(),lastProfileLocale=useRef('');
+  useEffect(()=>{if(!profileItem?.id||!profileItem.language)return;const key=String(profileItem.id)+':'+String(profileItem.language);if(lastProfileLocale.current===key)return;lastProfileLocale.current=key;chooseLocale(asLocale(profileItem.language));},[profileItem?.id,profileItem?.language,chooseLocale]);
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
@@ -253,7 +261,11 @@ function AppShellFrame({
   const searchLoading=query.trim().length>=2&&(remoteSearch.query!==query.trim()||remoteSearch.loading);
   const searchError=remoteSearch.query===query.trim()?remoteSearch.error:null;
 
-  function loadNotifications(){setNotificationsError(null);notificationQuery.refresh();}
+  async function loadNotifications(){
+    setNotificationsError(null);
+    try{await apiPost('/api/notifications/followups',{});}
+    catch(error){setNotificationsError(error instanceof Error?error.message:'Aktion fehlgeschlagen.');}
+  }
 
   function openNotifications(){
     setSheet("notifications");
@@ -276,9 +288,9 @@ function AppShellFrame({
   useEffect(()=>{
     const listener=(event:Event)=>setDark((event as CustomEvent<{resolved:string}>).detail.resolved==="dark");
     window.addEventListener("binso-theme",listener);
-    void loadTheme().catch(()=>{});
+    if(workspaceReady)void loadTheme().catch(()=>{});
     return()=>window.removeEventListener("binso-theme",listener);
-  },[]);
+  },[workspaceReady]);
   async function toggleTheme(){try{await saveTheme(dark?"light":"dark");}catch{setTimerNotice("Darstellung konnte nicht gespeichert werden.");}}
 
 
@@ -299,7 +311,7 @@ function AppShellFrame({
     {!access&&!accessError&&<AppStart/>}
     <div hidden={!access&&!accessError} ref={shellRef} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""} ${chatActive ? "app-chat" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
-    <TimerResumeNotice enabled={!!access&&!preview} onOpenTimer={()=>{if(dirty)setLeaveHref(new URL('/zeit',window.location.origin).href);else router.push('/zeit');}}/>
+    <TimerResumeNotice enabled={workspaceReady&&!preview} onOpenTimer={()=>{if(dirty)setLeaveHref(new URL('/zeit',window.location.origin).href);else router.push('/zeit');}}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Änderungen verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
     <aside id="customer-desktop-navigation" className="app-sidebar">
@@ -318,7 +330,6 @@ function AppShellFrame({
     <div className="app-main">
       <div className="desktop-appbar">
         <DesktopNavigationToggle collapsed={navigationCollapsed} onToggle={toggleNavigation} controls="customer-desktop-navigation"/>
-        <div className="workspace-location"><Link href={homeHref}><LocalizedText>{"Arbeitsbereich"}</LocalizedText></Link><span aria-hidden="true">/</span><span><LocalizedText verbatim={titleIsUserContent}>{title}</LocalizedText></span></div>
         {!formActive&&<div className="desktop-appbar-actions"><Button className="desktop-global-search" variant="secondary" ariaLabel="Suche" icon="search" onClick={()=>setSheet("search")}><LocalizedText>{"Alles durchsuchen"}</LocalizedText><kbd>⌘ / Ctrl K</kbd></Button><LocalizedElement as="button" className="desktop-notification-button" type="button" aria-label="Benachrichtigungen" onClick={openNotifications}><Icon name="bell"/>{unreadNotifications>0&&<i className="notification-badge"><LocalizedText>{unreadNotifications>9?"9+":unreadNotifications}</LocalizedText></i>}</LocalizedElement>
           <LocalizedElement as="button" className="avatar avatar-button" type="button" aria-label="Benutzerkonto" onClick={() => setSheet("account")}><Avatar name={profile.name} identity={profile.identity} src={profile.avatar} size="small"/></LocalizedElement>
         </div>}
@@ -388,7 +399,7 @@ export function AppShell(props:ShellProps){
  },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
  return register?props.children:<AppShellFrame {...props}/>;
 }
-const appSections:Record<string,string>={berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
+const appSections:Record<string,string>={vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
  const pathname=usePathname(),section=pathname.split("/")[1];
  const [configuration,setConfiguration]=useState<ShellConfiguration|null>(null);

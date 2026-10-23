@@ -47,6 +47,7 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  paragraph([customer.name,customer.contact_name,customer.address_lines||[customer.street||customer.address,customer.building_number].filter(Boolean).join(' '),customer.address_lines?'':[customer.postal_code||customer.zip,customer.city].filter(Boolean).join(' '),customer.country&& !['CH','Schweiz','Switzerland','Suisse'].includes(String(customer.country))?customer.country:''].filter(Boolean).join('\n'));
  ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(t(invoice?'RECHNUNG':'ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
  paragraph(t(invoice?'Rechnung Nr. ':'Angebot Nr. ')+String(document.number),11);
+ if(!invoice&&Number.isInteger(document.published_version)&&Number(document.published_version)>0)paragraph(t('Version')+' '+document.published_version,9);
  if(draft)paragraph(t('ENTWURF - nicht zur Zahlung / nicht versenden'),10);
  if(cancelled)paragraph(t('STORNIERT - keine Zahlung erforderlich'),10);
  const issueDate=date(document.issue_date),dueDate=date(invoice?document.due_date:document.valid_until);
@@ -58,20 +59,31 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   pdf.moveTo(left,y+18).lineTo(right,y+18).strokeColor('#aaa').lineWidth(.5).stroke();pdf.y=y+28;};
  tableHead();
  for(const item of (document.items||[]) as Row[]){
-  const description=String(item.description||'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
+  const discount=record(item.discount);const description=String(item.description||'')+(discount.kind&&discount.kind!=='none'?'\n'+t('Rabatt')+': '+String(discount.value)+(discount.kind==='percent'?' %':' '+String(discount.currency)):'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
+  const minutePrice=Number(item.price_base_quantity)===60,rowHeight=minutePrice?48:34;
   const h=pdf.heightOfString(description,{width:235,lineGap:2});
-  if(h<bottom-80&&pdf.y+Math.max(h,34)+12>bottom){pdf.addPage();tableHead();}
+  if(h<bottom-80&&pdf.y+Math.max(h,rowHeight)+12>bottom){pdf.addPage();tableHead();}
   // A repeated table header changes PDFKit's shared drawing state.
   pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const y=pdf.y,startPage=pdf.page;pdf.text(description,left,y,{width:235,lineGap:2});const after=pdf.y;
   const quantity=Number(item.quantity||0).toLocaleString(localeTags[locale],{maximumFractionDigits:3})+' '+String(item.unit||'');
-  const amount=item.line_total;
-  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(money(item.unit_price),366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+15,{width:83,align:'right'});pdf.y=Math.max(after,y+34)+12;}
-  else{pdf.y=after;paragraph(`${quantity} × ${money(item.unit_price)} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
+  const amount=item.line_total,price=money(item.unit_price);
+  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text('/ 60 min',366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
+  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' / 60 min':''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
  }
- ensure(98);const summary=(label:string,value:unknown,bold=false)=>{const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
+ ensure(98);const summary=(label:string,value:unknown,bold=false)=>{if(record(document.calculation).revision===1)ensure(bold?32:25);const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;
- summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
+ const calculation=record(document.calculation);
+ if(calculation.revision===1){
+  summary(t('Zwischentotal'),calculation.raw);
+  if(((calculation.lines??[]) as Row[]).some(line=>record(line.discount).kind!=='none'))summary(t('Positionsrabatte'),'-'+String(calculation.positionDiscountDisplay));
+  const discount=record(calculation.discount);
+  if(discount.kind!=='none')summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
+  for(const group of (calculation.taxGroups??[]) as Row[])summary(group.exempt?t('Steuerbefreit'):t('MWST')+' '+Number(group.rate)+' %',group.tax);
+  if(calculation.positionRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Positionen')+': '+String(calculation.positionRoundingCents)+' × 0.01 '+String(document.currency),8);
+  if(calculation.discountRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Gesamtrabatt')+': '+String(calculation.discountRoundingCents)+' × 0.01 '+String(document.currency),8);
+ }else{summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);}
+ summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
  // Validate before adding a page; an invalid setup never creates a phantom page.
  let bill:SwissQRBill|null=null,qrError='';
  let paymentData:ReturnType<typeof createQrBillData>|null=null;
@@ -91,6 +103,35 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  const footer=[companyName,company.vat_number?t('MWST')+' '+company.vat_number:company.uid,company.website,company.email].filter(Boolean).join(' · ');
  for(let page=0;page<contentPages;page++){pdf.switchToPage(page);const margin=pdf.page.margins.bottom;pdf.page.margins.bottom=0;pdf.font('Liberation Sans').fontSize(8).fillColor('#555');pdf.text(footer,left,pdf.page.height-51,{width:width-70,height:30,ellipsis:true});pdf.text(`${page+1} / ${totalPages}`,right-60,pdf.page.height-51,{width:60,align:'right',lineBreak:false});pdf.page.margins.bottom=margin;}
  pdf.switchToPage(contentPages-1);
- if(bill){pdf.addPage();pdf.font('Liberation Sans-Bold').fontSize(18).fillColor('#111').text(t('ZAHLUNGSINFORMATIONEN'),left,44,{width});pdf.moveDown(.8);paragraph(t('Rechnung')+' '+document.number,11);paragraph(t(paid>0||credited>0?'Bitte nur den offenen Betrag bezahlen.':'Bitte den Rechnungsbetrag mit dem folgenden QR-Zahlteil bezahlen.'),10);paragraph(t('Offener Betrag: ')+document.currency+' '+money(balance),11);bill.attachTo(pdf,0,pdf.page.height-SwissQRBill.height);}
+ if(bill){pdf.addPage();if(document.status!=='draft'&&Number(record(document.document_snapshot).layout_revision??0)<7){pdf.font('Liberation Sans-Bold').fontSize(18).fillColor('#111').text(t('ZAHLUNGSINFORMATIONEN'),left,44,{width});pdf.moveDown(.8);paragraph(t('Rechnung')+' '+document.number,11);paragraph(t(paid>0||credited>0?'Bitte nur den offenen Betrag bezahlen.':'Bitte den Rechnungsbetrag mit dem folgenden QR-Zahlteil bezahlen.'),10);paragraph(t('Offener Betrag: ')+document.currency+' '+money(balance),11);}bill.attachTo(pdf,0,pdf.page.height-SwissQRBill.height);}
+ pdf.end();return finished;
+}
+
+/** The same PDF owner/fonts as documents; only authorized report rows enter here. */
+export async function reportPdf(rows:readonly (readonly string[])[],options:{title:string;company:string;locale:string;logo?:Buffer;variant?:'time'}){
+ if(rows.length>1000||rows.some(row=>row.length>3||row.some(value=>value.length>3000)))throw new Error('Report size exceeds bounded rendering limits');
+ const pdf=new PDFDocument({size:'A4',margins:{top:44,bottom:60,left:44,right:44},bufferPages:true,info:{Title:options.title,Author:options.company}});
+ const [regular,bold]=await Promise.all(['Regular','Bold'].map(weight=>readFile(join(process.cwd(),'public/fonts/pdf',`LiberationSans-${weight}.ttf`))));
+ pdf.registerFont('Liberation Sans',regular).registerFont('Liberation Sans-Bold',bold);
+ const chunks:Buffer[]=[],finished=new Promise<Buffer>((resolve,reject)=>{pdf.on('data',chunk=>chunks.push(chunk));pdf.on('end',()=>resolve(Buffer.concat(chunks)));pdf.on('error',reject)});
+ if(options.logo){try{pdf.image(options.logo,44,40,{fit:[160,48]});pdf.y=104;}catch{pdf.y=44;}}
+ pdf.font('Liberation Sans-Bold').fontSize(18).text(options.title);pdf.moveDown(.5);pdf.font('Liberation Sans').fontSize(10).text(options.company);pdf.moveDown();
+ const columns=options.variant==='time'?[44,218,495]:[44,310,475],widths=options.variant==='time'?[160,263,55]:[250,150,75],numeric=options.variant==='time'?2:1;
+ const wrap=(value:string,width:number)=>value.split('\n').flatMap(paragraph=>{const lines:string[]=[];let line='';for(const character of paragraph){if(line&&pdf.widthOfString(line+character)>width){lines.push(line);line='';}line+=character;}lines.push(line);return lines;});
+ const tableRow=(row:readonly string[],heading=false)=>{
+  pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);
+  const cells=row.map((value,index)=>wrap(value,widths[index])),lineHeight=14,count=Math.max(1,...cells.map(lines=>lines.length));
+  for(let offset=0;offset<count;){
+   let available=Math.floor((pdf.page.height-65-pdf.y-12)/lineHeight);
+   if(available<1){pdf.addPage();if(rows[0]&&!heading)tableRow(rows[0],true);pdf.font(heading?'Liberation Sans-Bold':'Liberation Sans').fontSize(10);available=Math.floor((pdf.page.height-65-pdf.y-12)/lineHeight);}
+   const length=Math.min(available,count-offset),y=pdf.y;
+   cells.forEach((lines,index)=>{lines.slice(offset,offset+length).forEach((line,lineIndex)=>pdf.text(line,columns[index],y+lineIndex*lineHeight,{width:widths[index],lineBreak:false,align:index===numeric?'right':'left'}));});
+   offset+=length;pdf.y=y+length*lineHeight+12;
+  }
+  if(heading){pdf.moveTo(44,pdf.y-5).lineTo(550,pdf.y-5).strokeColor('#dce5ef').stroke();}
+ };
+ rows.forEach((row,index)=>tableRow(row,index===0));
+ const count=pdf.bufferedPageRange().count;
+ for(let page=0;page<count;page++){pdf.switchToPage(page);pdf.page.margins.bottom=0;pdf.font('Liberation Sans').fontSize(8).text(options.company,44,pdf.page.height-35,{width:400,lineBreak:false});pdf.text(`${page+1} / ${count}`,480,pdf.page.height-35,{width:70,align:'right',lineBreak:false});}
  pdf.end();return finished;
 }

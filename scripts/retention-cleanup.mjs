@@ -1,4 +1,5 @@
 import pg from "pg";
+import {reportRetentionScopes,expireReportCopies} from './report-snapshot-retention.mjs';
 
 const {Pool}=pg;
 const databaseUrl=process.env.DATABASE_URL?.trim();
@@ -17,6 +18,9 @@ function bool(name,fallback){
 }
 
 const dryRun=bool("RETENTION_DRY_RUN",false);
+// Empty by default: enabling additional production cleanup is a separate
+// operational configuration approval, never inferred from a code merge.
+const reportScopes=reportRetentionScopes(process.env.REPORT_SNAPSHOT_RETENTION_ORGANIZATION_IDS??'');
 
 const authDays=int("AUTH_ARTIFACT_RETENTION_DAYS",7,1,90);
 const sessionDays=int("EXPIRED_SESSION_RETENTION_DAYS",30,1,365);
@@ -41,8 +45,9 @@ async function count(text,params=[]){
   return result.rowCount??0;
 }
 
+let authPreviewOpen=false;
 try{
-  if(dryRun)await pool.query("BEGIN READ ONLY");
+  if(dryRun){await pool.query("BEGIN READ ONLY");authPreviewOpen=true;}
   const deletedEmailCodes=await count(
     `delete from auth_email_codes
       where (consumed_at is not null and consumed_at < now()-($1||' days')::interval)
@@ -63,6 +68,13 @@ try{
       where mfa_pending_expires_at is not null
         and mfa_pending_expires_at < now()`
   );
+  // End the authentication preview before starting independently bounded scopes.
+  if(authPreviewOpen){await pool.query('ROLLBACK');authPreviewOpen=false;}
+  let expiredReportCopies=0,deletedReportCopies=0,remainingExpiredReportCopies=0;
+  for(const organizationId of reportScopes){
+    const client=await pool.connect();
+    try{const result=await expireReportCopies(client,organizationId,{dryRun});expiredReportCopies+=result.eligible;deletedReportCopies+=result.deleted;remainingExpiredReportCopies+=result.remaining;}finally{client.release();}
+  }
   console.log(JSON.stringify({
     dryRun,
     authArtifactRetentionDays:authDays,
@@ -70,9 +82,14 @@ try{
     deletedEmailCodes,
     deletedCustomerSessions,
     deletedOperatorSessions,
-    clearedPendingMfa
+    clearedPendingMfa,
+    reportSnapshotCleanupConfigured:reportScopes.length>0,
+    reportSnapshotScopes:reportScopes.length,
+    expiredReportCopies,
+    deletedReportCopies,
+    remainingExpiredReportCopies
   }));
 }finally{
-  if(dryRun)await pool.query("ROLLBACK");
+  if(authPreviewOpen)await pool.query("ROLLBACK");
   await pool.end();
 }

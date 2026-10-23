@@ -1,3 +1,4 @@
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {NextRequest} from 'next/server';
 import {randomUUID} from 'node:crypto';
 import {requireSession} from '@/lib/server/session';
@@ -12,7 +13,7 @@ import {legalConfig} from '@/config/legal';
 import {query} from '@/lib/server/db';
 export const runtime='nodejs';
 export async function POST(request:NextRequest){try{
- assertSameOrigin(request);const s=await requireSession();authorize(s,'billing:write');
+ assertSameOrigin(request);const s=await requireSession();authorize(s,'billing:write');await requireFreshAuthentication(s);
  if(!stripeConfigured())throw new ApiError(503,'billing_unavailable','Stripe ist noch nicht vollständig eingerichtet.');
  await enforceRateLimit(request,'checkout:'+s.organizationId,10,60_000);
  const body=asObject(await readJson(request,8000));const plan=enumField(body,'plan',['start','business','pro'] as const),billing=enumField(body,'billing',['monthly','yearly'] as const);

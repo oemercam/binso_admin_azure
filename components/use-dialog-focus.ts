@@ -15,7 +15,7 @@ export function registerDialogPortal(trigger:HTMLElement|null,portal:HTMLElement
 const backgroundLocks=new Map<HTMLElement,{count:number;previous:boolean}>();
 /** Nested modals share background ownership; closing one cannot expose another's page. */
 function lockDialogBackground(dialog:HTMLElement){
- const targets=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement&&!element.contains(dialog));
+ const targets=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement&&!element.contains(dialog)&&!["SCRIPT","STYLE","LINK","TEMPLATE"].includes(element.tagName));
  for(const element of targets){const lock=backgroundLocks.get(element)??{count:0,previous:element.inert};lock.count++;backgroundLocks.set(element,lock);element.inert=true;}
  return()=>{for(const element of targets){const lock=backgroundLocks.get(element);if(!lock)continue;if(--lock.count===0){element.inert=lock.previous;backgroundLocks.delete(element);}}};
 }

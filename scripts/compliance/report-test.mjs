@@ -1,5 +1,6 @@
 import {pixelDifference} from './visual.mjs';
 import assert from 'node:assert/strict';
+import './authority-test.mjs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
@@ -69,14 +70,29 @@ try{
  execFileSync('git',['update-index','--index-info'],{cwd:identityDir,input:index});
  git('-c','user.name=Isolated Fixture','-c','user.email=fixture@example.invalid','commit','-q','-m','Synthetic identity fixture');
  assert(Buffer.byteLength(git('ls-files','-z'))>1024*1024,'Exercise the original child-process buffer boundary');
- const expected=createHash('sha256');for(const file of ['app/page.tsx','package.json','ux-compliance/requirements.v1.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
+ const expected=createHash('sha256').update('BINSO-evidence-source-v2\0');for(const file of ['app/page.tsx','package.json','ux-compliance/requirements.v1.json'])expected.update(file+'\0').update(fs.readFileSync(path.join(identityDir,file)));
  const initial=readIdentity();assert.equal(initial.sourceDigest,expected.digest('hex'),'Evidence paths do not change the source digest');assert.equal(initial.registryVersion,'9.9.9');
  fs.mkdirSync(path.join(identityDir,'evidence'));fs.writeFileSync(path.join(identityDir,'evidence/untracked.json'),'new generated result');assert.equal(readIdentity().sourceDigest,initial.sourceDigest);
  fs.writeFileSync(path.join(identityDir,'app/page.tsx'),'changed source fixture');assert.notEqual(readIdentity().sourceDigest,initial.sourceDigest,'Source edits remain bound');
+ for(const file of ['database/migrations/new.sql','database/operations/rights.sql','patches/fixture.patch','.github/workflows/quality.yml','pnpm-workspace.yaml','tsconfig.json','proxy.ts','AGENTS.md']){
+  const previous=readIdentity().sourceDigest;fs.mkdirSync(path.dirname(path.join(identityDir,file)),{recursive:true});fs.writeFileSync(path.join(identityDir,file),'first critical source');const first=readIdentity().sourceDigest;
+  assert.notEqual(first,previous,'Actual Git collection binds a new critical input: '+file);fs.writeFileSync(path.join(identityDir,file),'changed critical source');const changed=readIdentity().sourceDigest;assert.notEqual(changed,first,'Actual critical file mutation invalidates evidence: '+file);git('add',file);assert.equal(readIdentity().sourceDigest,changed,'Staging cannot hide or change source identity: '+file);
+ }
  const beforeRegistry=readIdentity();fs.writeFileSync(path.join(identityDir,'ux-compliance/requirements.v1.json'),JSON.stringify({version:'9.9.10'}));const afterRegistry=readIdentity();assert.equal(afterRegistry.registryVersion,'9.9.10');assert.notEqual(afterRegistry.sourceDigest,beforeRegistry.sourceDigest,'A changed visual contract invalidates older evidence');
  fs.mkdirSync(path.join(identityDir,'components'));fs.writeFileSync(path.join(identityDir,'components/new.tsx'),'untracked source fixture');const untracked=readIdentity().sourceDigest;git('add','components/new.tsx');assert.equal(readIdentity().sourceDigest,untracked,'Untracked source is included before staging');
  fs.mkdirSync(path.join(identityDir,'docs/audit/v24'),{recursive:true});const beforeContract=readIdentity().sourceDigest;
  fs.writeFileSync(path.join(identityDir,'docs/audit/v24/ux-contract.json'),'{}');assert.notEqual(readIdentity().sourceDigest,beforeContract,'Active presentation contracts invalidate old measurements');
  const beforeConfig=readIdentity().sourceDigest;fs.mkdirSync(path.join(identityDir,'config'));fs.writeFileSync(path.join(identityDir,'config/domain.ts'),'export const role="owner"');assert.notEqual(readIdentity().sourceDigest,beforeConfig,'Domain configuration is part of source identity');
- console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source binding.');
+ fs.mkdirSync(path.join(identityDir,'docs/audit/v25-revision7'),{recursive:true});
+ const beforeAuthority=readIdentity().sourceDigest;
+ for(const file of ['source.md','requirements.json'])fs.copyFileSync(path.resolve('docs/audit/v25-revision7',file),path.join(identityDir,'docs/audit/v25-revision7',file));
+ assert.notEqual(readIdentity().sourceDigest,beforeAuthority,'Current Revision7 source and normative register are bound');
+ const copyPath=path.join(identityDir,'docs/audit/v25-revision7/requirements.json'),copy=JSON.parse(fs.readFileSync(copyPath,'utf8')),beforeResult=readIdentity().sourceDigest;
+ copy.requirements[0].status='passed';copy.requirements[0].test='Synthetic result prose, not a review';fs.writeFileSync(copyPath,JSON.stringify(copy));
+ assert.equal(readIdentity().sourceDigest,beforeResult,'Recording result prose cannot invalidate unchanged executable or normative requirements');
+ copy.requirements[0].priority='P1';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.throws(readIdentity,'A priority differing from the binding original cannot supply valid evidence');
+ copy.requirements[0].requirement='Tampered source clause';fs.writeFileSync(copyPath,JSON.stringify(copy));assert.throws(readIdentity,'A substituted clause must block, never fall back to old evidence');
+ fs.copyFileSync(path.resolve('docs/audit/v25-revision7/requirements.json'),copyPath);
+ fs.appendFileSync(path.join(identityDir,'docs/audit/v25-revision7/source.md'),'\nUnapproved source drift');assert.throws(readIdentity,'Source drift without a matching register blocks');
+ console.log('Source identity handles >1 MiB of generated Git paths while retaining tracked/untracked source and Revision7 source/register binding.');
 }finally{fs.rmSync(identityDir,{recursive:true,force:true});}

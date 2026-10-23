@@ -57,12 +57,41 @@ export function logoutOperatorClientSession(){
 }
 
 export class ClientApiError extends Error {
-  constructor(message:string,public code:string,public status:number){super(message);}
+  readonly correlationId?:string;
+  constructor(message:string,public code:string,public status:number,reference?:unknown){
+    const id=typeof reference==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(reference)?reference.toLowerCase():undefined;
+    super(message+(id?' · #'+id:''));this.correlationId=id;
+  }
+}
+
+export type FreshAuthenticationRequest={action:string;confirm:()=>void;cancel:()=>void};
+let freshAuthentication:Promise<void>|null=null;
+export function requestFreshAuthentication(action:string):Promise<void>{
+  if(freshAuthentication)return freshAuthentication;
+  const pending=new Promise<void>((resolve,reject)=>{
+    const timer=window.setTimeout(()=>{window.dispatchEvent(new Event('binso-fresh-authentication-expired'));reject(new ClientApiError('Die Sicherheitsbestätigung ist abgelaufen.','fresh_authentication_expired',0));},120_000);
+    const finish=(confirmed:boolean)=>{window.clearTimeout(timer);if(confirmed)resolve();else reject(new ClientApiError('Sicherheitsbestätigung abgebrochen.','fresh_authentication_cancelled',0));};
+    window.dispatchEvent(new CustomEvent<FreshAuthenticationRequest>('binso-fresh-authentication',{detail:{action,confirm:()=>finish(true),cancel:()=>finish(false)}}));
+  });
+  freshAuthentication=pending;void pending.finally(()=>{if(freshAuthentication===pending)freshAuthentication=null;}).catch(()=>{});return pending;
 }
 
 async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
-  try{return await fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});}
+  const revision=dataRevision([]);
+  try{
+    const fetchOnce=()=>fetch(path,{...options,signal:options.signal??AbortSignal.timeout(options.method&&options.method!=="GET"?30000:15000)});
+    const response=await fetchOnce();
+    if(response.status===403&&(await response.clone().json().catch(()=>null))?.error==='fresh_authentication_required'){
+      await requestFreshAuthentication(path.startsWith('/api/customers/merge')?'Kundendubletten zusammenführen':path.startsWith('/api/settings/team')?'Zugriffsrechte ändern':path.startsWith('/api/auth/')?'Sicherheitseinstellungen ändern':'Geschützte Einstellungen ändern');
+      if(revision!==dataRevision([]))throw new ClientApiError('Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.','session_changed',401);
+      // Only the explicit pre-mutation denial is replayed, once, after the user
+      // confirms. Network/timeouts and uncertain writes are never retried here.
+      return await fetchOnce();
+    }
+    return response;
+  }
   catch(error){
+    if(error instanceof ClientApiError)throw error;
     const timeout=error instanceof DOMException&&["TimeoutError","AbortError"].includes(error.name);
     throw new ClientApiError(timeout?"Die Anfrage dauert zu lange. Bitte den gespeicherten Stand vor einer Wiederholung prüfen.":"Keine Verbindung zum Server. Bitte die Verbindung und den gespeicherten Stand prüfen.",timeout?"request_timeout":"network_unavailable",0);
   }
@@ -70,17 +99,19 @@ async function fetchApi(path:string,options:RequestInit={}):Promise<Response>{
 
 async function parseResponse<T>(response:Response,fallback:string):Promise<T>{
   const payload=await response.json().catch(()=>{throw new ClientApiError("Die Serverantwort konnte nicht gelesen werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);});
-  if(response.status===401){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
+  if(response.status===401||response.status===403&&payload?.error==='mfa_enrollment_required'){invalidateClientSession(false);if(typeof window!=="undefined")window.dispatchEvent(new Event("binso-session-invalid"));}
   if(!response.ok){
     const message=typeof payload?.message==="string"?payload.message:fallback;
-    throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status);
+    const reference=response.status>=500&&payload?.correlationId===response.headers.get('X-Correlation-ID')?payload.correlationId:undefined;
+    throw new ClientApiError(message,typeof payload?.error==="string"?payload.error:"request_failed",response.status,reference);
   }
   return payload as T;
 }
 
-async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string,method:"POST"|"PATCH"|"DELETE"){
+async function mutationResult<T>(response:Response,path:string,fallback:string,revision:string,method:"POST"|"PATCH"|"DELETE",validate?:(value:unknown)=>void){
   const result=await parseResponse<T>(response,fallback);
   if(revision!==dataRevision([]))throw new ClientApiError("Die Sitzung wurde geändert. Bitte den gespeicherten Stand prüfen.","session_changed",401);
+  validate?.(result);
   // Business creates need their persisted identity before any success broadcast.
   // An unreadable or incomplete response can follow a committed transaction;
   // leave the caller's idempotency key intact for its explicit retry.
@@ -93,11 +124,11 @@ async function mutationResult<T>(response:Response,path:string,fallback:string,r
       throw new ClientApiError("Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.","invalid_response",502);
     }
   }
-  publishMutation(path);
+  if(endpoint!=='/api/auth/reauthenticate')publishMutation(path);
   return result;
 }
 
-export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
+export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKey?:string;validate?:(value:unknown)=>void}={}):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"POST",
@@ -107,7 +138,7 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
     },
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision,"POST");
+  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision,"POST",options.validate);
 }
 
 const pendingGets=new Map<string,Promise<unknown>>();
@@ -138,19 +169,28 @@ export async function apiGet<T>(path:string):Promise<T>{
   return request;
 }
 
-export async function apiPatch<T>(path:string,body:unknown):Promise<T>{
+/** Explicit read-only POST for bounded previews; never broadcasts a business mutation. */
+export async function apiReadPost<T>(path:string,body:unknown):Promise<T>{
+ const revision=dataRevision([]),multipart=body instanceof FormData;
+ const response=await fetchApi(path,{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
+ const result=await parseResponse<T>(response,'Daten konnten nicht geladen werden.');
+ if(revision!==dataRevision([]))throw new ClientApiError('Die Sitzung wurde geändert. Bitte erneut versuchen.','session_changed',401);
+ return result;
+}
+
+export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unknown)=>void,options:{idempotencyKey?:string}={}):Promise<T>{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"PATCH",
-    headers:{"Content-Type":"application/json"},
+    headers:{"Content-Type":"application/json",...(options.idempotencyKey?{"Idempotency-Key":options.idempotencyKey}:{})},
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH");
+  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);
 }
 
-export async function apiDelete<T>(path:string):Promise<T>{
+export async function apiDelete<T>(path:string,body?:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
   const revision=dataRevision([]);
-  const response=await fetchApi(path,{method:"DELETE"});
+  const response=await fetchApi(path,{method:"DELETE",headers:{...(body===undefined?{}:{'Content-Type':'application/json'}),...(options.idempotencyKey?{'Idempotency-Key':options.idempotencyKey}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
   return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
 }
 
@@ -160,11 +200,15 @@ export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
   const file=form.get("file");
   const headers:Record<string,string>={};
   if(file instanceof File){
-    const scope=JSON.stringify([path,form.get("purpose"),form.get("entityId")]);
+    const scope=JSON.stringify([path,form.get("purpose"),form.get("entityId"),...(form.has('avatarCrop')?[form.get('avatarCrop')]:[])]);
     let keys=uploadReplayKeys.get(file);if(!keys){keys=new Map();uploadReplayKeys.set(file,keys);}
     let key=keys.get(scope);if(!key){key=crypto.randomUUID();keys.set(scope,key);}
     headers["Idempotency-Key"]=key;
   }
   const response=await fetchApi(path,{method:"POST",body:form,headers});
-  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST");
+  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST",value=>{
+    if(!['profile_avatar','company_logo'].includes(String(form.get('purpose'))))return;
+    const item=(value as {item?:{id?:unknown;available?:unknown;scanStatus?:unknown}}|null)?.item;
+    if(typeof item?.id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id)||typeof item.available!=='boolean'||!['clean','pending','rejected'].includes(String(item.scanStatus)))throw new ClientApiError('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.','invalid_response',502);
+  });
 }

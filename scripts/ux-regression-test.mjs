@@ -1,6 +1,7 @@
+import {expensePaymentModuleUrl} from './data-test-modules.mjs';
 import {readDesignCss} from './design-system.mjs';
 import './localization-test-adapter.mjs';
-import {financialModuleUrl,moneyModuleUrl} from "./data-test-modules.mjs";
+import {financialModuleUrl,moneyModuleUrl,documentAmountSqlModuleUrl} from "./data-test-modules.mjs";
 import {readPageFile} from "./page-source.mjs";
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -21,6 +22,8 @@ const requireReadCache=new Map(await Promise.all(['components/documents.tsx','co
 let source=await readPageFile('lib/server/repositories/business-api.ts','utf8');
 source=source.replace('import "server-only";','');
 const dependencies={
+ '@/lib/expense-payment':`export * from ${JSON.stringify(expensePaymentModuleUrl)}`,
+ '../document-amount-sql':`export * from ${JSON.stringify(documentAmountSqlModuleUrl)}`,
  '../business-idempotency':'export async function idempotentBusiness(c,input,write){return write()}',
  '../audit':'export async function audit(){}',
  '../http':'export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}',
@@ -28,7 +31,7 @@ const dependencies={
  '@/lib/financial-status':`export * from ${JSON.stringify(financialModuleUrl)}`,
  '@/lib/qr-bill':'export const invoicePaymentIssue=()=>null;',
 };
-for(const [specifier,stub] of Object.entries(dependencies))source=source.replace(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub)));
+for(const [specifier,stub] of Object.entries(dependencies))source=source.replaceAll(JSON.stringify(specifier),JSON.stringify(moduleUrl(stub))).replaceAll("'"+specifier+"'",JSON.stringify(moduleUrl(stub)));
 const {listApiBusiness}=await import(moduleUrl(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
 const session={organizationId:'tenant-under-test',userId:'owner',role:'owner'};
 const calls=[];
@@ -81,7 +84,39 @@ console.log('Apple and PWA installation icons use the Binso One artwork with One
 // Document detail contract: operational workspace; customer-facing rendering belongs to preview only.
 {
   const documents=read("components/documents.tsx");
-  assert(documents.includes("<DocumentReadView type={kind} draft={draft} directory={directory}/>"),"Document detail must expose the operational read view.");
+  const hasOperationalView=source=>{
+    const ast=ts.createSourceFile('documents.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+    const owner=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='DocumentPage');
+    const content=owner?.body?.statements.filter(ts.isVariableStatement).flatMap(statement=>statement.declarationList.declarations).find(node=>ts.isIdentifier(node.name)&&node.name.text==='documentContent');
+    let mounted=false;
+    const required={type:'kind',draft:'draft',directory:'directory',canWrite:'canWrite'};
+    const view=node=>{
+      if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='DocumentReadView'){
+        const props=node.attributes.properties;
+        mounted||=!props.some(ts.isJsxSpreadAttribute)&&Object.entries(required).every(([name,value])=>{
+          const found=props.filter(prop=>ts.isJsxAttribute(prop)&&prop.name.getText(ast)===name);
+          const expression=found[0]?.initializer;
+          return found.length===1&&expression&&ts.isJsxExpression(expression)&&expression.expression&&ts.isIdentifier(expression.expression)&&expression.expression.text===value;
+        });
+      }
+      ts.forEachChild(node,view);
+    };
+    const visit=node=>{
+      if(ts.isConditionalExpression(node)){
+        const condition=node.condition;
+        if(ts.isBinaryExpression(condition)&&condition.operatorToken.kind===ts.SyntaxKind.AmpersandAmpersandToken&&ts.isIdentifier(condition.left)&&condition.left.text==='existing'&&ts.isPrefixUnaryExpression(condition.right)&&condition.right.operator===ts.SyntaxKind.ExclamationToken&&ts.isIdentifier(condition.right.operand)&&condition.right.operand.text==='editing')view(node.whenTrue);
+      }
+      ts.forEachChild(node,visit);
+    };
+    if(content?.initializer)visit(content.initializer);
+    return mounted;
+  };
+  const fixture=(tag,condition='existing&&!editing')=>'function DocumentPage(){const documentContent='+condition+'?'+tag+':null;return documentContent}';
+  const readView='<DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite}/>';
+  assert.equal(hasOperationalView(fixture(readView)),true);
+  assert.equal(hasOperationalView(fixture(readView.replace('/>',' followup={<OfferFollowup/>}/>'))),true,'An additional central slot must preserve the existing read-view contract');
+  for(const source of [fixture(readView.replace('canWrite={canWrite}','canWrite={true}')),fixture(readView.replace('draft={draft}','draft={other}')),fixture(readView.replace('/>',' {...override}/>')),fixture('<Other/>'),fixture(readView,'existing&&editing'),'function DocumentPage(){const documentContent=null;/* '+readView+' */return documentContent}'])assert.equal(hasOperationalView(source),false,'Missing/incorrect/unreachable view or overridden permission cannot pass');
+  assert(hasOperationalView(documents),"Document detail must expose the operational read view with its current data and rights in the existing non-editing branch.");
   assert(!documents.includes('detailTab===\\\"document\\\"'),"Invoice and offer detail pages must not embed a second document-shaped preview.");
   assert(!documents.includes("document-inline-preview"),"The final customer document belongs exclusively to the preview action.");
   assert(documents.includes('IconButton label="Vorschau" icon="file"'),"Document detail must keep preview directly accessible.");
@@ -222,8 +257,8 @@ console.log('Project-linked idle timer context survives synchronization without 
  const originalWindow=globalThis.window;
  globalThis.window={setTimeout:callback=>{scheduled.push(callback)}};
  try{
-  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState','FormSection','safeAppPath','sameCustomerCreation','tenantCan',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError,({children})=>children,(value,fallback)=>typeof value==='string'&&value.startsWith('/')&&!value.startsWith('//')?value:fallback,(await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/customer-replay.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText))).sameCustomerCreation,tenantCan);
-  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',1:1,3:'Synthetic',4:'Contact'},14],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},13]]){
+  Function('require','exports','useState','useRef','useEffect','useRouter','useSearchParams','useBackendMode','isProductionBackendEnabled','apiGet','apiPost','apiPatch','appendDemoRow','AppShell','Button','Field','Toast','Icon','Status','Link','SectionTitle','EmptyState','businessDate','Input','Select','Textarea','FormActions','FormWizard','Avatar','useDirtySnapshot','sumMoney','useDataRevision','useApiQuery','FormSheet','allowDraftNavigation','useProcessDraft','ErrorState','FormSection','safeAppPath','sameCustomerCreation','tenantCan','useLocale','useTranslation','localeTags',compiled)(createRequire(import.meta.url),exports,initial=>{const index=hook++;return [Object.hasOwn(values,index)?values[index]:typeof initial==='function'?initial():initial,()=>{}]},initial=>({current:initial}),()=>{},()=>({push:path=>navigations.push(path)}),()=>({get:() =>'/dashboard'}),()=>true,()=>true,()=>{},write,write,()=>{throw Error('preview');},()=>null,()=>null,()=>null,Toast,()=>null,()=>null,()=>null,()=>null,()=>null,()=> '2026-10-07','input','select','textarea',({children})=>children,()=>null,()=>null,()=>{hook++;return {dirty:false,markPristine:()=>{}}},(await import(moneyModuleUrl)).sumMoney,()=> '',()=>({loading:false,error:null,data:undefined,refresh:()=>{}}),()=>null,()=>{},()=>({ready:true,persist:()=>{},clear:()=>{}}),FormError,({children})=>children,(value,fallback)=>typeof value==='string'&&value.startsWith('/')&&!value.startsWith('//')?value:fallback,(await import(moduleUrl(ts.transpileModule(await fs.readFile('lib/customer-replay.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText) )).sameCustomerCreation,tenantCan,()=>({locale:'de'}),()=>value=>value,{de:'de-CH'});
+  for(const [name,seeds,toastIndex] of [['CustomerForm',{0:'Audit GmbH',1:1,3:'Synthetic',4:'Contact'},14],['ProductForm',{0:'Beratung',4:'125.00'},8],['EmployeeForm',{0:'Test',1:'Person',2:'test@example.invalid',4:'ICT'},15]]){
    values=seeds;hook=0;calls=0;scheduled.length=0;navigations.length=0;
    const getSave=view=>{if(view?.props?.onSubmit)return ()=>view.props.onSubmit({preventDefault(){}});if(view?.props?.onClick&&/speichern/i.test(renderToStaticMarkup(React.createElement(React.Fragment,null,view.props.children))))return view.props.onClick;for(const child of [view?.props?.action,view?.props?.actions,...React.Children.toArray(view?.props?.children)]){const found=child&&getSave(child);if(found)return found;}return null;};
    const view=exports[name]({});const save=getSave(view);assert.ok(save,name+' has one reachable save action');
@@ -279,21 +314,32 @@ console.log('Project-linked idle timer context survives synchronization without 
   const compiled=ts.transpileModule('const run='+initializer.getText(ast)+';', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
   return Function(...Object.keys(scope),compiled+'\nreturn run;')(...Object.values(scope));
  };
- const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1'}}),reject:()=>reject(new Error('offline'))}};
+ const documentAst=ts.createSourceFile('documents.tsx',read('components/documents.tsx'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ const calculationHelpers=documentAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['decimalInput','cleanDiscount','calculateDraft'].includes(node.name?.text)).map(node=>node.getText(documentAst)).join('\n');
+ const calculateDraft=Function('calculateDocument',ts.transpileModule(calculationHelpers,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText+'\nreturn calculateDraft;')((await import(moneyModuleUrl)).calculateDocument);
+ const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1',total:108.1}}),reject:()=>reject(new Error('offline'))}};
  const noop=()=>{};
- const docScope=()=>({billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceLoading:false,sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:''},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
- const expenseScope=()=>({expenseRecovery:{ready:true,persist:()=>{},clear:()=>{}},expenseDraft:{},setExpenseReplayKey:()=>{},expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
+ const docScope=()=>({calculateDraft,billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceLoading:false,sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,company:{error:null},documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:'',vatRate:'8.1',currency:'CHF',positions:[{id:'one',quantity:'1',price:'100'}]},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
+ const expenseScope=()=>({paymentKind:"private",expenseRecovery:{ready:true,persist:()=>{},clear:()=>{}},expenseDraft:{},setExpenseReplayKey:()=>{},expenseMutationPending:{current:false},receiptScanPending:{current:false},lockedExpense:false,loadingExpense:false,expenseLoadError:null,amount:'89',expenseBillable:false,expenseCustomer:'',setToast:noop,window:{setTimeout:noop},status:'Eingereicht',setExpenseBusy:noop,person:'',merchant:'SBB',description:'',category:'Reise',date:'2026-10-08',currency:'CHF',vatRate:'8.1',expenseId:null,createdExpenseId:'',receiptFile:null,production:true,expenseRequestKey:{current:''},setCreatedExpenseId:noop,setReceiptFile:noop,apiUpload:noop,apiPatch:noop,appendDemoRow:noop,setSavedExpense:noop,existing:false,router:{push:noop}});
  for(const [file,fn,scopeFactory] of [['components/documents.tsx','DocumentPage',docScope],['components/app-pages.tsx','ExpenseForm',expenseScope]]){
   const pending=makeWrite();const scope=scopeFactory();scope.apiPost=pending.write;scope.apiPatch=pending.write;
   const run=handler(file,fn,'save',scope);const first=run();await run();assert.equal(pending.calls(),1,fn+' rejects same-frame duplicate writes');pending.resolve();await first;await run();assert.equal(pending.calls(),1,fn+' stays locked until navigation');
   const retry=makeWrite();const retryScope=scopeFactory();retryScope.apiPost=retry.write;retryScope.apiPatch=retry.write;
   const retryRun=handler(file,fn,'save',retryScope);const failure=retryRun();retry.reject();await failure;const next=retryRun();assert.equal(retry.calls(),2,fn+' releases the lock after failure');retry.resolve();await next;
  }
- for(const blocked of [{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'}]){
+ for(const blocked of [{company:{error:'Company unavailable'}},{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'}]){
   const pending=makeWrite(),scope={...docScope(),...blocked,apiPost:pending.write,apiPatch:pending.write};
   await handler('components/documents.tsx','DocumentPage','save',scope)();
   assert.equal(pending.calls(),0,'Source/customer loading or failure must block document writes');
  }
+ const invalidWrite=makeWrite(),invalidScope={...docScope(),draft:{...docScope().draft,discount:{kind:'percent',value:'101'}},apiPost:invalidWrite.write,apiPatch:invalidWrite.write};
+ await handler('components/documents.tsx','DocumentPage','save',invalidScope)();assert.equal(invalidWrite.calls(),0,'Actual calculation validation prevents an invalid discount from being saved');
+ const draftOnly=makeWrite(),draftOnlyScope={...docScope(),kind:'Rechnung',paymentIssue:'Bank details missing',apiPost:draftOnly.write,apiPatch:draftOnly.write};
+ const draftSaved=handler('components/documents.tsx','DocumentPage','save',draftOnlyScope)();assert.equal(draftOnly.calls(),1,'Missing bank data cannot block a saved invoice draft');draftOnly.resolve();await draftSaved;
+ let failRevision=true,revisionCalls=0,menuOpen=true,editing=false,dirty=true,currentDraft=null,navigations=0;const revisionKeys=[];
+ const revisionScope={...docScope(),documentKey:'AN-TEST-1',draft:{number:'AN-TEST-1'},documentActionPending:{current:false},revisionKey:{current:null},setActionBusy:noop,setActionError:noop,setMoreOpen:value=>{menuOpen=value},setDirty:value=>{dirty=value},setEditing:value=>{editing=value},setDraft:value=>{currentDraft=value},editableDocumentSnapshot:JSON.stringify,router:{replace:()=>{navigations++}},apiPost:async(_path,_body,options)=>{revisionCalls++;revisionKeys.push(options.idempotencyKey);if(failRevision)throw Error('Synthetic revision unavailable');return {item:{id:'offer-one',number:'AN-TEST-1',status:'draft',offer_version:2}}}};
+ const revise=handler('components/documents.tsx','DocumentPage','reviseOffer',revisionScope);await revise();assert.equal(menuOpen,true,'Failed revision retains its retry surface');assert.equal(editing,false);
+ failRevision=false;const revised=revise();await revise();await revised;assert.equal(revisionCalls,2,'Only one successful revision after one failed request');assert.equal(revisionKeys[0],revisionKeys[1],'Failure retains its revision idempotency key');assert.equal(menuOpen,false,'Successful same-route revision closes the action sheet');assert.equal(editing,true);assert.equal(dirty,false,'Persisted revision starts with a clean editor baseline');assert.equal(currentDraft.number,'AN-TEST-1');assert.equal(navigations,0,'Stable offer number does not trigger redundant navigation');
  console.log('Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.');
 }
 
@@ -329,6 +375,15 @@ console.log('Project-linked idle timer context survives synchronization without 
  const {avatarIdentity}=await import(moduleUrl(ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText));
  assert.equal(avatarIdentity('  Nina  Müller ','person-1').initials,'NM');
  assert.equal(avatarIdentity('Ömer Cam','person-2').initials,'ÖC');
+ const avatarNode=ast.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text==='Avatar');
+ const imageValidator=(await fs.readFile('lib/image-url.ts','utf8'));
+ const compiledAvatar=ts.transpileModule('import React,{useState} from '+JSON.stringify(new URL('../node_modules/react/index.js',import.meta.url).href)+'; const LocalizedElement=globalThis.LocalizedElement;const Icon=()=>React.createElement("span");'+imageValidator+node.getText(ast)+avatarNode.getText(ast),{compilerOptions:{module:ts.ModuleKind.ESNext,jsx:ts.JsxEmit.React}}).outputText;
+ const {Avatar}=await import(moduleUrl(compiledAvatar));
+ const previewUrl='blob:https://example.invalid/12345678-1234-1234-1234-123456789abc';
+ assert.ok(!renderToStaticMarkup(React.createElement(Avatar,{name:'Nina Müller',src:previewUrl})).includes('<img'),'Local blobs are never accepted as ordinary stored avatars');
+ assert.ok(renderToStaticMarkup(React.createElement(Avatar,{name:'Nina Müller',src:previewUrl,preview:true})).includes('<img'),'Explicit local preview uses the real shared avatar renderer');
+ for(const src of ['javascript:alert(1)','data:image/svg+xml,<svg/>','blob:https://example.invalid/<script>'])assert.ok(!renderToStaticMarkup(React.createElement(Avatar,{src,preview:true})).includes('<img'),'Preview does not authorize malformed image sources');
+
  assert.equal(avatarIdentity('', 'unknown').tone,5);
  assert.equal(avatarIdentity('Nina Müller','person-1').tone,avatarIdentity('Nina Meier','person-1').tone,'Identity, not render order or changed name, owns the color');
  for(let i=0;i<100;i++)assert.deepEqual(avatarIdentity('Nina Müller','person-1'),avatarIdentity('Nina Müller','person-1'));

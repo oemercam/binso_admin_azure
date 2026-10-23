@@ -8,7 +8,7 @@ import {LocaleSwitcher} from "./locale-switcher";
 import { useEffect, useState } from "react";
 import { Button, Icon, Logo } from "./ui";
 import {DetailTabs} from "./binso-ux";
-import {PrivacySettingsButton} from "./privacy-consent";
+import {PrivacySettingsButton} from "./privacy-settings-button";
 
 export function ProductCapabilities(){
  return <div className="reference-capabilities">{['Kunden & Kontakte','Angebote & Rechnungen','Aufträge & Zeit','Schweizer QR-Rechnung'].map(label=><span key={label}><LocalizedText>{label}</LocalizedText></span>)}</div>;
@@ -88,6 +88,9 @@ export function MarketingFooter() {
     <div><Logo/><LocaleSwitcher/><p><LocalizedText>{"Business-Software für Schweizer KMU."}</LocalizedText></p></div>
     <div className="footer-links">
       <Link href="/produkt"><LocalizedText>{"Produkt"}</LocalizedText></Link>
+      <Link href="/#funktionen"><LocalizedText>{"Funktionen"}</LocalizedText></Link>
+      <Link href="/impressum#kontakt"><LocalizedText>{"Kontakt"}</LocalizedText></Link>
+      <Link href="/support"><LocalizedText>{"Support"}</LocalizedText></Link>
       <Link href="/preise"><LocalizedText>{"Preise"}</LocalizedText></Link>
       <Link href="/registrieren"><LocalizedText>{"14 Tage kostenlos testen"}</LocalizedText></Link>
       <Link href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link>

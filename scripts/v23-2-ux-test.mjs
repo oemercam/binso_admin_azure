@@ -39,7 +39,7 @@ const sole=quick.QuickCreateAction({});assert.equal(sole.props.requiresWrite,fal
 const quickHtml=html(quick.QuickCreateAction({}));assert.ok(quickHtml.includes('/zeit?manual=1&amp;returnTo=/dashboard'));assert.ok(!quickHtml.includes('/rechnungen/neu'),'Unpermitted actions are absent');
 const statistics=await fs.readFile('components/statistics.tsx','utf8'),ring={};
 const {formatCurrency}=await import(financialModuleUrl),{sumMoney}=await import(moneyModuleUrl);
-Function('require','exports','useState','formatCurrency','sumMoney','useTranslation',compile(declaration('statistics.tsx',statistics,'RingChart')))(require,ring,()=>[null,()=>{}],formatCurrency,sumMoney,()=>value=>value);
+Function('require','exports','useState','formatCurrency','sumMoney','useTranslation','useLocale','localeTags',compile(declaration('statistics.tsx',statistics,'RingChart')))(require,ring,()=>[null,()=>{}],formatCurrency,sumMoney,()=>value=>value,()=>({locale:'de'}),{de:'de-CH'});
 const parts=[{key:'a',label:'Einnahmen',tone:'positive',value:0.1},{key:'b',label:'Ausgaben',tone:'negative',value:0.2}];
 const ringHtml=html(React.createElement(ring.RingChart,{label:'Zahlungsvolumen',parts}));assert.ok(ringHtml.includes('CHF 0.30'));assert.ok(ringHtml.includes('33.3 %'));assert.ok(ringHtml.includes('66.7 %'));
 for(const invalid of [parts.map(part=>({...part,value:0})),[{...parts[0],value:-10}],[{...parts[0],value:NaN}]])assert.ok(!html(React.createElement(ring.RingChart,{label:'Volumen',parts:invalid})).includes('<svg'),'Zero, negative and missing data cannot fabricate a ring');
@@ -51,20 +51,20 @@ const viewerCode=compile(declaration('pdf.tsx',pdfSource,'DocumentPageViewer')
  .replace(/import\(\/\* webpackIgnore: true \*\/ engineUrl\)/g,'loadEngine(engineUrl)')
  .replaceAll('import.meta.url','"https://fixture.invalid/viewer.js"'));
 function viewerHarness(loadEngine){
- const state=[0,null,null],updates=[],timers=new Map();let effect,cleanup,index=0,nextTimer=1;
+ const state=[],updates=[],timers=new Map();let effect,cleanup,index=0,nextTimer=1;
  const window={setTimeout(fn,ms){assert.equal(ms,20000);const id=nextTimer++;timers.set(id,fn);return id},clearTimeout(id){timers.delete(id)}};
  const exports={};
- Function('require','exports','useState','useEffect','window','loadEngine','LoadingState','ErrorState','DocumentPages',viewerCode)(require,exports,initial=>{const slot=index++;return [state[slot]??initial,value=>{state[slot]=typeof value==='function'?value(state[slot]):value;updates.push(slot)}]},fn=>{effect=fn},window,loadEngine,stub,stub,stub);
+ Function('require','exports','useState','useEffect','window','loadEngine','LoadingState','ErrorState','DocumentPages',viewerCode)(require,exports,initial=>{const slot=index++;if(!(slot in state))state[slot]=initial;return [state[slot],value=>{state[slot]=typeof value==='function'?value(state[slot]):value;updates.push(slot)}]},fn=>{effect=fn},window,loadEngine,stub,stub,stub);
  const file=new Blob(['%PDF-fixture']);exports.DocumentPageViewer({file});cleanup=effect();
- return {file,state,updates,timers,cleanup,timeout:()=>{for(const fn of [...timers.values()])fn();timers.clear()}};
+ return {file,state,get error(){return state.find(value=>value&&typeof value==='object'&&'message' in value)??null},get loaded(){return state.find(value=>value&&typeof value==='object'&&'pdf' in value)??null},updates,timers,cleanup,timeout:()=>{for(const fn of [...timers.values()])fn();timers.clear()}};
 }
 const flush=async()=>{for(let i=0;i<8;i++)await Promise.resolve()};
 let resolveEngine;const delayedEngine=new Promise(resolve=>{resolveEngine=resolve});
-const importStall=viewerHarness(()=>delayedEngine);importStall.timeout();assert.equal(importStall.state[2].file,importStall.file);assert.match(importStall.state[2].message,/dauert zu lange/);
+const importStall=viewerHarness(()=>delayedEngine);importStall.timeout();assert.equal(importStall.error.file,importStall.file);assert.match(importStall.error.message,/dauert zu lange/);
 resolveEngine({getDocument(){throw Error('Late engine must not start a worker')}});await flush();assert.equal(importStall.updates.length,1);importStall.cleanup();
 let resolvePdf,destroyed=0;const workerTask={promise:new Promise(resolve=>{resolvePdf=resolve}),destroy:async()=>{destroyed++}};
-const workerStall=viewerHarness(async()=>({GlobalWorkerOptions:{},getDocument:()=>workerTask}));await flush();workerStall.timeout();assert.equal(destroyed,1);resolvePdf({numPages:2});await flush();assert.equal(workerStall.state[1],null,'Timed-out worker cannot resurrect the old document');workerStall.cleanup();
-const success=viewerHarness(async()=>({GlobalWorkerOptions:{},getDocument:()=>({promise:Promise.resolve({numPages:2}),destroy:async()=>{}})}));await flush();assert.equal(success.state[1].pdf.numPages,2);assert.equal(success.timers.size,0);assert.equal(success.state[2],null);success.cleanup();
+const workerStall=viewerHarness(async()=>({GlobalWorkerOptions:{},getDocument:()=>workerTask}));await flush();workerStall.timeout();assert.equal(destroyed,1);resolvePdf({numPages:2});await flush();assert.equal(workerStall.loaded,null,'Timed-out worker cannot resurrect the old document');workerStall.cleanup();
+const success=viewerHarness(async()=>({GlobalWorkerOptions:{},getDocument:()=>({promise:Promise.resolve({numPages:2}),destroy:async()=>{}})}));await flush();assert.equal(success.loaded.pdf.numPages,2);assert.equal(success.timers.size,0);assert.equal(success.error,null);success.cleanup();
 let resolveUnmount;const unmounted=viewerHarness(()=>new Promise(resolve=>{resolveUnmount=resolve}));unmounted.cleanup();resolveUnmount({getDocument(){throw Error('Unmounted viewer must not start a worker')}});await flush();assert.equal(unmounted.updates.length,0);assert.equal(unmounted.timers.size,0);
 console.log('Actual PDF viewer: bounded module/worker startup, late-result suppression, successful load and unmount cleanup passed.');
 
@@ -117,3 +117,9 @@ console.log('Actual operator send: same-frame lock, late-completion draft preser
  }
  console.log('App light/dark themes: primary text, secondary labels and accent meet 4.5:1 contrast on all three surfaces.');
 }
+
+const localizedStamps=[];for(const locale of ['de-CH','en-CH','fr-CH','it-CH']){
+ const summer=formatDateTime('2026-10-21T23:30:00Z',locale),winter=formatDateTime('2026-12-31T23:30:00Z',locale);localizedStamps.push(summer);
+ assert.ok(summer.includes('22')&&summer.includes('01:30'),'Summer business timestamp belongs to the next Swiss day');
+ assert.ok(winter.includes('2027')&&winter.includes('00:30'),'Winter business timestamp crosses the Swiss year boundary');assert.equal(formatDateTime('invalid',locale),'');
+}assert.ok(new Set(localizedStamps).size>1,'The requested language changes timestamp formatting instead of silently remaining German');

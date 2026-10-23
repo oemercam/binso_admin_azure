@@ -1,6 +1,6 @@
 # Aktueller Lieferstand und Konzeptablage
 
-Stand: 20.10.2026, Europe/Zurich. Diese Seite ist der Einstieg in den aktuellen
+Historischer Bericht vom 20.10.2026, Europe/Zurich. Aktuelle Fortsetzung: [vollständiger V25-Master vom 21.10.2026](v25-complete-master-20261021.md), Basis Main ba423460 nach PR #303. Die nachfolgende Tabelle bewahrt den damaligen Stand; sie ist keine aktuelle PR-Statusabfrage. Diese Seite ist der Einstieg in den aktuellen
 Lieferstand, kein weiterer UX-Vertrag und kein zweites Freigaberegister.
 
 ## Konzepte und Rangfolge

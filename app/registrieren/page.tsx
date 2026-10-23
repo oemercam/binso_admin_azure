@@ -1,3 +1,3 @@
 import {Suspense} from "react";
-import {RegistrationSheet} from "@/components/registration/registration-sheet";
-export default function Register(){return <Suspense><RegistrationSheet/></Suspense>;}
+import {RegistrationPage} from "@/components/registration/registration-page";
+export default function Register(){return <Suspense><RegistrationPage/></Suspense>;}

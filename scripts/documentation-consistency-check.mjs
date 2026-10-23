@@ -100,7 +100,7 @@ assert.ok(portalRegisterRoute.includes('redirect("/registrieren")'),"Legacy port
 assert.ok(verifyEmailRoute.includes("consumeEmailCode")&&verifyEmailRoute.includes("t.token_type='verify_email'")&&verifyEmailRoute.includes("for update of t"),"The canonical verification endpoint must handle existing codes and transactionally consumed links");
 assert.ok(!verifyEmailRoute.includes("invalid_or_expired_token"),"Retired verification-link compatibility must not return");
 assert.ok(rootLayout.includes("<PrivacyConsent"),"Privacy consent controls must be mounted globally");
-assert.ok(privacyConsent.includes("Nur notwendige")&&privacyConsent.includes("Alle erlauben"),"Privacy controls must offer explicit choices");
+for(const choice of ['Alle ablehnen','Alle akzeptieren','Einstellungen'])assert.ok(privacyConsent.includes(choice),"Privacy controls must offer the current explicit choice: "+choice);
 assert.ok(webVitals.includes("readPerformanceConsent"),"Optional performance telemetry must respect the user's privacy preference");
 assert.ok(privacyPage.includes("Optionale Performance-Messungen")&&privacyPage.includes("keine Werbe- oder Cross-Site-Tracking-Cookies"),"Privacy policy must describe the current consent and tracking behavior");
 
