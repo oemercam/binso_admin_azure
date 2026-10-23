@@ -802,6 +802,13 @@ try{
    await statistics.locator('.bo-metric-tiles>.metric').filter({has:page.getByText('Einnahmen',{exact:true})}).locator(':scope>strong').getByText('CHF 200.00',{exact:true}).waitFor();
    assert.equal(await statistics.locator('.bo-metric-tiles>.metric').count(),4);
    for(const months of [1,3,6,12]){await chooseStatisticPeriod(page,statistics,months);assert.equal(await statistics.locator('.metric>strong').first().textContent(),months===1?'CHF 200.00':'CHF 320.00');}
+   const periodViewport=page.viewportSize(),periodCaption=await statistics.locator('.bo-period-control').getAttribute('title');
+   const resizeSheet=await openStatisticCalendar(page,statistics);
+   await resizeSheet.getByLabel('Von',{exact:true}).fill(previousStatisticFrom);await resizeSheet.getByLabel('Bis',{exact:true}).fill(previousStatisticTo);
+   await page.setViewportSize({...periodViewport,width:periodViewport.width>=1024?390:1440});await resizeSheet.waitFor({state:'detached'});
+   assert.equal(await statistics.locator('.bo-period-control').getAttribute('title'),periodCaption,'A layout breakpoint closes the chooser without applying its draft');
+   assert.equal(await statistics.locator('.metric>strong').first().textContent(),'CHF 320.00','Resizing does not change the applied financial window');
+   await page.setViewportSize(periodViewport);
    const periodSheet=await openStatisticCalendar(page,statistics);
    await periodSheet.getByLabel('Von',{exact:true}).fill(previousStatisticFrom);await periodSheet.getByLabel('Bis',{exact:true}).fill(previousStatisticTo);
    await capture(page,{animations:'disabled',path:path.join(output,`${theme}-430-period-sheet.png`)});

@@ -13,7 +13,7 @@ const labels={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Le
 export function StatisticPeriodPicker({period,onChange,maxDays}:{period:StatisticPeriod|null;onChange:(period:StatisticPeriod)=>void;maxDays?:number}){
  const id=useId(),{locale}=useLocale(),t=useTranslation();
  const [open,setOpen]=useState(false),[desktop,setDesktop]=useState(false),[draft,setDraft]=useState<StatisticPeriod>({months:1,from:'',to:''});
- useEffect(()=>{const media=matchMedia('(min-width:1024px)'),update=()=>setDesktop(media.matches);update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
+ useEffect(()=>{const media=matchMedia('(min-width:1024px)'),update=()=>{setDesktop(media.matches);setOpen(false)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[]);
  const today=businessDate(),bounds=period&&statisticBounds(period,today),pending=statisticBounds(draft,today);
  const valid=!!pending&&(!maxDays||(Date.parse(pending.to)-Date.parse(pending.from))/86400000<maxDays);
  const date=(day:string,month=false)=>new Intl.DateTimeFormat(localeTags[locale],month?{month:'long',year:'numeric',timeZone:'UTC'}:{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));

@@ -6,6 +6,14 @@ const directory='.github/workflows';
 const setup=yaml.load(fs.readFileSync('.github/actions/setup-node/action.yml','utf8'));
 for(const step of setup.runs.steps)if(step.uses)assert(/@[a-f0-9]{40}$/.test(step.uses),'Pinned composite dependency');
 const workflows=Object.fromEntries(fs.readdirSync(directory).filter(f=>f.endsWith('.yml')).map(f=>[f,yaml.load(fs.readFileSync(directory+'/'+f,'utf8'))]));
+for(const file of ['quality.yml','avatar-profile.yml','document-discounts.yml','v25-final-sample.yml','invoice-readiness.yml']){
+ const install=Object.values(workflows[file].jobs).flatMap(job=>job.steps??[]).find(step=>step.run?.includes('install --with-deps'));
+ assert(install,'Every browser workflow retains complete system dependency installation: '+file);
+ assert(install.run.indexOf('bash scripts/prepare-browser-host.sh')>=0&&install.run.indexOf('bash scripts/prepare-browser-host.sh')<install.run.indexOf('install --with-deps'),'Prepare the same reliable signed archive before browser dependencies: '+file);
+}
+const browserHost=fs.readFileSync('scripts/prepare-browser-host.sh','utf8');
+assert(browserHost.includes('https://archive.ubuntu.com/ubuntu'));
+assert(!/AllowUnauthenticated|AllowInsecureRepositories|Verify-Peer.*false|trusted=yes/.test(browserHost),'Mirror reliability cannot bypass package or TLS verification');
 for(const name of ['checks','ux-compliance']){
  const checkout=workflows['quality.yml'].jobs[name].steps.find(step=>step.uses?.startsWith('actions/checkout@'));
  assert.equal(checkout.with['fetch-depth'],0,'Immutable navigation reference checks require real historical source in '+name);

@@ -50,6 +50,7 @@ jobs:
         env:
           ENGINE: ${{ matrix.engine }}
         run: |
+          bash scripts/prepare-browser-host.sh
           npm install --prefix "$RUNNER_TEMP/binso-browser" --no-package-lock --ignore-scripts playwright@1.62.1
           if [ "$ENGINE" = chromium ]; then
             node "$RUNNER_TEMP/binso-browser/node_modules/playwright/cli.js" install --with-deps --only-shell chromium
