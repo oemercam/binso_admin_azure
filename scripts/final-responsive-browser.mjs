@@ -4,6 +4,7 @@ import path from 'node:path';
 import {localeTestModuleUrl,moduleUrl} from './data-test-modules.mjs';
 import {selectAppOption} from './app-select-browser.mjs';
 import {waitForFiniteAnimations} from './shared-control-browser.mjs';
+import {writeTestOutput} from './test-output.mjs';
 const {translateMessage}=await import(await localeTestModuleUrl());
 const {localeTags}=await import(moduleUrl(await fs.readFile('lib/locales/config.ts','utf8')));
 
@@ -72,7 +73,7 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
   }
  }
  await fs.mkdir(output,{recursive:true});
- await fs.writeFile(path.join(output,`sample-${locale}-${theme}.json`),JSON.stringify({scope:'Four representative routes; synthetic API fixtures, real isolated SSR session; no full V25 matrix',results},null,2)+'\n');
+ await writeTestOutput(path.join(output,`sample-${locale}-${theme}.json`),JSON.stringify({scope:'Four representative routes; synthetic API fixtures, real isolated SSR session; no full V25 matrix',results},null,2)+'\n');
  console.log(`Final responsive sample passed: ${locale}/${theme}, ${results.length} route/width cases, sidebar and dialog pointer interactions.`);
  return results;
 }
