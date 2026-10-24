@@ -60,7 +60,7 @@
 .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
 .auth-card h1{font-size:var(--type-large-heading);line-height:1.2}
 .auth-card>p{margin-bottom:24px;font-size:var(--type-control)}
-.auth-card input{font-size:var(--type-subheading)}
+.auth-card input{font-size:var(--control-font-mobile)}
 .auth-card .button{width:100%}
 }
 @media (max-width:1100px){
