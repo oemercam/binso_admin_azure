@@ -4,7 +4,7 @@ const timeOnlyPermissions=new Set(['time:read','time:write','documents:read','su
 export function profileAllowsPath(profile:ModuleProfile|undefined,path:string){
  if(profile===undefined||profile==='standard')return true;
  if(profile!=='time_only')return false;
- return path==='/zeit'||path.startsWith('/zeit/')||path==='/support'||path.startsWith('/support/')||['/einstellungen','/einstellungen/konto','/einstellungen/sicherheit','/einstellungen/benachrichtigungen','/einstellungen/darstellung','/einstellungen/sprache','/einstellungen/datenschutz','/benachrichtigungen'].includes(path);
+ return path==='/zeit'||path.startsWith('/zeit/')||path==='/support'||path.startsWith('/support/')||path==='/hilfe'||['/einstellungen','/einstellungen/konto','/einstellungen/sicherheit','/einstellungen/benachrichtigungen','/einstellungen/darstellung','/einstellungen/sprache','/einstellungen/datenschutz','/benachrichtigungen'].includes(path);
 }
 /** Personal settings never grant company settings or business-data access. */
 export function tenantCanOpenPath(role:string,path:string,profile:ModuleProfile='standard'){
@@ -88,6 +88,7 @@ export const modulePermissionMap:Record<string,{read:TenantPermission;write:Tena
 
 export function permissionForModule(moduleKey:string,action:"read"|"write"){return modulePermissionMap[moduleKey]?.[action]}
 export function routePermission(pathname:string):TenantPermission|undefined{
+ if(pathname==='/hilfe')return 'support:read';
  if(pathname==='/benachrichtigungen')return 'organization:read';
  if(pathname==="/finanzen"||pathname==="/belege")return "finance-overview:read";
  if(pathname==="/einstellungen/team")return "users:read";

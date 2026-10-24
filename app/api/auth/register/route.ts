@@ -15,7 +15,7 @@ export const runtime="nodejs";
 export async function GET(request:NextRequest){
  try{
   const context=registrationContext(request.nextUrl.searchParams.get("plan"),request.nextUrl.searchParams.get("billing"));
-  const session=env.databaseUrl?await getSession():null;
+  const session=env.databaseUrl?await getSession({allowMfaEnrollment:true}):null;
   if(session&&!session.isDemo)return json({context,state:"authenticated",...await registrationHandoff(session.organizationId,session.role,session.mfaEnabled)});
   const pending=await pendingRegistration();
   return json({context,state:pending?(pending.verified?"verified":"pending"):"new",pending:pending?{company:pending.company,email:pending.email,locale:pending.locale,plan:pending.plan,billingCycle:pending.billingCycle}:null});

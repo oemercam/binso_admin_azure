@@ -26,8 +26,8 @@ assert.match(modal,/role="dialog"/);assert.match(modal,/aria-modal="true"/);asse
 render(true,false,true);assert.deepEqual(guard,{active:true,unload:true},'A pending pristine save protects browser back/unload too');
 render(true,false,false);assert.deepEqual(guard,{active:false,unload:false},'A pristine idle workspace does not trap back/unload');
 const access=navigationAccess(read);
-assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('canOpen("/kunden")','canOpen("/zahlungen")'):read(file)),access,'A changed destination permission cannot pass the layout migration');
-assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('href="/dashboard" className={active===','href="/zahlungen" className={active==='):read(file)),access,'A changed bottom navigation target cannot pass');
+assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replaceAll('mainNavigation.filter(item=>canOpen(item.href))','mainNavigation.filter(item=>true)'):read(file)),access,'A changed destination permission cannot pass the layout migration');
+assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('href={item.href} className={primaryNavigationSection','href="/zahlungen" className={primaryNavigationSection'):read(file)),access,'A changed bottom navigation target cannot pass');
 const display={};Function('require','exports',compile(read('lib/display-format.ts').replace('import {formatCurrency} from "./financial-status";','')))(require,display);
 assert.equal(display.messageDay('2026-10-17T22:30:00Z'),'18.10.2026','Zurich midnight is a new chat day');
 assert.equal(display.messageDay('2026-01-17T22:30:00Z'),'17.01.2026','Winter offset is respected');

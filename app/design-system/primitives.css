@@ -60,8 +60,8 @@ button{cursor:pointer}
   border-radius:var(--shape-scale-999);
   background:var(--color-bg);
   color:var(--color-fg);
-  font-size:var(--type-secondary);
-  font-weight:400;
+  font-size:var(--status-label-font);
+  font-weight:500;
   line-height:1.4;
   white-space:normal;
   gap:6px;

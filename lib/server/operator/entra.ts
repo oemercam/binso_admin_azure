@@ -2,6 +2,7 @@ import "server-only";
 import {headers} from "next/headers";
 import type {OperatorRole} from "@/lib/permissions";
 import {env} from "@/lib/server/env";
+import {hasEntraMfaProof} from './entra-proof';
 
 type EasyAuthClaim={typ?:string;val?:string};
 type EasyAuthPrincipal={auth_typ?:string;name_typ?:string;role_typ?:string;claims?:EasyAuthClaim[]};
@@ -25,7 +26,7 @@ function firstClaim(principal:EasyAuthPrincipal,types:string[]){
   return claimValues(principal,types)[0]||"";
 }
 function decodePrincipal(raw:string){
-  try{return JSON.parse(Buffer.from(raw,"base64").toString("utf8")) as EasyAuthPrincipal}
+  try{const value=JSON.parse(Buffer.from(raw,"base64").toString("utf8"));return value&&typeof value==='object'&&Array.isArray(value.claims)&&value.claims.every((claim:EasyAuthClaim)=>claim&&typeof claim.typ==='string'&&typeof claim.val==='string')?value as EasyAuthPrincipal:null}
   catch{return null}
 }
 
@@ -45,6 +46,7 @@ export async function getEntraOperatorIdentity():Promise<EntraOperatorIdentity|n
 
   const principal=decodePrincipal(raw);
   if(!principal||String(principal.auth_typ??"").toLowerCase()!=="aad")return null;
+  if(!hasEntraMfaProof(principal.claims??[]))return null;
 
   const objectId=
     firstClaim(principal,["http://schemas.microsoft.com/identity/claims/objectidentifier","oid"])||

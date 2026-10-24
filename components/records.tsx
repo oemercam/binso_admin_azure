@@ -46,7 +46,7 @@ export function DataTableRow({children,href,onClick,className="desktop-record-ro
 function tone(status: string): "success" | "danger" | "warning" | "neutral" | "info" {
   if (["Bezahlt","Aktiv","Genehmigt","Angenommen","Verbucht","Gelöst","Verrechnet","Freigegeben"].includes(status)) return "success";
   if (status==="Versendet") return "info";
-  if (["Überfällig","Abgelehnt"].includes(status)) return "danger";
+  if (["Überfällig","Abgelehnt","Zurückgewiesen"].includes(status)) return "danger";
   if (["Offen","Teilweise bezahlt","Eingereicht","Gesendet","Ausstehend","Zuordnen","Zur Prüfung"].includes(status)) return "warning";
   if (["In Bearbeitung"].includes(status)) return "warning";
   return "neutral";
@@ -231,10 +231,10 @@ export function TimeEntryGroup({title,subtitle,value,children,titleVerbatim=fals
 }
 
 /** Employee ledgers and the time module share the same information layout. */
-export function TimeEntryRow({title,meta,value,status,selection,action,onOpen,onClick,information=false}:{information?:boolean;onOpen?:()=>void;onClick?:()=>void;title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
+export function TimeEntryRow({title,meta,value,status,selection,selectionLabel="Für Rechnung auswählen",action,onOpen,onClick,information=false}:{selectionLabel?:string;information?:boolean;onOpen?:()=>void;onClick?:()=>void;title:string;meta:string;value:string;status?:string;selection?:React.ReactNode;action?:React.ReactNode}){
  const [detailOpen,setDetailOpen]=useState(false);
- if(information)return <><RecordRow information title={title} meta={meta} value={value} onClick={onClick??onOpen??(()=>setDetailOpen(true))}/><FormSheet open={detailOpen} onClose={()=>setDetailOpen(false)} label="Zeiteintrag" actions={action}><RecordRow title={title} meta={meta} value={value} status={status}/>{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}</FormSheet></>;
- return <div><RecordRow onClick={onClick??onOpen} title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span><LocalizedText>{"Für Rechnung auswählen"}</LocalizedText></span></label>}{action}</div>}</div>;
+ if(information)return <><RecordRow information title={title} meta={meta} value={value} onClick={onClick??onOpen??(()=>setDetailOpen(true))}/><FormSheet open={detailOpen} onClose={()=>setDetailOpen(false)} label="Zeiteintrag" actions={action}><RecordRow title={title} meta={meta} value={value} status={status}/>{selection&&<label>{selection}<span><LocalizedText>{selectionLabel}</LocalizedText></span></label>}</FormSheet></>;
+ return <div><RecordRow onClick={onClick??onOpen} title={title} meta={meta} value={value} status={status}/>{(selection||action)&&<div className="record-controls">{selection&&<label>{selection}<span><LocalizedText>{selectionLabel}</LocalizedText></span></label>}{action}</div>}</div>;
 }
 
 /** The table owns its responsive tracks; callers supply only the column count. */
@@ -246,9 +246,9 @@ function recordGrid(columns?:number):CSSProperties|undefined{
 }
 
 /** Same identity and secondary line for customer, employee and other directories. */
-export function RecordIdentity({name,meta,identity=name,kind="organization"}:{name:string;meta?:string;identity?:string;kind?:"organization"|"person"}){
+export function RecordIdentity({name,meta,identity=name,kind="organization",showMark=true}:{name:string;meta?:string;identity?:string;kind?:"organization"|"person";showMark?:boolean}){
  const initials=name.trim().split(/\s+/).filter(Boolean).slice(0,2).map(word=>word[0]).join('').toLocaleUpperCase('de-CH');
- return <span className="record-identity">{kind==='person'?<Avatar name={name} identity={identity}/>:<span className="record-initials" aria-hidden="true">{initials}</span>}<span><strong><LocalizedText verbatim>{name}</LocalizedText></strong>{meta&&<small><LocalizedText verbatim>{meta}</LocalizedText></small>}</span></span>;
+ return <span className="record-identity">{showMark&&(kind==='person'?<Avatar name={name} identity={identity}/>:<span className="record-initials" aria-hidden="true">{initials}</span>)}<span><strong><LocalizedText verbatim>{name}</LocalizedText></strong>{meta&&<small><LocalizedText verbatim>{meta}</LocalizedText></small>}</span></span>;
 }
 
 /** Shared list paging for tables and grouped business records. */

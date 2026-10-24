@@ -2,7 +2,8 @@ import {tenantCan,permissionForModule} from './permissions';
 import {moduleForPath} from '@/config/plan-access';
 /** Exact workspace routes only: record details, chats and forms keep their context. */
 const descriptions:Readonly<Record<string,string>>={
- "/dashboard":"Deine Geschäftszahlen und nächsten Aufgaben im Blick.",
+ "/dashboard":"Dein Unternehmen auf einen Blick",
+ "/hilfe":"Hilfe und Informationen zu Binso One.",
  "/kunden":"Kunden und Kontaktpersonen verwalten.",
  "/angebote":"Angebote erstellen und ihren Status verfolgen.",
  "/rechnungen":"Rechnungen erstellen und offene Beträge verfolgen.",
@@ -17,7 +18,7 @@ const descriptions:Readonly<Record<string,string>>={
  "/mitarbeiter":"Mitarbeiter und ihre Geschäftsdaten verwalten.",
  "/support":"Support-Anfragen erstellen und Antworten verfolgen.",
  "/benachrichtigungen":"Aktuelle Hinweise und wichtige Ereignisse im Blick.",
- "/einstellungen":"Konto, Unternehmen und Anwendung einrichten.",
+ "/einstellungen":"Unternehmen und Geschäftsprozesse einrichten.",
  "/einstellungen/konto":"Dein Konto und deine Profildaten verwalten.",
  "/einstellungen/firma":"Unternehmensdaten für Dokumente und Kommunikation pflegen.",
  "/einstellungen/team":"Teamzugänge und Rollen verwalten.",

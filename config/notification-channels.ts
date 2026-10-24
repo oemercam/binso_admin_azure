@@ -1,3 +1,3 @@
-/** A saved preference does not constitute a working delivery implementation.
- * Web Push has no subscription/sender path yet; never advertise it as enabled. */
+/** Conservative public baseline. Device settings use authenticated server capabilities. */
 export const notificationChannels={email:true,push:false} as const;
+export const notificationPreferenceKinds=['Rechnungen','Angebote','Support','Zeiterfassung','Spesen','Sicherheit','Produktupdates'] as const;

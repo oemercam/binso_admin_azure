@@ -12,7 +12,7 @@
   --workspace-mobile-ink:#213047;
   --workspace-muted:#647080;
   --workspace-line:#edf1f6;
-  --workspace-title-size:20px;
+  --workspace-title-size:18px;
   --mobile-title-tracking:-.8px;
   --mobile-value-tracking:-.8px;
   --workspace-title-weight:600;
@@ -50,7 +50,7 @@
   --chart-compact-height:130px;
   --kpi-padding:16px;
   --action-row-height:48px;
-  --section-title-font:16px;
+  --section-title-font:14px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -78,29 +78,29 @@
 
   --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   /* Existing shared component values, now centrally owned. No visual change. */
-  --button-height:42px;
-  --button-font-size:15px;
+  --button-height:44px;
+  --button-font-size:14px;
   --button-font-weight:600;
   --button-line-height:1;
   --button-gap:8px;
   --button-padding-inline:16px;
-  --button-icon-size:17px;
+  --button-icon-size:18px;
   --page-heading-size:var(--type-desktop-heading);
   --page-heading-line-height:1.3;
   --page-heading-letter-spacing:-.6px;
-  --body-font-size:15px;
+  --body-font-size:14px;
   --body-line-height:1.45;
-  --metric-label-size:var(--type-label);
+  --metric-label-size:var(--kpi-label-font);
   --metric-label-line-height:1.2;
-  --metric-value-size:var(--workspace-value-size);
+  --metric-value-size:var(--kpi-value-font);
   --metric-value-line-height:1.2;
   --metric-value-letter-spacing:-1px;
 
 
   --radius-xs:5px;
   --radius-sm:7px;
-  --radius-md:7px;
-  --radius-lg:14px;
+  --radius-md:16px;
+  --radius-lg:16px;
   --radius-sheet:18px;
 
   --shadow-float:0 12px 32px rgba(0,0,0,.10);
@@ -123,7 +123,7 @@
   --desktop-section-y:24px;
   --desktop-surface-x:24px;
   --desktop-section-gap:20px;
-  --desktop-action-h:40px;
+  --desktop-action-h:44px;
   --desktop-action-gap:8px;
 
   --mobile-page-x:16px;
@@ -134,18 +134,21 @@
   --mobile-page-head-gap:16px;
   --mobile-toolbar-gap:10px;
   --mobile-section-gap:24px;
-  --mobile-search-h:40px;
+  --mobile-search-h:48px;
   --mobile-chip-h:34px;
   --mobile-row-h:64px;
   --mobile-sheet-row-h:56px;
   --touch:44px;
 
   --header-avatar-size:34px;
-  --kpi-value-font:24px;
-  --kpi-label-font:14px;
-  --kpi-trend-font:13px;
+  --kpi-value-font:20px;
+  --kpi-label-font:12px;
+  --kpi-trend-font:11px;
+  --navigation-label-font:11px;
+  --status-label-font:11px;
+  --sheet-title-font:16px;
   --app-header-icon-size:20px;
-  --accordion-chevron-size:18px;
+  --accordion-chevron-size:14px;
   --profile-avatar-size:60px;
   --control-focus-width:2px;
   --chart-positive:#16a34a;
@@ -158,9 +161,9 @@
   --chart-ring-width:10px;
   --control-h:48px;
   --control-h-mobile:48px;
-  --control-font:15px;
+  --control-font:14px;
   --control-font-mobile:16px;
-  --control-label-font:14px;
+  --control-label-font:13px;
   --control-label-weight:500;
   --heading-content-gap:12px;
   --field-label-gap:6px;
@@ -190,28 +193,28 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
   --type-subheading:14px;
-  --type-label:14px;
+  --type-label:13px;
   --type-metadata:12px;
-  --type-secondary:13px;
-  --shape-group:12px;
+  --type-secondary:12px;
+  --shape-group:16px;
   --type-large-heading:28px;
   --shape-control-mobile:8px;
-  --type-body:15px;
-  --type-control:15px;
-  --type-desktop-heading:20px;
+  --type-body:14px;
+  --type-control:14px;
+  --type-desktop-heading:18px;
   --type-display-small:30px;
-  --type-body-large:15px;
+  --type-body-large:14px;
   --shape-mark:2px;
-  --type-section:16px;
+  --type-section:14px;
   --shape-overlay:16px;
   --type-auth-display:28px;
   --shape-group-small:10px;
   --shape-medium:9px;
   --type-subtitle:20px;
-  --shape-panel:14px;
+  --shape-panel:16px;
   --shape-small:6px;
   --shape-kbd:3px;
-  --type-mobile-heading:20px;
+  --type-mobile-heading:18px;
   --shape-compact:4px;
   --shape-control-desktop:12px;
   --type-mobile-detail:18px;
@@ -341,7 +344,7 @@ html{scroll-behavior:auto}
 }
 
 @media (pointer:coarse){
-:root{--button-height:var(--touch);--control-h:48px;--control-font:15px;--desktop-action-h:var(--touch)}
+:root{--button-height:var(--touch);--control-h:48px;--control-font:14px;--desktop-action-h:var(--touch)}
 }
 
 /* Master V3 — staged on the five approved customer workspaces only.
@@ -349,9 +352,9 @@ html{scroll-behavior:auto}
 :root{
  --ux-page-inset:32px;
  --ux-card-inset:16px;
- --ux-section-title:16px;
- --ux-card-title:16px;
- --ux-page-title:20px;
+ --ux-section-title:var(--type-section);
+ --ux-card-title:var(--type-section);
+ --ux-page-title:var(--workspace-title-size);
  --ux-row-height:46px;
  --ux-chart-income:#16A34A;
  --ux-chart-expense:#DC2626;
@@ -360,15 +363,15 @@ html{scroll-behavior:auto}
  --workspace-sidebar-width:232px;
  --content-max:1440px;
  --desktop-header-h:56px;
- --body-font-size:15px;
+ --body-font-size:var(--type-body);
  --body-line-height:1.45;
  --page-heading-size:var(--ux-page-title);
  --page-heading-line-height:1.2;
- --section-title-font:16px;
+ --section-title-font:var(--type-section);
  --control-h:48px;
 }
 @media(max-width:760px){
- .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:20px;--body-font-size:15px;--body-line-height:1.45;--type-body:15px;--control-h:48px}
+ .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--body-line-height:1.45;--control-h:48px}
 }
 @media(min-width:761px) and (max-width:1199px){
  .app-root[data-ux="master-v3"]{--ux-page-inset:24px;--ux-card-inset:16px}

@@ -1,354 +1,1760 @@
-{ "Rapportaktionen":["Report actions","Actions du rapport","Azioni del rapporto"],
- "Saldo":["Balance","Solde","Saldo"],
-  "Vertrag öffnen": ["Open contract","Ouvrir le contrat","Apri contratto"],
-  "Ressource": ["Resource","Ressource","Risorsa"],
-  "Für diese Preisquelle fehlt die Berechtigung.": ["You do not have permission for this price source.","Vous n’avez pas l’autorisation pour cette source de prix.","Non disponi del permesso per questa fonte di prezzo."],
-  "Bitte die angezeigte Leistung und freigegebene Preisrevision auswählen.": ["Please select the displayed service and approved price revision.","Veuillez sélectionner la prestation affichée et la révision de prix approuvée.","Seleziona la prestazione visualizzata e la revisione di prezzo approvata."],
-  "Die Leistung oder Preisbindung wurde geändert. Bitte erneut prüfen.": ["The service or price binding has changed. Please review again.","La prestation ou la référence de prix a changé. Veuillez vérifier à nouveau.","La prestazione o il prezzo associato è cambiato. Verifica nuovamente."],
-  "Bereits zugeordnete Leistungen behalten ihre gespeicherte Preisquelle.": ["Allocated services retain their saved price source.","Les prestations déjà affectées conservent leur source de prix enregistrée.","Le prestazioni già assegnate mantengono la fonte di prezzo salvata."],
-  "Diese Stundenleistung benötigt einen ausdrücklich freigegebenen Stundensatz.": ["This hourly service requires an explicitly approved hourly rate.","Cette prestation horaire nécessite un tarif horaire explicitement approuvé.","Questa prestazione oraria richiede una tariffa oraria esplicitamente approvata."],
-  "Preisquelle konnte nicht geladen werden.": ["Could not load the price source.","Impossible de charger la source de prix.","Impossibile caricare la fonte di prezzo."],
-  "Preisquelle konnte nicht gespeichert werden.": ["Could not save the price source.","Impossible d’enregistrer la source de prix.","Impossibile salvare la fonte di prezzo."],
-  "Preisquelle": ["Price source","Source de prix","Fonte di prezzo"],
-  "Preisquelle bestätigen": ["Confirm price source","Confirmer la source de prix","Conferma fonte di prezzo"],
-  "Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt.": ["Purchase and sales prices are saved separately. No invoice is created.","Les prix d’achat et de vente sont enregistrés séparément. Aucune facture n’est créée.","I prezzi di acquisto e vendita sono salvati separatamente. Non viene creata alcuna fattura."],
-  "Gespeicherte Preisquelle": ["Saved price source","Source de prix enregistrée","Fonte di prezzo salvata"],
-  "Freigegebener Stundensatz": ["Approved hourly rate","Tarif horaire approuvé","Tariffa oraria approvata"],
-  "Kondition auswählen": ["Select terms","Sélectionner les conditions","Seleziona condizioni"],
-  "Für dieses Leistungsdatum fehlt ein passender freigegebener Stundensatz.": ["There is no matching approved hourly rate for this service date.","Aucun tarif horaire approuvé ne correspond à cette date de prestation.","Non esiste una tariffa oraria approvata corrispondente a questa data di prestazione."],
-  "Die gewählte Revision wird fest gespeichert. Es erfolgt keine Währungsumrechnung.": ["The selected revision is saved as a fixed snapshot. No currency conversion is performed.","La révision sélectionnée est enregistrée de façon fixe. Aucune conversion de devise n’est effectuée.","La revisione selezionata viene salvata come istantanea fissa. Non viene eseguita alcuna conversione valutaria."],
-  "Leistungsdatum": ["Service date","Date de prestation","Data di prestazione"],
-  "Vertrag auswählen": ["Select contract","Sélectionner un contrat","Seleziona contratto"],
-  "Richtung": ["Direction","Sens","Direzione"],
-  "Keine Arbeitszeit": ["Not working time","Hors temps de travail","Non è tempo di lavoro"],
-  "Lohnprüfung beantragt": ["Payroll review requested","Vérification salariale demandée","Richiesta verifica salariale"],
-  "Nicht lohnrelevant": ["Not payroll relevant","Sans incidence salariale","Non rilevante per la paga"],
-  "Nicht klassifiziert": ["Unclassified","Non classé","Non classificato"],
-  "Ungültige Zeiterfassung.": ["Invalid time entry.","Saisie de temps invalide.","Registrazione del tempo non valida."],
-  "Arbeit": ["Work","Travail","Lavoro"],
-  "Eigene Zeit": ["Own time","Mon temps","Tempo personale"],
-  "Externe Ressource": ["External resource","Ressource externe","Risorsa esterna"],
-  "Leistungserbringer": ["Service provider","Prestataire","Prestatore"],
-  "Lohnrelevanz beantragen": ["Request payroll relevance","Demander la prise en compte salariale","Richiedi rilevanza salariale"],
-  "Zeitart": ["Time category","Catégorie de temps","Categoria di tempo"],
-  "Ressource auswählen": ["Select resource","Sélectionner une ressource","Seleziona risorsa"],
-  "Bitte Zeitart, Arbeitszeit und Lohnrelevanz ausdrücklich festlegen.": ["Please explicitly specify time category, working time and payroll relevance.","Veuillez préciser la catégorie de temps, le temps de travail et la pertinence salariale.","Specifica categoria, tempo di lavoro e rilevanza salariale."],
-  "Keine Berechtigung für externe Zeiten.": ["No permission for external time entries.","Aucune autorisation pour les temps externes.","Nessun permesso per i tempi esterni."],
-  "Bitte Auftrag und Datum auswählen.": ["Please select a project and date.","Veuillez sélectionner un projet et une date.","Seleziona progetto e data."],
-  "Bitte den Speichervorgang erneut starten.": ["Please restart saving.","Veuillez relancer l’enregistrement.","Riavvia il salvataggio."],
-  "Diese Angaben gehören nicht zur externen Zeiterfassung.": ["These fields do not belong to external time recording.","Ces champs ne font pas partie de la saisie de temps externe.","Questi campi non appartengono alla registrazione dei tempi esterni."],
-  "Bitte Einsatz, Datum und volle Minuten prüfen. Externe Zeiten sind nicht lohnrelevant.": ["Please check assignment, date and whole minutes. External time is not relevant for payroll.","Veuillez vérifier l’affectation, la date et les minutes entières. Le temps externe ne relève pas de la paie.","Verifica assegnazione, data e minuti interi. I tempi esterni non sono rilevanti per la paga."],
-  "Lohnrelevante Zeit benötigt ein Mitarbeiterdossier.": ["Payroll-relevant time requires an employee record.","Le temps pertinent pour la paie nécessite un dossier salarié.","Il tempo rilevante per la paga richiede una scheda dipendente."],
-  "Bitte volle Minuten erfassen.": ["Please enter whole minutes.","Veuillez saisir des minutes entières.","Inserisci minuti interi."],
-  "Vertragsanhänge können nur im Entwurf oder nach ausdrücklichem Pausieren ergänzt werden.": ["Contract attachments can only be added to drafts or after explicitly pausing the contract.","Les pièces contractuelles ne peuvent être ajoutées qu’au brouillon ou après une pause explicite du contrat.","Gli allegati contrattuali possono essere aggiunti solo in bozza o dopo una sospensione esplicita."],
-  "Bereits geprüfte Vertragsdateien bleiben als Nachweis erhalten.": ["Reviewed contract files are retained as evidence.","Les fichiers contractuels vérifiés sont conservés comme justificatifs.","I file contrattuali verificati sono conservati come prova."],
-  "Bitte Vertragsstatus, Dateistand und Revisionsstand angeben.": ["Please provide contract status, document manifest and revision.","Veuillez indiquer le statut, l’état des fichiers et la révision du contrat.","Indica stato, versione dei file e revisione del contratto."],
-  "Der Dateistand wurde geändert. Bitte den Vertrag erneut prüfen.": ["The document set has changed. Please review the contract again.","Les fichiers ont changé. Veuillez vérifier à nouveau le contrat.","I file sono cambiati. Verifica nuovamente il contratto."],
-  "Bitte die Sicherheitsfreigabe aller Vertragsdateien abwarten oder ungeprüfte Anhänge kontrolliert entfernen.": ["Please wait for all contract files to pass security checks or explicitly remove unreviewed attachments.","Veuillez attendre la validation de sécurité de tous les fichiers ou retirer explicitement les pièces non vérifiées.","Attendi la verifica di sicurezza di tutti i file contrattuali o rimuovi espressamente gli allegati non verificati."],
-  "Bitte einen gültigen Vertragsfilter wählen.": ["Please select a valid contract filter.","Veuillez sélectionner un filtre de contrat valide.","Seleziona un filtro contrattuale valido."],
-  "Bitte eine gültige Sortierung wählen.": ["Please select a valid sort order.","Veuillez sélectionner un tri valide.","Seleziona un ordinamento valido."],
-  "Verträge suchen...": ["Search contracts...","Rechercher des contrats...","Cerca contratti..."],
-  "Verträge öffnen": ["Open contracts","Ouvrir les contrats","Apri contratti"],
-  "Vertrag erstellen": ["Create contract","Créer un contrat","Crea contratto"],
-  "Vertragsentwurf bearbeiten": ["Edit contract draft","Modifier le brouillon du contrat","Modifica bozza del contratto"],
-  "Vertragsart": ["Contract type","Type de contrat","Tipo di contratto"],
-  "Vertragspartner": ["Contracting party","Partenaire contractuel","Contraente"],
-  "Vertragsaktionen": ["Contract actions","Actions du contrat","Azioni sul contratto"],
-  "Auftrag (optional)": ["Project (optional)","Mandat (facultatif)","Progetto (facoltativo)"],
-  "Kündigungsfrist (Tage)": ["Notice period (days)","Délai de résiliation (jours)","Termine di disdetta (giorni)"],
-  "Abrechnungsperiode": ["Billing period","Période de facturation","Periodo di fatturazione"],
-  "Nach Vereinbarung": ["As agreed","Selon accord","Come concordato"],
-  "Einkauf": ["Purchase","Achat","Acquisto"],
-  "Quartalsweise": ["Quarterly","Trimestrielle","Trimestrale"],
-  "Konditionsrevision erfassen": ["Create condition revision","Saisir une révision des conditions","Registra revisione delle condizioni"],
-  "Konditionen erfassen": ["Record conditions","Saisir des conditions","Registra condizioni"],
-  "Konditionen vervollständigen": ["Complete conditions","Compléter les conditions","Completa condizioni"],
-  "Konditionsaktionen": ["Condition actions","Actions des conditions","Azioni sulle condizioni"],
-  "Vertragskonditionen": ["Contract conditions","Conditions contractuelles","Condizioni contrattuali"],
-  "Keine Konditionen erfasst": ["No conditions recorded","Aucune condition saisie","Nessuna condizione registrata"],
-  "Unvollständige Konditionen bleiben ein Entwurf. Eine neue Revision ersetzt den freigegebenen Preis erst nach unabhängiger Prüfung.": ["Incomplete conditions remain a draft. A new revision replaces the approved price only after independent review.","Les conditions incomplètes restent un brouillon. Une nouvelle révision remplace le prix validé uniquement après vérification indépendante.","Le condizioni incomplete restano una bozza. Una nuova revisione sostituisce il prezzo approvato solo dopo una verifica indipendente."],
-  "Ressourcenlieferant (optional)": ["Resource supplier (optional)","Fournisseur de ressources (facultatif)","Fornitore della risorsa (facoltativo)"],
-  "Ressource (optional)": ["Resource (optional)","Ressource (facultative)","Risorsa (facoltativa)"],
-  "Alle Ressourcen": ["All resources","Toutes les ressources","Tutte le risorse"],
-  "Bisherige Ressourcenreferenz": ["Existing resource reference","Référence de ressource existante","Riferimento alla risorsa esistente"],
-  "Ressourcenkondition": ["Resource conditions","Conditions de ressource","Condizioni della risorsa"],
-  "Noch offen": ["Not yet specified","Encore indéfini","Non ancora definito"],
-  "Einkaufspreis": ["Purchase price","Prix d’achat","Prezzo d’acquisto"],
-  "Steuerbehandlung": ["Tax treatment","Traitement fiscal","Trattamento fiscale"],
-  "Steuerpflichtig": ["Taxable","Imposable","Imponibile"],
-  "Ausserhalb des Steuerbereichs": ["Outside tax scope","Hors champ fiscal","Fuori dal campo d’imposta"],
-  "MwSt. (%)": ["VAT (%)","TVA (%)","IVA (%)"],
-  "Vertrag freigeben": ["Approve contract","Valider le contrat","Approva contratto"],
-  "Vertrag pausieren": ["Pause contract","Suspendre le contrat","Sospendi contratto"],
-  "Vertrag beenden": ["End contract","Terminer le contrat","Termina contratto"],
-  "Vertrag stornieren": ["Cancel contract","Annuler le contrat","Annulla contratto"],
-  "Vertrag freigeben?": ["Approve contract?","Valider le contrat ?","Approvare il contratto?"],
-  "Vertrag pausieren?": ["Pause contract?","Suspendre le contrat ?","Sospendere il contratto?"],
-  "Vertrag beenden?": ["End contract?","Terminer le contrat ?","Terminare il contratto?"],
-  "Vertrag stornieren?": ["Cancel contract?","Annuler le contrat ?","Annullare il contratto?"],
-  "Konditionen freigeben": ["Approve conditions","Valider les conditions","Approva condizioni"],
-  "Konditionen freigeben?": ["Approve conditions?","Valider les conditions ?","Approvare le condizioni?"],
-  "Konditionen ablehnen?": ["Reject conditions?","Rejeter les conditions ?","Rifiutare le condizioni?"],
-  "Freigegebene Preisrevision": ["Approved price revision","Révision de prix validée","Revisione del prezzo approvata"],
-  "Frühere Freigabe": ["Earlier approval","Validation antérieure","Approvazione precedente"],
-  "Historischer Vertragsstand. Bestehende Angaben und Belege bleiben unverändert.": ["Historical contract version. Existing data and documents remain unchanged.","Version historique du contrat. Les données et pièces existantes restent inchangées.","Versione storica del contratto. Dati e documenti esistenti restano invariati."],
-  "Vertragsdateien sind noch nicht sicher freigegeben.": ["Contract files have not yet passed security checks.","Les fichiers contractuels n’ont pas encore été validés par la sécurité.","I file contrattuali non hanno ancora superato le verifiche di sicurezza."],
-  "Der Dateistand wurde seit der letzten Vertragsfreigabe geändert.": ["The document set has changed since the last contract approval.","Les fichiers ont changé depuis la dernière validation du contrat.","I file sono cambiati dall’ultima approvazione del contratto."],
-  "Preis noch offen": ["Price not yet specified","Prix encore indéfini","Prezzo non ancora definito"],
-  "Steuerregel noch offen": ["Tax terms not yet specified","Règle fiscale encore indéfinie","Regola fiscale non ancora definita"],
-  "Spesenregel noch offen": ["Expense terms not yet specified","Règle des frais encore indéfinie","Regola sulle spese non ancora definita"],
-  "Vor Freigabe fehlen:": ["Missing before approval:","À compléter avant validation :","Da completare prima dell’approvazione:"],
-  "Vertragsdateien": ["Contract files","Fichiers contractuels","File contrattuali"],
-  "Keine Vertragsdateien": ["No contract files","Aucun fichier contractuel","Nessun file contrattuale"],
-  "Diese Preisrevision wird unabhängig freigegeben und gilt nur im erfassten Zeitraum.": ["This price revision is independently approved and applies only during the recorded period.","Cette révision de prix est validée indépendamment et s’applique uniquement à la période saisie.","Questa revisione del prezzo è approvata in modo indipendente e vale solo per il periodo registrato."],
-  "Diese Konditionsrevision wird abgelehnt. Frühere Freigaben bleiben unverändert.": ["This condition revision will be rejected. Earlier approvals remain unchanged.","Cette révision des conditions sera rejetée. Les validations antérieures restent inchangées.","Questa revisione delle condizioni sarà rifiutata. Le approvazioni precedenti restano invariate."],
-  "Vertrag und angezeigter Dateistand werden intern freigegeben. Das ersetzt keine Prüfung einer Unterschrift.": ["The contract and displayed document set will be approved internally. This does not verify a signature.","Le contrat et les fichiers affichés seront validés en interne. Cela ne remplace pas la vérification d’une signature.","Il contratto e i file visualizzati saranno approvati internamente. Ciò non sostituisce la verifica di una firma."],
-  "Neue Preisübernahmen werden angehalten. Bestehende Belege bleiben unverändert.": ["New price transfers will be stopped. Existing documents remain unchanged.","Les nouvelles reprises de prix seront suspendues. Les pièces existantes restent inchangées.","Le nuove applicazioni del prezzo saranno sospese. I documenti esistenti restano invariati."],
-  "Die Vertragsangaben sind ungültig.": ["The contract data is invalid.","Les données du contrat sont invalides.","I dati del contratto non sono validi."],
-  "Bitte Vertragspartner, Laufzeit, Bezeichnung und Kündigungsfrist prüfen.": ["Please check the contracting party, term, name and notice period.","Veuillez vérifier le partenaire, la durée, la désignation et le délai de résiliation.","Verifica contraente, durata, denominazione e termine di disdetta."],
-  "Die Konditionsangaben sind ungültig.": ["The condition data is invalid.","Les données des conditions sont invalides.","I dati delle condizioni non sono validi."],
-  "Bitte Gültigkeit, Ressource, Einheit, Währung und Steuer-/Spesenregel prüfen.": ["Please check validity, resource, unit, currency, tax and expense terms.","Veuillez vérifier la validité, la ressource, l’unité, la devise et les règles fiscales et de frais.","Verifica validità, risorsa, unità, valuta e regole fiscali e sulle spese."],
-  "Bitte einen nicht negativen Preis mit höchstens zwei Dezimalstellen erfassen.": ["Please enter a non-negative price with at most two decimal places.","Veuillez saisir un prix non négatif avec deux décimales au maximum.","Inserisci un prezzo non negativo con al massimo due decimali."],
-  "Bitte einen gültigen Steuersatz zwischen 0 und 100 erfassen.": ["Please enter a valid tax rate between 0 and 100.","Veuillez saisir un taux de taxe valide entre 0 et 100.","Inserisci un’aliquota valida tra 0 e 100."],
-  "Für diesen Vertragsbereich fehlt die Berechtigung.": ["Access to this contract area is not permitted.","L’accès à cet espace contractuel n’est pas autorisé.","L’accesso a questa area contrattuale non è consentito."],
-  "Vertrag wurde nicht gefunden.": ["Contract not found.","Contrat introuvable.","Contratto non trovato."],
-  "Freigegebene und historische Vertragsangaben können nicht überschrieben werden.": ["Released and historical contract data cannot be overwritten.","Les données contractuelles validées et historiques ne peuvent pas être écrasées.","I dati contrattuali approvati e storici non possono essere sovrascritti."],
-  "Der Vertrag wurde geändert. Bitte den aktuellen Stand prüfen.": ["The contract has changed. Please check the current revision.","Le contrat a été modifié. Veuillez vérifier la version actuelle.","Il contratto è cambiato. Verifica la versione attuale."],
-  "Vertragspartner und Auftragsbezug bleiben unverändert.": ["The contracting party and project reference are immutable.","Le partenaire contractuel et le rattachement au mandat restent inchangés.","Il contraente e il riferimento al progetto restano invariati."],
-  "Vertragspartner wurde nicht gefunden.": ["Contracting party not found.","Partenaire contractuel introuvable.","Contraente non trovato."],
-  "Der Auftrag gehört nicht zu diesem Vertragspartner.": ["The project does not belong to this contracting party.","Le mandat n’appartient pas à ce partenaire contractuel.","Il progetto non appartiene a questo contraente."],
-  "Die Laufzeit darf vorhandene Konditionsrevisionen nicht ausschliessen.": ["The term must not exclude existing condition revisions.","La durée ne doit pas exclure les révisions existantes des conditions.","La durata non deve escludere revisioni delle condizioni esistenti."],
-  "Die Konditionsgültigkeit muss innerhalb der Vertragslaufzeit liegen.": ["Condition validity must fall within the contract term.","La validité des conditions doit être comprise dans la durée du contrat.","La validità delle condizioni deve rientrare nella durata del contratto."],
-  "Bitte Ressource, Lieferant und Auftragsbezug prüfen.": ["Please check the resource, supplier and project reference.","Veuillez vérifier la ressource, le fournisseur et le rattachement au mandat.","Verifica risorsa, fornitore e riferimento al progetto."],
-  "Die Konditionen wurden geändert. Bitte den aktuellen Stand prüfen.": ["The conditions have changed. Please check the current revision.","Les conditions ont été modifiées. Veuillez vérifier la version actuelle.","Le condizioni sono cambiate. Verifica la versione attuale."],
-  "Der Ressourcenbezug einer Konditionsrevision bleibt unverändert.": ["The resource scope of a condition revision is immutable.","Le rattachement de ressource d’une révision des conditions reste inchangé.","Il riferimento alla risorsa di una revisione delle condizioni resta invariato."],
-  "Bitte Prüfentscheid und Revisionsstand angeben.": ["Please provide a review decision and revision.","Veuillez indiquer la décision de vérification et la révision.","Indica decisione di verifica e revisione."],
-  "Bitte Preis, Einheit, Währung und Steuer-/Spesenregel vor der Freigabe vervollständigen.": ["Please complete the price, unit, currency, tax and expense terms before approval.","Veuillez compléter le prix, l’unité, la devise et les règles fiscales et de frais avant validation.","Completa prezzo, unità, valuta e regole fiscali e sulle spese prima dell’approvazione."],
-  "Freigegebene Konditionen desselben Ressourcenbezugs dürfen sich nicht überschneiden.": ["Approved conditions for the same resource scope must not overlap.","Les conditions validées pour la même ressource ne doivent pas se chevaucher.","Le condizioni approvate per lo stesso riferimento alla risorsa non devono sovrapporsi."],
-  "Bitte Vertragsstatus und Revisionsstand angeben.": ["Please provide contract status and revision.","Veuillez indiquer le statut du contrat et la révision.","Indica stato del contratto e revisione."],
-  "Dieser Vertragsstatus kann hier nicht geändert werden.": ["This contract status cannot be changed here.","Ce statut contractuel ne peut pas être modifié ici.","Questo stato del contratto non può essere modificato qui."],
-  "Bitte zuerst vollständige Konditionen unabhängig freigeben.": ["Please independently approve complete conditions first.","Veuillez d’abord faire valider indépendamment les conditions complètes.","Prima fai approvare in modo indipendente le condizioni complete."],
-  "Der freigegebene Vertrag passt nicht zu dieser Leistung.": ["The approved contract does not match this service.","Le contrat validé ne correspond pas à cette prestation.","Il contratto approvato non corrisponde a questa prestazione."],
-  "Für diesen Stichtag und Leistungsbezug fehlen passende freigegebene Konditionen.": ["No matching approved conditions exist for this date and service scope.","Aucune condition validée correspondante n’existe pour cette date et cette prestation.","Non esistono condizioni approvate corrispondenti per questa data e prestazione."],
-  "Bitte einen gültigen Leistungsstichtag angeben.": ["Please provide a valid service date.","Veuillez indiquer une date de prestation valide.","Indica una data di prestazione valida."],
-  "Bitte eine gültige Seite wählen.": ["Please select a valid page.","Veuillez sélectionner une page valide.","Seleziona una pagina valida."],
-  "Vertragspreis": ["Contract price","Prix contractuel","Prezzo contrattuale"],
-  "Steuerregel": ["Tax terms","Règle fiscale","Regola fiscale"],
-  "Spesenregel": ["Expense terms","Règle des frais","Regola sulle spese"],
-  "Begründung der Steuerbefreiung": ["Tax exemption reason","Motif d’exonération fiscale","Motivo dell’esenzione fiscale"],
-  "Spesen inbegriffen": ["Expenses included","Frais inclus","Spese incluse"],
-  "Spesen ausgeschlossen": ["Expenses excluded","Frais exclus","Spese escluse"],
-  "Spesen separat nach Nachweis": ["Expenses separately against evidence","Frais séparés sur justificatif","Spese separate con giustificativo"],
-  "Meine Abwesenheiten": ["My absences","Mes absences","Le mie assenze"],
-  "Abwesenheitsanträge": ["Absence requests","Demandes d’absence","Richieste di assenza"],
-  "Abwesenheitsaktionen": ["Absence actions","Actions d’absence","Azioni sulle assenze"],
-  "Abwesenheit beantragen": ["Request absence","Demander une absence","Richiedi assenza"],
-  "Keine Abwesenheitsanträge": ["No absence requests","Aucune demande d’absence","Nessuna richiesta di assenza"],
-  "Kein Mitarbeiterdossier verknüpft": ["No employee dossier linked","Aucun dossier du personnel lié","Nessun dossier del personale collegato"],
-  "Abwesenheitsart": ["Absence type","Type d’absence","Tipo di assenza"],
-  "Beantragte Tage": ["Requested days","Jours demandés","Giorni richiesti"],
-  "Antrag einreichen": ["Submit request","Soumettre la demande","Invia richiesta"],
-  "Antrag zurückziehen": ["Withdraw request","Retirer la demande","Ritira richiesta"],
-  "Antrag genehmigen?": ["Approve request?","Approuver la demande ?","Approvare la richiesta?"],
-  "Antrag ablehnen?": ["Reject request?","Rejeter la demande ?","Rifiutare la richiesta?"],
-  "Antrag zurückziehen?": ["Withdraw request?","Retirer la demande ?","Ritirare la richiesta?"],
-  "Ferien": ["Vacation","Vacances","Vacanze"],
-  "Krankheit": ["Sickness","Maladie","Malattia"],
-  "Unfall": ["Accident","Accident","Infortunio"],
-  "Militär / Zivildienst": ["Military / civilian service","Service militaire / civil","Servizio militare / civile"],
-  "Andere Abwesenheit": ["Other absence","Autre absence","Altra assenza"],
-  "Beantragte Tage werden ausdrücklich erfasst. Keine automatische Feiertagsberechnung, Ferienbuchung oder Lohnzahlung. Keine Diagnosen erfassen.": ["Requested days are entered explicitly. No automatic holiday calculation, vacation posting or salary payment. Do not enter diagnoses.","Les jours demandés sont saisis explicitement. Aucun calcul automatique des jours fériés, écriture de vacances ou versement salarial. Ne pas saisir de diagnostic.","I giorni richiesti sono inseriti espressamente. Nessun calcolo automatico dei festivi, registrazione delle ferie o pagamento salariale. Non inserire diagnosi."],
-  "Der gewählte Status wird verbindlich gespeichert. Eine Genehmigung darf nur durch eine andere berechtigte Person erfolgen.": ["The selected status will be saved. Approval requires another authorized person.","Le statut sélectionné sera enregistré. L’approbation nécessite une autre personne autorisée.","Lo stato selezionato sarà registrato. L’approvazione richiede un’altra persona autorizzata."],
-  "Der Abwesenheitsantrag ist ungültig.": ["The absence request is invalid.","La demande d’absence est invalide.","La richiesta di assenza non è valida."],
-  "Bitte Mitarbeiter, Anstellung, Abwesenheitsart, Zeitraum und beantragte Tage prüfen.": ["Please check the employee, employment, absence type, dates and requested days.","Veuillez vérifier le collaborateur, l’engagement, le type d’absence, la période et les jours demandés.","Verifica dipendente, impiego, tipo di assenza, periodo e giorni richiesti."],
-  "Die beantragten Tage dürfen den Kalenderzeitraum nicht überschreiten.": ["Requested days must not exceed the calendar period.","Les jours demandés ne doivent pas dépasser la période calendaire.","I giorni richiesti non devono superare il periodo di calendario."],
-  "Für diesen Abwesenheitsbereich fehlt die Berechtigung.": ["Access to this absence area is not permitted.","L’accès à cet espace d’absence n’est pas autorisé.","L’accesso a questa area delle assenze non è consentito."],
-  "Der Antrag kann mit diesem Zugang nicht gespeichert werden.": ["This account cannot save the request.","Ce compte ne peut pas enregistrer la demande.","Questo account non può salvare la richiesta."],
-  "Bitte eine aktuelle Anstellungsrevision und dazu passende Abwesenheitsdaten wählen.": ["Please select a current employment revision and matching absence dates.","Veuillez sélectionner une révision actuelle de l’engagement et des dates d’absence correspondantes.","Seleziona una revisione attuale dell’impiego e date di assenza corrispondenti."],
-  "Für diesen Zeitraum besteht bereits ein offener oder genehmigter Antrag.": ["An open or approved request already exists for this period.","Une demande ouverte ou approuvée existe déjà pour cette période.","Esiste già una richiesta aperta o approvata per questo periodo."],
-  "Bitte Status und aktuellen Revisionsstand prüfen.": ["Please check the status and current revision.","Veuillez vérifier le statut et la révision actuelle.","Verifica stato e revisione attuale."],
-  "Der Antrag wurde gleichzeitig geändert. Bitte den aktuellen Stand prüfen.": ["The request was changed concurrently. Please check the current revision.","La demande a été modifiée simultanément. Veuillez vérifier la révision actuelle.","La richiesta è stata modificata contemporaneamente. Verifica la revisione attuale."],
-  "Dieser Antrag kann in diesem Status nicht geändert werden.": ["This request cannot be changed in its current status.","Cette demande ne peut pas être modifiée dans son statut actuel.","Questa richiesta non può essere modificata nello stato attuale."],
-  "Die Anstellung wurde geändert. Bitte den Antrag neu erfassen.": ["The employment has changed. Please create a new request.","L’engagement a été modifié. Veuillez saisir une nouvelle demande.","Il rapporto di lavoro è cambiato. Inserisci una nuova richiesta."],
-  "Bitte einen gültigen Abwesenheitsbereich wählen.": ["Please select a valid absence scope.","Veuillez sélectionner un espace d’absence valide.","Seleziona un ambito delle assenze valido."],
-  "Geburtsdatum": ["Date of birth","Date de naissance","Data di nascita"],
-  "Kanton": ["Canton","Canton","Cantone"],
-  "Kind": ["Child","Enfant","Figlio"],
-  "Familie und Zulagen": ["Family and allowances","Famille et allocations","Famiglia e assegni"],
-  "Familienaktionen": ["Family actions","Actions familiales","Azioni familiari"],
-  "Kind erfassen": ["Add child","Ajouter un enfant","Aggiungi figlio"],
-  "Kinderdaten korrigieren": ["Revise child data","Corriger les données de l’enfant","Correggi i dati del figlio"],
-  "Kinder": ["Children","Enfants","Figli"],
-  "Keine Kinder erfasst": ["No children recorded","Aucun enfant enregistré","Nessun figlio registrato"],
-  "Zulagenentscheide": ["Allowance decisions","Décisions d’allocations","Decisioni sugli assegni"],
-  "Keine Zulagenentscheide": ["No allowance decisions","Aucune décision d’allocations","Nessuna decisione sugli assegni"],
-  "Kassenentscheid": ["Authority decision","Décision de la caisse","Decisione della cassa"],
-  "Kassenentscheid erfassen": ["Record authority decision","Saisir une décision de la caisse","Registra decisione della cassa"],
-  "Kassenentscheid geprüft": ["Authority decision reviewed","Décision de la caisse vérifiée","Decisione della cassa verificata"],
-  "Kassenentscheid geprüft bestätigen": ["Confirm authority decision review","Confirmer la vérification de la décision","Conferma la verifica della decisione"],
-  "Entscheid widerrufen": ["Revoke decision","Révoquer la décision","Revoca decisione"],
-  "Kinderzulage": ["Child allowance","Allocation pour enfant","Assegno per figli"],
-  "Ausbildungszulage": ["Education allowance","Allocation de formation","Assegno di formazione"],
-  "Name des Kindes": ["Child’s name","Nom de l’enfant","Nome del figlio"],
-  "Zulagenart": ["Allowance type","Type d’allocation","Tipo di assegno"],
-  "Ausgleichskasse": ["Compensation fund","Caisse de compensation","Cassa di compensazione"],
-  "Kassenentscheid-Referenz": ["Authority decision reference","Référence de la décision de la caisse","Riferimento della decisione della cassa"],
-  "Bestätigter Monatsbetrag (CHF)": ["Confirmed monthly amount (CHF)","Montant mensuel confirmé (CHF)","Importo mensile confermato (CHF)"],
-  "Kinderdaten lösen keine Zulage aus. Kassenentscheid, Zeitraum und Betrag werden separat erfasst und unabhängig geprüft. Keine Lohnzahlung.": ["Child data does not trigger an allowance. Authority decision, validity and amount are recorded separately and reviewed independently. No salary payment.","Les données d’un enfant ne déclenchent aucune allocation. La décision, la période et le montant sont saisis séparément et vérifiés indépendamment. Aucun versement de salaire.","I dati del figlio non generano assegni. Decisione, periodo e importo sono registrati separatamente e verificati in modo indipendente. Nessun pagamento salariale."],
-  "Entscheid aktuell nicht wirksam: Zeitraum oder Quellrevision prüfen.": ["Decision currently inactive: check the validity period or source revision.","Décision actuellement inactive : vérifier la période ou la révision source.","Decisione attualmente non valida: verifica il periodo o la revisione di origine."],
-  "Die Familienangaben sind ungültig.": ["The family data is invalid.","Les données familiales sont invalides.","I dati familiari non sono validi."],
-  "Bitte Namen, gültiges Geburtsdatum und aktuellen Revisionsstand prüfen.": ["Please check the name, valid birth date and current revision.","Veuillez vérifier le nom, la date de naissance et la révision actuelle.","Verifica nome, data di nascita valida e revisione attuale."],
-  "Die Anspruchsangaben sind ungültig.": ["The entitlement data is invalid.","Les données du droit sont invalides.","I dati del diritto non sono validi."],
-  "Bitte Kind, Anstellung, Kassenentscheid, Kanton, Zeitraum und bestätigten CHF-Betrag vollständig prüfen.": ["Please check the child, employment, authority decision, canton, period and confirmed CHF amount.","Veuillez vérifier l’enfant, l’engagement, la décision, le canton, la période et le montant CHF confirmé.","Verifica figlio, impiego, decisione, cantone, periodo e importo CHF confermato."],
-  "Die Familienangaben wurden geändert. Bitte den aktuellen Stand prüfen.": ["The family data has changed. Please check the current revision.","Les données familiales ont changé. Veuillez vérifier la version actuelle.","I dati familiari sono cambiati. Verifica la versione attuale."],
-  "Der Anspruch wurde geändert. Bitte den aktuellen Stand prüfen.": ["The claim has changed. Please check the current revision.","Le droit a été modifié. Veuillez vérifier la version actuelle.","Il diritto è cambiato. Verifica la versione attuale."],
-  "Dieser Anspruchsstatus kann hier nicht geändert werden.": ["This claim status cannot be changed here.","Ce statut du droit ne peut pas être modifié ici.","Questo stato del diritto non può essere modificato qui."],
-  "Die Prüfung muss durch eine andere berechtigte Person erfolgen.": ["Another authorized person must perform the review.","La vérification doit être effectuée par une autre personne autorisée.","La verifica deve essere eseguita da un’altra persona autorizzata."],
-  "Die Prüfung darf die erfassten Anspruchsdaten nicht gleichzeitig ändern.": ["The review must not simultaneously change the recorded claim data.","La vérification ne doit pas modifier simultanément les données du droit saisies.","La verifica non deve modificare contemporaneamente i dati del diritto registrati."],
-  "Neue Ansprüche müssen zuerst als Entwurf gespeichert werden.": ["New claims must first be saved as drafts.","Les nouveaux droits doivent d’abord être enregistrés comme brouillons.","I nuovi diritti devono prima essere salvati come bozze."],
-  "Bitte aktuelle Kind- und Anstellungsrevision sowie den Anspruchszeitraum prüfen.": ["Please check the current child and employment revisions and the entitlement period.","Veuillez vérifier les révisions actuelles de l’enfant et de l’engagement ainsi que la période du droit.","Verifica le revisioni attuali del figlio e dell’impiego e il periodo del diritto."],
-  "Geprüfte Ansprüche für dasselbe Kind dürfen sich nicht überschneiden.": ["Reviewed claims for the same child must not overlap.","Les droits vérifiés pour le même enfant ne doivent pas se chevaucher.","I diritti verificati per lo stesso figlio non devono sovrapporsi."],
-  "Lohnvertrag": ["Salary contract","Contrat salarial","Contratto salariale"],
-  "Lohnvertragsaktionen": ["Salary contract actions","Actions du contrat salarial","Azioni del contratto salariale"],
-  "Lohndefinition hinzufügen": ["Add salary definition","Ajouter une définition salariale","Aggiungi una definizione salariale"],
-  "Lohndefinition korrigieren": ["Revise salary definition","Corriger la définition salariale","Correggi la definizione salariale"],
-  "Keine Lohndefinitionen": ["No salary definitions","Aucune définition salariale","Nessuna definizione salariale"],
-  "Vertragsbeträge werden unverändert erfasst. Keine automatische Umrechnung, Pensumskürzung oder Lohnzahlung.": ["Contract amounts are recorded as agreed. No automatic conversion, workload reduction or salary payment.","Les montants contractuels sont saisis tels que convenus. Aucune conversion, réduction selon le taux d’activité ou versement automatique.","Gli importi contrattuali sono registrati come concordati. Nessuna conversione, riduzione per il grado di occupazione o pagamento automatico."],
-  "Monatslohn": ["Monthly salary","Salaire mensuel","Salario mensile"],
-  "Stundenlohn": ["Hourly wage","Salaire horaire","Salario orario"],
-  "Jahreslohn": ["Annual salary","Salaire annuel","Salario annuo"],
-  "Inklusive 13. Monatslohn": ["Including 13th-month salary","Treizième salaire inclus","Tredicesima inclusa"],
-  "Exklusive 13. Monatslohn": ["Excluding 13th-month salary","Treizième salaire exclu","Tredicesima esclusa"],
-  "Ohne Anspruch auf 13. Monatslohn": ["No entitlement to 13th-month salary","Sans droit au treizième salaire","Senza diritto alla tredicesima"],
-  "Anspruch auf 13. Monatslohn": ["Entitlement to 13th-month salary","Droit au treizième salaire","Diritto alla tredicesima"],
-  "Auszahlungstag": ["Payment day","Jour de versement","Giorno di pagamento"],
-  "Monatsletzter": ["Last day of the month","Dernier jour du mois","Ultimo giorno del mese"],
-  "Auszahlungsmonat 13. Monatslohn": ["13th-month salary payment month","Mois de versement du treizième salaire","Mese di pagamento della tredicesima"],
-  "Anstellungsrevision": ["Employment revision","Révision de l’engagement","Revisione del rapporto di lavoro"],
-  "Lohnmodell": ["Salary model","Modèle salarial","Modello salariale"],
-  "Vertragsbetrag": ["Contract amount","Montant contractuel","Importo contrattuale"],
-  "Jahreslohnbasis": ["Annual salary basis","Base du salaire annuel","Base del salario annuo"],
-  "Anstellungsrevision geändert. Lohnvertrag ausdrücklich prüfen und neu bestätigen.": ["Employment revision changed. Explicitly review and reconfirm the salary contract.","Révision de l’engagement modifiée. Vérifiez et confirmez à nouveau le contrat salarial.","Revisione del rapporto di lavoro modificata. Verifica e riconferma espressamente il contratto salariale."],
-  "Bitte Lohnmodell, Anspruch und Auszahlungsplan ausdrücklich auswählen.": ["Please explicitly select a salary model, entitlement and payment schedule.","Veuillez sélectionner explicitement le modèle salarial, le droit et le calendrier de versement.","Seleziona espressamente il modello salariale, il diritto e il piano di pagamento."],
-  "Die Lohndefinition ist ungültig.": ["The salary definition is invalid.","La définition salariale est invalide.","La definizione salariale non è valida."],
-  "Bitte eine gültige Lohngültigkeit erfassen.": ["Please enter a valid salary validity period.","Veuillez saisir une période de validité salariale correcte.","Inserisci un periodo di validità salariale valido."],
-  "Bitte einen positiven Vertragsbetrag mit höchstens zwei Dezimalstellen erfassen.": ["Please enter a positive contract amount with at most two decimal places.","Veuillez saisir un montant contractuel positif avec deux décimales au maximum.","Inserisci un importo contrattuale positivo con al massimo due decimali."],
-  "Bitte Jahreslohnbasis und Anspruch auf den 13. Monatslohn ausdrücklich festlegen.": ["Please explicitly define the annual salary basis and entitlement to a 13th-month salary.","Veuillez définir explicitement la base annuelle et le droit au treizième salaire.","Definisci espressamente la base annua e il diritto alla tredicesima."],
-  "Eine Jahreslohnbasis ist nur bei Jahreslohn zulässig.": ["An annual salary basis is only allowed for annual salaries.","Une base annuelle est autorisée uniquement pour un salaire annuel.","Una base annua è consentita solo per un salario annuo."],
-  "Bitte einen Auszahlungstag von 1 bis 28 oder den Monatsletzten wählen.": ["Please select a payment day from 1 to 28 or the last day of the month.","Veuillez choisir un jour de versement de 1 à 28 ou le dernier jour du mois.","Seleziona un giorno di pagamento da 1 a 28 oppure l’ultimo giorno del mese."],
-  "Bitte den Auszahlungsmonat für den 13. Monatslohn passend zum Anspruch erfassen.": ["Please enter the payment month for the 13th-month salary consistent with entitlement.","Veuillez saisir le mois de versement du treizième salaire conformément au droit.","Inserisci il mese di pagamento della tredicesima coerente con il diritto."],
-  "Bitte eine aktuelle Anstellungsrevision und dazu passende Lohngültigkeit wählen.": ["Please select a current employment revision and a matching salary validity period.","Veuillez choisir une révision actuelle de l’engagement et une validité salariale correspondante.","Seleziona una revisione attuale del rapporto di lavoro e una validità salariale corrispondente."],
-  "Die Lohndefinition wurde gleichzeitig geändert. Bitte den aktuellen Stand prüfen.": ["The salary definition was changed concurrently. Please review the current version.","La définition salariale a été modifiée simultanément. Veuillez vérifier la version actuelle.","La definizione salariale è stata modificata contemporaneamente. Verifica la versione attuale."],
-  "Eine Lohnrevision muss zur gleichen Anstellungsperiode gehören.": ["A salary revision must belong to the same employment period.","Une révision salariale doit appartenir à la même période d’engagement.","Una revisione salariale deve appartenere allo stesso periodo di impiego."],
-  "Lohngültigkeiten dürfen sich nicht überschneiden.": ["Salary validity periods must not overlap.","Les périodes de validité salariale ne doivent pas se chevaucher.","I periodi di validità salariale non devono sovrapporsi."],
-  "Gültig ab": ["Valid from","Valable dès le","Valido dal"],
-  "Sensible Fachrechte": ["Sensitive data permissions","Droits sur les données sensibles","Diritti sui dati sensibili"],
-  "Sensible Personaldaten lesen": ["Read sensitive personnel data","Lire les données sensibles du personnel","Leggi i dati sensibili del personale"],
-  "Sensible Personaldaten bearbeiten": ["Edit sensitive personnel data","Modifier les données sensibles du personnel","Modifica i dati sensibili del personale"],
-  "Familiendaten lesen": ["Read family data","Lire les données familiales","Leggi i dati familiari"],
-  "Familiendaten bearbeiten": ["Edit family data","Modifier les données familiales","Modifica i dati familiari"],
-  "Lohndaten lesen": ["Read payroll data","Lire les données salariales","Leggi i dati salariali"],
-  "Lohnvorbereitung bearbeiten": ["Edit payroll preparation","Modifier la préparation des salaires","Modifica la preparazione salariale"],
-  "Lohnläufe prüfen und freigeben": ["Review and approve payroll runs","Vérifier et approuver les décomptes de salaire","Verifica e approva i conteggi salariali"],
-  "Lohnzahlungen bestätigen": ["Confirm salary payments","Confirmer les paiements de salaire","Conferma i pagamenti salariali"],
-  "Diese Rechte werden ausdrücklich vergeben und gelten zusätzlich zur Mandanten- und Modulprüfung. Eigene Lohnabrechnungen werden getrennt geprüft.": ["These permissions are explicitly assigned in addition to company and module checks. Access to personal payslips is checked separately.","Ces droits sont attribués explicitement en complément des contrôles de société et de module. L’accès aux propres fiches de salaire est contrôlé séparément.","Questi diritti sono assegnati esplicitamente oltre ai controlli di azienda e modulo. L’accesso ai propri conteggi salariali viene verificato separatamente."],
-  "Fachrechte können nur für aktive Standardzugänge vergeben werden.": ["Permissions can only be assigned to active standard accounts.","Les droits ne peuvent être attribués qu’aux accès standard actifs.","I diritti possono essere assegnati solo agli accessi standard attivi."],
-  "Die Fachrechte sind ungültig.": ["The permissions are invalid.","Les droits sont invalides.","I diritti non sono validi."],
-  "Diese Fachrechte passen nicht zur gewählten Rolle.": ["These permissions do not match the selected role.","Ces droits ne correspondent pas au rôle choisi.","Questi diritti non corrispondono al ruolo selezionato."],
-  "Zum Bearbeiten oder Freigeben muss auch das entsprechende Leserecht ausgewählt sein.": ["Editing or approval also requires the corresponding read permission to be selected.","La modification ou l’approbation nécessite aussi de sélectionner le droit de lecture correspondant.","Per modificare o approvare occorre selezionare anche il relativo diritto di lettura."],
-  "Für diese sensiblen Daten fehlt das ausdrücklich vergebene Fachrecht.": ["The explicitly assigned permission for this sensitive data is missing.","Le droit explicitement attribué pour ces données sensibles manque.","Manca il diritto esplicitamente assegnato per questi dati sensibili."],
-  "Nur der Inhaber kann diese Inhaberrechte verwalten.": ["Only the owner can manage these owner permissions.","Seul le propriétaire peut gérer ces droits du propriétaire.","Solo il titolare può gestire questi diritti del titolare."],
-  "Die Fachrechte wurden geändert. Bitte den aktuellen Stand prüfen.": ["The permissions have changed. Please check the current settings.","Les droits ont changé. Veuillez vérifier les paramètres actuels.","I diritti sono cambiati. Verifica le impostazioni attuali."],
-  "Bitte die Rollenänderung zuerst speichern oder verwerfen.": ["Please save or discard the role change first.","Veuillez d’abord enregistrer ou abandonner le changement de rôle.","Salva o annulla prima la modifica del ruolo."],
-  "Teammitglied wurde nicht gefunden.": ["Team member not found.","Membre de l’équipe introuvable.","Membro del team non trovato."],
-  "Externe Ressourcen": ["External resources","Ressources externes","Risorse esterne"],
-  "Ressourcenaktionen": ["Resource actions","Actions sur les ressources","Azioni sulle risorse"],
-  "Externe Person hinzufügen": ["Add external person","Ajouter une personne externe","Aggiungi una persona esterna"],
-  "Externe Person bearbeiten": ["Edit external person","Modifier une personne externe","Modifica una persona esterna"],
-  "Externe Personen gehören zum Lieferanten. Es werden weder Mitarbeiterakte noch Benutzerkonto oder Lohnzahlung erstellt.": ["External people belong to the supplier. No employee dossier, user account or salary payment is created.","Les personnes externes appartiennent au fournisseur. Aucun dossier du personnel, compte utilisateur ou versement de salaire n’est créé.","Le persone esterne appartengono al fornitore. Non vengono creati dossier del personale, account utente o pagamenti salariali."],
-  "Keine externen Ressourcen": ["No external resources","Aucune ressource externe","Nessuna risorsa esterna"],
-  "Einsatz hinzufügen": ["Add assignment","Ajouter une mission","Aggiungi un incarico"],
-  "Externe Einsätze": ["External assignments","Missions externes","Incarichi esterni"],
-  "Einsatz beenden": ["End assignment","Terminer la mission","Termina l’incarico"],
-  "Einsatz beenden?": ["End assignment?","Terminer la mission ?","Terminare l’incarico?"],
-  "Bitte Ressource und Einsatzangaben prüfen.": ["Please check the resource and assignment details.","Veuillez vérifier la ressource et les données de la mission.","Verifica la risorsa e i dati dell’incarico."],
-  "Diese Ressourcenangaben können hier nicht geändert werden.": ["These resource details cannot be changed here.","Ces données de ressource ne peuvent pas être modifiées ici.","Questi dati della risorsa non possono essere modificati qui."],
-  "Externe Ressource wurde nicht gefunden.": ["External resource not found.","Ressource externe introuvable.","Risorsa esterna non trovata."],
-  "Der Stand wurde geändert. Bitte die Ansicht aktualisieren.": ["The data has changed. Please refresh the view.","Les données ont changé. Veuillez actualiser la vue.","I dati sono cambiati. Aggiorna la vista."],
-  "Einsatz wurde nicht gefunden.": ["Assignment not found.","Mission introuvable.","Incarico non trovato."],
-  "Ressource oder Lieferant ist nicht aktiv.": ["Resource or supplier is not active.","La ressource ou le fournisseur n’est pas actif.","La risorsa o il fornitore non è attivo."],
-  "Für diese externe Ressource fehlt ein gültiger Einsatz.": ["There is no valid assignment for this external resource.","Aucune mission valide n’est disponible pour cette ressource externe.","Non esiste un incarico valido per questa risorsa esterna."],
-  "Eingangsrechnungsbelege": ["Supplier invoice receipts", "Justificatifs de facture fournisseur", "Giustificativi della fattura fornitore"],
-  "Eingangsrechnungsentwurf": ["Supplier invoice draft","Brouillon de facture fournisseur","Bozza di fattura fornitore"],
-  "Entwürfe können unvollständig gespeichert werden. Sie sind weder freigegeben noch bezahlt.": ["Drafts may be saved incomplete. They are neither approved nor paid.","Les brouillons peuvent être enregistrés incomplets. Ils ne sont ni approuvés ni payés.","Le bozze possono essere salvate incomplete. Non sono né approvate né pagate."],
-  "Keine Eingangsrechnungen": ["No supplier invoices","Aucune facture fournisseur","Nessuna fattura fornitore"],
-  "Nummer offen": ["Number pending","Numéro à compléter","Numero da completare"],
-  "Betrag offen": ["Amount pending","Montant à compléter","Importo da completare"],
-  "Währung ungeklärt": ["Currency unresolved","Devise à clarifier","Valuta da chiarire"],
-  "In Prüfung": ["Under review","En cours de vérification","In verifica"],
-  "Entwurf bearbeiten": ["Edit draft","Modifier le brouillon","Modifica la bozza"],
-  "Nettobetrag": ["Net amount","Montant net","Importo netto"],
-  "MwSt.-Betrag": ["VAT amount","Montant de TVA","Importo IVA"],
-  "Diese Rechnungsangaben können hier nicht geändert werden.": ["These invoice details cannot be changed here.","Ces données de facture ne peuvent pas être modifiées ici.","Questi dati della fattura non possono essere modificati qui."],
-  "Bitte die Eingangsrechnungsangaben prüfen.": ["Please check the supplier invoice details.","Veuillez vérifier les données de la facture fournisseur.","Verifica i dati della fattura fornitore."],
-  "Bitte Beträge mit höchstens zwei Nachkommastellen erfassen.": ["Please enter amounts with at most two decimal places.","Veuillez saisir des montants avec au maximum deux décimales.","Inserisci importi con al massimo due decimali."],
-  "Nettobetrag und MwSt. stimmen nicht mit dem Gesamtbetrag überein.": ["Net amount and VAT do not match the total.","Le montant net et la TVA ne correspondent pas au total.","L’importo netto e l’IVA non corrispondono al totale."],
-  "Eingangsrechnung wurde nicht gefunden.": ["Supplier invoice not found.","Facture fournisseur introuvable.","Fattura fornitore non trovata."],
-  "Die Eingangsrechnung wurde geändert oder ist kein bearbeitbarer Entwurf.": ["The supplier invoice has changed or is not an editable draft.","La facture fournisseur a changé ou n’est pas un brouillon modifiable.","La fattura fornitore è cambiata o non è una bozza modificabile."],
-  "Diese Rechnungsnummer ist bei diesem Lieferanten bereits vorhanden. Bitte den vorhandenen Beleg prüfen.": ["This invoice number already exists for this supplier. Please check the existing document.","Ce numéro de facture existe déjà pour ce fournisseur. Veuillez vérifier le document existant.","Questo numero di fattura esiste già per questo fornitore. Verifica il documento esistente."],
-  "Einladung erneut senden": ["Resend invitation","Renvoyer l’invitation","Invia di nuovo l’invito"],
-  "Einladung erneut senden?": ["Resend invitation?","Renvoyer l’invitation ?","Inviare di nuovo l’invito?"],
-  "Der bisherige Link wird ungültig. Die neue Einladung gilt sieben Tage; Rolle und Modulprofil bleiben erhalten.": ["The previous link becomes invalid. The new invitation is valid for seven days; role and module profile are preserved.","Le lien précédent devient invalide. La nouvelle invitation est valable sept jours ; le rôle et le profil de modules sont conservés.","Il link precedente non sarà più valido. Il nuovo invito vale sette giorni; ruolo e profilo dei moduli restano invariati."],
-  "Neue Einladung an Versand übergeben.": ["New invitation submitted for sending.","Nouvelle invitation transmise pour envoi.","Nuovo invito inoltrato per l’invio."],
-  "Diese Einladung wurde geändert oder ist nicht mehr offen.": ["This invitation has changed or is no longer pending.","Cette invitation a changé ou n’est plus en attente.","Questo invito è cambiato o non è più in sospeso."],
-  "Einladung wurde nicht gefunden.": ["Invitation not found.","Invitation introuvable.","Invito non trovato."],
-  "Mitarbeiterzugang verknüpfen": ["Link employee account","Associer l’accès du collaborateur","Collega l’accesso del collaboratore"],
-  "Die Verknüpfung erstellt weder ein Konto noch eine Kunden- oder Auftragsfreigabe.": ["Linking does not create an account or grant customer or project access.","L’association ne crée aucun compte et n’accorde aucun accès aux clients ou aux mandats.","Il collegamento non crea un account e non concede accesso a clienti o incarichi."],
-  "Bitte Mitarbeiter und bestehenden Zugang prüfen.": ["Please check the employee and existing account.","Veuillez vérifier le collaborateur et l’accès existant.","Verifica il collaboratore e l’accesso esistente."],
-  "Bankverbindung bearbeiten": ["Edit bank details","Modifier les coordonnées bancaires","Modifica le coordinate bancarie"],
-  "Keine Bankverbindung": ["No bank details","Aucune coordonnée bancaire","Nessuna coordinata bancaria"],
-  "Schweiz oder Liechtenstein. Leer lassen, um die Bankverbindung zu entfernen.": ["Switzerland or Liechtenstein. Leave empty to remove the bank details.","Suisse ou Liechtenstein. Laissez vide pour supprimer les coordonnées bancaires.","Svizzera o Liechtenstein. Lascia vuoto per rimuovere le coordinate bancarie."],
-  "Die Änderung benötigt eine Sicherheitsbestätigung. Es wird keine Zahlung ausgelöst.": ["The change requires security confirmation. No payment will be initiated.","La modification nécessite une confirmation de sécurité. Aucun paiement ne sera déclenché.","La modifica richiede una conferma di sicurezza. Non verrà avviato alcun pagamento."],
-  "Bitte die Bankverbindung und den aktuellen Stand prüfen.": ["Please check the bank details and current version.","Veuillez vérifier les coordonnées bancaires et la version actuelle.","Verifica le coordinate bancarie e la versione attuale."],
-  "Bitte eine gültige Schweizer oder Liechtensteiner IBAN eingeben.": ["Please enter a valid Swiss or Liechtenstein IBAN.","Veuillez saisir un IBAN suisse ou liechtensteinois valide.","Inserisci un IBAN svizzero o del Liechtenstein valido."],
-  "Tatsächliches Zahlungsdatum": ["Actual payment date","Date effective du paiement","Data effettiva del pagamento"],
-  "Bitte den Erstattungsbetrag und die Währung prüfen.": ["Please check the reimbursement amount and currency.","Veuillez vérifier le montant et la devise du remboursement.","Verifica l’importo e la valuta del rimborso."],
-  "Der Spesenbetrag wurde geändert. Bitte den aktuellen Stand prüfen.": ["The expense amount has changed. Please check the current details.","Le montant des frais a changé. Veuillez vérifier les données actuelles.","L’importo delle spese è cambiato. Verifica i dati attuali."],
-  "Bezahlt mit": ["Paid with","Payé avec","Pagato con"],
-  "Zahlungsart ungeklärt": ["Payment source unresolved","Mode de paiement à clarifier","Modalità di pagamento da chiarire"],
-  "Privat bezahlt": ["Paid personally","Payé à titre privé","Pagato privatamente"],
-  "Firmenkarte": ["Company card","Carte de société","Carta aziendale"],
-  "Direkt durch die Firma bezahlt": ["Paid directly by the company","Payé directement par la société","Pagato direttamente dall’azienda"],
-  "Bitte eine gültige Zahlungsart wählen.": ["Please select a valid payment source.","Veuillez choisir un mode de paiement valide.","Seleziona una modalità di pagamento valida."],
-  "Nur nachweislich privat bezahlte Spesen können erstattet werden.": ["Only expenses explicitly paid personally can be reimbursed.","Seuls les frais explicitement payés à titre privé peuvent être remboursés.","Possono essere rimborsate solo le spese esplicitamente pagate privatamente."],
-  "Lieferanten suchen...": ["Search suppliers...", "Rechercher des fournisseurs...", "Cerca fornitori..."],
-  "Lieferant hinzufügen": ["Add supplier", "Ajouter un fournisseur", "Aggiungi fornitore"],
-  "Lieferant bearbeiten": ["Edit supplier", "Modifier le fournisseur", "Modifica fornitore"],
-  "Lieferantenaktionen": ["Supplier actions", "Actions relatives au fournisseur", "Azioni relative al fornitore"],
-  "Diese Lieferantenangaben können hier nicht geändert werden.": ["These supplier details cannot be changed here.", "Ces informations sur le fournisseur ne peuvent pas être modifiées ici.", "Questi dati del fornitore non possono essere modificati qui."],
-  "Die Lieferantenangaben sind ungültig.": ["The supplier details are invalid.", "Les informations sur le fournisseur sont invalides.", "I dati del fornitore non sono validi."],
-  "Bitte einen Lieferantennamen eingeben.": ["Please enter a supplier name.", "Veuillez saisir un nom de fournisseur.", "Inserisci un nome del fornitore."],
-  "Bitte eine Zahlungsfrist zwischen 0 und 180 Tagen erfassen.": ["Please enter a payment term between 0 and 180 days.", "Veuillez saisir un délai de paiement entre 0 et 180 jours.", "Inserisci un termine di pagamento compreso tra 0 e 180 giorni."],
-  "Lieferant wurde nicht gefunden.": ["Supplier not found.", "Fournisseur introuvable.", "Fornitore non trovato."],
-  "Der Lieferant wurde geändert. Bitte die Ansicht aktualisieren.": ["The supplier has changed. Please refresh the view.", "Le fournisseur a été modifié. Veuillez actualiser la vue.", "Il fornitore è stato modificato. Aggiorna la vista."],
-  "Eine mögliche Lieferantendublette ist vorhanden. Bitte die Stammdaten zuerst prüfen.": ["A possible duplicate supplier exists. Please check the master data first.", "Un doublon potentiel du fournisseur existe. Veuillez d’abord vérifier les données de base.", "Esiste un possibile duplicato del fornitore. Verifica prima i dati di base."],
-  "Anstellung": ["Employment", "Emploi", "Impiego"],
-  "Anstellungsperioden": ["Employment periods", "Périodes d’emploi", "Periodi di impiego"],
-  "Anstellungsaktionen": ["Employment actions", "Actions relatives à l’emploi", "Azioni relative all’impiego"],
-  "Anstellungsperiode hinzufügen": ["Add employment period", "Ajouter une période d’emploi", "Aggiungi un periodo di impiego"],
-  "Keine Anstellungsperioden": ["No employment periods", "Aucune période d’emploi", "Nessun periodo di impiego"],
-  "Unbefristet": ["Open-ended", "Durée indéterminée", "A tempo indeterminato"],
-  "Aktueller Vertragsstand": ["Current contract version", "Version actuelle du contrat", "Versione attuale del contratto"],
-  "Frühere Revision": ["Previous revision", "Révision précédente", "Revisione precedente"],
-  "Vertragsstand korrigieren": ["Correct contract version", "Corriger la version du contrat", "Correggi la versione del contratto"],
-  "Vertragsstände bleiben als Revisionen erhalten. Eine Anstellung erstellt keinen App-Zugang und löst keine Lohnzahlung aus.": ["Contract versions are retained as revisions. Employment does not create app access or trigger salary payments.", "Les versions du contrat sont conservées en tant que révisions. Un emploi ne crée pas d’accès à l’application et ne déclenche aucun versement de salaire.", "Le versioni del contratto vengono conservate come revisioni. Un impiego non crea un accesso all’app e non avvia pagamenti di salario."],
-  "Bitte den aktuellen Revisionsstand angeben.": ["Please provide the current revision.", "Veuillez indiquer la révision actuelle.", "Indica la revisione attuale."],
-  "Arbeitsort": ["Workplace", "Lieu de travail", "Luogo di lavoro"],
-  "Austritt": ["Leaving date", "Date de départ", "Data di uscita"],
-  "Optional · erstellt keinen App-Zugang": ["Optional · does not create app access", "Facultatif · ne crée pas d’accès à l’application", "Facoltativo · non crea un accesso all’app"],
-  "Bitte ein gültiges Austrittsdatum erfassen.": ["Please enter a valid leaving date.", "Veuillez saisir une date de départ valide.", "Inserisci una data di uscita valida."],
-  "Der Austritt darf nicht vor dem Eintritt liegen.": ["The leaving date must not precede the start date.", "La date de départ ne peut pas précéder la date d’entrée.", "La data di uscita non può precedere la data di entrata."],
-  "Bitte einen Arbeitsort mit höchstens 180 Zeichen erfassen.": ["Please enter a workplace with no more than 180 characters.", "Veuillez saisir un lieu de travail de 180 caractères maximum.", "Inserisci un luogo di lavoro di massimo 180 caratteri."],
+{
+  "Rapportaktionen": [
+    "Report actions",
+    "Actions du rapport",
+    "Azioni del rapporto"
+  ],
+  "Saldo": [
+    "Balance",
+    "Solde",
+    "Saldo",
+    "Bakiye"
+  ],
+  "Vertrag öffnen": [
+    "Open contract",
+    "Ouvrir le contrat",
+    "Apri contratto"
+  ],
+  "Ressource": [
+    "Resource",
+    "Ressource",
+    "Risorsa"
+  ],
+  "Für diese Preisquelle fehlt die Berechtigung.": [
+    "You do not have permission for this price source.",
+    "Vous n’avez pas l’autorisation pour cette source de prix.",
+    "Non disponi del permesso per questa fonte di prezzo."
+  ],
+  "Bitte die angezeigte Leistung und freigegebene Preisrevision auswählen.": [
+    "Please select the displayed service and approved price revision.",
+    "Veuillez sélectionner la prestation affichée et la révision de prix approuvée.",
+    "Seleziona la prestazione visualizzata e la revisione di prezzo approvata."
+  ],
+  "Die Leistung oder Preisbindung wurde geändert. Bitte erneut prüfen.": [
+    "The service or price binding has changed. Please review again.",
+    "La prestation ou la référence de prix a changé. Veuillez vérifier à nouveau.",
+    "La prestazione o il prezzo associato è cambiato. Verifica nuovamente."
+  ],
+  "Bereits zugeordnete Leistungen behalten ihre gespeicherte Preisquelle.": [
+    "Allocated services retain their saved price source.",
+    "Les prestations déjà affectées conservent leur source de prix enregistrée.",
+    "Le prestazioni già assegnate mantengono la fonte di prezzo salvata."
+  ],
+  "Diese Stundenleistung benötigt einen ausdrücklich freigegebenen Stundensatz.": [
+    "This hourly service requires an explicitly approved hourly rate.",
+    "Cette prestation horaire nécessite un tarif horaire explicitement approuvé.",
+    "Questa prestazione oraria richiede una tariffa oraria esplicitamente approvata."
+  ],
+  "Preisquelle konnte nicht geladen werden.": [
+    "Could not load the price source.",
+    "Impossible de charger la source de prix.",
+    "Impossibile caricare la fonte di prezzo."
+  ],
+  "Preisquelle konnte nicht gespeichert werden.": [
+    "Could not save the price source.",
+    "Impossible d’enregistrer la source de prix.",
+    "Impossibile salvare la fonte di prezzo."
+  ],
+  "Preisquelle": [
+    "Price source",
+    "Source de prix",
+    "Fonte di prezzo"
+  ],
+  "Preisquelle bestätigen": [
+    "Confirm price source",
+    "Confirmer la source de prix",
+    "Conferma fonte di prezzo"
+  ],
+  "Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt.": [
+    "Purchase and sales prices are saved separately. No invoice is created.",
+    "Les prix d’achat et de vente sont enregistrés séparément. Aucune facture n’est créée.",
+    "I prezzi di acquisto e vendita sono salvati separatamente. Non viene creata alcuna fattura."
+  ],
+  "Gespeicherte Preisquelle": [
+    "Saved price source",
+    "Source de prix enregistrée",
+    "Fonte di prezzo salvata"
+  ],
+  "Freigegebener Stundensatz": [
+    "Approved hourly rate",
+    "Tarif horaire approuvé",
+    "Tariffa oraria approvata"
+  ],
+  "Kondition auswählen": [
+    "Select terms",
+    "Sélectionner les conditions",
+    "Seleziona condizioni"
+  ],
+  "Für dieses Leistungsdatum fehlt ein passender freigegebener Stundensatz.": [
+    "There is no matching approved hourly rate for this service date.",
+    "Aucun tarif horaire approuvé ne correspond à cette date de prestation.",
+    "Non esiste una tariffa oraria approvata corrispondente a questa data di prestazione."
+  ],
+  "Die gewählte Revision wird fest gespeichert. Es erfolgt keine Währungsumrechnung.": [
+    "The selected revision is saved as a fixed snapshot. No currency conversion is performed.",
+    "La révision sélectionnée est enregistrée de façon fixe. Aucune conversion de devise n’est effectuée.",
+    "La revisione selezionata viene salvata come istantanea fissa. Non viene eseguita alcuna conversione valutaria."
+  ],
+  "Leistungsdatum": [
+    "Service date",
+    "Date de prestation",
+    "Data di prestazione"
+  ],
+  "Vertrag auswählen": [
+    "Select contract",
+    "Sélectionner un contrat",
+    "Seleziona contratto"
+  ],
+  "Richtung": [
+    "Direction",
+    "Sens",
+    "Direzione"
+  ],
+  "Keine Arbeitszeit": [
+    "Not working time",
+    "Hors temps de travail",
+    "Non è tempo di lavoro"
+  ],
+  "Lohnprüfung beantragt": [
+    "Payroll review requested",
+    "Vérification salariale demandée",
+    "Richiesta verifica salariale"
+  ],
+  "Nicht lohnrelevant": [
+    "Not payroll relevant",
+    "Sans incidence salariale",
+    "Non rilevante per la paga"
+  ],
+  "Nicht klassifiziert": [
+    "Unclassified",
+    "Non classé",
+    "Non classificato"
+  ],
+  "Ungültige Zeiterfassung.": [
+    "Invalid time entry.",
+    "Saisie de temps invalide.",
+    "Registrazione del tempo non valida."
+  ],
+  "Arbeit": [
+    "Work",
+    "Travail",
+    "Lavoro"
+  ],
+  "Eigene Zeit": [
+    "Own time",
+    "Mon temps",
+    "Tempo personale"
+  ],
+  "Externe Ressource": [
+    "External resource",
+    "Ressource externe",
+    "Risorsa esterna"
+  ],
+  "Leistungserbringer": [
+    "Service provider",
+    "Prestataire",
+    "Prestatore"
+  ],
+  "Lohnrelevanz beantragen": [
+    "Request payroll relevance",
+    "Demander la prise en compte salariale",
+    "Richiedi rilevanza salariale"
+  ],
+  "Zeitart": [
+    "Time category",
+    "Catégorie de temps",
+    "Categoria di tempo"
+  ],
+  "Ressource auswählen": [
+    "Select resource",
+    "Sélectionner une ressource",
+    "Seleziona risorsa"
+  ],
+  "Bitte Zeitart, Arbeitszeit und Lohnrelevanz ausdrücklich festlegen.": [
+    "Please explicitly specify time category, working time and payroll relevance.",
+    "Veuillez préciser la catégorie de temps, le temps de travail et la pertinence salariale.",
+    "Specifica categoria, tempo di lavoro e rilevanza salariale."
+  ],
+  "Keine Berechtigung für externe Zeiten.": [
+    "No permission for external time entries.",
+    "Aucune autorisation pour les temps externes.",
+    "Nessun permesso per i tempi esterni."
+  ],
+  "Bitte Auftrag und Datum auswählen.": [
+    "Please select a project and date.",
+    "Veuillez sélectionner un projet et une date.",
+    "Seleziona progetto e data."
+  ],
+  "Bitte den Speichervorgang erneut starten.": [
+    "Please restart saving.",
+    "Veuillez relancer l’enregistrement.",
+    "Riavvia il salvataggio."
+  ],
+  "Diese Angaben gehören nicht zur externen Zeiterfassung.": [
+    "These fields do not belong to external time recording.",
+    "Ces champs ne font pas partie de la saisie de temps externe.",
+    "Questi campi non appartengono alla registrazione dei tempi esterni."
+  ],
+  "Bitte Einsatz, Datum und volle Minuten prüfen. Externe Zeiten sind nicht lohnrelevant.": [
+    "Please check assignment, date and whole minutes. External time is not relevant for payroll.",
+    "Veuillez vérifier l’affectation, la date et les minutes entières. Le temps externe ne relève pas de la paie.",
+    "Verifica assegnazione, data e minuti interi. I tempi esterni non sono rilevanti per la paga."
+  ],
+  "Lohnrelevante Zeit benötigt ein Mitarbeiterdossier.": [
+    "Payroll-relevant time requires an employee record.",
+    "Le temps pertinent pour la paie nécessite un dossier salarié.",
+    "Il tempo rilevante per la paga richiede una scheda dipendente."
+  ],
+  "Bitte volle Minuten erfassen.": [
+    "Please enter whole minutes.",
+    "Veuillez saisir des minutes entières.",
+    "Inserisci minuti interi."
+  ],
+  "Vertragsanhänge können nur im Entwurf oder nach ausdrücklichem Pausieren ergänzt werden.": [
+    "Contract attachments can only be added to drafts or after explicitly pausing the contract.",
+    "Les pièces contractuelles ne peuvent être ajoutées qu’au brouillon ou après une pause explicite du contrat.",
+    "Gli allegati contrattuali possono essere aggiunti solo in bozza o dopo una sospensione esplicita."
+  ],
+  "Bereits geprüfte Vertragsdateien bleiben als Nachweis erhalten.": [
+    "Reviewed contract files are retained as evidence.",
+    "Les fichiers contractuels vérifiés sont conservés comme justificatifs.",
+    "I file contrattuali verificati sono conservati come prova."
+  ],
+  "Bitte Vertragsstatus, Dateistand und Revisionsstand angeben.": [
+    "Please provide contract status, document manifest and revision.",
+    "Veuillez indiquer le statut, l’état des fichiers et la révision du contrat.",
+    "Indica stato, versione dei file e revisione del contratto."
+  ],
+  "Der Dateistand wurde geändert. Bitte den Vertrag erneut prüfen.": [
+    "The document set has changed. Please review the contract again.",
+    "Les fichiers ont changé. Veuillez vérifier à nouveau le contrat.",
+    "I file sono cambiati. Verifica nuovamente il contratto."
+  ],
+  "Bitte die Sicherheitsfreigabe aller Vertragsdateien abwarten oder ungeprüfte Anhänge kontrolliert entfernen.": [
+    "Please wait for all contract files to pass security checks or explicitly remove unreviewed attachments.",
+    "Veuillez attendre la validation de sécurité de tous les fichiers ou retirer explicitement les pièces non vérifiées.",
+    "Attendi la verifica di sicurezza di tutti i file contrattuali o rimuovi espressamente gli allegati non verificati."
+  ],
+  "Bitte einen gültigen Vertragsfilter wählen.": [
+    "Please select a valid contract filter.",
+    "Veuillez sélectionner un filtre de contrat valide.",
+    "Seleziona un filtro contrattuale valido."
+  ],
+  "Bitte eine gültige Sortierung wählen.": [
+    "Please select a valid sort order.",
+    "Veuillez sélectionner un tri valide.",
+    "Seleziona un ordinamento valido."
+  ],
+  "Verträge suchen...": [
+    "Search contracts...",
+    "Rechercher des contrats...",
+    "Cerca contratti..."
+  ],
+  "Verträge öffnen": [
+    "Open contracts",
+    "Ouvrir les contrats",
+    "Apri contratti"
+  ],
+  "Vertrag erstellen": [
+    "Create contract",
+    "Créer un contrat",
+    "Crea contratto"
+  ],
+  "Vertragsentwurf bearbeiten": [
+    "Edit contract draft",
+    "Modifier le brouillon du contrat",
+    "Modifica bozza del contratto"
+  ],
+  "Vertragsart": [
+    "Contract type",
+    "Type de contrat",
+    "Tipo di contratto"
+  ],
+  "Vertragspartner": [
+    "Contracting party",
+    "Partenaire contractuel",
+    "Contraente"
+  ],
+  "Vertragsaktionen": [
+    "Contract actions",
+    "Actions du contrat",
+    "Azioni sul contratto"
+  ],
+  "Auftrag (optional)": [
+    "Project (optional)",
+    "Mandat (facultatif)",
+    "Progetto (facoltativo)"
+  ],
+  "Kündigungsfrist (Tage)": [
+    "Notice period (days)",
+    "Délai de résiliation (jours)",
+    "Termine di disdetta (giorni)"
+  ],
+  "Abrechnungsperiode": [
+    "Billing period",
+    "Période de facturation",
+    "Periodo di fatturazione"
+  ],
+  "Nach Vereinbarung": [
+    "As agreed",
+    "Selon accord",
+    "Come concordato"
+  ],
+  "Einkauf": [
+    "Purchase",
+    "Achat",
+    "Acquisto"
+  ],
+  "Quartalsweise": [
+    "Quarterly",
+    "Trimestrielle",
+    "Trimestrale"
+  ],
+  "Konditionsrevision erfassen": [
+    "Create condition revision",
+    "Saisir une révision des conditions",
+    "Registra revisione delle condizioni"
+  ],
+  "Konditionen erfassen": [
+    "Record conditions",
+    "Saisir des conditions",
+    "Registra condizioni"
+  ],
+  "Konditionen vervollständigen": [
+    "Complete conditions",
+    "Compléter les conditions",
+    "Completa condizioni"
+  ],
+  "Konditionsaktionen": [
+    "Condition actions",
+    "Actions des conditions",
+    "Azioni sulle condizioni"
+  ],
+  "Vertragskonditionen": [
+    "Contract conditions",
+    "Conditions contractuelles",
+    "Condizioni contrattuali"
+  ],
+  "Keine Konditionen erfasst": [
+    "No conditions recorded",
+    "Aucune condition saisie",
+    "Nessuna condizione registrata"
+  ],
+  "Unvollständige Konditionen bleiben ein Entwurf. Eine neue Revision ersetzt den freigegebenen Preis erst nach unabhängiger Prüfung.": [
+    "Incomplete conditions remain a draft. A new revision replaces the approved price only after independent review.",
+    "Les conditions incomplètes restent un brouillon. Une nouvelle révision remplace le prix validé uniquement après vérification indépendante.",
+    "Le condizioni incomplete restano una bozza. Una nuova revisione sostituisce il prezzo approvato solo dopo una verifica indipendente."
+  ],
+  "Ressourcenlieferant (optional)": [
+    "Resource supplier (optional)",
+    "Fournisseur de ressources (facultatif)",
+    "Fornitore della risorsa (facoltativo)"
+  ],
+  "Ressource (optional)": [
+    "Resource (optional)",
+    "Ressource (facultative)",
+    "Risorsa (facoltativa)"
+  ],
+  "Alle Ressourcen": [
+    "All resources",
+    "Toutes les ressources",
+    "Tutte le risorse"
+  ],
+  "Bisherige Ressourcenreferenz": [
+    "Existing resource reference",
+    "Référence de ressource existante",
+    "Riferimento alla risorsa esistente"
+  ],
+  "Ressourcenkondition": [
+    "Resource conditions",
+    "Conditions de ressource",
+    "Condizioni della risorsa"
+  ],
+  "Noch offen": [
+    "Not yet specified",
+    "Encore indéfini",
+    "Non ancora definito"
+  ],
+  "Einkaufspreis": [
+    "Purchase price",
+    "Prix d’achat",
+    "Prezzo d’acquisto"
+  ],
+  "Steuerbehandlung": [
+    "Tax treatment",
+    "Traitement fiscal",
+    "Trattamento fiscale"
+  ],
+  "Steuerpflichtig": [
+    "Taxable",
+    "Imposable",
+    "Imponibile"
+  ],
+  "Ausserhalb des Steuerbereichs": [
+    "Outside tax scope",
+    "Hors champ fiscal",
+    "Fuori dal campo d’imposta"
+  ],
+  "MwSt. (%)": [
+    "VAT (%)",
+    "TVA (%)",
+    "IVA (%)"
+  ],
+  "Vertrag freigeben": [
+    "Approve contract",
+    "Valider le contrat",
+    "Approva contratto"
+  ],
+  "Vertrag pausieren": [
+    "Pause contract",
+    "Suspendre le contrat",
+    "Sospendi contratto"
+  ],
+  "Vertrag beenden": [
+    "End contract",
+    "Terminer le contrat",
+    "Termina contratto"
+  ],
+  "Vertrag stornieren": [
+    "Cancel contract",
+    "Annuler le contrat",
+    "Annulla contratto"
+  ],
+  "Vertrag freigeben?": [
+    "Approve contract?",
+    "Valider le contrat ?",
+    "Approvare il contratto?"
+  ],
+  "Vertrag pausieren?": [
+    "Pause contract?",
+    "Suspendre le contrat ?",
+    "Sospendere il contratto?"
+  ],
+  "Vertrag beenden?": [
+    "End contract?",
+    "Terminer le contrat ?",
+    "Terminare il contratto?"
+  ],
+  "Vertrag stornieren?": [
+    "Cancel contract?",
+    "Annuler le contrat ?",
+    "Annullare il contratto?"
+  ],
+  "Konditionen freigeben": [
+    "Approve conditions",
+    "Valider les conditions",
+    "Approva condizioni"
+  ],
+  "Konditionen freigeben?": [
+    "Approve conditions?",
+    "Valider les conditions ?",
+    "Approvare le condizioni?"
+  ],
+  "Konditionen ablehnen?": [
+    "Reject conditions?",
+    "Rejeter les conditions ?",
+    "Rifiutare le condizioni?"
+  ],
+  "Freigegebene Preisrevision": [
+    "Approved price revision",
+    "Révision de prix validée",
+    "Revisione del prezzo approvata"
+  ],
+  "Frühere Freigabe": [
+    "Earlier approval",
+    "Validation antérieure",
+    "Approvazione precedente"
+  ],
+  "Historischer Vertragsstand. Bestehende Angaben und Belege bleiben unverändert.": [
+    "Historical contract version. Existing data and documents remain unchanged.",
+    "Version historique du contrat. Les données et pièces existantes restent inchangées.",
+    "Versione storica del contratto. Dati e documenti esistenti restano invariati."
+  ],
+  "Vertragsdateien sind noch nicht sicher freigegeben.": [
+    "Contract files have not yet passed security checks.",
+    "Les fichiers contractuels n’ont pas encore été validés par la sécurité.",
+    "I file contrattuali non hanno ancora superato le verifiche di sicurezza."
+  ],
+  "Der Dateistand wurde seit der letzten Vertragsfreigabe geändert.": [
+    "The document set has changed since the last contract approval.",
+    "Les fichiers ont changé depuis la dernière validation du contrat.",
+    "I file sono cambiati dall’ultima approvazione del contratto."
+  ],
+  "Preis noch offen": [
+    "Price not yet specified",
+    "Prix encore indéfini",
+    "Prezzo non ancora definito"
+  ],
+  "Steuerregel noch offen": [
+    "Tax terms not yet specified",
+    "Règle fiscale encore indéfinie",
+    "Regola fiscale non ancora definita"
+  ],
+  "Spesenregel noch offen": [
+    "Expense terms not yet specified",
+    "Règle des frais encore indéfinie",
+    "Regola sulle spese non ancora definita"
+  ],
+  "Vor Freigabe fehlen:": [
+    "Missing before approval:",
+    "À compléter avant validation :",
+    "Da completare prima dell’approvazione:"
+  ],
+  "Vertragsdateien": [
+    "Contract files",
+    "Fichiers contractuels",
+    "File contrattuali"
+  ],
+  "Keine Vertragsdateien": [
+    "No contract files",
+    "Aucun fichier contractuel",
+    "Nessun file contrattuale"
+  ],
+  "Diese Preisrevision wird unabhängig freigegeben und gilt nur im erfassten Zeitraum.": [
+    "This price revision is independently approved and applies only during the recorded period.",
+    "Cette révision de prix est validée indépendamment et s’applique uniquement à la période saisie.",
+    "Questa revisione del prezzo è approvata in modo indipendente e vale solo per il periodo registrato."
+  ],
+  "Diese Konditionsrevision wird abgelehnt. Frühere Freigaben bleiben unverändert.": [
+    "This condition revision will be rejected. Earlier approvals remain unchanged.",
+    "Cette révision des conditions sera rejetée. Les validations antérieures restent inchangées.",
+    "Questa revisione delle condizioni sarà rifiutata. Le approvazioni precedenti restano invariate."
+  ],
+  "Vertrag und angezeigter Dateistand werden intern freigegeben. Das ersetzt keine Prüfung einer Unterschrift.": [
+    "The contract and displayed document set will be approved internally. This does not verify a signature.",
+    "Le contrat et les fichiers affichés seront validés en interne. Cela ne remplace pas la vérification d’une signature.",
+    "Il contratto e i file visualizzati saranno approvati internamente. Ciò non sostituisce la verifica di una firma."
+  ],
+  "Neue Preisübernahmen werden angehalten. Bestehende Belege bleiben unverändert.": [
+    "New price transfers will be stopped. Existing documents remain unchanged.",
+    "Les nouvelles reprises de prix seront suspendues. Les pièces existantes restent inchangées.",
+    "Le nuove applicazioni del prezzo saranno sospese. I documenti esistenti restano invariati."
+  ],
+  "Die Vertragsangaben sind ungültig.": [
+    "The contract data is invalid.",
+    "Les données du contrat sont invalides.",
+    "I dati del contratto non sono validi."
+  ],
+  "Bitte Vertragspartner, Laufzeit, Bezeichnung und Kündigungsfrist prüfen.": [
+    "Please check the contracting party, term, name and notice period.",
+    "Veuillez vérifier le partenaire, la durée, la désignation et le délai de résiliation.",
+    "Verifica contraente, durata, denominazione e termine di disdetta."
+  ],
+  "Die Konditionsangaben sind ungültig.": [
+    "The condition data is invalid.",
+    "Les données des conditions sont invalides.",
+    "I dati delle condizioni non sono validi."
+  ],
+  "Bitte Gültigkeit, Ressource, Einheit, Währung und Steuer-/Spesenregel prüfen.": [
+    "Please check validity, resource, unit, currency, tax and expense terms.",
+    "Veuillez vérifier la validité, la ressource, l’unité, la devise et les règles fiscales et de frais.",
+    "Verifica validità, risorsa, unità, valuta e regole fiscali e sulle spese."
+  ],
+  "Bitte einen nicht negativen Preis mit höchstens zwei Dezimalstellen erfassen.": [
+    "Please enter a non-negative price with at most two decimal places.",
+    "Veuillez saisir un prix non négatif avec deux décimales au maximum.",
+    "Inserisci un prezzo non negativo con al massimo due decimali."
+  ],
+  "Bitte einen gültigen Steuersatz zwischen 0 und 100 erfassen.": [
+    "Please enter a valid tax rate between 0 and 100.",
+    "Veuillez saisir un taux de taxe valide entre 0 et 100.",
+    "Inserisci un’aliquota valida tra 0 e 100."
+  ],
+  "Für diesen Vertragsbereich fehlt die Berechtigung.": [
+    "Access to this contract area is not permitted.",
+    "L’accès à cet espace contractuel n’est pas autorisé.",
+    "L’accesso a questa area contrattuale non è consentito."
+  ],
+  "Vertrag wurde nicht gefunden.": [
+    "Contract not found.",
+    "Contrat introuvable.",
+    "Contratto non trovato."
+  ],
+  "Freigegebene und historische Vertragsangaben können nicht überschrieben werden.": [
+    "Released and historical contract data cannot be overwritten.",
+    "Les données contractuelles validées et historiques ne peuvent pas être écrasées.",
+    "I dati contrattuali approvati e storici non possono essere sovrascritti."
+  ],
+  "Der Vertrag wurde geändert. Bitte den aktuellen Stand prüfen.": [
+    "The contract has changed. Please check the current revision.",
+    "Le contrat a été modifié. Veuillez vérifier la version actuelle.",
+    "Il contratto è cambiato. Verifica la versione attuale."
+  ],
+  "Vertragspartner und Auftragsbezug bleiben unverändert.": [
+    "The contracting party and project reference are immutable.",
+    "Le partenaire contractuel et le rattachement au mandat restent inchangés.",
+    "Il contraente e il riferimento al progetto restano invariati."
+  ],
+  "Vertragspartner wurde nicht gefunden.": [
+    "Contracting party not found.",
+    "Partenaire contractuel introuvable.",
+    "Contraente non trovato."
+  ],
+  "Der Auftrag gehört nicht zu diesem Vertragspartner.": [
+    "The project does not belong to this contracting party.",
+    "Le mandat n’appartient pas à ce partenaire contractuel.",
+    "Il progetto non appartiene a questo contraente."
+  ],
+  "Die Laufzeit darf vorhandene Konditionsrevisionen nicht ausschliessen.": [
+    "The term must not exclude existing condition revisions.",
+    "La durée ne doit pas exclure les révisions existantes des conditions.",
+    "La durata non deve escludere revisioni delle condizioni esistenti."
+  ],
+  "Die Konditionsgültigkeit muss innerhalb der Vertragslaufzeit liegen.": [
+    "Condition validity must fall within the contract term.",
+    "La validité des conditions doit être comprise dans la durée du contrat.",
+    "La validità delle condizioni deve rientrare nella durata del contratto."
+  ],
+  "Bitte Ressource, Lieferant und Auftragsbezug prüfen.": [
+    "Please check the resource, supplier and project reference.",
+    "Veuillez vérifier la ressource, le fournisseur et le rattachement au mandat.",
+    "Verifica risorsa, fornitore e riferimento al progetto."
+  ],
+  "Die Konditionen wurden geändert. Bitte den aktuellen Stand prüfen.": [
+    "The conditions have changed. Please check the current revision.",
+    "Les conditions ont été modifiées. Veuillez vérifier la version actuelle.",
+    "Le condizioni sono cambiate. Verifica la versione attuale."
+  ],
+  "Der Ressourcenbezug einer Konditionsrevision bleibt unverändert.": [
+    "The resource scope of a condition revision is immutable.",
+    "Le rattachement de ressource d’une révision des conditions reste inchangé.",
+    "Il riferimento alla risorsa di una revisione delle condizioni resta invariato."
+  ],
+  "Bitte Prüfentscheid und Revisionsstand angeben.": [
+    "Please provide a review decision and revision.",
+    "Veuillez indiquer la décision de vérification et la révision.",
+    "Indica decisione di verifica e revisione."
+  ],
+  "Bitte Preis, Einheit, Währung und Steuer-/Spesenregel vor der Freigabe vervollständigen.": [
+    "Please complete the price, unit, currency, tax and expense terms before approval.",
+    "Veuillez compléter le prix, l’unité, la devise et les règles fiscales et de frais avant validation.",
+    "Completa prezzo, unità, valuta e regole fiscali e sulle spese prima dell’approvazione."
+  ],
+  "Freigegebene Konditionen desselben Ressourcenbezugs dürfen sich nicht überschneiden.": [
+    "Approved conditions for the same resource scope must not overlap.",
+    "Les conditions validées pour la même ressource ne doivent pas se chevaucher.",
+    "Le condizioni approvate per lo stesso riferimento alla risorsa non devono sovrapporsi."
+  ],
+  "Bitte Vertragsstatus und Revisionsstand angeben.": [
+    "Please provide contract status and revision.",
+    "Veuillez indiquer le statut du contrat et la révision.",
+    "Indica stato del contratto e revisione."
+  ],
+  "Dieser Vertragsstatus kann hier nicht geändert werden.": [
+    "This contract status cannot be changed here.",
+    "Ce statut contractuel ne peut pas être modifié ici.",
+    "Questo stato del contratto non può essere modificato qui."
+  ],
+  "Bitte zuerst vollständige Konditionen unabhängig freigeben.": [
+    "Please independently approve complete conditions first.",
+    "Veuillez d’abord faire valider indépendamment les conditions complètes.",
+    "Prima fai approvare in modo indipendente le condizioni complete."
+  ],
+  "Der freigegebene Vertrag passt nicht zu dieser Leistung.": [
+    "The approved contract does not match this service.",
+    "Le contrat validé ne correspond pas à cette prestation.",
+    "Il contratto approvato non corrisponde a questa prestazione."
+  ],
+  "Für diesen Stichtag und Leistungsbezug fehlen passende freigegebene Konditionen.": [
+    "No matching approved conditions exist for this date and service scope.",
+    "Aucune condition validée correspondante n’existe pour cette date et cette prestation.",
+    "Non esistono condizioni approvate corrispondenti per questa data e prestazione."
+  ],
+  "Bitte einen gültigen Leistungsstichtag angeben.": [
+    "Please provide a valid service date.",
+    "Veuillez indiquer une date de prestation valide.",
+    "Indica una data di prestazione valida."
+  ],
+  "Bitte eine gültige Seite wählen.": [
+    "Please select a valid page.",
+    "Veuillez sélectionner une page valide.",
+    "Seleziona una pagina valida."
+  ],
+  "Vertragspreis": [
+    "Contract price",
+    "Prix contractuel",
+    "Prezzo contrattuale"
+  ],
+  "Steuerregel": [
+    "Tax terms",
+    "Règle fiscale",
+    "Regola fiscale"
+  ],
+  "Spesenregel": [
+    "Expense terms",
+    "Règle des frais",
+    "Regola sulle spese"
+  ],
+  "Begründung der Steuerbefreiung": [
+    "Tax exemption reason",
+    "Motif d’exonération fiscale",
+    "Motivo dell’esenzione fiscale"
+  ],
+  "Spesen inbegriffen": [
+    "Expenses included",
+    "Frais inclus",
+    "Spese incluse"
+  ],
+  "Spesen ausgeschlossen": [
+    "Expenses excluded",
+    "Frais exclus",
+    "Spese escluse"
+  ],
+  "Spesen separat nach Nachweis": [
+    "Expenses separately against evidence",
+    "Frais séparés sur justificatif",
+    "Spese separate con giustificativo"
+  ],
+  "Meine Abwesenheiten": [
+    "My absences",
+    "Mes absences",
+    "Le mie assenze"
+  ],
+  "Abwesenheitsanträge": [
+    "Absence requests",
+    "Demandes d’absence",
+    "Richieste di assenza"
+  ],
+  "Abwesenheitsaktionen": [
+    "Absence actions",
+    "Actions d’absence",
+    "Azioni sulle assenze"
+  ],
+  "Abwesenheit beantragen": [
+    "Request absence",
+    "Demander une absence",
+    "Richiedi assenza"
+  ],
+  "Keine Abwesenheitsanträge": [
+    "No absence requests",
+    "Aucune demande d’absence",
+    "Nessuna richiesta di assenza"
+  ],
+  "Kein Mitarbeiterdossier verknüpft": [
+    "No employee dossier linked",
+    "Aucun dossier du personnel lié",
+    "Nessun dossier del personale collegato"
+  ],
+  "Abwesenheitsart": [
+    "Absence type",
+    "Type d’absence",
+    "Tipo di assenza"
+  ],
+  "Beantragte Tage": [
+    "Requested days",
+    "Jours demandés",
+    "Giorni richiesti"
+  ],
+  "Antrag einreichen": [
+    "Submit request",
+    "Soumettre la demande",
+    "Invia richiesta"
+  ],
+  "Antrag zurückziehen": [
+    "Withdraw request",
+    "Retirer la demande",
+    "Ritira richiesta"
+  ],
+  "Antrag genehmigen?": [
+    "Approve request?",
+    "Approuver la demande ?",
+    "Approvare la richiesta?"
+  ],
+  "Antrag ablehnen?": [
+    "Reject request?",
+    "Rejeter la demande ?",
+    "Rifiutare la richiesta?"
+  ],
+  "Antrag zurückziehen?": [
+    "Withdraw request?",
+    "Retirer la demande ?",
+    "Ritirare la richiesta?"
+  ],
+  "Ferien": [
+    "Vacation",
+    "Vacances",
+    "Vacanze"
+  ],
+  "Krankheit": [
+    "Sickness",
+    "Maladie",
+    "Malattia"
+  ],
+  "Unfall": [
+    "Accident",
+    "Accident",
+    "Infortunio"
+  ],
+  "Militär / Zivildienst": [
+    "Military / civilian service",
+    "Service militaire / civil",
+    "Servizio militare / civile"
+  ],
+  "Andere Abwesenheit": [
+    "Other absence",
+    "Autre absence",
+    "Altra assenza"
+  ],
+  "Beantragte Tage werden ausdrücklich erfasst. Keine automatische Feiertagsberechnung, Ferienbuchung oder Lohnzahlung. Keine Diagnosen erfassen.": [
+    "Requested days are entered explicitly. No automatic holiday calculation, vacation posting or salary payment. Do not enter diagnoses.",
+    "Les jours demandés sont saisis explicitement. Aucun calcul automatique des jours fériés, écriture de vacances ou versement salarial. Ne pas saisir de diagnostic.",
+    "I giorni richiesti sono inseriti espressamente. Nessun calcolo automatico dei festivi, registrazione delle ferie o pagamento salariale. Non inserire diagnosi."
+  ],
+  "Der gewählte Status wird verbindlich gespeichert. Eine Genehmigung darf nur durch eine andere berechtigte Person erfolgen.": [
+    "The selected status will be saved. Approval requires another authorized person.",
+    "Le statut sélectionné sera enregistré. L’approbation nécessite une autre personne autorisée.",
+    "Lo stato selezionato sarà registrato. L’approvazione richiede un’altra persona autorizzata."
+  ],
+  "Der Abwesenheitsantrag ist ungültig.": [
+    "The absence request is invalid.",
+    "La demande d’absence est invalide.",
+    "La richiesta di assenza non è valida."
+  ],
+  "Bitte Mitarbeiter, Anstellung, Abwesenheitsart, Zeitraum und beantragte Tage prüfen.": [
+    "Please check the employee, employment, absence type, dates and requested days.",
+    "Veuillez vérifier le collaborateur, l’engagement, le type d’absence, la période et les jours demandés.",
+    "Verifica dipendente, impiego, tipo di assenza, periodo e giorni richiesti."
+  ],
+  "Die beantragten Tage dürfen den Kalenderzeitraum nicht überschreiten.": [
+    "Requested days must not exceed the calendar period.",
+    "Les jours demandés ne doivent pas dépasser la période calendaire.",
+    "I giorni richiesti non devono superare il periodo di calendario."
+  ],
+  "Für diesen Abwesenheitsbereich fehlt die Berechtigung.": [
+    "Access to this absence area is not permitted.",
+    "L’accès à cet espace d’absence n’est pas autorisé.",
+    "L’accesso a questa area delle assenze non è consentito."
+  ],
+  "Der Antrag kann mit diesem Zugang nicht gespeichert werden.": [
+    "This account cannot save the request.",
+    "Ce compte ne peut pas enregistrer la demande.",
+    "Questo account non può salvare la richiesta."
+  ],
+  "Bitte eine aktuelle Anstellungsrevision und dazu passende Abwesenheitsdaten wählen.": [
+    "Please select a current employment revision and matching absence dates.",
+    "Veuillez sélectionner une révision actuelle de l’engagement et des dates d’absence correspondantes.",
+    "Seleziona una revisione attuale dell’impiego e date di assenza corrispondenti."
+  ],
+  "Für diesen Zeitraum besteht bereits ein offener oder genehmigter Antrag.": [
+    "An open or approved request already exists for this period.",
+    "Une demande ouverte ou approuvée existe déjà pour cette période.",
+    "Esiste già una richiesta aperta o approvata per questo periodo."
+  ],
+  "Bitte Status und aktuellen Revisionsstand prüfen.": [
+    "Please check the status and current revision.",
+    "Veuillez vérifier le statut et la révision actuelle.",
+    "Verifica stato e revisione attuale."
+  ],
+  "Der Antrag wurde gleichzeitig geändert. Bitte den aktuellen Stand prüfen.": [
+    "The request was changed concurrently. Please check the current revision.",
+    "La demande a été modifiée simultanément. Veuillez vérifier la révision actuelle.",
+    "La richiesta è stata modificata contemporaneamente. Verifica la revisione attuale."
+  ],
+  "Dieser Antrag kann in diesem Status nicht geändert werden.": [
+    "This request cannot be changed in its current status.",
+    "Cette demande ne peut pas être modifiée dans son statut actuel.",
+    "Questa richiesta non può essere modificata nello stato attuale."
+  ],
+  "Die Anstellung wurde geändert. Bitte den Antrag neu erfassen.": [
+    "The employment has changed. Please create a new request.",
+    "L’engagement a été modifié. Veuillez saisir une nouvelle demande.",
+    "Il rapporto di lavoro è cambiato. Inserisci una nuova richiesta."
+  ],
+  "Bitte einen gültigen Abwesenheitsbereich wählen.": [
+    "Please select a valid absence scope.",
+    "Veuillez sélectionner un espace d’absence valide.",
+    "Seleziona un ambito delle assenze valido."
+  ],
+  "Geburtsdatum": [
+    "Date of birth",
+    "Date de naissance",
+    "Data di nascita"
+  ],
+  "Kanton": [
+    "Canton",
+    "Canton",
+    "Cantone"
+  ],
+  "Kind": [
+    "Child",
+    "Enfant",
+    "Figlio"
+  ],
+  "Familie und Zulagen": [
+    "Family and allowances",
+    "Famille et allocations",
+    "Famiglia e assegni"
+  ],
+  "Familienaktionen": [
+    "Family actions",
+    "Actions familiales",
+    "Azioni familiari"
+  ],
+  "Kind erfassen": [
+    "Add child",
+    "Ajouter un enfant",
+    "Aggiungi figlio"
+  ],
+  "Kinderdaten korrigieren": [
+    "Revise child data",
+    "Corriger les données de l’enfant",
+    "Correggi i dati del figlio"
+  ],
+  "Kinder": [
+    "Children",
+    "Enfants",
+    "Figli"
+  ],
+  "Keine Kinder erfasst": [
+    "No children recorded",
+    "Aucun enfant enregistré",
+    "Nessun figlio registrato"
+  ],
+  "Zulagenentscheide": [
+    "Allowance decisions",
+    "Décisions d’allocations",
+    "Decisioni sugli assegni"
+  ],
+  "Keine Zulagenentscheide": [
+    "No allowance decisions",
+    "Aucune décision d’allocations",
+    "Nessuna decisione sugli assegni"
+  ],
+  "Kassenentscheid": [
+    "Authority decision",
+    "Décision de la caisse",
+    "Decisione della cassa"
+  ],
+  "Kassenentscheid erfassen": [
+    "Record authority decision",
+    "Saisir une décision de la caisse",
+    "Registra decisione della cassa"
+  ],
+  "Kassenentscheid geprüft": [
+    "Authority decision reviewed",
+    "Décision de la caisse vérifiée",
+    "Decisione della cassa verificata"
+  ],
+  "Kassenentscheid geprüft bestätigen": [
+    "Confirm authority decision review",
+    "Confirmer la vérification de la décision",
+    "Conferma la verifica della decisione"
+  ],
+  "Entscheid widerrufen": [
+    "Revoke decision",
+    "Révoquer la décision",
+    "Revoca decisione"
+  ],
+  "Kinderzulage": [
+    "Child allowance",
+    "Allocation pour enfant",
+    "Assegno per figli"
+  ],
+  "Ausbildungszulage": [
+    "Education allowance",
+    "Allocation de formation",
+    "Assegno di formazione"
+  ],
+  "Name des Kindes": [
+    "Child’s name",
+    "Nom de l’enfant",
+    "Nome del figlio"
+  ],
+  "Zulagenart": [
+    "Allowance type",
+    "Type d’allocation",
+    "Tipo di assegno"
+  ],
+  "Ausgleichskasse": [
+    "Compensation fund",
+    "Caisse de compensation",
+    "Cassa di compensazione"
+  ],
+  "Kassenentscheid-Referenz": [
+    "Authority decision reference",
+    "Référence de la décision de la caisse",
+    "Riferimento della decisione della cassa"
+  ],
+  "Bestätigter Monatsbetrag (CHF)": [
+    "Confirmed monthly amount (CHF)",
+    "Montant mensuel confirmé (CHF)",
+    "Importo mensile confermato (CHF)"
+  ],
+  "Kinderdaten lösen keine Zulage aus. Kassenentscheid, Zeitraum und Betrag werden separat erfasst und unabhängig geprüft. Keine Lohnzahlung.": [
+    "Child data does not trigger an allowance. Authority decision, validity and amount are recorded separately and reviewed independently. No salary payment.",
+    "Les données d’un enfant ne déclenchent aucune allocation. La décision, la période et le montant sont saisis séparément et vérifiés indépendamment. Aucun versement de salaire.",
+    "I dati del figlio non generano assegni. Decisione, periodo e importo sono registrati separatamente e verificati in modo indipendente. Nessun pagamento salariale."
+  ],
+  "Entscheid aktuell nicht wirksam: Zeitraum oder Quellrevision prüfen.": [
+    "Decision currently inactive: check the validity period or source revision.",
+    "Décision actuellement inactive : vérifier la période ou la révision source.",
+    "Decisione attualmente non valida: verifica il periodo o la revisione di origine."
+  ],
+  "Die Familienangaben sind ungültig.": [
+    "The family data is invalid.",
+    "Les données familiales sont invalides.",
+    "I dati familiari non sono validi."
+  ],
+  "Bitte Namen, gültiges Geburtsdatum und aktuellen Revisionsstand prüfen.": [
+    "Please check the name, valid birth date and current revision.",
+    "Veuillez vérifier le nom, la date de naissance et la révision actuelle.",
+    "Verifica nome, data di nascita valida e revisione attuale."
+  ],
+  "Die Anspruchsangaben sind ungültig.": [
+    "The entitlement data is invalid.",
+    "Les données du droit sont invalides.",
+    "I dati del diritto non sono validi."
+  ],
+  "Bitte Kind, Anstellung, Kassenentscheid, Kanton, Zeitraum und bestätigten CHF-Betrag vollständig prüfen.": [
+    "Please check the child, employment, authority decision, canton, period and confirmed CHF amount.",
+    "Veuillez vérifier l’enfant, l’engagement, la décision, le canton, la période et le montant CHF confirmé.",
+    "Verifica figlio, impiego, decisione, cantone, periodo e importo CHF confermato."
+  ],
+  "Die Familienangaben wurden geändert. Bitte den aktuellen Stand prüfen.": [
+    "The family data has changed. Please check the current revision.",
+    "Les données familiales ont changé. Veuillez vérifier la version actuelle.",
+    "I dati familiari sono cambiati. Verifica la versione attuale."
+  ],
+  "Der Anspruch wurde geändert. Bitte den aktuellen Stand prüfen.": [
+    "The claim has changed. Please check the current revision.",
+    "Le droit a été modifié. Veuillez vérifier la version actuelle.",
+    "Il diritto è cambiato. Verifica la versione attuale."
+  ],
+  "Dieser Anspruchsstatus kann hier nicht geändert werden.": [
+    "This claim status cannot be changed here.",
+    "Ce statut du droit ne peut pas être modifié ici.",
+    "Questo stato del diritto non può essere modificato qui."
+  ],
+  "Die Prüfung muss durch eine andere berechtigte Person erfolgen.": [
+    "Another authorized person must perform the review.",
+    "La vérification doit être effectuée par une autre personne autorisée.",
+    "La verifica deve essere eseguita da un’altra persona autorizzata."
+  ],
+  "Die Prüfung darf die erfassten Anspruchsdaten nicht gleichzeitig ändern.": [
+    "The review must not simultaneously change the recorded claim data.",
+    "La vérification ne doit pas modifier simultanément les données du droit saisies.",
+    "La verifica non deve modificare contemporaneamente i dati del diritto registrati."
+  ],
+  "Neue Ansprüche müssen zuerst als Entwurf gespeichert werden.": [
+    "New claims must first be saved as drafts.",
+    "Les nouveaux droits doivent d’abord être enregistrés comme brouillons.",
+    "I nuovi diritti devono prima essere salvati come bozze."
+  ],
+  "Bitte aktuelle Kind- und Anstellungsrevision sowie den Anspruchszeitraum prüfen.": [
+    "Please check the current child and employment revisions and the entitlement period.",
+    "Veuillez vérifier les révisions actuelles de l’enfant et de l’engagement ainsi que la période du droit.",
+    "Verifica le revisioni attuali del figlio e dell’impiego e il periodo del diritto."
+  ],
+  "Geprüfte Ansprüche für dasselbe Kind dürfen sich nicht überschneiden.": [
+    "Reviewed claims for the same child must not overlap.",
+    "Les droits vérifiés pour le même enfant ne doivent pas se chevaucher.",
+    "I diritti verificati per lo stesso figlio non devono sovrapporsi."
+  ],
+  "Lohnvertrag": [
+    "Salary contract",
+    "Contrat salarial",
+    "Contratto salariale"
+  ],
+  "Lohnvertragsaktionen": [
+    "Salary contract actions",
+    "Actions du contrat salarial",
+    "Azioni del contratto salariale"
+  ],
+  "Lohndefinition hinzufügen": [
+    "Add salary definition",
+    "Ajouter une définition salariale",
+    "Aggiungi una definizione salariale"
+  ],
+  "Lohndefinition korrigieren": [
+    "Revise salary definition",
+    "Corriger la définition salariale",
+    "Correggi la definizione salariale"
+  ],
+  "Keine Lohndefinitionen": [
+    "No salary definitions",
+    "Aucune définition salariale",
+    "Nessuna definizione salariale"
+  ],
+  "Vertragsbeträge werden unverändert erfasst. Keine automatische Umrechnung, Pensumskürzung oder Lohnzahlung.": [
+    "Contract amounts are recorded as agreed. No automatic conversion, workload reduction or salary payment.",
+    "Les montants contractuels sont saisis tels que convenus. Aucune conversion, réduction selon le taux d’activité ou versement automatique.",
+    "Gli importi contrattuali sono registrati come concordati. Nessuna conversione, riduzione per il grado di occupazione o pagamento automatico."
+  ],
+  "Monatslohn": [
+    "Monthly salary",
+    "Salaire mensuel",
+    "Salario mensile"
+  ],
+  "Stundenlohn": [
+    "Hourly wage",
+    "Salaire horaire",
+    "Salario orario"
+  ],
+  "Jahreslohn": [
+    "Annual salary",
+    "Salaire annuel",
+    "Salario annuo"
+  ],
+  "Inklusive 13. Monatslohn": [
+    "Including 13th-month salary",
+    "Treizième salaire inclus",
+    "Tredicesima inclusa"
+  ],
+  "Exklusive 13. Monatslohn": [
+    "Excluding 13th-month salary",
+    "Treizième salaire exclu",
+    "Tredicesima esclusa"
+  ],
+  "Ohne Anspruch auf 13. Monatslohn": [
+    "No entitlement to 13th-month salary",
+    "Sans droit au treizième salaire",
+    "Senza diritto alla tredicesima"
+  ],
+  "Anspruch auf 13. Monatslohn": [
+    "Entitlement to 13th-month salary",
+    "Droit au treizième salaire",
+    "Diritto alla tredicesima"
+  ],
+  "Auszahlungstag": [
+    "Payment day",
+    "Jour de versement",
+    "Giorno di pagamento"
+  ],
+  "Monatsletzter": [
+    "Last day of the month",
+    "Dernier jour du mois",
+    "Ultimo giorno del mese"
+  ],
+  "Auszahlungsmonat 13. Monatslohn": [
+    "13th-month salary payment month",
+    "Mois de versement du treizième salaire",
+    "Mese di pagamento della tredicesima"
+  ],
+  "Anstellungsrevision": [
+    "Employment revision",
+    "Révision de l’engagement",
+    "Revisione del rapporto di lavoro"
+  ],
+  "Lohnmodell": [
+    "Salary model",
+    "Modèle salarial",
+    "Modello salariale"
+  ],
+  "Vertragsbetrag": [
+    "Contract amount",
+    "Montant contractuel",
+    "Importo contrattuale"
+  ],
+  "Jahreslohnbasis": [
+    "Annual salary basis",
+    "Base du salaire annuel",
+    "Base del salario annuo"
+  ],
+  "Anstellungsrevision geändert. Lohnvertrag ausdrücklich prüfen und neu bestätigen.": [
+    "Employment revision changed. Explicitly review and reconfirm the salary contract.",
+    "Révision de l’engagement modifiée. Vérifiez et confirmez à nouveau le contrat salarial.",
+    "Revisione del rapporto di lavoro modificata. Verifica e riconferma espressamente il contratto salariale."
+  ],
+  "Bitte Lohnmodell, Anspruch und Auszahlungsplan ausdrücklich auswählen.": [
+    "Please explicitly select a salary model, entitlement and payment schedule.",
+    "Veuillez sélectionner explicitement le modèle salarial, le droit et le calendrier de versement.",
+    "Seleziona espressamente il modello salariale, il diritto e il piano di pagamento."
+  ],
+  "Die Lohndefinition ist ungültig.": [
+    "The salary definition is invalid.",
+    "La définition salariale est invalide.",
+    "La definizione salariale non è valida."
+  ],
+  "Bitte eine gültige Lohngültigkeit erfassen.": [
+    "Please enter a valid salary validity period.",
+    "Veuillez saisir une période de validité salariale correcte.",
+    "Inserisci un periodo di validità salariale valido."
+  ],
+  "Bitte einen positiven Vertragsbetrag mit höchstens zwei Dezimalstellen erfassen.": [
+    "Please enter a positive contract amount with at most two decimal places.",
+    "Veuillez saisir un montant contractuel positif avec deux décimales au maximum.",
+    "Inserisci un importo contrattuale positivo con al massimo due decimali."
+  ],
+  "Bitte Jahreslohnbasis und Anspruch auf den 13. Monatslohn ausdrücklich festlegen.": [
+    "Please explicitly define the annual salary basis and entitlement to a 13th-month salary.",
+    "Veuillez définir explicitement la base annuelle et le droit au treizième salaire.",
+    "Definisci espressamente la base annua e il diritto alla tredicesima."
+  ],
+  "Eine Jahreslohnbasis ist nur bei Jahreslohn zulässig.": [
+    "An annual salary basis is only allowed for annual salaries.",
+    "Une base annuelle est autorisée uniquement pour un salaire annuel.",
+    "Una base annua è consentita solo per un salario annuo."
+  ],
+  "Bitte einen Auszahlungstag von 1 bis 28 oder den Monatsletzten wählen.": [
+    "Please select a payment day from 1 to 28 or the last day of the month.",
+    "Veuillez choisir un jour de versement de 1 à 28 ou le dernier jour du mois.",
+    "Seleziona un giorno di pagamento da 1 a 28 oppure l’ultimo giorno del mese."
+  ],
+  "Bitte den Auszahlungsmonat für den 13. Monatslohn passend zum Anspruch erfassen.": [
+    "Please enter the payment month for the 13th-month salary consistent with entitlement.",
+    "Veuillez saisir le mois de versement du treizième salaire conformément au droit.",
+    "Inserisci il mese di pagamento della tredicesima coerente con il diritto."
+  ],
+  "Bitte eine aktuelle Anstellungsrevision und dazu passende Lohngültigkeit wählen.": [
+    "Please select a current employment revision and a matching salary validity period.",
+    "Veuillez choisir une révision actuelle de l’engagement et une validité salariale correspondante.",
+    "Seleziona una revisione attuale del rapporto di lavoro e una validità salariale corrispondente."
+  ],
+  "Die Lohndefinition wurde gleichzeitig geändert. Bitte den aktuellen Stand prüfen.": [
+    "The salary definition was changed concurrently. Please review the current version.",
+    "La définition salariale a été modifiée simultanément. Veuillez vérifier la version actuelle.",
+    "La definizione salariale è stata modificata contemporaneamente. Verifica la versione attuale."
+  ],
+  "Eine Lohnrevision muss zur gleichen Anstellungsperiode gehören.": [
+    "A salary revision must belong to the same employment period.",
+    "Une révision salariale doit appartenir à la même période d’engagement.",
+    "Una revisione salariale deve appartenere allo stesso periodo di impiego."
+  ],
+  "Lohngültigkeiten dürfen sich nicht überschneiden.": [
+    "Salary validity periods must not overlap.",
+    "Les périodes de validité salariale ne doivent pas se chevaucher.",
+    "I periodi di validità salariale non devono sovrapporsi."
+  ],
+  "Gültig ab": [
+    "Valid from",
+    "Valable dès le",
+    "Valido dal"
+  ],
+  "Sensible Fachrechte": [
+    "Sensitive data permissions",
+    "Droits sur les données sensibles",
+    "Diritti sui dati sensibili"
+  ],
+  "Sensible Personaldaten lesen": [
+    "Read sensitive personnel data",
+    "Lire les données sensibles du personnel",
+    "Leggi i dati sensibili del personale"
+  ],
+  "Sensible Personaldaten bearbeiten": [
+    "Edit sensitive personnel data",
+    "Modifier les données sensibles du personnel",
+    "Modifica i dati sensibili del personale"
+  ],
+  "Familiendaten lesen": [
+    "Read family data",
+    "Lire les données familiales",
+    "Leggi i dati familiari"
+  ],
+  "Familiendaten bearbeiten": [
+    "Edit family data",
+    "Modifier les données familiales",
+    "Modifica i dati familiari"
+  ],
+  "Lohndaten lesen": [
+    "Read payroll data",
+    "Lire les données salariales",
+    "Leggi i dati salariali"
+  ],
+  "Lohnvorbereitung bearbeiten": [
+    "Edit payroll preparation",
+    "Modifier la préparation des salaires",
+    "Modifica la preparazione salariale"
+  ],
+  "Lohnläufe prüfen und freigeben": [
+    "Review and approve payroll runs",
+    "Vérifier et approuver les décomptes de salaire",
+    "Verifica e approva i conteggi salariali"
+  ],
+  "Lohnzahlungen bestätigen": [
+    "Confirm salary payments",
+    "Confirmer les paiements de salaire",
+    "Conferma i pagamenti salariali"
+  ],
+  "Diese Rechte werden ausdrücklich vergeben und gelten zusätzlich zur Mandanten- und Modulprüfung. Eigene Lohnabrechnungen werden getrennt geprüft.": [
+    "These permissions are explicitly assigned in addition to company and module checks. Access to personal payslips is checked separately.",
+    "Ces droits sont attribués explicitement en complément des contrôles de société et de module. L’accès aux propres fiches de salaire est contrôlé séparément.",
+    "Questi diritti sono assegnati esplicitamente oltre ai controlli di azienda e modulo. L’accesso ai propri conteggi salariali viene verificato separatamente."
+  ],
+  "Fachrechte können nur für aktive Standardzugänge vergeben werden.": [
+    "Permissions can only be assigned to active standard accounts.",
+    "Les droits ne peuvent être attribués qu’aux accès standard actifs.",
+    "I diritti possono essere assegnati solo agli accessi standard attivi."
+  ],
+  "Die Fachrechte sind ungültig.": [
+    "The permissions are invalid.",
+    "Les droits sont invalides.",
+    "I diritti non sono validi."
+  ],
+  "Diese Fachrechte passen nicht zur gewählten Rolle.": [
+    "These permissions do not match the selected role.",
+    "Ces droits ne correspondent pas au rôle choisi.",
+    "Questi diritti non corrispondono al ruolo selezionato."
+  ],
+  "Zum Bearbeiten oder Freigeben muss auch das entsprechende Leserecht ausgewählt sein.": [
+    "Editing or approval also requires the corresponding read permission to be selected.",
+    "La modification ou l’approbation nécessite aussi de sélectionner le droit de lecture correspondant.",
+    "Per modificare o approvare occorre selezionare anche il relativo diritto di lettura."
+  ],
+  "Für diese sensiblen Daten fehlt das ausdrücklich vergebene Fachrecht.": [
+    "The explicitly assigned permission for this sensitive data is missing.",
+    "Le droit explicitement attribué pour ces données sensibles manque.",
+    "Manca il diritto esplicitamente assegnato per questi dati sensibili."
+  ],
+  "Nur der Inhaber kann diese Inhaberrechte verwalten.": [
+    "Only the owner can manage these owner permissions.",
+    "Seul le propriétaire peut gérer ces droits du propriétaire.",
+    "Solo il titolare può gestire questi diritti del titolare."
+  ],
+  "Die Fachrechte wurden geändert. Bitte den aktuellen Stand prüfen.": [
+    "The permissions have changed. Please check the current settings.",
+    "Les droits ont changé. Veuillez vérifier les paramètres actuels.",
+    "I diritti sono cambiati. Verifica le impostazioni attuali."
+  ],
+  "Bitte die Rollenänderung zuerst speichern oder verwerfen.": [
+    "Please save or discard the role change first.",
+    "Veuillez d’abord enregistrer ou abandonner le changement de rôle.",
+    "Salva o annulla prima la modifica del ruolo."
+  ],
+  "Teammitglied wurde nicht gefunden.": [
+    "Team member not found.",
+    "Membre de l’équipe introuvable.",
+    "Membro del team non trovato."
+  ],
+  "Externe Ressourcen": [
+    "External resources",
+    "Ressources externes",
+    "Risorse esterne"
+  ],
+  "Ressourcenaktionen": [
+    "Resource actions",
+    "Actions sur les ressources",
+    "Azioni sulle risorse"
+  ],
+  "Externe Person hinzufügen": [
+    "Add external person",
+    "Ajouter une personne externe",
+    "Aggiungi una persona esterna"
+  ],
+  "Externe Person bearbeiten": [
+    "Edit external person",
+    "Modifier une personne externe",
+    "Modifica una persona esterna"
+  ],
+  "Externe Personen gehören zum Lieferanten. Es werden weder Mitarbeiterakte noch Benutzerkonto oder Lohnzahlung erstellt.": [
+    "External people belong to the supplier. No employee dossier, user account or salary payment is created.",
+    "Les personnes externes appartiennent au fournisseur. Aucun dossier du personnel, compte utilisateur ou versement de salaire n’est créé.",
+    "Le persone esterne appartengono al fornitore. Non vengono creati dossier del personale, account utente o pagamenti salariali."
+  ],
+  "Keine externen Ressourcen": [
+    "No external resources",
+    "Aucune ressource externe",
+    "Nessuna risorsa esterna"
+  ],
+  "Einsatz hinzufügen": [
+    "Add assignment",
+    "Ajouter une mission",
+    "Aggiungi un incarico"
+  ],
+  "Externe Einsätze": [
+    "External assignments",
+    "Missions externes",
+    "Incarichi esterni"
+  ],
+  "Einsatz beenden": [
+    "End assignment",
+    "Terminer la mission",
+    "Termina l’incarico"
+  ],
+  "Einsatz beenden?": [
+    "End assignment?",
+    "Terminer la mission ?",
+    "Terminare l’incarico?"
+  ],
+  "Bitte Ressource und Einsatzangaben prüfen.": [
+    "Please check the resource and assignment details.",
+    "Veuillez vérifier la ressource et les données de la mission.",
+    "Verifica la risorsa e i dati dell’incarico."
+  ],
+  "Diese Ressourcenangaben können hier nicht geändert werden.": [
+    "These resource details cannot be changed here.",
+    "Ces données de ressource ne peuvent pas être modifiées ici.",
+    "Questi dati della risorsa non possono essere modificati qui."
+  ],
+  "Externe Ressource wurde nicht gefunden.": [
+    "External resource not found.",
+    "Ressource externe introuvable.",
+    "Risorsa esterna non trovata."
+  ],
+  "Der Stand wurde geändert. Bitte die Ansicht aktualisieren.": [
+    "The data has changed. Please refresh the view.",
+    "Les données ont changé. Veuillez actualiser la vue.",
+    "I dati sono cambiati. Aggiorna la vista."
+  ],
+  "Einsatz wurde nicht gefunden.": [
+    "Assignment not found.",
+    "Mission introuvable.",
+    "Incarico non trovato."
+  ],
+  "Ressource oder Lieferant ist nicht aktiv.": [
+    "Resource or supplier is not active.",
+    "La ressource ou le fournisseur n’est pas actif.",
+    "La risorsa o il fornitore non è attivo."
+  ],
+  "Für diese externe Ressource fehlt ein gültiger Einsatz.": [
+    "There is no valid assignment for this external resource.",
+    "Aucune mission valide n’est disponible pour cette ressource externe.",
+    "Non esiste un incarico valido per questa risorsa esterna."
+  ],
+  "Eingangsrechnungsbelege": [
+    "Supplier invoice receipts",
+    "Justificatifs de facture fournisseur",
+    "Giustificativi della fattura fornitore"
+  ],
+  "Eingangsrechnungsentwurf": [
+    "Supplier invoice draft",
+    "Brouillon de facture fournisseur",
+    "Bozza di fattura fornitore"
+  ],
+  "Entwürfe können unvollständig gespeichert werden. Sie sind weder freigegeben noch bezahlt.": [
+    "Drafts may be saved incomplete. They are neither approved nor paid.",
+    "Les brouillons peuvent être enregistrés incomplets. Ils ne sont ni approuvés ni payés.",
+    "Le bozze possono essere salvate incomplete. Non sono né approvate né pagate."
+  ],
+  "Keine Eingangsrechnungen": [
+    "No supplier invoices",
+    "Aucune facture fournisseur",
+    "Nessuna fattura fornitore"
+  ],
+  "Nummer offen": [
+    "Number pending",
+    "Numéro à compléter",
+    "Numero da completare"
+  ],
+  "Betrag offen": [
+    "Amount pending",
+    "Montant à compléter",
+    "Importo da completare"
+  ],
+  "Währung ungeklärt": [
+    "Currency unresolved",
+    "Devise à clarifier",
+    "Valuta da chiarire"
+  ],
+  "In Prüfung": [
+    "Under review",
+    "En cours de vérification",
+    "In verifica"
+  ],
+  "Entwurf bearbeiten": [
+    "Edit draft",
+    "Modifier le brouillon",
+    "Modifica la bozza"
+  ],
+  "Nettobetrag": [
+    "Net amount",
+    "Montant net",
+    "Importo netto"
+  ],
+  "MwSt.-Betrag": [
+    "VAT amount",
+    "Montant de TVA",
+    "Importo IVA"
+  ],
+  "Diese Rechnungsangaben können hier nicht geändert werden.": [
+    "These invoice details cannot be changed here.",
+    "Ces données de facture ne peuvent pas être modifiées ici.",
+    "Questi dati della fattura non possono essere modificati qui."
+  ],
+  "Bitte die Eingangsrechnungsangaben prüfen.": [
+    "Please check the supplier invoice details.",
+    "Veuillez vérifier les données de la facture fournisseur.",
+    "Verifica i dati della fattura fornitore."
+  ],
+  "Bitte Beträge mit höchstens zwei Nachkommastellen erfassen.": [
+    "Please enter amounts with at most two decimal places.",
+    "Veuillez saisir des montants avec au maximum deux décimales.",
+    "Inserisci importi con al massimo due decimali."
+  ],
+  "Nettobetrag und MwSt. stimmen nicht mit dem Gesamtbetrag überein.": [
+    "Net amount and VAT do not match the total.",
+    "Le montant net et la TVA ne correspondent pas au total.",
+    "L’importo netto e l’IVA non corrispondono al totale."
+  ],
+  "Eingangsrechnung wurde nicht gefunden.": [
+    "Supplier invoice not found.",
+    "Facture fournisseur introuvable.",
+    "Fattura fornitore non trovata."
+  ],
+  "Die Eingangsrechnung wurde geändert oder ist kein bearbeitbarer Entwurf.": [
+    "The supplier invoice has changed or is not an editable draft.",
+    "La facture fournisseur a changé ou n’est pas un brouillon modifiable.",
+    "La fattura fornitore è cambiata o non è una bozza modificabile."
+  ],
+  "Diese Rechnungsnummer ist bei diesem Lieferanten bereits vorhanden. Bitte den vorhandenen Beleg prüfen.": [
+    "This invoice number already exists for this supplier. Please check the existing document.",
+    "Ce numéro de facture existe déjà pour ce fournisseur. Veuillez vérifier le document existant.",
+    "Questo numero di fattura esiste già per questo fornitore. Verifica il documento esistente."
+  ],
+  "Einladung erneut senden": [
+    "Resend invitation",
+    "Renvoyer l’invitation",
+    "Invia di nuovo l’invito"
+  ],
+  "Einladung erneut senden?": [
+    "Resend invitation?",
+    "Renvoyer l’invitation ?",
+    "Inviare di nuovo l’invito?"
+  ],
+  "Der bisherige Link wird ungültig. Die neue Einladung gilt sieben Tage; Rolle und Modulprofil bleiben erhalten.": [
+    "The previous link becomes invalid. The new invitation is valid for seven days; role and module profile are preserved.",
+    "Le lien précédent devient invalide. La nouvelle invitation est valable sept jours ; le rôle et le profil de modules sont conservés.",
+    "Il link precedente non sarà più valido. Il nuovo invito vale sette giorni; ruolo e profilo dei moduli restano invariati."
+  ],
+  "Neue Einladung an Versand übergeben.": [
+    "New invitation submitted for sending.",
+    "Nouvelle invitation transmise pour envoi.",
+    "Nuovo invito inoltrato per l’invio."
+  ],
+  "Diese Einladung wurde geändert oder ist nicht mehr offen.": [
+    "This invitation has changed or is no longer pending.",
+    "Cette invitation a changé ou n’est plus en attente.",
+    "Questo invito è cambiato o non è più in sospeso."
+  ],
+  "Einladung wurde nicht gefunden.": [
+    "Invitation not found.",
+    "Invitation introuvable.",
+    "Invito non trovato."
+  ],
+  "Mitarbeiterzugang verknüpfen": [
+    "Link employee account",
+    "Associer l’accès du collaborateur",
+    "Collega l’accesso del collaboratore"
+  ],
+  "Die Verknüpfung erstellt weder ein Konto noch eine Kunden- oder Auftragsfreigabe.": [
+    "Linking does not create an account or grant customer or project access.",
+    "L’association ne crée aucun compte et n’accorde aucun accès aux clients ou aux mandats.",
+    "Il collegamento non crea un account e non concede accesso a clienti o incarichi."
+  ],
+  "Bitte Mitarbeiter und bestehenden Zugang prüfen.": [
+    "Please check the employee and existing account.",
+    "Veuillez vérifier le collaborateur et l’accès existant.",
+    "Verifica il collaboratore e l’accesso esistente."
+  ],
+  "Bankverbindung bearbeiten": [
+    "Edit bank details",
+    "Modifier les coordonnées bancaires",
+    "Modifica le coordinate bancarie"
+  ],
+  "Keine Bankverbindung": [
+    "No bank details",
+    "Aucune coordonnée bancaire",
+    "Nessuna coordinata bancaria"
+  ],
+  "Schweiz oder Liechtenstein. Leer lassen, um die Bankverbindung zu entfernen.": [
+    "Switzerland or Liechtenstein. Leave empty to remove the bank details.",
+    "Suisse ou Liechtenstein. Laissez vide pour supprimer les coordonnées bancaires.",
+    "Svizzera o Liechtenstein. Lascia vuoto per rimuovere le coordinate bancarie."
+  ],
+  "Die Änderung benötigt eine Sicherheitsbestätigung. Es wird keine Zahlung ausgelöst.": [
+    "The change requires security confirmation. No payment will be initiated.",
+    "La modification nécessite une confirmation de sécurité. Aucun paiement ne sera déclenché.",
+    "La modifica richiede una conferma di sicurezza. Non verrà avviato alcun pagamento."
+  ],
+  "Bitte die Bankverbindung und den aktuellen Stand prüfen.": [
+    "Please check the bank details and current version.",
+    "Veuillez vérifier les coordonnées bancaires et la version actuelle.",
+    "Verifica le coordinate bancarie e la versione attuale."
+  ],
+  "Bitte eine gültige Schweizer oder Liechtensteiner IBAN eingeben.": [
+    "Please enter a valid Swiss or Liechtenstein IBAN.",
+    "Veuillez saisir un IBAN suisse ou liechtensteinois valide.",
+    "Inserisci un IBAN svizzero o del Liechtenstein valido."
+  ],
+  "Tatsächliches Zahlungsdatum": [
+    "Actual payment date",
+    "Date effective du paiement",
+    "Data effettiva del pagamento"
+  ],
+  "Bitte den Erstattungsbetrag und die Währung prüfen.": [
+    "Please check the reimbursement amount and currency.",
+    "Veuillez vérifier le montant et la devise du remboursement.",
+    "Verifica l’importo e la valuta del rimborso."
+  ],
+  "Der Spesenbetrag wurde geändert. Bitte den aktuellen Stand prüfen.": [
+    "The expense amount has changed. Please check the current details.",
+    "Le montant des frais a changé. Veuillez vérifier les données actuelles.",
+    "L’importo delle spese è cambiato. Verifica i dati attuali."
+  ],
+  "Bezahlt mit": [
+    "Paid with",
+    "Payé avec",
+    "Pagato con"
+  ],
+  "Zahlungsart ungeklärt": [
+    "Payment source unresolved",
+    "Mode de paiement à clarifier",
+    "Modalità di pagamento da chiarire"
+  ],
+  "Privat bezahlt": [
+    "Paid personally",
+    "Payé à titre privé",
+    "Pagato privatamente"
+  ],
+  "Firmenkarte": [
+    "Company card",
+    "Carte de société",
+    "Carta aziendale"
+  ],
+  "Direkt durch die Firma bezahlt": [
+    "Paid directly by the company",
+    "Payé directement par la société",
+    "Pagato direttamente dall’azienda"
+  ],
+  "Bitte eine gültige Zahlungsart wählen.": [
+    "Please select a valid payment source.",
+    "Veuillez choisir un mode de paiement valide.",
+    "Seleziona una modalità di pagamento valida."
+  ],
+  "Nur nachweislich privat bezahlte Spesen können erstattet werden.": [
+    "Only expenses explicitly paid personally can be reimbursed.",
+    "Seuls les frais explicitement payés à titre privé peuvent être remboursés.",
+    "Possono essere rimborsate solo le spese esplicitamente pagate privatamente."
+  ],
+  "Lieferanten suchen...": [
+    "Search suppliers...",
+    "Rechercher des fournisseurs...",
+    "Cerca fornitori..."
+  ],
+  "Lieferant hinzufügen": [
+    "Add supplier",
+    "Ajouter un fournisseur",
+    "Aggiungi fornitore"
+  ],
+  "Lieferant bearbeiten": [
+    "Edit supplier",
+    "Modifier le fournisseur",
+    "Modifica fornitore"
+  ],
+  "Lieferantenaktionen": [
+    "Supplier actions",
+    "Actions relatives au fournisseur",
+    "Azioni relative al fornitore"
+  ],
+  "Diese Lieferantenangaben können hier nicht geändert werden.": [
+    "These supplier details cannot be changed here.",
+    "Ces informations sur le fournisseur ne peuvent pas être modifiées ici.",
+    "Questi dati del fornitore non possono essere modificati qui."
+  ],
+  "Die Lieferantenangaben sind ungültig.": [
+    "The supplier details are invalid.",
+    "Les informations sur le fournisseur sont invalides.",
+    "I dati del fornitore non sono validi."
+  ],
+  "Bitte einen Lieferantennamen eingeben.": [
+    "Please enter a supplier name.",
+    "Veuillez saisir un nom de fournisseur.",
+    "Inserisci un nome del fornitore."
+  ],
+  "Bitte eine Zahlungsfrist zwischen 0 und 180 Tagen erfassen.": [
+    "Please enter a payment term between 0 and 180 days.",
+    "Veuillez saisir un délai de paiement entre 0 et 180 jours.",
+    "Inserisci un termine di pagamento compreso tra 0 e 180 giorni."
+  ],
+  "Lieferant wurde nicht gefunden.": [
+    "Supplier not found.",
+    "Fournisseur introuvable.",
+    "Fornitore non trovato."
+  ],
+  "Der Lieferant wurde geändert. Bitte die Ansicht aktualisieren.": [
+    "The supplier has changed. Please refresh the view.",
+    "Le fournisseur a été modifié. Veuillez actualiser la vue.",
+    "Il fornitore è stato modificato. Aggiorna la vista."
+  ],
+  "Eine mögliche Lieferantendublette ist vorhanden. Bitte die Stammdaten zuerst prüfen.": [
+    "A possible duplicate supplier exists. Please check the master data first.",
+    "Un doublon potentiel du fournisseur existe. Veuillez d’abord vérifier les données de base.",
+    "Esiste un possibile duplicato del fornitore. Verifica prima i dati di base."
+  ],
+  "Anstellung": [
+    "Employment",
+    "Emploi",
+    "Impiego"
+  ],
+  "Anstellungsperioden": [
+    "Employment periods",
+    "Périodes d’emploi",
+    "Periodi di impiego"
+  ],
+  "Anstellungsaktionen": [
+    "Employment actions",
+    "Actions relatives à l’emploi",
+    "Azioni relative all’impiego"
+  ],
+  "Anstellungsperiode hinzufügen": [
+    "Add employment period",
+    "Ajouter une période d’emploi",
+    "Aggiungi un periodo di impiego"
+  ],
+  "Keine Anstellungsperioden": [
+    "No employment periods",
+    "Aucune période d’emploi",
+    "Nessun periodo di impiego"
+  ],
+  "Unbefristet": [
+    "Open-ended",
+    "Durée indéterminée",
+    "A tempo indeterminato"
+  ],
+  "Aktueller Vertragsstand": [
+    "Current contract version",
+    "Version actuelle du contrat",
+    "Versione attuale del contratto"
+  ],
+  "Frühere Revision": [
+    "Previous revision",
+    "Révision précédente",
+    "Revisione precedente"
+  ],
+  "Vertragsstand korrigieren": [
+    "Correct contract version",
+    "Corriger la version du contrat",
+    "Correggi la versione del contratto"
+  ],
+  "Vertragsstände bleiben als Revisionen erhalten. Eine Anstellung erstellt keinen App-Zugang und löst keine Lohnzahlung aus.": [
+    "Contract versions are retained as revisions. Employment does not create app access or trigger salary payments.",
+    "Les versions du contrat sont conservées en tant que révisions. Un emploi ne crée pas d’accès à l’application et ne déclenche aucun versement de salaire.",
+    "Le versioni del contratto vengono conservate come revisioni. Un impiego non crea un accesso all’app e non avvia pagamenti di salario."
+  ],
+  "Bitte den aktuellen Revisionsstand angeben.": [
+    "Please provide the current revision.",
+    "Veuillez indiquer la révision actuelle.",
+    "Indica la revisione attuale."
+  ],
+  "Arbeitsort": [
+    "Workplace",
+    "Lieu de travail",
+    "Luogo di lavoro"
+  ],
+  "Austritt": [
+    "Leaving date",
+    "Date de départ",
+    "Data di uscita"
+  ],
+  "Optional · erstellt keinen App-Zugang": [
+    "Optional · does not create app access",
+    "Facultatif · ne crée pas d’accès à l’application",
+    "Facoltativo · non crea un accesso all’app"
+  ],
+  "Bitte ein gültiges Austrittsdatum erfassen.": [
+    "Please enter a valid leaving date.",
+    "Veuillez saisir une date de départ valide.",
+    "Inserisci una data di uscita valida."
+  ],
+  "Der Austritt darf nicht vor dem Eintritt liegen.": [
+    "The leaving date must not precede the start date.",
+    "La date de départ ne peut pas précéder la date d’entrée.",
+    "La data di uscita non può precedere la data di entrata."
+  ],
+  "Bitte einen Arbeitsort mit höchstens 180 Zeichen erfassen.": [
+    "Please enter a workplace with no more than 180 characters.",
+    "Veuillez saisir un lieu de travail de 180 caractères maximum.",
+    "Inserisci un luogo di lavoro di massimo 180 caratteri."
+  ],
   "Diese Mitarbeiterangaben können hier nicht geändert werden.": [
     "These employee details cannot be changed here.",
     "Ces informations sur le collaborateur ne peuvent pas être modifiées ici.",
@@ -547,7 +1953,8 @@
   "Filter": [
     "Filter",
     "Filtrer",
-    "Filtra"
+    "Filtra",
+    "Filtre"
   ],
   "Letzte Rechnungen": [
     "Recent invoices",
@@ -572,7 +1979,8 @@
   "Sortieren": [
     "Sort",
     "Trier",
-    "Ordina"
+    "Ordina",
+    "Sırala"
   ],
   "Arbeitsbereich": [
     "Workspace",
@@ -597,7 +2005,8 @@
   "Offene Rechnungen": [
     "Open invoices",
     "Factures ouvertes",
-    "Fatture aperte"
+    "Fatture aperte",
+    "Açık faturalar"
   ],
   "Alles durchsuchen": [
     "Search everything",
@@ -612,7 +2021,8 @@
   "Kontaktperson": [
     "Contact person",
     "Personne de contact",
-    "Persona di contatto"
+    "Persona di contatto",
+    "İrtibat kişisi"
   ],
   "Aktivitäten": [
     "Activities",
@@ -992,7 +2402,8 @@
   "Abbrechen": [
     "Cancel",
     "Annuler",
-    "Annulla"
+    "Annulla",
+    "İptal"
   ],
   "Abgelaufen": [
     "Expired",
@@ -1017,7 +2428,8 @@
   "Abmelden": [
     "Sign out",
     "Se déconnecter",
-    "Esci"
+    "Esci",
+    "Çıkış yap"
   ],
   "Abmelden fehlgeschlagen. Bitte erneut versuchen.": [
     "Sign-out failed. Please try again.",
@@ -1197,7 +2609,8 @@
   "Aktiv": [
     "Active",
     "Actif",
-    "Attivo"
+    "Attivo",
+    "Etkin"
   ],
   "Aktive Abonnemente": [
     "Active subscriptions",
@@ -1362,7 +2775,8 @@
   "Alle anzeigen": [
     "Show all",
     "Tout afficher",
-    "Mostra tutto"
+    "Mostra tutto",
+    "Tümünü göster"
   ],
   "Alle Benachrichtigungen": [
     "All notifications",
@@ -1557,7 +2971,8 @@
   "Änderungen verwerfen?": [
     "Discard changes?",
     "Abandonner les modifications ?",
-    "Scartare le modifiche?"
+    "Scartare le modifiche?",
+    "Değişiklikler silinsin mi?"
   ],
   "Angaben": [
     "Details",
@@ -1607,7 +3022,8 @@
   "Angebote": [
     "Quotes",
     "Devis",
-    "Offerte"
+    "Offerte",
+    "Teklifler"
   ],
   "Angebote / Rechnungen": [
     "Quotes / invoices",
@@ -1962,7 +3378,8 @@
   "Aufträge": [
     "Jobs",
     "Mandats",
-    "Commesse"
+    "Commesse",
+    "İşler"
   ],
   "Aufträge, Leistungen, Budgets und Fortschritt steuern.": [
     "Manage jobs, services, budgets and progress.",
@@ -2007,7 +3424,8 @@
   "Ausgaben": [
     "Expenditure",
     "Dépenses",
-    "Uscite"
+    "Uscite",
+    "Giderler"
   ],
   "Auslandtransfer": [
     "International transfer",
@@ -2342,7 +3760,8 @@
   "Benachrichtigungen": [
     "Notifications",
     "Notifications",
-    "Notifiche"
+    "Notifiche",
+    "Bildirimler"
   ],
   "Benachrichtigungen konnten nicht aktualisiert werden.": [
     "Notifications could not be updated.",
@@ -2407,7 +3826,8 @@
   "Bereit": [
     "Ready",
     "Prêt",
-    "Pronto"
+    "Pronto",
+    "Hazır"
   ],
   "Bereits bezahlt": [
     "Already paid",
@@ -2437,7 +3857,8 @@
   "Berichte": [
     "Reports",
     "Rapports",
-    "Report"
+    "Report",
+    "Raporlar"
   ],
   "Beschreibe dein Anliegen kurz...": [
     "Briefly describe your request...",
@@ -3212,7 +4633,8 @@
   "Darstellung": [
     "Appearance",
     "Apparence",
-    "Aspetto"
+    "Aspetto",
+    "Görünüm"
   ],
   "Darstellung & Sprache": [
     "Appearance & language",
@@ -3477,7 +4899,8 @@
   "Datenschutz": [
     "Privacy",
     "Protection des données",
-    "Privacy"
+    "Privacy",
+    "Gizlilik"
   ],
   "DATENSCHUTZ": [
     "PRIVACY",
@@ -3597,7 +5020,8 @@
   "Deine Änderungen sind noch nicht gespeichert und gehen verloren.": [
     "Your changes have not been saved and will be lost.",
     "Vos modifications ne sont pas enregistrées et seront perdues.",
-    "Le modifiche non sono salvate e andranno perse."
+    "Le modifiche non sono salvate e andranno perse.",
+    "Değişiklikleriniz kaydedilmedi ve silinecek."
   ],
   "Deine Änderungen sind noch nicht gespeichert.": [
     "Your changes have not been saved yet.",
@@ -4452,7 +5876,8 @@
   "Dokumente": [
     "Documents",
     "Documents",
-    "Documenti"
+    "Documenti",
+    "Belgeler"
   ],
   "Dokumente werden geladen …": [
     "Loading documents…",
@@ -4692,7 +6117,8 @@
   "Eingereicht": [
     "Submitted",
     "Soumis",
-    "Presentato"
+    "Presentato",
+    "Gönderildi"
   ],
   "Eingeschränkt": [
     "Restricted",
@@ -4792,7 +6218,8 @@
   "Einnahmen": [
     "Income",
     "Recettes",
-    "Entrate"
+    "Entrate",
+    "Gelirler"
   ],
   "Einreichen": [
     "Submit",
@@ -4992,7 +6419,8 @@
   "Entfernen": [
     "Remove",
     "Supprimer",
-    "Rimuovi"
+    "Rimuovi",
+    "Kaldır"
   ],
   "Entwickelt für Schweizer KMU.": [
     "Designed for Swiss SMEs.",
@@ -5032,7 +6460,8 @@
   "Erfasst": [
     "Recorded",
     "Saisi",
-    "Registrato"
+    "Registrato",
+    "Kaydedildi"
   ],
   "Erfasste Anwendungsfehler": [
     "Recorded application errors",
@@ -5372,7 +6801,8 @@
   "Finanzen": [
     "Finance",
     "Finances",
-    "Finanze"
+    "Finanze",
+    "Finans"
   ],
   "Finanzen werden geladen …": [
     "Loading finances…",
@@ -5477,7 +6907,8 @@
   "Fortsetzen": [
     "Continue",
     "Continuer",
-    "Continua"
+    "Continua",
+    "Devam et"
   ],
   "Frage zu einer Rechnung": [
     "Question about an invoice",
@@ -5512,7 +6943,8 @@
   "Freigegeben": [
     "Approved",
     "Approuvé",
-    "Approvato"
+    "Approvato",
+    "Onaylandı"
   ],
   "Freigegebene Zeiten hinzufügen": [
     "Add approved time entries",
@@ -6002,7 +7434,8 @@
   "Inaktiv": [
     "Inactive",
     "Inactif",
-    "Inattivo"
+    "Inattivo",
+    "Devre dışı"
   ],
   "Infrastruktur": [
     "Infrastructure",
@@ -6412,7 +7845,8 @@
   "Keine Kontakte erfasst": [
     "No contacts recorded",
     "Aucun contact enregistré",
-    "Nessun contatto registrato"
+    "Nessun contatto registrato",
+    "Kayıtlı kişi yok"
   ],
   "Keine Kreditkarte für die Testphase": [
     "No credit card for the trial",
@@ -6467,7 +7901,8 @@
   "Keine offenen Rechnungen": [
     "No open invoices",
     "Aucune facture ouverte",
-    "Nessuna fattura aperta"
+    "Nessuna fattura aperta",
+    "Açık fatura yok"
   ],
   "Keine offenen Supportfälle": [
     "No open support cases",
@@ -6657,7 +8092,8 @@
   "Kontakt hinzufügen": [
     "Add contact",
     "Ajouter un contact",
-    "Aggiungi contatto"
+    "Aggiungi contatto",
+    "Kişi ekle"
   ],
   "Kontakt konnte nicht entfernt werden.": [
     "Contact could not be removed.",
@@ -6687,7 +8123,8 @@
   "Kontakte": [
     "Contacts",
     "Contacts",
-    "Contatti"
+    "Contatti",
+    "Kişiler"
   ],
   "Kontakte und Historie sofort griffbereit.": [
     "Contacts and history instantly at hand.",
@@ -6852,7 +8289,8 @@
   "Kunden": [
     "Customers",
     "Clients",
-    "Clienti"
+    "Clienti",
+    "Müşteriler"
   ],
   "Kunden nachschlagen, Zeit erfassen und Rechnungen prüfen. Direkt auf deinem Smartphone oder als installierbare Web-App.": [
     "Look up customers, track time and review invoices. On your smartphone or as an installable web app.",
@@ -7032,7 +8470,8 @@
   "Läuft": [
     "Running",
     "En cours",
-    "In corso"
+    "In corso",
+    "Çalışıyor"
   ],
   "Läuft 08/29 ab": [
     "Expires 08/29",
@@ -7277,7 +8716,8 @@
   "Mehr": [
     "More",
     "Plus",
-    "Altro"
+    "Altro",
+    "Diğer"
   ],
   "Mehr anzeigen": [
     "Show more",
@@ -7297,7 +8737,8 @@
   "Mein Profil": [
     "My profile",
     "Mon profil",
-    "Il mio profilo"
+    "Il mio profilo",
+    "Profilim"
   ],
   "Melde dich sicher in deinem Binso One Konto an.": [
     "Sign in securely to your Binso One account.",
@@ -8202,7 +9643,8 @@
   "Optional": [
     "Optional",
     "Facultatif",
-    "Facoltativo"
+    "Facoltativo",
+    "İsteğe bağlı"
   ],
   "Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking.": [
     "Optionally collects technical metrics such as loading time, layout stability and a shortened route. No advertising or cross-site tracking.",
@@ -8317,12 +9759,14 @@
   "Pause": [
     "Pause",
     "Pause",
-    "Pausa"
+    "Pausa",
+    "Duraklat"
   ],
   "Pausiert": [
     "Paused",
     "En pause",
-    "In pausa"
+    "In pausa",
+    "Duraklatıldı"
   ],
   "PDF herunterladen": [
     "Download PDF",
@@ -8417,7 +9861,8 @@
   "Persönlich": [
     "Personal",
     "Personnel",
-    "Personale"
+    "Personale",
+    "Kişisel"
   ],
   "Persönliche Daten": [
     "Personal details",
@@ -8907,7 +10352,8 @@
   "Rechnungen": [
     "Invoices",
     "Factures",
-    "Fatture"
+    "Fatture",
+    "Faturalar"
   ],
   "Rechnungen anzeigen": [
     "Show invoices",
@@ -9112,7 +10558,8 @@
   "Schliessen": [
     "Close",
     "Fermer",
-    "Chiudi"
+    "Chiudi",
+    "Kapat"
   ],
   "Schnell erstellen und nachverfolgen.": [
     "Create and track quickly.",
@@ -9197,7 +10644,8 @@
   "Sicherheit": [
     "Security",
     "Sécurité",
-    "Sicurezza"
+    "Sicurezza",
+    "Güvenlik"
   ],
   "Sicherheitsereignisse": [
     "Security events",
@@ -9287,7 +10735,8 @@
   "Speichern": [
     "Save",
     "Enregistrer",
-    "Salva"
+    "Salva",
+    "Kaydet"
   ],
   "Sperrung erstellt": [
     "Block created",
@@ -9347,7 +10796,8 @@
   "Spesen": [
     "Expenses",
     "Frais",
-    "Spese"
+    "Spese",
+    "Masraflar"
   ],
   "Spesen suchen...": [
     "Search expenses...",
@@ -9377,7 +10827,8 @@
   "Sprache": [
     "Language",
     "Langue",
-    "Lingua"
+    "Lingua",
+    "Dil"
   ],
   "Sprache der Benutzeroberfläche.": [
     "Interface language.",
@@ -9427,7 +10878,8 @@
   "Starten": [
     "Start",
     "Démarrer",
-    "Avvia"
+    "Avvia",
+    "Başlat"
   ],
   "Statistikwährung": [
     "Statistics currency",
@@ -9477,7 +10929,8 @@
   "Stoppen": [
     "Stop",
     "Arrêter",
-    "Ferma"
+    "Ferma",
+    "Durdur"
   ],
   "Storniert": [
     "Cancelled",
@@ -9677,7 +11130,8 @@
   "Suchen": [
     "Search",
     "Rechercher",
-    "Cerca"
+    "Cerca",
+    "Ara"
   ],
   "Suchen ...": [
     "Search...",
@@ -9707,7 +11161,8 @@
   "Support": [
     "Support",
     "Assistance",
-    "Assistenza"
+    "Assistenza",
+    "Destek"
   ],
   "Support direkt aus der Anwendung.": [
     "Support directly in the app.",
@@ -10037,7 +11492,8 @@
   "Übersicht": [
     "Overview",
     "Vue d’ensemble",
-    "Panoramica"
+    "Panoramica",
+    "Genel bakış"
   ],
   "Übersicht wird geladen …": [
     "Loading overview…",
@@ -10067,7 +11523,8 @@
   "Umsatz": [
     "Revenue",
     "Chiffre d’affaires",
-    "Ricavi"
+    "Ricavi",
+    "Ciro"
   ],
   "Umsatzsteuer": [
     "VAT",
@@ -10347,7 +11804,8 @@
   "Unternehmen": [
     "Company",
     "Entreprise",
-    "Azienda"
+    "Azienda",
+    "Şirket"
   ],
   "Unternehmen einrichten": [
     "Set up company",
@@ -10367,7 +11825,8 @@
   "Unternehmenseinstellungen": [
     "Company settings",
     "Paramètres de l’entreprise",
-    "Impostazioni azienda"
+    "Impostazioni azienda",
+    "Şirket ayarları"
   ],
   "Unternehmensidentifikation": [
     "Company identification",
@@ -10487,7 +11946,8 @@
   "Verrechnet": [
     "Invoiced",
     "Facturé",
-    "Fatturato"
+    "Fatturato",
+    "Faturalandı"
   ],
   "Versand in der Demo deaktiviert": [
     "Sending disabled in demo",
@@ -10737,7 +12197,8 @@
   "Weiter bearbeiten": [
     "Keep editing",
     "Continuer à modifier",
-    "Continua a modificare"
+    "Continua a modificare",
+    "Düzenlemeye devam et"
   ],
   "Weiter zu Binso One": [
     "Continue to Binso One",
@@ -11142,7 +12603,8 @@
   "Zeit": [
     "Time",
     "Temps",
-    "Tempo"
+    "Tempo",
+    "Zaman"
   ],
   "Zeit erfassen": [
     "Track time",
@@ -11472,7 +12934,8 @@
   "Zurücksetzen": [
     "Reset",
     "Réinitialiser",
-    "Reimposta"
+    "Reimposta",
+    "Sıfırla"
   ],
   "Zurückziehen": [
     "Withdraw",
@@ -12252,7 +13715,8 @@
   "Rechtliches": [
     "Legal",
     "Informations légales",
-    "Informazioni legali"
+    "Informazioni legali",
+    "Yasal bilgiler"
   ],
   "Alles verbunden.": [
     "Everything connected.",
@@ -13377,7 +14841,8 @@
   "Keine Aufträge erfasst": [
     "No orders recorded",
     "Aucun mandat enregistré",
-    "Nessun incarico registrato"
+    "Nessun incarico registrato",
+    "Kayıtlı iş yok"
   ],
   "Keine Zahlungen erfasst": [
     "No payments recorded",
@@ -13407,7 +14872,8 @@
   "Stammdaten": [
     "Master data",
     "Données de base",
-    "Dati principali"
+    "Dati principali",
+    "Temel bilgiler"
   ],
   "Zur Abrechnung bereit": [
     "Ready for invoicing",
@@ -13802,7 +15268,8 @@
   "Duplizieren": [
     "Duplicate",
     "Dupliquer",
-    "Duplica"
+    "Duplica",
+    "Çoğalt"
   ],
   "Geschützte Einstellungen ändern": [
     "Change protected settings",
@@ -13827,12 +15294,14 @@
   "Nach oben": [
     "Move up",
     "Déplacer vers le haut",
-    "Sposta su"
+    "Sposta su",
+    "Yukarı taşı"
   ],
   "Nach unten": [
     "Move down",
     "Déplacer vers le bas",
-    "Sposta giù"
+    "Sposta giù",
+    "Aşağı taşı"
   ],
   "Nachrichtenaktionen": [
     "Message actions",
@@ -13862,7 +15331,8 @@
   "Verlauf": [
     "History",
     "Historique",
-    "Cronologia"
+    "Cronologia",
+    "Geçmiş"
   ],
   "Versand": [
     "Dispatch",
@@ -14112,7 +15582,8 @@
   "Kontakte importieren": [
     "Import contacts",
     "Importer des contacts",
-    "Importa contatti"
+    "Importa contatti",
+    "Kişileri içe aktar"
   ],
   "Kunden importieren": [
     "Import customers",
@@ -16019,46 +17490,495 @@
     "Lignes contractuelles distinctes requises",
     "Sono necessarie righe contrattuali separate"
   ],
-  "Freigaberegeln": ["Approval rules","Règles d’approbation","Regole di approvazione"],
-  "Unabhängige Vier-Augen-Prüfung bei mehreren Benutzern": ["Independent approval with multiple users","Approbation indépendante avec plusieurs utilisateurs","Approvazione indipendente con più utenti"],
-  "Diese Regeln gelten für Lieferantenrechnungen. Sie lösen keine Zahlung aus. Ein berechtigter Solo-Owner darf selbst freigeben.": ["These rules apply to supplier invoices. They do not trigger payment. An authorized sole owner may approve their own invoices.","Ces règles s’appliquent aux factures fournisseurs. Elles ne déclenchent aucun paiement. Un propriétaire seul et autorisé peut approuver ses propres factures.","Queste regole si applicano alle fatture fornitori. Non attivano pagamenti. Un titolare unico autorizzato può approvare le proprie fatture."],
-  "Leere Betragsgrenzen bedeuten keine zusätzliche Obergrenze. Beträge gelten nur in der angegebenen Währung. Abweichungen werden nicht automatisch toleriert.": ["Empty limits mean no additional cap. Amounts apply only in the specified currency. Differences are never automatically tolerated.","Une limite vide signifie aucun plafond supplémentaire. Les montants ne valent que dans la devise indiquée. Les écarts ne sont jamais automatiquement tolérés.","Un limite vuoto indica nessun massimale aggiuntivo. Gli importi valgono solo nella valuta indicata. Gli scostamenti non sono mai tollerati automaticamente."],
-  "Freigaberegel speichern": ["Save approval rule","Enregistrer la règle d’approbation","Salva regola di approvazione"],
-  "Freigaberegel konnte nicht gespeichert werden.": ["Could not save the approval rule.","La règle d’approbation n’a pas pu être enregistrée.","Impossibile salvare la regola di approvazione."],
-  "Für diese Freigaberegel fehlt die Berechtigung.": ["You do not have permission for this approval rule.","Vous n’avez pas l’autorisation pour cette règle d’approbation.","Non disponi dei permessi per questa regola di approvazione."],
-  "Bitte Freigaberegel und aktuellen Revisionsstand prüfen.": ["Please check the approval rule and current revision.","Veuillez vérifier la règle d’approbation et la révision actuelle.","Verifica la regola di approvazione e la revisione attuale."],
-  "Bitte gültige Freigabegrenzen in der jeweiligen Währung erfassen.": ["Enter valid approval limits in each currency.","Saisissez des limites d’approbation valides dans chaque devise.","Inserisci limiti di approvazione validi in ciascuna valuta."],
-  "Die Freigaberegel wurde geändert. Bitte erneut laden.": ["The approval rule has changed. Please reload.","La règle d’approbation a changé. Veuillez recharger.","La regola di approvazione è cambiata. Ricarica."],
-  "Leere Betragsgrenzen bedeuten keine zusätzliche Obergrenze. Betragsgrenzen beziehen sich auf den Gesamtbetrag inklusive MwSt. und gelten nur in der angegebenen Währung. Abweichungen werden nicht automatisch toleriert.": ["Empty limits mean no additional cap. Limits apply to the total including VAT and only in the specified currency. Differences are never automatically tolerated.","Une limite vide signifie aucun plafond supplémentaire. Les limites portent sur le total TVA comprise, uniquement dans la devise indiquée. Les écarts ne sont jamais automatiquement tolérés.","Un limite vuoto indica nessun massimale aggiuntivo. I limiti si riferiscono al totale IVA inclusa, solo nella valuta indicata. Gli scostamenti non sono mai tollerati automaticamente."],
-  "Eine Freigabe bestätigt diese Rechnungsrevision. Sie löst keine Zahlung aus.": ["Approval confirms this invoice revision. It does not trigger payment.","L’approbation confirme cette révision de facture. Elle ne déclenche aucun paiement.","L’approvazione conferma questa revisione della fattura. Non attiva alcun pagamento."],
-  "Rechnung ist zur ausdrücklichen Freigabe bereit.": ["The invoice is ready for explicit approval.","La facture est prête pour une approbation explicite.","La fattura è pronta per un’approvazione esplicita."],
-  "Freigabe nicht möglich: Abgleich, Vier-Augen-Regel und Betragsgrenzen prüfen.": ["Approval unavailable: check matching, independent approval and amount limits.","Approbation impossible : vérifiez le rapprochement, l’indépendance et les limites de montant.","Approvazione non disponibile: verifica abbinamento, indipendenza e limiti di importo."],
-  "Begründung oder Rückfrage": ["Reason or inquiry","Motif ou demande de clarification","Motivazione o richiesta di chiarimento"],
-  "Prüfverlauf": ["Review history","Historique des vérifications","Cronologia verifiche"],
-  "Rückfrage speichern": ["Save inquiry","Enregistrer la demande","Salva richiesta"],
-  "Rechnung freigeben": ["Approve invoice","Approuver la facture","Approva fattura"],
-  "Rechnungsprüfung konnte nicht gespeichert werden.": ["Could not save invoice review.","La vérification de la facture n’a pas pu être enregistrée.","Impossibile salvare la verifica della fattura."],
-  "Für diese Rechnungsprüfung fehlt die Berechtigung.": ["You do not have permission to review this invoice.","Vous n’avez pas l’autorisation de vérifier cette facture.","Non disponi dei permessi per verificare questa fattura."],
-  "Bitte Entscheidung, Revisionsstand und eine verständliche Rückfrage erfassen.": ["Enter the decision, revision and a clear inquiry.","Saisissez la décision, la révision et une demande claire.","Inserisci decisione, revisione e una richiesta chiara."],
-  "Rechnung oder Freigaberegel wurde geändert. Bitte erneut prüfen.": ["The invoice or approval rule has changed. Please review again.","La facture ou la règle d’approbation a changé. Veuillez vérifier à nouveau.","La fattura o la regola di approvazione è cambiata. Verifica nuovamente."],
-  "Ein aktueller Abgleich ohne ungeklärte Abweichungen ist erforderlich.": ["A current match without unresolved differences is required.","Un rapprochement actuel sans écart non résolu est nécessaire.","È necessario un abbinamento attuale senza scostamenti irrisolti."],
-  "Vier-Augen-Regel oder Betragsgrenze verhindert diese Freigabe.": ["Independent approval or an amount limit prevents this approval.","L’indépendance requise ou une limite de montant empêche cette approbation.","L’indipendenza richiesta o un limite di importo impedisce questa approvazione."],
-  "Eine Rückfrage ist offen. Bitte den Entwurf überarbeiten und erneut abgleichen.": ["An inquiry is open. Revise the draft and match it again.","Une demande reste ouverte. Corrigez le brouillon et effectuez un nouveau rapprochement.","È aperta una richiesta. Correggi la bozza ed esegui nuovamente l’abbinamento."],
-  "Rückfrage": ["Inquiry","Demande de clarification","Richiesta di chiarimento"],
-  "Guten Morgen": ["Good morning","Bonjour","Buongiorno"],
-  "Guten Tag": ["Good afternoon","Bonjour","Buongiorno"],
-  "Guten Abend": ["Good evening","Bonsoir","Buonasera"],
-  "Dein Unternehmen auf einen Blick": ["Your business at a glance","Votre entreprise en un coup d’œil","La tua azienda a colpo d’occhio"],
-  "Zeitfreigaben": ["Time approvals","Validations des heures","Approvazioni ore"],
-  "Spesenfreigaben": ["Expense approvals","Validations des frais","Approvazioni spese"],
-  "Eingänge": ["Incoming payments","Encaissements","Incassi"],
-  "Details zu den Kennzahlen": ["Metric details","Détails des indicateurs","Dettagli degli indicatori"],
-  "Offene Aufgaben": ["Open tasks","Tâches ouvertes","Attività aperte"],
-  "Vergleich": ["Comparison","Comparaison","Confronto"],
-  "Keine vergleichbaren Vorperiodendaten": ["No comparable previous-period data","Aucune donnée comparable pour la période précédente","Nessun dato comparabile del periodo precedente"],
-  "Rechnungen nach Gutschriften": ["Invoices after credit notes","Factures après notes de crédit","Fatture al netto delle note di credito"],
-  "Zeitaktionen": ["Time actions","Actions de temps","Azioni del tempo"],
-  "Trends benötigen eine nichtnull Vergleichsbasis. Fehlende Vergleiche werden mit einem Strich dargestellt.": ["Trends require a nonzero comparison baseline. Missing comparisons appear as a dash.","Les tendances nécessitent une base de comparaison non nulle. Un tiret indique une comparaison indisponible.","Le tendenze richiedono una base di confronto diversa da zero. Un trattino indica confronti non disponibili."],
-  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Eingänge: erfasste Zahlungen nach Rückerstattungen. Ausgaben: nachgewiesene Auszahlungen. Saldo: Eingänge abzüglich Ausgaben, kein Bankkontostand.": ["Revenue: invoiced volume including VAT after credit notes. Incoming payments: recorded payments after refunds. Expenses: verified outflows. Balance: incoming payments minus expenses, not a bank balance.","Chiffre d’affaires : volume facturé TTC après notes de crédit. Encaissements : paiements enregistrés après remboursements. Dépenses : décaissements justifiés. Solde : encaissements moins dépenses, et non le solde bancaire.","Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Incassi: pagamenti registrati al netto dei rimborsi. Uscite: pagamenti comprovati. Saldo: incassi meno uscite, non il saldo bancario."],
-  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Ohne Rechnungsdaten werden Einnahmen gezeigt. Offen und überfällig: aktueller Forderungsbestand, unabhängig vom Zeitraumfilter. Ausgaben: nachgewiesene Auszahlungen im gewählten Zeitraum.": ["Revenue: invoiced volume including VAT after credit notes. Without invoice data, incoming payments are shown. Open and overdue: current receivables, independent of the period filter. Expenses: verified outflows during the selected period.","Chiffre d’affaires : volume facturé TTC après notes de crédit. En l’absence de factures, les encaissements sont affichés. Ouvert et échu : créances actuelles, indépendamment du filtre de période. Dépenses : décaissements justifiés pendant la période sélectionnée.","Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Senza dati delle fatture sono mostrati gli incassi. Aperto e scaduto: crediti attuali, indipendenti dal filtro temporale. Uscite: pagamenti comprovati nel periodo selezionato."]
+  "Freigaberegeln": [
+    "Approval rules",
+    "Règles d’approbation",
+    "Regole di approvazione"
+  ],
+  "Unabhängige Vier-Augen-Prüfung bei mehreren Benutzern": [
+    "Independent approval with multiple users",
+    "Approbation indépendante avec plusieurs utilisateurs",
+    "Approvazione indipendente con più utenti"
+  ],
+  "Diese Regeln gelten für Lieferantenrechnungen. Sie lösen keine Zahlung aus. Ein berechtigter Solo-Owner darf selbst freigeben.": [
+    "These rules apply to supplier invoices. They do not trigger payment. An authorized sole owner may approve their own invoices.",
+    "Ces règles s’appliquent aux factures fournisseurs. Elles ne déclenchent aucun paiement. Un propriétaire seul et autorisé peut approuver ses propres factures.",
+    "Queste regole si applicano alle fatture fornitori. Non attivano pagamenti. Un titolare unico autorizzato può approvare le proprie fatture."
+  ],
+  "Leere Betragsgrenzen bedeuten keine zusätzliche Obergrenze. Beträge gelten nur in der angegebenen Währung. Abweichungen werden nicht automatisch toleriert.": [
+    "Empty limits mean no additional cap. Amounts apply only in the specified currency. Differences are never automatically tolerated.",
+    "Une limite vide signifie aucun plafond supplémentaire. Les montants ne valent que dans la devise indiquée. Les écarts ne sont jamais automatiquement tolérés.",
+    "Un limite vuoto indica nessun massimale aggiuntivo. Gli importi valgono solo nella valuta indicata. Gli scostamenti non sono mai tollerati automaticamente."
+  ],
+  "Freigaberegel speichern": [
+    "Save approval rule",
+    "Enregistrer la règle d’approbation",
+    "Salva regola di approvazione"
+  ],
+  "Freigaberegel konnte nicht gespeichert werden.": [
+    "Could not save the approval rule.",
+    "La règle d’approbation n’a pas pu être enregistrée.",
+    "Impossibile salvare la regola di approvazione."
+  ],
+  "Für diese Freigaberegel fehlt die Berechtigung.": [
+    "You do not have permission for this approval rule.",
+    "Vous n’avez pas l’autorisation pour cette règle d’approbation.",
+    "Non disponi dei permessi per questa regola di approvazione."
+  ],
+  "Bitte Freigaberegel und aktuellen Revisionsstand prüfen.": [
+    "Please check the approval rule and current revision.",
+    "Veuillez vérifier la règle d’approbation et la révision actuelle.",
+    "Verifica la regola di approvazione e la revisione attuale."
+  ],
+  "Bitte gültige Freigabegrenzen in der jeweiligen Währung erfassen.": [
+    "Enter valid approval limits in each currency.",
+    "Saisissez des limites d’approbation valides dans chaque devise.",
+    "Inserisci limiti di approvazione validi in ciascuna valuta."
+  ],
+  "Die Freigaberegel wurde geändert. Bitte erneut laden.": [
+    "The approval rule has changed. Please reload.",
+    "La règle d’approbation a changé. Veuillez recharger.",
+    "La regola di approvazione è cambiata. Ricarica."
+  ],
+  "Leere Betragsgrenzen bedeuten keine zusätzliche Obergrenze. Betragsgrenzen beziehen sich auf den Gesamtbetrag inklusive MwSt. und gelten nur in der angegebenen Währung. Abweichungen werden nicht automatisch toleriert.": [
+    "Empty limits mean no additional cap. Limits apply to the total including VAT and only in the specified currency. Differences are never automatically tolerated.",
+    "Une limite vide signifie aucun plafond supplémentaire. Les limites portent sur le total TVA comprise, uniquement dans la devise indiquée. Les écarts ne sont jamais automatiquement tolérés.",
+    "Un limite vuoto indica nessun massimale aggiuntivo. I limiti si riferiscono al totale IVA inclusa, solo nella valuta indicata. Gli scostamenti non sono mai tollerati automaticamente."
+  ],
+  "Eine Freigabe bestätigt diese Rechnungsrevision. Sie löst keine Zahlung aus.": [
+    "Approval confirms this invoice revision. It does not trigger payment.",
+    "L’approbation confirme cette révision de facture. Elle ne déclenche aucun paiement.",
+    "L’approvazione conferma questa revisione della fattura. Non attiva alcun pagamento."
+  ],
+  "Rechnung ist zur ausdrücklichen Freigabe bereit.": [
+    "The invoice is ready for explicit approval.",
+    "La facture est prête pour une approbation explicite.",
+    "La fattura è pronta per un’approvazione esplicita."
+  ],
+  "Freigabe nicht möglich: Abgleich, Vier-Augen-Regel und Betragsgrenzen prüfen.": [
+    "Approval unavailable: check matching, independent approval and amount limits.",
+    "Approbation impossible : vérifiez le rapprochement, l’indépendance et les limites de montant.",
+    "Approvazione non disponibile: verifica abbinamento, indipendenza e limiti di importo."
+  ],
+  "Begründung oder Rückfrage": [
+    "Reason or inquiry",
+    "Motif ou demande de clarification",
+    "Motivazione o richiesta di chiarimento"
+  ],
+  "Prüfverlauf": [
+    "Review history",
+    "Historique des vérifications",
+    "Cronologia verifiche"
+  ],
+  "Rückfrage speichern": [
+    "Save inquiry",
+    "Enregistrer la demande",
+    "Salva richiesta"
+  ],
+  "Rechnung freigeben": [
+    "Approve invoice",
+    "Approuver la facture",
+    "Approva fattura"
+  ],
+  "Rechnungsprüfung konnte nicht gespeichert werden.": [
+    "Could not save invoice review.",
+    "La vérification de la facture n’a pas pu être enregistrée.",
+    "Impossibile salvare la verifica della fattura."
+  ],
+  "Für diese Rechnungsprüfung fehlt die Berechtigung.": [
+    "You do not have permission to review this invoice.",
+    "Vous n’avez pas l’autorisation de vérifier cette facture.",
+    "Non disponi dei permessi per verificare questa fattura."
+  ],
+  "Bitte Entscheidung, Revisionsstand und eine verständliche Rückfrage erfassen.": [
+    "Enter the decision, revision and a clear inquiry.",
+    "Saisissez la décision, la révision et une demande claire.",
+    "Inserisci decisione, revisione e una richiesta chiara."
+  ],
+  "Rechnung oder Freigaberegel wurde geändert. Bitte erneut prüfen.": [
+    "The invoice or approval rule has changed. Please review again.",
+    "La facture ou la règle d’approbation a changé. Veuillez vérifier à nouveau.",
+    "La fattura o la regola di approvazione è cambiata. Verifica nuovamente."
+  ],
+  "Ein aktueller Abgleich ohne ungeklärte Abweichungen ist erforderlich.": [
+    "A current match without unresolved differences is required.",
+    "Un rapprochement actuel sans écart non résolu est nécessaire.",
+    "È necessario un abbinamento attuale senza scostamenti irrisolti."
+  ],
+  "Vier-Augen-Regel oder Betragsgrenze verhindert diese Freigabe.": [
+    "Independent approval or an amount limit prevents this approval.",
+    "L’indépendance requise ou une limite de montant empêche cette approbation.",
+    "L’indipendenza richiesta o un limite di importo impedisce questa approvazione."
+  ],
+  "Eine Rückfrage ist offen. Bitte den Entwurf überarbeiten und erneut abgleichen.": [
+    "An inquiry is open. Revise the draft and match it again.",
+    "Une demande reste ouverte. Corrigez le brouillon et effectuez un nouveau rapprochement.",
+    "È aperta una richiesta. Correggi la bozza ed esegui nuovamente l’abbinamento."
+  ],
+  "Rückfrage": [
+    "Inquiry",
+    "Demande de clarification",
+    "Richiesta di chiarimento"
+  ],
+  "Guten Morgen": [
+    "Good morning",
+    "Bonjour",
+    "Buongiorno",
+    "Günaydın"
+  ],
+  "Guten Tag": [
+    "Good afternoon",
+    "Bonjour",
+    "Buongiorno",
+    "İyi günler"
+  ],
+  "Guten Abend": [
+    "Good evening",
+    "Bonsoir",
+    "Buonasera",
+    "İyi akşamlar"
+  ],
+  "Dein Unternehmen auf einen Blick": [
+    "Your business at a glance",
+    "Votre entreprise en un coup d’œil",
+    "La tua azienda a colpo d’occhio",
+    "Şirketinize genel bakış"
+  ],
+  "Zeitfreigaben": [
+    "Time approvals",
+    "Validations des heures",
+    "Approvazioni ore"
+  ],
+  "Spesenfreigaben": [
+    "Expense approvals",
+    "Validations des frais",
+    "Approvazioni spese"
+  ],
+  "Eingänge": [
+    "Incoming payments",
+    "Encaissements",
+    "Incassi",
+    "Tahsilatlar"
+  ],
+  "Details zu den Kennzahlen": [
+    "Metric details",
+    "Détails des indicateurs",
+    "Dettagli degli indicatori"
+  ],
+  "Offene Aufgaben": [
+    "Open tasks",
+    "Tâches ouvertes",
+    "Attività aperte"
+  ],
+  "Vergleich": [
+    "Comparison",
+    "Comparaison",
+    "Confronto"
+  ],
+  "Keine vergleichbaren Vorperiodendaten": [
+    "No comparable previous-period data",
+    "Aucune donnée comparable pour la période précédente",
+    "Nessun dato comparabile del periodo precedente"
+  ],
+  "Rechnungen nach Gutschriften": [
+    "Invoices after credit notes",
+    "Factures après notes de crédit",
+    "Fatture al netto delle note di credito"
+  ],
+  "Zeitaktionen": [
+    "Time actions",
+    "Actions de temps",
+    "Azioni del tempo"
+  ],
+  "Trends benötigen eine nichtnull Vergleichsbasis. Fehlende Vergleiche werden mit einem Strich dargestellt.": [
+    "Trends require a nonzero comparison baseline. Missing comparisons appear as a dash.",
+    "Les tendances nécessitent une base de comparaison non nulle. Un tiret indique une comparaison indisponible.",
+    "Le tendenze richiedono una base di confronto diversa da zero. Un trattino indica confronti non disponibili."
+  ],
+  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Eingänge: erfasste Zahlungen nach Rückerstattungen. Ausgaben: nachgewiesene Auszahlungen. Saldo: Eingänge abzüglich Ausgaben, kein Bankkontostand.": [
+    "Revenue: invoiced volume including VAT after credit notes. Incoming payments: recorded payments after refunds. Expenses: verified outflows. Balance: incoming payments minus expenses, not a bank balance.",
+    "Chiffre d’affaires : volume facturé TTC après notes de crédit. Encaissements : paiements enregistrés après remboursements. Dépenses : décaissements justifiés. Solde : encaissements moins dépenses, et non le solde bancaire.",
+    "Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Incassi: pagamenti registrati al netto dei rimborsi. Uscite: pagamenti comprovati. Saldo: incassi meno uscite, non il saldo bancario."
+  ],
+  "Umsatz: fakturiertes Volumen inklusive MwSt. nach Gutschriften. Ohne Rechnungsdaten werden Einnahmen gezeigt. Offen und überfällig: aktueller Forderungsbestand, unabhängig vom Zeitraumfilter. Ausgaben: nachgewiesene Auszahlungen im gewählten Zeitraum.": [
+    "Revenue: invoiced volume including VAT after credit notes. Without invoice data, incoming payments are shown. Open and overdue: current receivables, independent of the period filter. Expenses: verified outflows during the selected period.",
+    "Chiffre d’affaires : volume facturé TTC après notes de crédit. En l’absence de factures, les encaissements sont affichés. Ouvert et échu : créances actuelles, indépendamment du filtre de période. Dépenses : décaissements justifiés pendant la période sélectionnée.",
+    "Ricavi: volume fatturato IVA inclusa al netto delle note di credito. Senza dati delle fatture sono mostrati gli incassi. Aperto e scaduto: crediti attuali, indipendenti dal filtro temporale. Uscite: pagamenti comprovati nel periodo selezionato."
+  ],
+  "Geschäft": [
+    "Business",
+    "Activité",
+    "Attività",
+    "İşletme"
+  ],
+  "Auswertung": [
+    "Analysis",
+    "Analyse",
+    "Analisi",
+    "Analiz"
+  ],
+  "Verwaltung": [
+    "Administration",
+    "Administration",
+    "Amministrazione",
+    "Yönetim"
+  ],
+  "Mitarbeiter & Berechtigungen": [
+    "Employees & permissions",
+    "Personnel et autorisations",
+    "Collaboratori e autorizzazioni",
+    "Çalışanlar ve yetkiler"
+  ],
+  "Hilfe & Informationen": [
+    "Help & information",
+    "Aide et informations",
+    "Aiuto e informazioni",
+    "Yardım ve bilgiler"
+  ],
+  "Hilfe": [
+    "Help",
+    "Aide",
+    "Aiuto",
+    "Yardım"
+  ],
+  "Profil": [
+    "Profile",
+    "Profil",
+    "Profilo",
+    "Profil"
+  ],
+  "Sitzungen": [
+    "Sessions",
+    "Sessions",
+    "Sessioni",
+    "Oturumlar"
+  ],
+  "Unternehmenssicherheit": [
+    "Company security",
+    "Sécurité de l’entreprise",
+    "Sicurezza aziendale",
+    "Şirket güvenliği"
+  ],
+  "Authenticator-Pflicht": [
+    "Authenticator requirement",
+    "Authentificateur obligatoire",
+    "Autenticatore obbligatorio",
+    "Doğrulayıcı zorunluluğu"
+  ],
+  "Verpflichtend": [
+    "Required",
+    "Obligatoire",
+    "Obbligatorio",
+    "Zorunlu"
+  ],
+  "Für alle Unternehmenskonten verpflichtend": [
+    "Required for all company accounts",
+    "Obligatoire pour tous les comptes de l’entreprise",
+    "Obbligatorio per tutti gli account aziendali",
+    "Tüm şirket hesapları için zorunlu"
+  ],
+  "Die Regel gilt für alle Mitarbeiter und Administratoren. Ohne eingerichteten Authenticator bleibt nur der Sicherheitsbereich zugänglich.": [
+    "This rule applies to all employees and administrators. Until an authenticator is set up, only security settings remain accessible.",
+    "Cette règle s’applique à tous les collaborateurs et administrateurs. Sans authentificateur configuré, seuls les paramètres de sécurité restent accessibles.",
+    "La regola si applica a tutti i collaboratori e amministratori. Senza un autenticatore configurato rimangono accessibili solo le impostazioni di sicurezza.",
+    "Bu kural tüm çalışanlar ve yöneticiler için geçerlidir. Doğrulayıcı kurulana kadar yalnızca güvenlik ayarlarına erişilebilir."
+  ],
+  "Sicherheitsregel konnte nicht gespeichert werden.": [
+    "The security policy could not be saved.",
+    "La règle de sécurité n’a pas pu être enregistrée.",
+    "Impossibile salvare la regola di sicurezza.",
+    "Güvenlik kuralı kaydedilemedi."
+  ],
+  "Verwerfen": [
+    "Discard",
+    "Abandonner",
+    "Scarta",
+    "Sil"
+  ],
+  "Position verschoben.": [
+    "Position moved.",
+    "Position déplacée.",
+    "Posizione spostata.",
+    "Kalem taşındı."
+  ],
+  "Zum Verschieben halten oder Pfeil nach oben und unten verwenden.": [
+    "Hold to move or use the up and down arrow keys.",
+    "Maintenez pour déplacer ou utilisez les flèches haut et bas.",
+    "Tieni premuto per spostare o usa le frecce su e giù.",
+    "Taşımak için basılı tutun veya yukarı ve aşağı ok tuşlarını kullanın."
+  ],
+  "Zurückgewiesen": [
+    "Rejected",
+    "Rejeté",
+    "Respinto",
+    "Reddedildi"
+  ],
+  "Zur Prüfung einreichen": [
+    "Submit for review",
+    "Soumettre pour validation",
+    "Invia per verifica",
+    "İncelemeye gönder"
+  ],
+  "Zur Freigabe auswählen": [
+    "Select for approval",
+    "Sélectionner pour validation",
+    "Seleziona per approvazione",
+    "Onay için seç"
+  ],
+  "Zum Einreichen auswählen": [
+    "Select for submission",
+    "Sélectionner pour soumission",
+    "Seleziona per invio",
+    "Göndermek için seç"
+  ],
+  "Ausgewählte Zeiten freigeben": [
+    "Approve selected time entries",
+    "Approuver les heures sélectionnées",
+    "Approva le ore selezionate",
+    "Seçilen süreleri onayla"
+  ],
+  "Ausgewählte Zeiten einreichen": [
+    "Submit selected time entries",
+    "Soumettre les heures sélectionnées",
+    "Invia le ore selezionate",
+    "Seçilen süreleri gönder"
+  ],
+  "Auswahl aufheben": [
+    "Clear selection",
+    "Désélectionner",
+    "Annulla selezione",
+    "Seçimi kaldır"
+  ],
+  "Zeiten freigegeben.": [
+    "Time entries approved.",
+    "Heures approuvées.",
+    "Ore approvate.",
+    "Süreler onaylandı."
+  ],
+  "Zeiten eingereicht.": [
+    "Time entries submitted.",
+    "Heures soumises.",
+    "Ore inviate.",
+    "Süreler gönderildi."
+  ],
+  "Zeiten konnten nicht verarbeitet werden.": [
+    "Time entries could not be processed.",
+    "Les heures n’ont pas pu être traitées.",
+    "Impossibile elaborare le ore.",
+    "Süreler işlenemedi."
+  ],
+  "Bitte 1 bis 100 Zeiteinträge auswählen.": [
+    "Please select 1 to 100 time entries.",
+    "Veuillez sélectionner entre 1 et 100 entrées de temps.",
+    "Seleziona da 1 a 100 registrazioni orarie.",
+    "Lütfen 1 ile 100 arasında zaman kaydı seçin."
+  ],
+  "Name A–Z": [
+    "Name A–Z",
+    "Nom A–Z",
+    "Nome A–Z",
+    "Ad A–Z"
+  ],
+  "Name Z–A": [
+    "Name Z–A",
+    "Nom Z–A",
+    "Nome Z–A",
+    "Ad Z–A"
+  ],
+  "Dein Konto verwendet Passwort oder Passkey.": [
+    "Your account uses a password or passkey.",
+    "Votre compte utilise un mot de passe ou une clé d’accès.",
+    "Il tuo account utilizza una password o una passkey.",
+    "Hesabınız parola veya geçiş anahtarı kullanır."
+  ],
+  "Dein Unternehmen verlangt eine Authenticator-App. Richte sie ein, um Binso One zu verwenden.": [
+    "Your company requires an authenticator app. Set it up to use Binso One.",
+    "Votre entreprise exige une application d’authentification. Configurez-la pour utiliser Binso One.",
+    "La tua azienda richiede un’app di autenticazione. Configurala per usare Binso One.",
+    "Şirketiniz bir doğrulayıcı uygulama gerektiriyor. Binso One kullanmak için uygulamayı kurun."
+  ],
+  "Dein Unternehmen verlangt eine Authenticator-App. Bitte richte sie unter Sicherheit ein.": [
+    "Your company requires an authenticator app. Please set it up under Security.",
+    "Votre entreprise exige une application d’authentification. Configurez-la sous Sécurité.",
+    "La tua azienda richiede un’app di autenticazione. Configurala in Sicurezza.",
+    "Şirketiniz bir doğrulayıcı uygulama gerektiriyor. Lütfen Güvenlik bölümünde kurun."
+  ],
+  "Dein Unternehmen verlangt den Authenticator. Er kann nicht einzeln deaktiviert werden.": [
+    "Your company requires the authenticator. It cannot be disabled individually.",
+    "Votre entreprise exige l’authentificateur. Il ne peut pas être désactivé individuellement.",
+    "La tua azienda richiede l’autenticatore. Non è possibile disattivarlo individualmente.",
+    "Şirketiniz doğrulayıcıyı zorunlu kılıyor. Bireysel olarak devre dışı bırakılamaz."
+  ],
+  "Bitte wähle eine gültige Authenticator-Regel.": [
+    "Please choose a valid authenticator policy.",
+    "Veuillez choisir une règle d’authentification valide.",
+    "Seleziona una regola di autenticazione valida.",
+    "Lütfen geçerli bir doğrulayıcı kuralı seçin."
+  ],
+  "Aktiviere zuerst deinen eigenen Authenticator unter Sicherheit.": [
+    "First enable your own authenticator under Security.",
+    "Activez d’abord votre propre authentificateur sous Sécurité.",
+    "Attiva prima il tuo autenticatore in Sicurezza.",
+    "Önce Güvenlik bölümünde kendi doğrulayıcınızı etkinleştirin."
+  ],
+  "Hilfe und Informationen zu Binso One.": [
+    "Help and information about Binso One.",
+    "Aide et informations sur Binso One.",
+    "Aiuto e informazioni su Binso One.",
+    "Binso One hakkında yardım ve bilgiler."
+  ],
+  "Unternehmen und Geschäftsprozesse einrichten.": [
+    "Set up your company and business processes.",
+    "Configurez votre entreprise et ses processus.",
+    "Configura l’azienda e i processi aziendali.",
+    "Şirketinizi ve iş süreçlerinizi yapılandırın."
+  ],
+  "Fachmodule": [
+    "Business modules",
+    "Modules métier",
+    "Moduli aziendali",
+    "İş modülleri"
+  ],
+  "Neue Benachrichtigung": [
+    "New notification",
+    "Nouvelle notification",
+    "Nuova notifica",
+    "Yeni bildirim"
+  ],
+  "Ungültige Push-Anmeldung.": [
+    "Invalid push subscription.",
+    "Inscription push non valide.",
+    "Registrazione push non valida.",
+    "Geçersiz anlık bildirim kaydı."
+  ],
+  "Dieses Gerät ist bereits einem anderen Konto zugeordnet.": [
+    "This device is already linked to another account.",
+    "Cet appareil est déjà associé à un autre compte.",
+    "Questo dispositivo è già associato a un altro account.",
+    "Bu cihaz zaten başka bir hesaba bağlı."
+  ],
+  "Bitte Push zuerst auf diesem Gerät aktivieren.": [
+    "Enable push on this device first.",
+    "Activez d’abord les notifications push sur cet appareil.",
+    "Attiva prima le notifiche push su questo dispositivo.",
+    "Önce bu cihazda anlık bildirimleri etkinleştirin."
+  ],
+  "Push wird auf diesem Gerät nicht unterstützt.": [
+    "Push is not supported on this device.",
+    "Les notifications push ne sont pas prises en charge sur cet appareil.",
+    "Le notifiche push non sono supportate su questo dispositivo.",
+    "Bu cihaz anlık bildirimleri desteklemiyor."
+  ],
+  "Push auf diesem Gerät deaktivieren": [
+    "Disable push on this device",
+    "Désactiver les notifications push sur cet appareil",
+    "Disattiva le notifiche push su questo dispositivo",
+    "Bu cihazda anlık bildirimleri devre dışı bırak"
+  ],
+  "Push auf diesem Gerät aktivieren": [
+    "Enable push on this device",
+    "Activer les notifications push sur cet appareil",
+    "Attiva le notifiche push su questo dispositivo",
+    "Bu cihazda anlık bildirimleri etkinleştir"
+  ]
 }

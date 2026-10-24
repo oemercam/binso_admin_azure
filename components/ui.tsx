@@ -7,9 +7,12 @@ import {usePageAccess} from "@/lib/client/page-access";
 import {fieldInputHint} from "@/lib/form-input-hints";
 import {Children,cloneElement,isValidElement,useId,useState} from "react";
 import Link from "next/link";
+import {House,Users,BriefcaseBusiness,Clock3,Ellipsis,HelpCircle} from 'lucide-react';
 import {SelectControl} from './select-control';
 
-export function Icon({ name, size = 20 }: { name: string; size?: number }) {
+export function Icon({ name, size = 18 }: { name: string; size?: number }) {
+  const NavigationIcon={house:House,'navigation-users':Users,'briefcase-business':BriefcaseBusiness,clock3:Clock3,ellipsis:Ellipsis,help:HelpCircle}[name as 'house'];
+  if(NavigationIcon)return <NavigationIcon size={size} aria-hidden="true" strokeWidth={2}/>;
   const common = {
     width: size,
     height: size,

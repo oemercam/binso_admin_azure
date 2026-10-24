@@ -1,6 +1,8 @@
 "use client";
 
-import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
+import {LocalizedText,LocalizedElement,useLocale} from "@/lib/client/locale";
+import {localeTags} from '@/lib/locales';
+import {formatDateTime} from '@/lib/display-format';
 import Link from "next/link";
 import {ActionRow,DetailTabs,SettingsGroup} from "../binso-ux";
 import {useApiQuery} from "@/lib/client/use-api-query";
@@ -28,13 +30,14 @@ export function notificationIcon(kind:string){
   return "bell";
 }
 
-export function notificationDate(value:string){
+export function notificationDate(value:string,locale="de-CH"){
   const date=new Date(value);
-  return Number.isNaN(date.getTime())?"":date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
+  return Number.isNaN(date.getTime())?"":formatDateTime(value,locale);
 }
 
 export function NotificationsPage() {
 
+  const {locale}=useLocale();
   const access=usePageAccess();
   const [busy,setBusy]=useState(false);
   const [view,setView]=useState<"all"|"unread">("all");
@@ -63,7 +66,7 @@ export function NotificationsPage() {
         {loading&&remoteItems.length===0&&<LoadingState><LocalizedText>{"Benachrichtigungen werden geladen …"}</LocalizedText></LoadingState>}
         {error&&<ErrorState onRetry={load} retryLabel="Erneut laden"><LocalizedText>{error}</LocalizedText></ErrorState>}
         {!loading&&!error&&visible.length===0&&<EmptyState  title={view==="unread"?"Alles gelesen":"Noch keine Benachrichtigungen"} />}
-        {!error&&visible.length>0&&notificationGroups(visible).map(group=><SettingsGroup key={group.label} title={group.label}><div className="action-list">{group.items.map(item=><ActionRow href={item.href||"/dashboard"} key={item.id} icon={notificationIcon(item.kind)} title={item.title} description={item.body} metadata={notificationDate(item.created_at)} endAdornment={!item.read_at?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>void markRead(item.id)}/>)}</div></SettingsGroup>)}
+        {!error&&visible.length>0&&notificationGroups(visible).map(group=><SettingsGroup key={group.label} title={group.label}><div className="action-list">{group.items.map(item=><ActionRow href={item.href||"/dashboard"} key={item.id} icon={notificationIcon(item.kind)} title={item.title} description={item.body} metadata={notificationDate(item.created_at,localeTags[locale])} endAdornment={!item.read_at?<LocalizedElement as="i" className="unread-dot" aria-label="Ungelesen"/>:undefined} onClick={()=>void markRead(item.id)}/>)}</div></SettingsGroup>)}
         {unreadCount>0&&<Button variant="secondary" disabled={busy} onClick={()=>{setBusy(true);void apiPatch("/api/notifications",{all:true}).then(()=>setMutationError(null)).catch(err=>setMutationError(err instanceof Error?err.message:"Aktualisierung fehlgeschlagen.")).finally(()=>setBusy(false));}}><LocalizedText>{"Alle als gelesen"}</LocalizedText></Button>}
         <Link className="notification-preferences" href="/einstellungen/benachrichtigungen"><Icon name="settings" size={17}/><span><LocalizedText>{"Benachrichtigungseinstellungen"}</LocalizedText></span><Icon name="arrow" size={15}/></Link>
       </div>

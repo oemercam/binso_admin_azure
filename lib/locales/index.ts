@@ -13,17 +13,14 @@ export function translateMessage(value:string,locale:Locale):string{
  const key=value.replace(/\s+/g,' ').trim();
  const periodMessage=(periodCatalogue as Record<string,Partial<Record<Locale,string>>>)[key]?.[locale];
  if(periodMessage)return (value.startsWith(' ')?' ':'')+periodMessage+(value.endsWith(' ')?' ':'');
- // Turkish is introduced for the period control; untranslated app copy retains
- // its source language instead of accidentally selecting the Italian catalogue.
- if(locale==='tr')return value;
  const count=key.match(/^(\d+) (.+)$/),forms=count?plurals[count[2]]?.[locale]:undefined;
  if(count&&forms)return (value.startsWith(' ')?' ':'')+count[1]+' '+forms[pluralRules[locale].select(Number(count[1]))==='one'?'one':'other']+(value.endsWith(' ')?' ':'');
  if(locale==='de')return value;
- const result=messages[key]?.[locale==='en'?0:locale==='fr'?1:2];
+ const result=messages[key]?.[locale==='en'?0:locale==='fr'?1:locale==='it'?2:3];
  if(!result){
   for(const {source,translations,pattern} of templatePatterns){
    const match=key.match(pattern);
-   if(match)return translations[locale==='en'?0:locale==='fr'?1:2].replace(/\{(\d+)\}/g,(_,index)=>{
+   if(match&&translations[locale==='en'?0:locale==='fr'?1:locale==='it'?2:3])return translations[locale==='en'?0:locale==='fr'?1:locale==='it'?2:3].replace(/\{(\d+)\}/g,(_,index)=>{
     const value=match[Number(index)+1]??'';
     const label=source.startsWith('Schritt ')&&index==='2'||source.endsWith('Zugriffsrechte.')&&index==='1';
     return label?translateMessage(value,locale):value;

@@ -3,6 +3,7 @@ import {LocalizedText} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
+import type {ReactNode} from 'react';
 import {ListRow,DetailTabs} from "./binso-ux";
 
 import {financialStatus,financialStatusTone,financialStatusText,documentFilters,documentMatchesFilter,documentDateLabel,openAmount,formatCurrency,formatDate,type FinancialDocument} from '@/lib/financial-status';
@@ -28,9 +29,9 @@ export function DocumentSummaryRow({item,customerHeading=false,compact=false,ret
  const label=financialStatusText(state,item.kind);
  const tone=financialStatusTone(item);
  const amount=formatCurrency(open?openAmount(item):item.total,item.currency);
- return <FinancialSummaryRow title={customerHeading?item.customer?.name||'Kunde':item.number??''} status={label} tone={tone} meta={compact?[customerHeading?item.number:null,documentDateLabel(item)].filter(Boolean).join(' · '):[customerHeading?item.number:item.customer?.name,formatDate(item.issue_date)].filter(Boolean).join(' · ')} amount={amount} amountLabel={open?'Offen':compact&&state!=='draft'?undefined:'Total'} compact={compact} href={(item.kind==='offer'?'/angebote/':'/rechnungen/')+encodeURIComponent(item.number??'')+(returnTo?'?returnTo='+encodeURIComponent(returnTo):'')}/>;
+ return <FinancialSummaryRow title={item.number??''} status={label} tone={tone} meta={<span className="document-summary-meta"><span>{item.customer?.name??''}</span><time dateTime={item.issue_date??undefined}>{formatDate(item.issue_date)}</time></span>} amount={amount} compact={compact} href={(item.kind==='offer'?'/angebote/':'/rechnungen/')+encodeURIComponent(item.number??'')+(returnTo?'?returnTo='+encodeURIComponent(returnTo):'')}/>;
 }
 
-export function FinancialSummaryRow({href,title,status,tone='neutral',meta,amount,amountLabel,compact=false}:{href:string;title:string;status:string;tone?:'neutral'|'success'|'warning'|'danger'|'info';meta:string;amount:string;amountLabel?:string;compact?:boolean}){
- return <ListRow translateTitle={false} href={href} title={title} meta={meta} status={status} tone={tone} value={amount} valueLabel={amountLabel} compact={compact}/>;
+export function FinancialSummaryRow({href,title,status,tone='neutral',meta,amount,compact=false}:{href:string;title:string;status:string;tone?:'neutral'|'success'|'warning'|'danger'|'info';meta:ReactNode;amount:string;amountLabel?:string;compact?:boolean}){
+ return <ListRow translateTitle={false} href={href} title={title} meta={meta} status={status} tone={tone} value={amount} valuePlacement="metadata" compact={compact}/>;
 }

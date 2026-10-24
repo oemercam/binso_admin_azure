@@ -19,7 +19,7 @@
 .records-filter-label{display:none}
 .detail-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px;margin-top:14px}
 .searchbox{
-  height:42px;
+  height:var(--control-h);
   max-width:420px;
   padding:0 11px;
   display:flex;
@@ -234,7 +234,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-detail-main .detail-card{max-width:none}
 .page-container> :is(.toolbar,.tabs):first-of-type{margin-top:0}
 .page-container>.detail-grid{margin-top:var(--desktop-section-gap)}
-.searchbox{height:var(--desktop-toolbar-h);max-width:440px;border-radius:var(--control-radius)}
+.searchbox{height:var(--control-h);max-width:440px;border-radius:var(--control-radius)}
 .searchbox.large{max-width:620px}
 .chips{min-width:0}
 .chips button,.tabs button,.tabs a{height:34px;min-height:34px}
@@ -389,7 +389,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 @media(max-width:760px){
  .bo-desktop-actions{display:none}
  .page-container[data-section="kunden"] .records-search-row{grid-template-columns:minmax(0,1fr) 44px;gap:8px}
- .page-container[data-section="kunden"] .records-search-row>.searchbox{height:44px;min-height:44px}
  .page-container[data-section="kunden"] .records-search-row>.records-filter-action{width:44px;height:44px;min-height:44px}
  .page-container[data-section="kunden"] .document-summary-row.is-information>.status{grid-column:2;grid-row:1;white-space:nowrap}
 }
