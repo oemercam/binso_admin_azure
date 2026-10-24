@@ -136,13 +136,14 @@ export async function assertPresentationControls(page){
  }));
  for(const control of measured){
   if(control.toggle)assert.ok(control.width>=44&&control.height>=44,'Shared switches retain a 44px target');
-  else {assert.ok(control.font>=12,'Status labels remain at least 12px');assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
+  else {assert.ok(Math.abs(control.font-11)<.1,'Status labels remain at the approved Phase 1 11px');assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
  }
 }
 
 export async function verifyPresentationControlRegression(page){
  for(const [selector,properties,expected] of [
   ['.status',[['font-size','9px']],/Status labels remain/],
+  ['.status',[['font-size','16px']],/Status labels remain/],
   ['.status',[['gap','0px']],/Status marker and label/],
   ['.toggle',[['height','24px'],['min-height','24px']],/44px target/],
  ]){

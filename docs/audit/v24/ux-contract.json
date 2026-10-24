@@ -117,9 +117,9 @@
     {
       "id": "UX24-STYLE-001",
       "scope": ".button",
-      "requirement": "min-height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "min-height: var(--button-height); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung min-height: var(--button-height) und deren Root-Definition 42px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung min-height: var(--button-height) und deren Root-Definition 44px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -127,9 +127,9 @@
     {
       "id": "UX24-STYLE-002",
       "scope": ".button",
-      "requirement": "height: var(--button-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "height: var(--button-height); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-height) und deren Root-Definition 42px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-height) und deren Root-Definition 44px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -137,9 +137,9 @@
     {
       "id": "UX24-STYLE-003",
       "scope": ".button",
-      "requirement": "font-size: var(--button-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "font-size: var(--button-font-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--button-font-size) und deren Root-Definition 15px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--button-font-size) und deren Root-Definition 14px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert var(--type-control). Visuelle Abnahme bleibt offen."
@@ -177,9 +177,9 @@
     {
       "id": "UX24-STYLE-007",
       "scope": ".button svg",
-      "requirement": "width: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "width: var(--button-icon-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung width: var(--button-icon-size) und deren Root-Definition 17px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung width: var(--button-icon-size) und deren Root-Definition 18px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -187,9 +187,9 @@
     {
       "id": "UX24-STYLE-008",
       "scope": ".button svg",
-      "requirement": "height: var(--button-icon-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "height: var(--button-icon-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/primitives.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-icon-size) und deren Root-Definition 17px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung height: var(--button-icon-size) und deren Root-Definition 18px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -227,9 +227,9 @@
     {
       "id": "UX24-STYLE-012",
       "scope": ".page-head p",
-      "requirement": "font-size: var(--body-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "font-size: var(--body-font-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--body-font-size) und deren Root-Definition 15px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--body-font-size) und deren Root-Definition 14px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -247,9 +247,9 @@
     {
       "id": "UX24-STYLE-014",
       "scope": ".metric-top",
-      "requirement": "font-size: var(--metric-label-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "font-size: var(--metric-label-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-label-size) und deren Root-Definition var(--type-label); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-label-size) und deren Root-Definition var(--kpi-label-font); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -267,9 +267,9 @@
     {
       "id": "UX24-STYLE-016",
       "scope": ".metric strong",
-      "requirement": "font-size: var(--metric-value-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
+      "requirement": "font-size: var(--metric-value-size); Quelle: freigegebener Master Implementation Phase 1, zentrales Designsystem. Responsive Varianten bleiben beim Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-value-size) und deren Root-Definition var(--workspace-value-size); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--metric-value-size) und deren Root-Definition var(--kpi-value-font); Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -341,7 +341,8 @@
       "context": "",
       "property": "min-height",
       "token": "--button-height",
-      "value": "42px"
+      "value": "44px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-002",
@@ -350,7 +351,8 @@
       "context": "",
       "property": "height",
       "token": "--button-height",
-      "value": "42px"
+      "value": "44px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-003",
@@ -359,7 +361,8 @@
       "context": "",
       "property": "font-size",
       "token": "--button-font-size",
-      "value": "15px"
+      "value": "14px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-004",
@@ -395,7 +398,8 @@
       "context": "",
       "property": "width",
       "token": "--button-icon-size",
-      "value": "17px"
+      "value": "18px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-008",
@@ -404,7 +408,8 @@
       "context": "",
       "property": "height",
       "token": "--button-icon-size",
-      "value": "17px"
+      "value": "18px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-009",
@@ -440,7 +445,8 @@
       "context": "",
       "property": "font-size",
       "token": "--body-font-size",
-      "value": "15px"
+      "value": "14px",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-013",
@@ -458,7 +464,8 @@
       "context": "",
       "property": "font-size",
       "token": "--metric-label-size",
-      "value": "var(--type-label)"
+      "value": "var(--kpi-label-font)",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-015",
@@ -476,7 +483,8 @@
       "context": "",
       "property": "font-size",
       "token": "--metric-value-size",
-      "value": "var(--workspace-value-size)"
+      "value": "var(--kpi-value-font)",
+      "source": "docs/architecture/master-phase1/source.md#2-zentrales-designsystem"
     },
     {
       "id": "UX24-STYLE-017",

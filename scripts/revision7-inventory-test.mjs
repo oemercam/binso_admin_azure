@@ -8,7 +8,7 @@ assert.deepEqual([...new Set(requirements.requirements.map(x=>x.chapter))],Array
 assert.equal(new Set(requirements.requirements.map(x=>x.id)).size,requirements.requirements.length);
 const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(path.join(d,x.name)):[path.join(d,x.name).replaceAll('\\','/')]);
 // Preserve the V25 snapshot and explicitly account for subsequent V26 and approved UX routes.
-const additions=['docs/architecture/v26-route-additions.json','docs/architecture/ux-master-v5/route-additions.json'].flatMap(file=>JSON.parse(fs.readFileSync(file)).routes);
+const additions=['docs/architecture/v26-route-additions.json','docs/architecture/ux-master-v5/route-additions.json','docs/architecture/master-phase1/route-additions.json'].flatMap(file=>JSON.parse(fs.readFileSync(file)).routes);
 for(const row of additions){assert.equal(row.status,'nicht_abgenommen');assert.ok(fs.existsSync(row.source));assert.ok(fs.existsSync(row.authorization));assert.ok(row.states.includes('Fehler'));assert.ok(row.states.includes('Speichern/Reload/neue Sitzung'));assert.ok(!routes.routes.some(prior=>prior.file===row.file),'Subsequent supplements cannot override a V25 route');}
 assert.equal(new Set([...routes.routes,...additions].map(row=>row.file)).size,routes.routes.length+additions.length);
 assert.deepEqual([...routes.routes,...additions].map(x=>x.file).sort(),walk('app').filter(x=>x.endsWith('/page.tsx')).sort(),'Every actual route is accounted for');
