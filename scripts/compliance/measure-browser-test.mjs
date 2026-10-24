@@ -110,10 +110,11 @@ try{
  // RecordsControls now owns these classes; a stale selector must not silently
  // leave the real mobile toolbar outside the geometry gate.
  await page.setViewportSize({width:390,height:1000});
- const toolbar=({reverse=false,stack=false,tabsAbove=false,hidden=false}={})=>`<style>body{margin:0}.records-search-row{display:flex;${stack?'flex-direction:column;':''}}.searchbox{display:block;width:240px;height:44px}.records-filter-action{width:44px;height:44px;${hidden?'display:none;':''}}.tabs{height:30px}</style><div class="records-inline-controls">${tabsAbove?'<div class="tabs">Tabs</div>':''}<div class="records-search-row">${reverse?'<button class="records-filter-action">Filter</button>':''}<label class="searchbox">Search</label>${reverse?'':'<button class="records-filter-action">Filter</button>'}</div>${tabsAbove?'':'<div class="tabs">Tabs</div>'}</div>`;
+ const toolbar=({reverse=false,stack=false,tabsAbove=false,hidden=false,searchHeight=48,filterHeight=44,misaligned=false}={})=>`<style>body{margin:0}.records-search-row{display:flex;align-items:center;${stack?'flex-direction:column;':''}}.searchbox{display:block;width:240px;height:${searchHeight}px}.records-filter-action{box-sizing:border-box;width:44px;height:${filterHeight}px;${misaligned?'transform:translateY(8px);':''}${hidden?'display:none;':''}}.tabs{height:30px}</style><div class="records-inline-controls">${tabsAbove?'<div class="tabs">Tabs</div>':''}<div class="records-search-row">${reverse?'<button class="records-filter-action">Filter</button>':''}<label class="searchbox">Search</label>${reverse?'':'<button class="records-filter-action">Filter</button>'}</div>${tabsAbove?'':'<div class="tabs">Tabs</div>'}</div>`;
  const toolbarCheck=async options=>{await page.setContent(toolbar(options));const result=await measureCompliance(page,{output,route:'/kunden',theme:'light',width:390,state:'toolbar-'+JSON.stringify(options),engine});return result.checks.filter(check=>check.id==='UX-CTL-001');};
  assert.equal((await toolbarCheck({}))[0].status,'passed','The current RecordsControls owner emits mobile geometry evidence');
- for(const options of [{reverse:true},{stack:true},{tabsAbove:true}])assert.equal((await toolbarCheck(options))[0].status,'failed','Wrong order, stacked controls and misplaced tabs stay blocking');
+ for(const options of [{reverse:true},{stack:true},{tabsAbove:true},{searchHeight:60},{filterHeight:32},{misaligned:true}])assert.equal((await toolbarCheck(options))[0].status,'failed','Wrong order, stacked controls and misplaced tabs stay blocking');
+ assert.equal((await toolbarCheck({searchHeight:44,filterHeight:44}))[0].status,'passed','Equal-height compact controls remain valid');
  assert.equal((await toolbarCheck({hidden:true})).length,0,'An invisible filter is not evidence of a measured control pair');
  await page.setViewportSize({width:1440,height:1000});
  const sortCheck=async(content,state)=>{await page.setContent(`<div class="records-inline-controls"><button class="records-filter-action" aria-label="Filter und Sortierung">Filter</button>${content}</div>`);const result=await measureCompliance(page,{output,route:'/kunden',theme:'light',width:1440,state,engine});return result.checks.filter(check=>check.id==='UX-CTL-003');};
@@ -122,6 +123,19 @@ try{
  assert.equal((await sortCheck(sortControl+sortControl,'sort-two-choices'))[0].status,'failed','Two actual sort selectors remain blocking');
  assert.equal((await sortCheck(sortControl+'<button aria-label="Sortieren">Extra</button>','sort-extra-unowned-choice'))[0].status,'failed','An additional sort action outside its canonical owner remains blocking');
  assert.equal((await sortCheck(sortControl+'<button class="records-reset" aria-label="Sortierung zurücksetzen">Reset</button>','sort-reset-chip'))[0].status,'passed','An active-filter reset is not another sort selector');
+ // Phase 1 changes destinations explicitly; frozen geometry must still fail when altered.
+ const navBaseline=JSON.parse(await fs.readFile('ux-compliance/navigation-baseline.phase1.json','utf8'));
+ const historical=JSON.parse(await fs.readFile('ux-compliance/navigation-baseline.v4.json','utf8'));
+ for(const [index,c] of navBaseline.cases.entries()){
+  const old=historical.cases[index];assert.deepEqual({...c,navigation:{...c.navigation,links:old.navigation.links}},old,'Only the explicitly approved destination changes');
+ }
+ await page.setViewportSize({width:390,height:1000});
+ const navCheck=async({legacy=false,height=68,offset=0}={})=>{
+  await page.setContent('<style>body{margin:0}.bottom-nav{position:static;margin-top:'+(1000-height-offset)+'px;height:'+height+'px;width:390px;border-radius:0}</style><nav class="bottom-nav">'+['/dashboard','/kunden',legacy?'/finanzen':'/projekte','/zeit'].map(href=>'<a href="'+href+'">Link</a>').join('')+'</nav>');
+  const r=await measureCompliance(page,{output,route:'/kunden',theme:'light',width:390,state:'normal',engine});return r.checks.find(c=>c.id==='UX-NAV-003').status;
+ };
+ assert.equal(await navCheck(),'passed','Approved Navigation V2 matches protected geometry');
+ for(const broken of [{legacy:true},{height:80},{offset:8}])assert.equal(await navCheck(broken),'failed','Old destinations and altered geometry remain blocking');
  // Verify cascade pruning against browser-computed values, not source matching.
  const originalCss='.probe{color:red;padding:4px;border-radius:8px;transition:opacity 100ms}.probe,.other{color:blue;transition:transform 100ms}.probe:hover{color:green}@media(max-width:760px){.probe{padding:8px}.probe,.other{padding:12px}}';
  const prunedCss=parseCss(originalCss);assert.ok(pruneSuperseded(prunedCss).length>0);

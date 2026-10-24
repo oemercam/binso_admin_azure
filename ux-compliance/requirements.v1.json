@@ -596,13 +596,13 @@
       "componentTypes": [
         "RecordsView"
       ],
-      "expected": "Bis 760px Such-/Filterhöhe und Y gleich (+2px); Tabs unter erster Zeile",
+      "expected": "Bis 760px Suche links und Filter rechts, vertikal zentriert (+2px); Feldhöhe ca. 48px und Touchfläche mindestens 44px (je 44–50px); Tabs unter beiden Steuerelementen. Master Phase 1 Abschnitte 1–3.",
       "owner": "RecordsView",
       "method": "browser",
       "testCase": "TC-UX-CTL-001",
       "adapter": "controls",
       "priority": "P1",
-      "acceptance": "Bis 760px Such-/Filterhöhe und Y gleich (+2px); Tabs unter erster Zeile",
+      "acceptance": "Bis 760px Suche links und Filter rechts, vertikal zentriert (+2px); Feldhöhe ca. 48px und Touchfläche mindestens 44px (je 44–50px); Tabs unter beiden Steuerelementen. Master Phase 1 Abschnitte 1–3.",
       "automation": "automatic",
       "provenance": "Current UX compliance instruction; approved UX summary where referenced",
       "review": null,
