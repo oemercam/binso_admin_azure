@@ -9,8 +9,8 @@
 }
 .desktop-navigation-toggle{display:none}
 @keyframes page-enter{
-  from{opacity:.01;transform:translateY(3px)}
-  to{opacity:1;transform:none}
+  from{opacity:.01}
+  to{opacity:1}
 }
 .desktop-back{
   min-height:24px;

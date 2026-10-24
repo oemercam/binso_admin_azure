@@ -1,4 +1,4 @@
-const CACHE = "binso-one-shell-v7";
+const CACHE = "binso-one-shell-v8";
 const OFFLINE_URL = "/offline";
 const SHELL_ASSETS = [
   OFFLINE_URL,
@@ -24,6 +24,22 @@ self.addEventListener("activate", event => {
   );
 });
 
+// A stalled radio/DNS connection must not leave an installed PWA blank forever.
+// Keep personal documents network-only; the fallback is the public offline page.
+async function fetchNavigation(request) {
+  const controller = new AbortController();
+  const cancel = () => controller.abort();
+  if (request.signal.aborted) cancel();
+  else request.signal.addEventListener("abort", cancel, { once: true });
+  const timeout = setTimeout(cancel, 8000);
+  try {
+    return await fetch(request, { cache: "no-store", signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+    request.signal.removeEventListener("abort", cancel);
+  }
+}
+
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -39,7 +55,7 @@ self.addEventListener("fetch", event => {
   // document when the network is genuinely unavailable.
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request, { cache: "no-store" })
+      fetchNavigation(request)
         .catch(() => caches.open(CACHE).then(cache => cache.match(OFFLINE_URL)))
     );
     return;

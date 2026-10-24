@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState,useSyncExternalStore} from 'react';
+import {useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {apiGet} from './backend';
 import {dataRevision,subscribeClientData} from './data-events';
 import {clearQuerySnapshots,readQuerySnapshot,writeQuerySnapshot} from './query-snapshot';
@@ -16,6 +16,8 @@ export function useApiQuery<T>(path:string|null){
  const revision=useDataRevision(path?[path]:[]);
  const [state,setState]=useState<{path:string|null;revision:string;session:string;attempt:number;data:T|undefined;error:string|null;loading:boolean}>({path:null,revision:'',session:'',attempt:-1,data:undefined,error:null,loading:Boolean(path)});
  const [retry,setRetry]=useState(0);
+ // A forced refresh belongs to this visit, not every later route using the hook.
+ const visit=useRef({path,retry});
  useEffect(()=>{
   if(!path)return;
   const interval=window.setInterval(()=>{if(document.visibilityState==='visible'&&navigator.onLine)setRetry(value=>value+1)},60000);
@@ -25,7 +27,8 @@ export function useApiQuery<T>(path:string|null){
   if(!path)return;
   let active=true;
   const session=dataRevision([]);
-  const snapshot=retry===0?readQuerySnapshot<T>(path,revision,session):undefined;
+  if(visit.current.path!==path)visit.current={path,retry};
+  const snapshot=retry===visit.current.retry?readQuerySnapshot<T>(path,revision,session):undefined;
   if(snapshot!==undefined){queueMicrotask(()=>{if(active)setState({path,revision,session,attempt:retry,data:snapshot,error:null,loading:false})});return()=>{active=false;};}
   queueMicrotask(()=>{if(active)setState(previous=>({path,revision,session,attempt:retry,data:previous.path===path&&previous.session===session?previous.data:undefined,error:null,loading:true}));});
   apiGet<T>(path).then(data=>{if(active){writeQuerySnapshot(path,revision,session,data);setState({path,revision,session,attempt:retry,data,error:null,loading:false});}}).catch(error=>{const denied=typeof error==='object'&&error!==null&&'status' in error&&[401,403,404].includes(Number(error.status));if(denied)clearQuerySnapshots();if(active)setState(previous=>({path,revision,session,attempt:retry,data:!denied&&previous.path===path&&previous.session===session?previous.data:undefined,error:error instanceof Error?error.message:'Daten konnten nicht geladen werden.',loading:false}));});

@@ -10,10 +10,11 @@ let state=[],effects=[],cursor=0,effectCursor=0,pending=[],requests=[],session='
 const previousWindow=globalThis.window;
 globalThis.window={setInterval(){return 1;},clearInterval(){}};
 const exports={};
-Function('exports','useState','useEffect','useSyncExternalStore','apiGet','dataRevision','subscribeClientData','clearQuerySnapshots','readQuerySnapshot','writeQuerySnapshot',compile(body))(
+Function('exports','useState','useEffect','useRef','useSyncExternalStore','apiGet','dataRevision','subscribeClientData','clearQuerySnapshots','readQuerySnapshot','writeQuerySnapshot',compile(body))(
  exports,
  initial=>{const index=cursor++;if(!(index in state))state[index]=initial;return [state[index],value=>{state[index]=typeof value==='function'?value(state[index]):value;}];},
  (effect,deps)=>{const index=effectCursor++,old=effects[index];if(old&&deps.every((value,i)=>Object.is(value,old.deps[i])))return;old?.cleanup?.();effects[index]={deps,cleanup:null};pending.push(()=>{effects[index].cleanup=effect();});},
+ initial=>{const index=cursor++;return state[index]??=({current:initial});},
  (_subscribe,snapshot)=>snapshot(),
  path=>new Promise((resolve,reject)=>requests.push({path,resolve,reject})),
  paths=>paths.length?session+':'+revision:session,()=>()=>{},
@@ -48,5 +49,12 @@ try{
  requests.at(-1).reject({status:403,message:'Access removed'});
  const denied=await settle('/api/customers');assert.equal(denied.data,undefined);assert.ok(denied.error);
  session='b';assert.equal(render('/api/customers').data,undefined,'A session transition cannot reuse another tenant response');
+ // A previous manual/poll refresh must not permanently disable warm navigation.
+ session='retry-session';revision=0;clock+=10;render('/api/customers');requests.at(-1).resolve({name:'Fresh before refresh'});await settle('/api/customers');
+ render('/api/customers').refresh();render('/api/customers');requests.at(-1).resolve({name:'Refreshed customer'});await settle('/api/customers');
+ render('/api/products');requests.at(-1).resolve({name:'Fresh product'});await settle('/api/products');
+ const readsBefore=requests.length;assert.deepEqual(render('/api/customers').data,{name:'Refreshed customer'});await settle('/api/customers');
+ assert.equal(requests.length,readsBefore,'A refresh on the previous visit cannot disable fresh return snapshots');
+ render('/api/customers').refresh();render('/api/customers');assert.equal(requests.length,readsBefore+1,'A new explicit refresh still bypasses the fresh snapshot');
  console.log('Actual query hook: immediate fresh/stale returns, background refresh, mutation/session fences, stale responses and access-denial eviction passed.');
 }finally{for(const effect of effects)effect.cleanup?.();globalThis.window=previousWindow;}

@@ -12,7 +12,7 @@ if(!process.env.BINSO_BASE_URL){
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let attempt=0;;attempt++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(attempt>=60||server.exitCode!==null){server.kill();throw new Error('PWA server unavailable: '+logs);}await new Promise(r=>setTimeout(r,250));}
 }
-const browser=await chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage','--single-process']}: {})});
+const browser=await chromium.launch({headless:true,...(process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE,args:['--no-sandbox','--disable-dev-shm-usage']}: {})});
 try{
  const context=await browser.newContext({viewport:{width:375,height:812},colorScheme:'light',serviceWorkers:'allow',
   // Seed an existing PWA preference before navigation. Writing storage while
