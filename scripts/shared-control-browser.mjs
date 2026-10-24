@@ -40,15 +40,15 @@ export async function verifyListFrameMeasurement(page){
  }finally{await detached.dispose();}
 }
 
-/** Closed fields retain the shared geometry; Master V5 uses 44px desktop app controls and 48px mobile fields.
+/** Current global UX audit: 48px fields, 15px desktop text and 16px mobile text (iOS focus zoom).
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
- const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,compactDesktop:!!el.closest('.app-root[data-ux="master-v3"]')&&matchMedia('(min-width:761px)').matches}]:[]}));
+ const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,mobile:matchMedia('(max-width:760px)').matches}]:[]}));
  for(const geometry of fields){
-  assert.equal(geometry.height,geometry.compactDesktop?44:48,route+': canonical closed field height');
+  assert.equal(geometry.height,48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');
-  assert.equal(geometry.font,'14px',route+': canonical field text');
+  assert.equal(geometry.font,geometry.mobile?'16px':'15px',route+': canonical field text');
  }
 }
 
