@@ -200,7 +200,9 @@ jobs:
     if: needs.plan.outputs.browser == 'true'
     runs-on: ubuntu-24.04
     # Responsive shards and functional suites use separate runners; all gate quality.
-    timeout-minutes: 30
+    # Full nightly WebKit route sweeps can exceed 30 minutes under shared runner load.
+    # Coverage and blocking results remain unchanged; only the execution ceiling increases.
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
