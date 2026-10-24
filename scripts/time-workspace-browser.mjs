@@ -36,6 +36,10 @@ export async function verifyTimeWorkspace(page,{capture}){
  await tools.getByRole('button',{name:'Filter und Sortierung',exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'Zeitfilter',exact:true});await dialog.waitFor();
  await tools.waitFor({state:'hidden'});
+ // A child sheet covers its parent immediately; ActionsMenu closes the parent on the next frame.
+ // Wait for that actual handoff, rather than treating a covered parent as already closed.
+ await page.waitForFunction(()=>document.querySelector('.records-tools-action')?.getAttribute('aria-expanded')==='false');
+ await assertFilterTrigger(trigger,false);
  assert.equal(await dialog.evaluate(el=>el.contains(document.activeElement)),true,'Filter moves focus into the dialog');
  await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
  await assertFilterTrigger(trigger,false);
