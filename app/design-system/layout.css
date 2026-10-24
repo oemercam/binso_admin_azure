@@ -123,7 +123,7 @@
 }
 .surface{padding:20px}
 .bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
-.bo-workspace-section>h2{margin:0 0 16px;font-size:var(--type-body);font-weight:500;line-height:1.5}
+.bo-workspace-section>h2{margin:0 0 16px}
 .page-container{--page-x:var(--workspace-page-inset);--mobile-page-x:22px}
 .section-title{
   min-height:30px;
