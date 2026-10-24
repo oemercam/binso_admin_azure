@@ -95,7 +95,7 @@ export async function tenantUpdate<T extends Row>(table:string,id:string,data:T)
  return result;});
 }
 export async function currentCompany(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select * from organizations where id=$1",[s.organizationId])).rows[0])}
-export async function currentProfile(){const s=await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select id,email,display_name,first_name,last_name,phone,job_title,language,theme,avatar_url from app_users where id=$1",[s.userId])).rows[0]??null)}
+export async function currentProfile(verifiedSession?:SessionUser){const s=verifiedSession??await requireSession();return withTenant(s.organizationId,s.userId,async c=>(await c.query("select id,email,display_name,first_name,last_name,phone,job_title,language,theme,avatar_url from app_users where id=$1",[s.userId])).rows[0]??null)}
 export async function updateProfile(data:Row){
  const s=await requireSession();const map:Row={};
  for(const key of ['display_name','first_name','last_name','phone','job_title'])if(data[key]!==undefined)map[key]=data[key];

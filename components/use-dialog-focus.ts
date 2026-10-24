@@ -13,6 +13,14 @@ export function registerDialogPortal(trigger:HTMLElement|null,portal:HTMLElement
  dialogPortals.set(portal,owner);return()=>{dialogPortals.delete(portal)};
 }
 const backgroundLocks=new Map<HTMLElement,{count:number;previous:boolean}>();
+const coveredSheets=new Map<HTMLElement,{count:number;previous:boolean}>();
+/** Keep a parent editor mounted, but show only the active child sheet. */
+function coverParentSheets(dialog:HTMLElement){
+ if(!dialog.matches('.bottom-sheet'))return()=>{};
+ const layers=Array.from(document.querySelectorAll<HTMLElement>('.sheet-layer')).filter(layer=>!layer.contains(dialog));
+ for(const layer of layers){const lock=coveredSheets.get(layer)??{count:0,previous:layer.hasAttribute('data-sheet-covered')};lock.count++;coveredSheets.set(layer,lock);layer.setAttribute('data-sheet-covered','');}
+ return()=>{for(const layer of layers){const lock=coveredSheets.get(layer);if(lock&&--lock.count===0){layer.toggleAttribute('data-sheet-covered',lock.previous);coveredSheets.delete(layer);}}};
+}
 /** Nested modals share background ownership; closing one cannot expose another's page. */
 function lockDialogBackground(dialog:HTMLElement){
  const targets=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement&&!element.contains(dialog)&&!["SCRIPT","STYLE","LINK","TEMPLATE"].includes(element.tagName));
@@ -42,6 +50,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     const dialog = dialogRef.current;
     const unlockScroll=lockPageScroll(()=>dialog);
     const unlockBackground=headerPanel?()=>{}:lockDialogBackground(dialog);
+    const uncoverSheets=coverParentSheets(dialog);
     modalStack.push(dialog);
     if(!headerPanel)document.documentElement.dataset.modalOverlay="true";
     if(!headerPanel)window.dispatchEvent(new Event("binso-modal-open"));
@@ -49,11 +58,18 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     const trigger = active instanceof HTMLElement && !dialog.contains(active) ? active : triggerRef.current;
     // clip prevents a new body scroll container from breaking sticky app headers.
     const viewport=window.visualViewport;
+    let resizeFrame=0;
     const resize=()=>{
       document.documentElement.style.setProperty("--dialog-viewport-height",`${viewport?.height??window.innerHeight}px`);
       document.documentElement.style.setProperty("--dialog-viewport-top",`${viewport?.offsetTop??0}px`);
-      const focused=document.activeElement;
-      if(focused instanceof HTMLElement&&dialog.contains(focused))focused.scrollIntoView({block:"nearest",behavior:"instant"});
+      cancelAnimationFrame(resizeFrame);
+      resizeFrame=requestAnimationFrame(()=>{
+       const focused=document.activeElement;
+       if(!(focused instanceof HTMLElement)||!dialog.contains(focused)||!focused.matches('input,select,textarea,[contenteditable="true"]'))return;
+       const field=focused.getBoundingClientRect(),body=focused.closest('.sheet-body,.sheet-form-content')?.getBoundingClientRect();
+       const top=Math.max(viewport?.offsetTop??0,body?.top??0),bottom=Math.min((viewport?.offsetTop??0)+(viewport?.height??window.innerHeight),body?.bottom??Infinity);
+       if(field.top<top||field.bottom>bottom)focused.scrollIntoView({block:"nearest",behavior:"instant"});
+      });
     };
     resize();viewport?.addEventListener("resize",resize);viewport?.addEventListener("scroll",resize);
     const roots=()=>[dialog,...[...dialogPortals].filter(([,owner])=>owner===dialog).map(([portal])=>portal)];
@@ -84,6 +100,8 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     return () => {
       const index=modalStack.indexOf(dialog);if(index>=0)modalStack.splice(index,1);
       unlockBackground();
+      uncoverSheets();
+      cancelAnimationFrame(resizeFrame);
       if(!modalStack.some(item=>!item.matches(".header-panel")))delete document.documentElement.dataset.modalOverlay;
       viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
       document.removeEventListener("keydown", onKey);

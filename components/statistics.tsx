@@ -5,7 +5,7 @@ import Link from "next/link";
 import {comparisonBarWidths} from "@/lib/cash-statistics";
 import {useId,useState} from 'react';
 import {MetricTiles,MetricTile} from './binso-ux';
-import {Button} from './ui';
+import {Button,LoadingState} from './ui';
 import {sumMoney} from '@/lib/money';
 import {businessDate,formatCurrency} from '@/lib/financial-status';
 import {aggregateStatistics,lineChartCoordinates,statisticBounds,type StatisticBucket,type StatisticEvent,type StatisticPeriod} from '@/lib/statistics-period';
@@ -49,7 +49,7 @@ export function LineChart({buckets,series,selected,onSelect,value}:{buckets:read
 /** One period control, signed line chart and shared KPI renderer. */
 export function Statistics({title,subtitle,events,series,metrics,currency='CHF',storageKey,notice,metricKeys=[],composition,defaultTrendVisible,hideHeading=false,compact=false}:{compact?:boolean;hideHeading?:boolean;title:string;subtitle:string;events:readonly StatisticEvent[];series:readonly Series[];metrics:(totals:Record<string,number>)=>readonly Metric[];currency?:string;storageKey:string;notice?:string;metricKeys?:readonly string[];composition?:{label:string;parts:readonly RingPart[]};defaultTrendVisible?:boolean}){
  const id=useId(),{locale}=useLocale();
- const [storedPeriod,setPeriod]=useStatisticPeriod(storageKey,{months:6,from:'',to:''});
+ const [storedPeriod,setPeriod,periodReady]=useStatisticPeriod(storageKey,{months:6,from:'',to:''});
  const period=storedPeriod!;
  const [selected,setSelected]=useState<string|null>(null);
  const [showTrend,setShowTrend]=useState(defaultTrendVisible??!composition);
@@ -62,6 +62,7 @@ export function Statistics({title,subtitle,events,series,metrics,currency='CHF',
  const hasEntries=events.some(event=>bounds&&event.date>=bounds.from&&event.date<=bounds.to);
  const hasTrend=hasEntries&&aggregated.buckets.some(bucket=>series.some(item=>bucket.values[item.key]!==0));
  const choose=(next:StatisticPeriod)=>{setPeriod(next);setSelected(null)};
+ if(!periodReady)return <LoadingState/>;
  return <section className="bo-statistics" data-compact={compact||undefined} aria-labelledby={id}>
   <header className="bo-statistics-heading"><div className={hideHeading?"visually-hidden":undefined}><h2 id={id}><LocalizedText>{title}</LocalizedText></h2>{subtitle&&<p><LocalizedText>{subtitle}</LocalizedText></p>}</div><StatisticPeriodPicker period={period} onChange={choose}/></header>
   <MetricTiles columns={Math.min(4,Math.max(2,kpis.length)) as 2|3|4}>{kpis.slice(0,4).map(metric=><MetricTile key={metric.label} label={metric.label} value={metric.format==='number'?value(metric.value,'number'):metric.value} currency={metric.format==='number'?undefined:currency} compactMoney={compact} hint={compact?undefined:metric.hint}/>)}</MetricTiles>

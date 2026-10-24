@@ -1,4 +1,5 @@
 "use client";
+import {formControlSnapshot} from '@/lib/client/form-snapshot';
 
 import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
 import {asLocale} from '@/lib/locales';
@@ -159,7 +160,7 @@ function AppShellFrame({
   const shellRef=useRef<HTMLDivElement>(null);
   const formBaseline=useRef("");
   const touchedRef=useRef(false);
-  const formValues=()=>JSON.stringify(Array.from(shellRef.current?.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>('.form-field input,.form-field select,.form-field textarea,.mobile-line-field input,.mobile-line-field select,input[type=file]')??[]).map(el=>el instanceof HTMLInputElement&&['checkbox','radio'].includes(el.type)?el.checked:el.value));
+  const formValues=()=>formControlSnapshot(shellRef.current,'.form-field input,.form-field select,.form-field textarea,.mobile-line-field input,.mobile-line-field select,input[type=file]');
   // Hydrated backend values become the baseline until the first genuine edit.
   useEffect(()=>{if(!formActive&&touchedRef.current){touchedRef.current=false;queueMicrotask(()=>{setFormDirty(false)})}if(formActive&&!touchedRef.current)formBaseline.current=formValues()});
   const dirty=unsavedChanges??formDirty;
@@ -310,7 +311,7 @@ function AppShellFrame({
 
 
 
-  return <UserProfileContext.Provider value={profileItem??null}><WorkspaceActionContext.Provider value={registerContextActions}><PageAccessContext.Provider value={pageAccess}>
+  return <UserProfileContext.Provider value={profileItem??(profileQuery.data||profileQuery.error?{}:null)}><WorkspaceActionContext.Provider value={registerContextActions}><PageAccessContext.Provider value={pageAccess}>
     {!access&&!accessError&&<AppStart/>}
     <div hidden={!access&&!accessError} ref={shellRef} data-ux={(["/dashboard","/kunden","/finanzen","/zeit","/einstellungen"].includes(pathname)||pathname.startsWith("/einstellungen/"))?"master-v3":undefined} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""} ${chatActive ? "app-chat" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>

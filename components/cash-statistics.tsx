@@ -19,9 +19,9 @@ import type {ReportSummary} from '@/lib/report-export';
 
 /** Shared real ledger presentation; snapshot balances never acquire invented trends. */
 export function CashOverview({data,dashboard=false,compact=false,afterMetrics,onPeriodChange,tools}:{data:CashStatisticsData;dashboard?:boolean;compact?:boolean;afterMetrics?:ReactNode;tools?:ReactNode;onPeriodChange?:(period:StatisticPeriod)=>void}){
- const [storedPeriod,setPeriod]=useStatisticPeriod(dashboard?'dashboard':'finance-overview'),period=storedPeriod!;
+ const [storedPeriod,setPeriod,periodReady]=useStatisticPeriod(dashboard?'dashboard':'finance-overview'),period=storedPeriod!;
  const [selected,setSelected]=useState<string|null>(null),translate=useTranslation();
- useEffect(()=>{onPeriodChange?.(period)},[onPeriodChange,period]);
+ useEffect(()=>{if(periodReady)onPeriodChange?.(period)},[onPeriodChange,period,periodReady]);
  const today=businessDate(),events=financialStatisticEvents(data),bounds=statisticBounds(period,today)!;
  const {totals,buckets:trend}=aggregateStatistics(events,bounds,['revenue','income','costs']);
  const snapshot=data.financial?.snapshot,key=snapshot?'revenue':'income';
@@ -32,6 +32,7 @@ export function CashOverview({data,dashboard=false,compact=false,afterMetrics,on
  const neutral=trendFor(0,0,false),revenueTrend=trendFor(totals[key],prior[key],snapshot?knownRevenue:knownIncome);
  const maximum=Math.max(1,...trend.map(bucket=>Math.abs(bucket.values[key]))),modern=dashboard||compact;
  const label=key==='revenue'?'Umsatz':'Eingänge';
+ if(!periodReady)return <LoadingState/>;
  return <section className="bo-cash-overview" data-compact={modern||undefined} aria-label={dashboard?'Monatsüberblick':'Finanzüberblick'}>
   <div className="records-search-row"><StatisticPeriodPicker period={period} onChange={value=>{setPeriod(value);onPeriodChange?.(value);setSelected(null)}}/>{tools}</div>
 
@@ -61,7 +62,7 @@ export function CashOverview({data,dashboard=false,compact=false,afterMetrics,on
 
 /** Existing cash ledger and current receivables remain distinct time bases. */
 export function CashStatistics({data,storageKey}:{data:CashStatisticsData;storageKey:string}){
- const [storedPeriod,setPeriod]=useStatisticPeriod(storageKey),period=storedPeriod!;
+ const [storedPeriod,setPeriod,periodReady]=useStatisticPeriod(storageKey),period=storedPeriod!;
  const {locale}=useLocale(),translate=useTranslation(),access=usePageAccess();
  const today=businessDate(),bounds=statisticBounds(period,today)!,previous=previousStatisticBounds(bounds);
  const events=cashStatisticEvents(data),keys=['income','costs'];
@@ -78,7 +79,7 @@ export function CashStatistics({data,storageKey}:{data:CashStatisticsData;storag
  const date=(day:string)=>new Intl.DateTimeFormat(localeTags[locale],{dateStyle:'medium',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));
  const caption=period.months===1?new Intl.DateTimeFormat(localeTags[locale],{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(bounds.from+'T12:00:00Z')):date(bounds.from)+' – '+date(bounds.to);
  const reportRange=(Date.parse(bounds.to)-Date.parse(bounds.from))/86400000<366;
- const report=useApiQuery<ReportSummary>(access.canOpen('/berichte')&&access.canOpen('/angebote')&&reportRange?'/api/reports?'+new URLSearchParams({months:'custom',from:bounds.from,to:bounds.to}):null);
+ const report=useApiQuery<ReportSummary>(periodReady&&access.canOpen('/berichte')&&access.canOpen('/angebote')&&reportRange?'/api/reports?'+new URLSearchParams({months:'custom',from:bounds.from,to:bounds.to}):null);
  const offerRows=report.data?.offers,offerStates=['draft','sent','accepted','declined','expired','revised','cancelled'];
  const offersKnown=Array.isArray(offerRows),offerCounts=Object.fromEntries(offerStates.map(status=>[status,offersKnown?offerRows.filter(row=>row.status===status).reduce((total,row)=>total+Number(row.count),0):0]));
  const offerTotal=offersKnown?offerRows.reduce((total,row)=>total+Number(row.count),0):null;
@@ -88,6 +89,7 @@ export function CashStatistics({data,storageKey}:{data:CashStatisticsData;storag
  useEffect(()=>{if(!restored.current||report.loading||scrollRestore.current===null)return;let second=0;const first=requestAnimationFrame(()=>{second=requestAnimationFrame(()=>{if(scrollRestore.current!==null){window.scrollTo({top:scrollRestore.current,behavior:'instant'});scrollRestore.current=null}})});return()=>{cancelAnimationFrame(first);cancelAnimationFrame(second)}},[expanded,report.loading,stateKey]);
  const remember=(next=expanded,y=window.scrollY)=>{if(restored.current)listStateStore.set(stateKey,JSON.stringify({...next,y}))};
  const expand=(key:'receivables'|'offers',open:boolean)=>{const next={...expanded,[key]:open};setExpanded(next);remember(next)};
+ if(!periodReady)return <LoadingState/>;
  return <div className="bo-finance-analysis bo-statistics" data-compact onClickCapture={event=>{const link=event.target instanceof Element?event.target.closest('a[href]'):null;if(link&&event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey)remember()}}>
   <div className="records-search-row"><StatisticPeriodPicker period={period} onChange={setPeriod}/><ActionsMenu tools label="Analysewerkzeuge"><ActionRow icon="file" title="Datenhinweise" onClick={()=>setNotes(true)}/></ActionsMenu></div>
   <MetricTiles columns={4}>

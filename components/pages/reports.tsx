@@ -15,15 +15,16 @@ import {MetricTiles,MetricTile,WorkspaceSection} from '../binso-ux';
 import {ErrorState,LoadingState,EmptyState,SectionTitle,Status} from '../ui';
 import {projectStatusLabels as projectLabels} from '@/lib/projects';
 export function ReportsPage(){
- const {locale}=useLocale(),[selectedPeriod,setPeriod]=useStatisticPeriod('reports'),period=selectedPeriod!;
+ const {locale}=useLocale(),[selectedPeriod,setPeriod,periodReady]=useStatisticPeriod('reports'),period=selectedPeriod!;
  const bounds=statisticBounds(period,businessDate())!;
  const reportPeriod={months:'custom',from:bounds.from,to:bounds.to};
- const query=new URLSearchParams(reportPeriod),resource=useApiQuery<ReportSummary>('/api/reports?'+query.toString()),data=resource.data;
+ const query=new URLSearchParams(reportPeriod),resource=useApiQuery<ReportSummary>(periodReady?'/api/reports?'+query.toString():null),data=resource.data;
  const hasAccess=!!data&&[data.customers,data.projects,data.time,data.payments,data.expenses,data.expenseCategories,data.employees,data.invoices,data.offers,data.vat].some(value=>value!=null);
  const decisions=offerDecisionTotals(data?.offers??[]);
  const [timeOpen,setTimeOpen]=useState(false);
 
  const number=(value:string)=>Number(value).toLocaleString(localeTags[locale],{maximumFractionDigits:2});
+ if(!periodReady)return <AppShell title="Berichte" active="berichte"><LoadingState/></AppShell>;
  return <AppShell title="Berichte" active="berichte">
   <WorkspaceSection><div className="records-search-row"><StatisticPeriodPicker period={period} onChange={setPeriod} maxDays={366}/>{hasAccess&&<ReportActions tools query={query.toString()} onTimeReport={data?.time?()=>setTimeOpen(true):undefined}/>}</div></WorkspaceSection>
   {resource.error?<ErrorState onRetry={resource.refresh}>{resource.error}</ErrorState>:resource.loading?<LoadingState/>:data&&<>

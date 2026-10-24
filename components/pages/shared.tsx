@@ -59,12 +59,12 @@ function customerAmounts(value:unknown,key:'revenue'|'open_amount',locale:string
  return value.filter(item=>item&&typeof item.currency==='string'&&Number.isFinite(Number(item[key]))).map(item=>formatCurrency(item[key],item.currency,locale)).join(' · ')||'—';
 }
 
-export function useRemoteRows(collection:DataCollection,filters="") {
+export function useRemoteRows(collection:DataCollection,filters="",enabled=true) {
   const {locale}=useLocale(),translateUnit=useTranslation();
   const base=`/api/${collection}`;
   const path=base+(filters?(base.includes('?')?'&':'?')+filters:'');
-  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(path);
-  return {rows:mapRemoteRows(collection,data?.items??[],{locale:localeTags[locale],translateUnit}),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading,error};
+  const {data,loading,error}=useApiQuery<{items:Record<string,unknown>[];total?:number}>(enabled?path:null);
+  return {rows:mapRemoteRows(collection,data?.items??[],{locale:localeTags[locale],translateUnit}),total:data?.total??Number(data?.items?.[0]?.total_count??data?.items?.length??0),loading:!enabled||loading,error};
 }
 
 /** Module configuration changes domain fields, never the committed list state owner. */
@@ -78,6 +78,6 @@ export function useRecordList(collection:DataCollection,options:Parameters<typeo
  if(options.scope?.review)filters.set('review','1');
  if(options.scope?.employeeId)filters.set('employee_id','eq.'+options.scope.employeeId);
  const selected=filterValues[controller.activeChip];if(selected)filters.set(selected.field,selected.value);
- const data=useRemoteRows(collection,filters.toString());
+ const data=useRemoteRows(collection,filters.toString(),controller.restored);
  return {...data,controller,pagination:{total:data.total,page:controller.page,pageSize,onPage:controller.setPage}};
 }
