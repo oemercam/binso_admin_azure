@@ -1,0 +1,72 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const compile=(file,deps={})=>{
+ const result={};
+ Function('require','exports',ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText)(key=>Object.hasOwn(deps,key)?deps[key]:require(key),result);
+ return result;
+};
+const {formSnapshot,formControlSnapshot}=compile('lib/client/form-snapshot.ts');
+assert.equal(formSnapshot({name:'A\r\nB',nested:{b:2,a:1}}),formSnapshot({nested:{a:1,b:2},name:'A\nB'}));
+assert.notEqual(formSnapshot({text:' A'}),formSnapshot({text:'A'}),'Meaningful whitespace remains an edit');
+const a=new File(['receipt'],'receipt.pdf',{lastModified:1}),b=new File(['changed'],'receipt.pdf',{lastModified:1});
+assert.equal(formSnapshot([a]),formSnapshot([a]));
+assert.notEqual(formSnapshot([a]),formSnapshot([b]),'Same metadata cannot hide a replaced file');
+assert.notEqual(formSnapshot({attachments:['a']}),formSnapshot({attachments:[]}),'Removing an attachment is an edit');
+assert.notEqual(formSnapshot({lines:[{price:'1'}]}),formSnapshot({lines:[{price:'2'}]}));
+const savedInput=globalThis.HTMLInputElement,savedSelect=globalThis.HTMLSelectElement;
+try{
+ globalThis.HTMLInputElement=class {constructor(type,value,owner){this.type=type;this.value=value;this.owner=owner;this.name='field';this.id='';}closest(){return this.owner;}};
+ globalThis.HTMLSelectElement=class {};
+ const parent={},child={},field=new HTMLInputElement('text','loaded',parent),nested=new HTMLInputElement('text','child',child),file=new HTMLInputElement('file','fakepath',parent);file.files=[a];
+ const root={closest:()=>parent,querySelectorAll:()=>[field,nested,file]};
+ const initial=formControlSnapshot(root);nested.value='opened child';assert.equal(formControlSnapshot(root),initial,'Nested dialog controls belong to their own baseline');
+ file.files=[b];assert.notEqual(formControlSnapshot(root),initial);
+ file.files=[a];assert.equal(formControlSnapshot(root),initial,'Restoring the original file clears dirty state');
+}finally{globalThis.HTMLInputElement=savedInput;globalThis.HTMLSelectElement=savedSelect;}
+
+/** Exercise the actual hook/component functions through state/effect transitions. */
+function hooks(){
+ let position=0;const cells=[],effects=[];
+ const react={Fragment:Symbol('Fragment'),useState(initial){const index=position++;if(!(index in cells))cells[index]=typeof initial==='function'?initial():initial;return [cells[index],next=>{cells[index]=typeof next==='function'?next(cells[index]):next}];},useRef(value){const index=position++;return cells[index]??=({current:value});},useEffect(callback,deps){const index=position++,previous=cells[index];if(!previous||!deps||deps.some((value,i)=>!Object.is(value,previous[i]))){cells[index]=deps;effects.push(callback);}}};
+ return {react,render(fn){position=0;return fn();},async flush(){for(const effect of effects.splice(0))effect();await new Promise(resolve=>queueMicrotask(resolve));}};
+}
+let session;
+const boundaryHooks=hooks(),{SessionDataBoundary}=compile('components/session-data-boundary.tsx',{react:boundaryHooks.react,'./ui':{ErrorState:()=>null},'@/lib/client/use-api-query':{useApiQuery:()=>({data:session})}});
+const page={type:'private-page'};
+assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'Initial identity must not mount then remount a page');
+session={authenticated:true,user:{id:'one'},tenant:{id:'tenant'}};
+const first=boundaryHooks.render(()=>SessionDataBoundary({children:page}));await boundaryHooks.flush();
+assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key);
+session={...session,tenant:{...session.tenant,role:'admin'}};
+assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key,'Same-person permission refresh preserves draft identity');
+session={...session,user:{id:'two'}};
+assert.notEqual(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key,'A new person resets private page state');
+
+const storage=new Map([['binso.statistics:finance',JSON.stringify({months:6,from:'',to:''})]]),savedStorage=globalThis.sessionStorage;
+try{
+ globalThis.sessionStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)};
+ const periodHooks=hooks(),{useStatisticPeriod}=compile('lib/client/statistic-period.ts',{react:periodHooks.react,'@/lib/financial-status':{businessDate:()=> '2026-10-24'},'@/lib/statistics-period':{statisticBounds:value=>[1,3,6,12].includes(value.months)?{}:null}});
+ assert.equal(periodHooks.render(()=>useStatisticPeriod('finance'))[2],false);
+ await periodHooks.flush();const restored=periodHooks.render(()=>useStatisticPeriod('finance'));assert.equal(restored[0].months,6);assert.equal(restored[2],true);await periodHooks.flush();
+ assert.equal(JSON.parse(storage.get('binso.statistics:finance')).months,6,'Default period cannot overwrite the stored selection during startup');
+ assert.equal(periodHooks.render(()=>useStatisticPeriod('other'))[2],false,'Another evaluation waits for its own restoration');
+ await periodHooks.flush();assert.equal(periodHooks.render(()=>useStatisticPeriod('other'))[0].months,1);
+}finally{globalThis.sessionStorage=savedStorage;}
+
+const verified={organizationId:'tenant-one',userId:'person-one'};let authCalls=0,profileSession;
+const profile=compile('app/api/settings/profile/route.ts',{'next/server':{},'@/lib/server/http':{json:value=>value,apiError:error=>{throw error}},'@/lib/server/auth':{requireUser:async()=>{authCalls++;return {user:{email:'fixture@example.invalid'},session:verified}}},'@/lib/server/database':{currentProfile:async session=>{profileSession=session;return {first_name:'Fixture'}}}});
+assert.equal((await profile.GET()).item.first_name,'Fixture');assert.equal(authCalls,1);assert.equal(profileSession,verified,'Only the already verified request session is reused');
+
+// Evaluate the consolidated count query against real PostgreSQL semantics.
+const {PGlite}=await import('@electric-sql/pglite');const db=new PGlite();
+try{
+ await db.exec("create table customers(organization_id text,archived_at text);create table projects(organization_id text,archived_at text,status text);create table employees(organization_id text,archived_at text,active boolean);insert into customers values('a',null),('a','archived'),('b',null);insert into projects values('a',null,'active'),('a',null,'in_progress'),('a',null,'closed'),('b',null,'active');insert into employees values('a',null,true),('a',null,false),('b',null,true)");
+ const source=fs.readFileSync('app/api/dashboard/route.ts','utf8'),sql=source.match(/const counts=[\s\S]*?\(\x60([\s\S]*?)\x60,/)[1];
+ assert.deepEqual((await db.query(sql,['a',true,true,true])).rows[0],{customer_count:1,project_count:2,employee_count:1});
+ assert.deepEqual((await db.query(sql,['a',false,false,false])).rows[0],{customer_count:null,project_count:null,employee_count:null});
+ assert.deepEqual((await db.query(sql,['empty',true,true,true])).rows[0],{customer_count:0,project_count:0,employee_count:0});
+}finally{await db.close();}
+console.log('Global UX/startup: normalized dirty values/files/nested forms, stable first identity, restored period readiness, verified profile session reuse, and tenant-scoped PostgreSQL counts passed.');

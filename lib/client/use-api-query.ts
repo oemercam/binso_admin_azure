@@ -33,6 +33,9 @@ export function useApiQuery<T>(path:string|null){
  },[path,revision,retry]);
  const current=state.path===path&&state.revision===revision&&state.attempt===retry;
  const sameSession=state.path===path&&state.session===dataRevision([]);
- const data=(sameSession?state.data:undefined)??(path?readQuerySnapshot<T>(path,revision,dataRevision([]),undefined,300000):undefined);
+ // A newly mounted page must not first show a five-minute-old result. Existing
+ // mounted data can remain during background refresh; navigation uses the same
+ // 30-second freshness window as the request shortcut above.
+ const data=(sameSession?state.data:undefined)??(path?readQuerySnapshot<T>(path,revision,dataRevision([])):undefined);
  return {data,error:current?state.error:null,loading:Boolean(path)&&data===undefined&&(!current||state.loading),refreshing:Boolean(path)&&(!current||state.loading)&&data!==undefined,refresh:()=>setRetry(value=>value+1)};
 }

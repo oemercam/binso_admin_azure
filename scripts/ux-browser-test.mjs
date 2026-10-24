@@ -186,7 +186,7 @@ async function actionEvidence(page,name,theme){
   assert.ok(rows.length>0,'Entity actions use the central row');
   assert.equal(await dialog.locator('.sheet-menu,.button-danger').count(),0,'No legacy action rows or detached destructive button');
   const labelFont=await dialog.evaluate(el=>getComputedStyle(el).getPropertyValue('--type-label').trim());
-  const labelWeight=await dialog.evaluate(el=>getComputedStyle(el).getPropertyValue('--control-label-weight').trim());assert.equal(labelWeight,'500','Revision7 label typography is13px/500');
+  const labelWeight=await dialog.evaluate(el=>getComputedStyle(el).getPropertyValue('--control-label-weight').trim());assert.equal(labelWeight,'500','Shared form label weight remains 500');
   for(const row of rows){assert.ok(row.height>=44);assert.equal(row.font,labelFont);assert.equal(row.weight,labelWeight);assert.equal(row.text,rows[0].text);if(row.destructive)assert.equal(row.chevron,1,'Destructive row has no navigation arrow');}
  }
  await capture(page,{animations:'disabled',path:path.join(output,`${theme}-${name}-actions.png`)});
@@ -467,7 +467,7 @@ try{
     }
     const creationShapes=await page.evaluate(()=>[...document.querySelectorAll('.bo-create-action')].flatMap(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();if(!r.width||!r.height||['hidden','collapse'].includes(c.visibility))return [];const label=el.querySelector('.create-action-label'),short=el.querySelector('.create-action-short');return [{width:r.width,height:r.height,radius:c.borderRadius,background:c.backgroundColor,label:!!label?.getClientRects().length,short:!!short?.checkVisibility()&&short.getBoundingClientRect().width>0&&short.getBoundingClientRect().right<=r.right}]}));
     for(const shape of creationShapes){
-      if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'5px','Desktop creation follows the original control shape');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
+      if(width>=761){assert.ok(shape.label,`${route}: desktop creation keeps its visible label`);assert.equal(shape.radius,'12px','Desktop creation follows the shared 12px control shape; mobile FAB geometry remains frozen');assert.equal(shape.background,theme==='light'?'rgb(37, 102, 189)':'rgb(72, 167, 255)');}
       else{assert.equal(shape.label,false,'Mobile creation uses its icon');assert.equal(shape.short,false,'No competing text inside the round action');assert.ok(shape.width>=44&&shape.height>=44,'Creation keeps its touch target');assert.equal(shape.radius,'50%','Approved mobile creation is circular');}
     }
     // Snapshot values in one browser task: query hydration can replace metric nodes between awaited locator calls.

@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "sourceBase": "107676415d566d82fadb7e0122793718bc184961",
+  "scope": "30-minute implementation; global central-component changes, not complete application acceptance",
+  "specification": "User-adopted GLOBAL UX AUDIT, STANDARDISIERUNG & AUTOMATISCHE KORREKTUR, chapters 1–18 (attachment ends after the three navigation bullets)",
+  "implementation": [
+    "Central Inter hierarchy: 20px page, 18px sheet/detail, 16px section, 15px body, 14px labels, 13px secondary, 24px KPI; shared gaps, 48px fields, 12px corners",
+    "Existing bottom-navigation geometry, labels, icons, permissions and behavior preserved; dedicated original-size tokens protect them from typography changes; original responsive floating-action inset preserved",
+    "Initial session identity no longer mounts a private subtree under an initial key and then remounts it under the confirmed key; first-session errors retain retry",
+    "Restored list filters gate the initial data request; restored evaluation periods gate KPI/chart display and dependent report/time-entry requests",
+    "Profile-dependent greeting has no assumed initial time of day; five-minute stale snapshots are not restored on navigation",
+    "Normalized dirty snapshots include object key ordering, line endings, file identity, removed attachments and nested arrays; central sheets accept loaded baselines until genuine input",
+    "Parent sheets remain mounted but hidden while a child sheet is active; keyboard viewport updates coalesce field scrolling",
+    "Dashboard reuses its verified plan, profile GET reuses its verified request session, dashboard counts use one tenant-scoped SQL round trip with original gates and predicates",
+    "UX style bindings and source inventories updated without granting visual or production acceptance"
+  ],
+  "checks": {
+    "typecheck": "passed on final source",
+    "changedFileLint": "passed on final source",
+    "regressions": [
+      "global-ux-startup",
+      "ux-regression",
+      "ux-master-v3",
+      "ux-master-v4",
+      "ux-master-v4-1",
+      "ux-master-v5",
+      "period-control",
+      "client-session",
+      "v23-2-ux",
+      "task-focused-ux",
+      "ux-style-contract"
+    ],
+    "browser": [
+      "Actual central FormSheet in the existing development UX-Lab, synthetic data, mobile and desktop viewport overrides",
+      "Unchanged close: no discard prompt; genuine edit: discard prompt; original value restored: no discard prompt"
+    ],
+    "productionBuild": "Exit 0: compiled, typechecked, generated all 171 static pages; Windows EPERM symlink warning while copying standalone dependencies. Final session-error fallback was added after the initial compilation; clean final-source Linux packaging remains unverified.",
+    "uxContract": "passed: 34 owners, 87 source pages; static coverage is not visual acceptance",
+    "integrationInventory": "passed: no local runtime import cycles, current fingerprint and complete route matrix"
+  },
+  "notVerified": [
+    "Complete route-by-route and role-by-role visual/function acceptance for all 18 chapters",
+    "Physical iPhone/iPad installed-PWA cold start, Safari keyboard and resume timing",
+    "All five languages, dark/system modes and accessibility zoom across all routes",
+    "Authenticated customer/admin production routes; local authenticated session was unavailable",
+    "Large translation payload and remaining server query waterfall; no measured end-to-end speedup claimed"
+  ],
+  "externalActions": {
+    "githubPush": false,
+    "merge": false,
+    "deployment": false
+  },
+  "evidence": {
+    "mobile": "../../../../ux-audit-mobile-form.png",
+    "desktop": "../../../../ux-audit-desktop-form.png",
+    "live": "http://localhost:3101/dev/ux-lab",
+    "scope": "Existing shared components with synthetic local examples, not authenticated production acceptance"
+  }
+}

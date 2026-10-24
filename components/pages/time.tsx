@@ -51,7 +51,7 @@ export function TimePage() {
   const [entryQuery,setEntryQuery]=useState("");
   const [timeFilterOpen,setTimeFilterOpen]=useState(false);
   const [pendingStatus,setPendingStatus]=useState("Alle");
-  const [entryPeriod,setEntryPeriod]=useStatisticPeriod('time-entries:'+String(employeeFilter??'')+':'+String(projectFilter??'')+':'+String(reviewMode),null);
+  const [entryPeriod,setEntryPeriod,entryPeriodReady]=useStatisticPeriod('time-entries:'+String(employeeFilter??'')+':'+String(projectFilter??'')+':'+String(reviewMode),null);
   const entryBounds=entryPeriod&&statisticBounds(entryPeriod,businessDate());
   const entryFrom=entryBounds?.from??'',entryTo=entryBounds?.to??'';
   const [timeSaving,setTimeSaving]=useState(false);
@@ -95,11 +95,11 @@ export function TimePage() {
   const [pagination,setPagination]=useState({scope:'',page:0});
   const timePage=pagination.scope===filterScope?pagination.page:0;
   const entriesPath='/api/time-entries?'+timeEntryQuery(entryFilters,{...scopeOptions,page:timePage});
-  const entriesResource=useApiQuery<{items:TimeEntry[];total?:number;total_minutes?:number}>(entriesPath);
+  const entriesResource=useApiQuery<{items:TimeEntry[];total?:number;total_minutes?:number}>(timeTab==='timer'||entryPeriodReady?entriesPath:null);
   const [entryOverride,setEntryOverride]=useState<{key:string;items:TimeEntry[]}|null>(null);
   const entryKey=entriesPath+':'+dataRevision([entriesPath]);
   const remoteEntries=entryOverride?.key===entryKey?entryOverride.items:entriesResource.data?.items??[];
-  const entriesLoading=entriesResource.loading||(timeTab==="entries"&&entryQuery!==debouncedEntryQuery),entriesError=entriesResource.error;
+  const entriesLoading=entriesResource.loading||(timeTab==="entries"&&(!entryPeriodReady||entryQuery!==debouncedEntryQuery)),entriesError=entriesResource.error;
   const setRemoteEntries=(next:TimeEntry[]|((items:TimeEntry[])=>TimeEntry[]))=>setEntryOverride(current=>{const key=entriesPath+':'+dataRevision([entriesPath]),items=current?.key===key?current.items:entriesResource.data?.items??[];return {key,items:typeof next==='function'?next(items):next};});
   useEffect(()=>{let active=true;queueMicrotask(()=>{if(active)setEntryOverride(null)});return()=>{active=false};},[entriesResource.data]);
   const [selectedTimeIds,setSelectedTimeIds]=useState<string[]>([]);

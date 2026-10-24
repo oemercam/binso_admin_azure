@@ -12,12 +12,12 @@
   --workspace-mobile-ink:#213047;
   --workspace-muted:#647080;
   --workspace-line:#edf1f6;
-  --workspace-title-size:22px;
+  --workspace-title-size:20px;
   --mobile-title-tracking:-.8px;
   --mobile-value-tracking:-.8px;
   --workspace-title-weight:600;
   --workspace-row-weight:500;
-  --workspace-value-size:20px;
+  --workspace-value-size:24px;
   --workspace-value-weight:600;
   --timer-value-size:44px;
   --app-canvas:#fff;
@@ -46,11 +46,11 @@
   --form-column-min:220px;
   --workspace-viewport-height:100dvh;
   --workspace-viewport-top:0px;
-  --workspace-header-height:58px;
+  --workspace-header-height:56px;
   --chart-compact-height:130px;
-  --kpi-padding:14px;
+  --kpi-padding:16px;
   --action-row-height:48px;
-  --section-title-font:14px;
+  --section-title-font:16px;
   color-scheme:light;
   --color-bg:#fff;
   --color-fg:#000;
@@ -88,12 +88,12 @@
   --page-heading-size:var(--type-desktop-heading);
   --page-heading-line-height:1.3;
   --page-heading-letter-spacing:-.6px;
-  --body-font-size:14px;
-  --body-line-height:1.5;
+  --body-font-size:15px;
+  --body-line-height:1.45;
   --metric-label-size:var(--type-label);
   --metric-label-line-height:1.2;
   --metric-value-size:var(--workspace-value-size);
-  --metric-value-line-height:1.5;
+  --metric-value-line-height:1.2;
   --metric-value-letter-spacing:-1px;
 
 
@@ -126,13 +126,14 @@
   --desktop-action-h:40px;
   --desktop-action-gap:8px;
 
-  --mobile-page-x:clamp(16px,4.55vw,20px);
+  --mobile-page-x:16px;
+  --floating-action-inset:clamp(16px,4.55vw,20px);
   --mobile-header-h:56px;
   --mobile-nav-h:68px;
   --mobile-page-top:14px;
   --mobile-page-head-gap:16px;
   --mobile-toolbar-gap:10px;
-  --mobile-section-gap:18px;
+  --mobile-section-gap:24px;
   --mobile-search-h:40px;
   --mobile-chip-h:34px;
   --mobile-row-h:64px;
@@ -140,9 +141,9 @@
   --touch:44px;
 
   --header-avatar-size:34px;
-  --kpi-value-font:20px;
-  --kpi-label-font:12px;
-  --kpi-trend-font:11px;
+  --kpi-value-font:24px;
+  --kpi-label-font:14px;
+  --kpi-trend-font:13px;
   --app-header-icon-size:20px;
   --accordion-chevron-size:18px;
   --profile-avatar-size:60px;
@@ -157,15 +158,15 @@
   --chart-ring-width:10px;
   --control-h:48px;
   --control-h-mobile:48px;
-  --control-font:14px;
-  --control-font-mobile:14px;
-  --control-label-font:var(--type-label);
+  --control-font:15px;
+  --control-font-mobile:16px;
+  --control-label-font:14px;
   --control-label-weight:500;
   --heading-content-gap:12px;
   --field-label-gap:6px;
-  --field-group-gap:14px;
+  --field-group-gap:16px;
   --sheet-row-gap:10px;
-  --control-help-font:var(--type-metadata);
+  --control-help-font:var(--type-secondary);
   --control-x:16px;
   --control-radius:var(--app-control-radius);
   --control-textarea-min:110px;
@@ -189,18 +190,19 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
   --type-subheading:14px;
-  --type-label:13px;
+  --type-label:14px;
   --type-metadata:12px;
+  --type-secondary:13px;
   --shape-group:12px;
   --type-large-heading:28px;
   --shape-control-mobile:8px;
-  --type-body:14px;
-  --type-control:14px;
-  --type-desktop-heading:18px;
+  --type-body:15px;
+  --type-control:15px;
+  --type-desktop-heading:20px;
   --type-display-small:30px;
   --type-body-large:15px;
   --shape-mark:2px;
-  --type-section:14px;
+  --type-section:16px;
   --shape-overlay:16px;
   --type-auth-display:28px;
   --shape-group-small:10px;
@@ -209,9 +211,9 @@
   --shape-panel:14px;
   --shape-small:6px;
   --shape-kbd:3px;
-  --type-mobile-heading:18px;
+  --type-mobile-heading:20px;
   --shape-compact:4px;
-  --shape-control-desktop:5px;
+  --shape-control-desktop:12px;
   --type-mobile-detail:18px;
   --shape-feature:24px;
   --record-row-min:86px;
@@ -332,24 +334,24 @@ html{scroll-behavior:auto}
   }
 }
 @media (max-height:520px) and (orientation:landscape){
-:root{--mobile-page-x:20px}
+:root{--mobile-page-x:16px}
 }
 @media (max-width:760px){
 :root{--app-control-radius:12px}
 }
 
 @media (pointer:coarse){
-:root{--button-height:var(--touch);--control-h:48px;--control-font:14px;--desktop-action-h:var(--touch)}
+:root{--button-height:var(--touch);--control-h:48px;--control-font:15px;--desktop-action-h:var(--touch)}
 }
 
 /* Master V3 — staged on the five approved customer workspaces only.
    Navigation/FAB geometry tokens deliberately retain their existing owners. */
 :root{
  --ux-page-inset:32px;
- --ux-card-inset:20px;
- --ux-section-title:14px;
- --ux-card-title:14px;
- --ux-page-title:18px;
+ --ux-card-inset:16px;
+ --ux-section-title:16px;
+ --ux-card-title:16px;
+ --ux-page-title:20px;
  --ux-row-height:46px;
  --ux-chart-income:#16A34A;
  --ux-chart-expense:#DC2626;
@@ -357,18 +359,18 @@ html{scroll-behavior:auto}
 .app-root[data-ux="master-v3"]{
  --workspace-sidebar-width:232px;
  --content-max:1440px;
- --desktop-header-h:64px;
- --body-font-size:14px;
- --body-line-height:1.55;
+ --desktop-header-h:56px;
+ --body-font-size:15px;
+ --body-line-height:1.45;
  --page-heading-size:var(--ux-page-title);
  --page-heading-line-height:1.2;
- --section-title-font:var(--ux-section-title);
- --control-h:44px;
+ --section-title-font:16px;
+ --control-h:48px;
 }
 @media(max-width:760px){
- .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:18px;--body-font-size:14px;--body-line-height:1.5;--type-body:14px;--control-h:44px}
+ .app-root[data-ux="master-v3"]{--ux-page-inset:16px;--ux-card-inset:16px;--ux-page-title:20px;--body-font-size:15px;--body-line-height:1.45;--type-body:15px;--control-h:48px}
 }
 @media(min-width:761px) and (max-width:1199px){
- .app-root[data-ux="master-v3"]{--ux-page-inset:24px;--ux-card-inset:20px}
+ .app-root[data-ux="master-v3"]{--ux-page-inset:24px;--ux-card-inset:16px}
 }
 @media(min-width:1920px){.app-root[data-ux="master-v3"]{--ux-page-inset:40px}}

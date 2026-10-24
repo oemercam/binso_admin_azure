@@ -12,7 +12,7 @@
   align-items:stretch;
 }
 .auth-card h1{margin:0 0 9px;font-size:var(--type-large-heading);line-height:1.2;font-weight:600;letter-spacing:-.7px}
-.auth-inline-action{min-height:var(--touch);margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-metadata);font-weight:650;text-align:center;cursor:pointer}
+.auth-inline-action{min-height:var(--touch);margin-top:10px;border:0;background:transparent;color:var(--color-muted);font:inherit;font-size:var(--type-secondary);font-weight:650;text-align:center;cursor:pointer}
 .auth-inline-action:hover{text-decoration:underline;text-underline-offset:3px}
 .auth-card>p{margin:0 0 28px;color:var(--color-muted);font-size:var(--type-control);line-height:1.55}
 .auth-card form{display:grid;gap:16px}
@@ -20,11 +20,11 @@
 .auth-card label:has(>input[type="checkbox"]){display:grid;grid-template-columns:18px minmax(0,1fr);align-items:start;gap:10px;font-weight:400;line-height:1.5}
 .auth-card input[type="checkbox"]{width:18px;height:18px;min-height:0;padding:0;margin:1px 0 0;accent-color:var(--color-fg)}
 .auth-divider{margin:24px 0;border-top:1px solid var(--color-line);text-align:center;line-height:0}
-.auth-divider span{padding:0 10px;background:var(--color-bg);color:var(--color-muted);font-size:var(--type-metadata)}
-.auth-bottom{margin:0;text-align:center;font-size:var(--type-metadata)}
+.auth-divider span{padding:0 10px;background:var(--color-bg);color:var(--color-muted);font-size:var(--type-secondary)}
+.auth-bottom{margin:0;text-align:center;font-size:var(--type-secondary)}
 .auth-bottom a{font-weight:700}
-.auth-error{margin:0;color:var(--palette-a61b1b);font-size:var(--type-metadata)}
-.auth-card>.operator-login-note{margin:0 0 22px;font-size:var(--type-metadata);line-height:1.5}
+.auth-error{margin:0;color:var(--palette-a61b1b);font-size:var(--type-secondary)}
+.auth-card>.operator-login-note{margin:0 0 22px;font-size:var(--type-secondary);line-height:1.5}
 .auth-page{grid-template-columns:minmax(0,1fr);align-items:center}
 .auth-card{width:min(100%,440px);margin-inline:auto}
 .auth-card>.logo{margin-bottom:40px}
@@ -60,7 +60,7 @@
 .auth-card>.logo{width:88px;height:28px;margin-bottom:28px}
 .auth-card h1{font-size:var(--type-large-heading);line-height:1.2}
 .auth-card>p{margin-bottom:24px;font-size:var(--type-control)}
-.auth-card input{font-size:var(--type-subheading)}
+.auth-card input{font-size:var(--control-font-mobile)}
 .auth-card .button{width:100%}
 }
 @media (max-width:1100px){

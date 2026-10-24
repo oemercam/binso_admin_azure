@@ -7,8 +7,8 @@ type ProfileBody={firstName?:unknown;lastName?:unknown;phone?:unknown;jobTitle?:
 
 export async function GET(){
   try{
-    const {user}=await requireUser();
-    return json({item:await currentProfile(),email:user.email??null});
+    const {user,session}=await requireUser();
+    return json({item:await currentProfile(session),email:user.email??null});
   }catch(error){return apiError(error);}
 }
 

@@ -60,7 +60,7 @@ button{cursor:pointer}
   border-radius:var(--shape-scale-999);
   background:var(--color-bg);
   color:var(--color-fg);
-  font-size:var(--type-metadata);
+  font-size:var(--type-secondary);
   font-weight:400;
   line-height:1.4;
   white-space:normal;
@@ -99,7 +99,7 @@ input::-webkit-date-and-time-value{text-align:left}
 textarea{min-height:var(--control-textarea-min);padding:var(--control-x);resize:vertical}
 input::placeholder,textarea::placeholder{color:var(--color-muted);opacity:1}
 .empty-state{padding:var(--field-group-gap) 0;color:var(--color-muted);text-align:start;overflow-wrap:anywhere}
-.empty-state p{margin:0;font-size:var(--type-metadata);line-height:1.5}
+.empty-state p{margin:0;font-size:var(--type-secondary);line-height:1.5}
 .empty-state p+p{margin-top:var(--field-label-gap)}
 input[type="file"]{max-width:100%;min-width:0;color:var(--color-muted);font-size:var(--control-font)}
 input[type="file"]::file-selector-button{min-height:var(--touch);margin-inline-end:12px;padding:8px 14px;border:0;border-radius:var(--shape-control-desktop);background:var(--upload-bg);color:var(--upload-fg);font:inherit;cursor:pointer;transition:background-color var(--motion-fast) var(--motion-ease)}
@@ -163,7 +163,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 .wizard-content{min-width:0;padding-top:var(--field-group-gap)}
 .form-wizard .mobile-sticky-save{display:flex;gap:var(--field-group-gap);position:static;flex:none;background:var(--color-bg);margin-top:0;padding-block:var(--field-group-gap) 0}
 .form-wizard .mobile-sticky-save>.button{flex:1;width:0;min-height:var(--process-action-h);height:var(--process-action-h)}
-.toggle{position:relative;width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch);padding:0;display:flex;align-items:center;border:0;border-radius:var(--shape-control-mobile);background:transparent;flex-shrink:0;
+.toggle{position:relative;width:var(--touch);height:var(--touch);min-width:var(--touch);min-height:var(--touch);padding:0;display:flex;align-items:center;border:0;border-radius:var(--app-control-radius);background:transparent;flex-shrink:0;
 }
 .toggle::before{content:"";position:absolute;left:0;right:0;top:50%;height:24px;transform:translateY(-50%);border-radius:var(--shape-scale-999);background:var(--color-muted);transition:background-color var(--motion-fast) var(--motion-ease)}
 .toggle span{width:20px;height:20px;border-radius:50%;background:var(--color-bg);box-shadow:0 1px 4px var(--palette-rgba-0-0-0-2);transition:transform var(--motion-fast) var(--motion-ease);position:relative;margin-left:2px;flex:0 0 20px}
@@ -190,7 +190,7 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
 
 .context-block .status{width:max-content}
 .announcement-card .status{width:max-content}
-.notice>span:not(.status){color:var(--color-muted);font-size:var(--type-metadata);overflow-wrap:anywhere}
+.notice>span:not(.status){color:var(--color-muted);font-size:var(--type-secondary);overflow-wrap:anywhere}
 .notice>.status,.notice>.button{justify-self:start}
 @media (min-width:761px) and (max-width:1100px){
 .timer-actions .button{white-space:nowrap}
@@ -389,3 +389,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 .locale-choice-popup .app-select-option{min-height:44px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:0;background:transparent;color:var(--color-fg)}
 .locale-choice-popup .app-select-option>span{color:var(--app-action-accent)}
 .locale-choice-popup .app-select-option[data-active="true"]{background:var(--app-accent-soft)}
+
+/* Native WebKit dates share the control baseline; 16px prevents iOS focus zoom. */
+input:is([type="date"],[type="time"],[type="datetime-local"])::-webkit-date-and-time-value{display:inline-flex;align-items:center;min-height:1.45em;margin:0;text-align:left}
+input:is([type="date"],[type="time"],[type="datetime-local"])::-webkit-datetime-edit{padding:0}
+@media(max-width:760px){.form-field :is(input,select,textarea),.form-grid>label :is(input,select,textarea),.app-select-trigger,.search-field input{font-size:max(16px,var(--control-font-mobile))}}

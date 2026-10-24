@@ -5,7 +5,7 @@
 .document-review-positions>div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .document-review-positions>div:last-child{border-bottom:0}
 .document-review-positions>div>span{min-width:0;overflow-wrap:anywhere}
-.document-review-positions small{display:block;margin-top:4px;color:var(--color-muted);font-size:var(--type-metadata)}
+.document-review-positions small{display:block;margin-top:4px;color:var(--color-muted);font-size:var(--type-secondary)}
 .document-review-positions>div>strong{white-space:nowrap}
 .invoice-form{
   border:0;
@@ -40,7 +40,7 @@
 .document-facts small{
   margin-bottom:6px;
   color:var(--color-muted);
-  font-size:var(--type-metadata);
+  font-size:var(--type-secondary);
 }
 .document-facts b{
   font-size:var(--type-control);
@@ -61,7 +61,7 @@
 .document-read-head{
   min-height:38px;
   color:var(--color-muted);
-  font-size:var(--type-metadata);
+  font-size:var(--type-secondary);
 }
 .document-read-head span:not(:first-child),
 .document-read-row>span,
@@ -80,7 +80,7 @@
 }
 .document-read-row span{
   color:var(--color-muted);
-  font-size:var(--type-metadata);
+  font-size:var(--type-secondary);
   white-space:nowrap;
 }
 .document-read-row strong{
@@ -89,7 +89,7 @@
 }
 .invoice-workspace{display:block}
 .invoice-form{overflow:hidden}
-.document-customer-hint{margin:5px 0 10px;color:var(--color-muted);font-size:var(--type-metadata)}
+.document-customer-hint{margin:5px 0 10px;color:var(--color-muted);font-size:var(--type-secondary)}
 .line-items,
 .document-line-items{overflow:hidden;border:1px solid var(--color-line);border-radius:var(--radius-md)}
 .line-items>div,
@@ -179,7 +179,7 @@
 .document-summary-row.is-compact{min-height:var(--mobile-row-h);grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:4px 12px;padding-block:15px}
 .document-summary-row.is-compact>b{grid-column:1;grid-row:1}
 .document-summary-row.is-compact .document-summary-amount>small{display:none}
-.document-summary-row.is-compact>small{grid-column:1;grid-row:2;font-size:var(--type-metadata);display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.document-summary-row.is-compact>small{grid-column:1;grid-row:2;font-size:var(--type-secondary);display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .document-summary-row.is-compact>.document-summary-amount{grid-column:2;grid-row:1;align-self:baseline}
 .document-summary-row.is-compact .document-summary-amount>strong{font-size:var(--type-control);font-weight:400}
 @media (min-width:761px) and (max-width:1100px){
@@ -215,7 +215,7 @@
     justify-content:center;
     gap:14px;
     border-top:1px solid var(--color-line);
-    font-size:var(--type-metadata);
+    font-size:var(--type-secondary);
     font-weight:700;
   }
 .document-page-navigation button{
@@ -265,7 +265,7 @@
 .invoice-form .form-section:first-child{padding-top:0}
 .invoice-form .form-section>h2,
   .invoice-form .section-title h2{letter-spacing:-.01em}
-.document-customer-hint{margin:8px 0 0;font-size:var(--type-metadata)}
+.document-customer-hint{margin:8px 0 0;font-size:var(--type-secondary)}
 .document-customer-hint b,.document-customer-hint span{display:block}
 .document-customer-hint span{margin-top:2px}
 .document-line-items{width:100%;overflow:visible;border:0;border-radius:0}
@@ -296,7 +296,7 @@
 .invoice-form>.form-section:last-child{padding-bottom:4px}
 .invoice-form .compact-section-label,
   .invoice-form .form-section>h2,
-  .invoice-form .section-title h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-metadata);line-height:1.2}
+  .invoice-form .section-title h2{margin:0 0 var(--heading-content-gap);font-size:var(--type-secondary);line-height:1.2}
 .invoice-form .section-title h2{margin:0}
 .invoice-form .form-grid{gap:var(--field-group-gap)}
 .invoice-form .form-field{gap:var(--field-label-gap)}
@@ -380,7 +380,7 @@
 
 /* Shared offer/invoice position identity and contextual actions. */
 .document-line-actions{align-self:center;justify-self:end}
-.document-position-number{font-size:var(--type-metadata);color:var(--color-muted);font-variant-numeric:tabular-nums}
+.document-position-number{font-size:var(--type-secondary);color:var(--color-muted);font-variant-numeric:tabular-nums}
 .public-offer{width:min(100%,820px);margin-inline:auto;padding:calc(var(--page-x) + var(--safe-top)) max(var(--page-x),var(--safe-right)) calc(var(--page-x) + var(--safe-bottom)) max(var(--page-x),var(--safe-left));display:grid;gap:24px;min-width:0}
 .public-offer>section{display:grid;gap:16px;min-width:0}
 .public-offer p{white-space:pre-wrap;overflow-wrap:anywhere}
@@ -393,7 +393,7 @@
 .public-offer-logo{object-fit:contain;object-position:left center;max-width:100%;height:72px}
 .offer-history-event{display:flex;justify-content:space-between;align-items:start;gap:12px;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .offer-history-event>div{min-width:0;overflow-wrap:anywhere}
-.offer-history-event small{display:block;color:var(--color-muted);font-size:var(--type-metadata)}
+.offer-history-event small{display:block;color:var(--color-muted);font-size:var(--type-secondary)}
 @media (min-width:761px){
   .document-line-item>.mobile-line-field.description{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--field-label-gap)}
 }
@@ -404,7 +404,7 @@
 /* Document discounts use the existing field, menu and totals owners. */
 .document-discount-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--field-group-gap);min-width:0}
 .document-discount-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--button-gap);margin-top:var(--field-group-gap)}
-.document-discount-actions p{margin:0;flex:1;color:var(--color-muted);font-size:var(--type-metadata)}
+.document-discount-actions p{margin:0;flex:1;color:var(--color-muted);font-size:var(--type-secondary)}
 .invoice-totals b{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
 
 /* Opt-in informational rows; entity/document lists retain their detail pattern. */

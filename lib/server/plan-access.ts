@@ -19,8 +19,13 @@ export async function getOrganizationPlan(organizationId:string):Promise<PlanId>
 
 export async function requireModuleEntitlement(organizationId:string,moduleKey:string){
  const plan=await getOrganizationPlan(organizationId);
- if(!planAllowsModule(plan,moduleKey))throw new Response("Diese Funktion ist in deinem aktuellen Plan nicht enthalten.",{status:403});
+ assertModuleEntitlement(plan,moduleKey);
  return plan;
+}
+
+/** Reuse an already verified database plan within the same request. */
+export function assertModuleEntitlement(plan:PlanId,moduleKey:string){
+ if(!planAllowsModule(plan,moduleKey))throw new Response("Diese Funktion ist in deinem aktuellen Plan nicht enthalten.",{status:403});
 }
 
 export async function requireProjectCapacity(organizationId:string,userId:string,transaction?:PoolClient){

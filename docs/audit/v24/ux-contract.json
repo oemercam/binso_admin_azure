@@ -229,7 +229,7 @@
       "scope": ".page-head p",
       "requirement": "font-size: var(--body-font-size); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--body-font-size) und deren Root-Definition 14px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--body-font-size) und deren Root-Definition 15px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -239,7 +239,7 @@
       "scope": ".page-head p",
       "requirement": "line-height: var(--body-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--body-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--body-line-height) und deren Root-Definition 1.45; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Revision 7 Kapitel 20: verbindliche zentrale Typografie; ersetzt den historischen Wert 1.45. Visuelle Abnahme bleibt offen."
@@ -279,7 +279,7 @@
       "scope": ".metric strong",
       "requirement": "line-height: var(--metric-value-line-height); Quelle: Referenzrolle im neuen Theme. Responsive Varianten gehören zum Komponenten-Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--metric-value-line-height) und deren Root-Definition 1.5; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--metric-value-line-height) und deren Root-Definition 1.2; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
       "status": "offen",
       "evidence": [],
       "decision": "Bestehender Wert zentralisiert; keine neue visuelle Festlegung"
@@ -440,7 +440,7 @@
       "context": "",
       "property": "font-size",
       "token": "--body-font-size",
-      "value": "14px"
+      "value": "15px"
     },
     {
       "id": "UX24-STYLE-013",
@@ -449,7 +449,7 @@
       "context": "",
       "property": "line-height",
       "token": "--body-line-height",
-      "value": "1.5"
+      "value": "1.45"
     },
     {
       "id": "UX24-STYLE-014",
@@ -485,7 +485,7 @@
       "context": "",
       "property": "line-height",
       "token": "--metric-value-line-height",
-      "value": "1.5"
+      "value": "1.2"
     },
     {
       "id": "UX24-STYLE-018",

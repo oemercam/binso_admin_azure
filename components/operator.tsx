@@ -397,8 +397,8 @@ function OperatorFinanceView(){
   const data=resource.data??{};
   const error=resource.error,refresh=resource.refresh;
 
-  const [selectedPeriod,setPeriod]=useStatisticPeriod('operator-finance'),period=selectedPeriod!;
-  if(resource.loading||error)return <OperatorLoadState loading={resource.loading} error={error} onRetry={refresh}/>;
+  const [selectedPeriod,setPeriod,periodReady]=useStatisticPeriod('operator-finance'),period=selectedPeriod!;
+  if(!periodReady||resource.loading||error)return <OperatorLoadState loading={!periodReady||resource.loading} error={error} onRetry={refresh}/>;
   const bounds=statisticBounds(period,businessDate())!;
   const {volume,platformRevenue,costs,result,monthly,monthlyTruncated}=platformFinanceInsights(data,'custom',businessDate(),bounds),max=Math.max(1,...monthly.map(x=>x.value));
   return <div className="operator-finance">
