@@ -132,15 +132,20 @@ export async function assertChatTargets(page){
 export async function assertPresentationControls(page){
  const measured=await page.locator('.status,.toggle').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{
   const css=getComputedStyle(el),box=el.getBoundingClientRect();
-  return {toggle:el.matches('.toggle'),font:parseFloat(css.fontSize),gap:parseFloat(css.columnGap),width:box.width,height:box.height,overflow:el.scrollWidth>el.clientWidth+1};
+  return {path:location.pathname,classes:el.className,toggle:el.matches('.toggle'),font:parseFloat(css.fontSize),gap:parseFloat(css.columnGap),width:box.width,height:box.height,overflow:el.scrollWidth>el.clientWidth+1};
  }));
  for(const control of measured){
   if(control.toggle)assert.ok(control.width>=44&&control.height>=44,'Shared switches retain a 44px target');
-  else {assert.ok(Math.abs(control.font-11)<.1,'Status labels remain at the approved Phase 1 11px');assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
+  else {assert.ok(Math.abs(control.font-11)<.1,'Status labels remain at the approved Phase 1 11px: '+JSON.stringify(control));assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
  }
 }
 
 export async function verifyPresentationControlRegression(page){
+ const status=page.locator('.status').filter({visible:true}).first();
+ if(await status.count()){
+  await status.evaluate(el=>{const context=document.createElement('div');context.id='binso-context-status-probe';context.className='context-block compact-list';context.append(el.cloneNode(true));document.body.append(context)});
+  try{await assertPresentationControls(page);}finally{await page.locator('#binso-context-status-probe').evaluate(el=>el.remove());}
+ }
  for(const [selector,properties,expected] of [
   ['.status',[['font-size','9px']],/Status labels remain/],
   ['.status',[['font-size','16px']],/Status labels remain/],

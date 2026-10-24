@@ -404,3 +404,4 @@ assert.equal(companyLogoSource('blob:https://example.invalid/12345678-1234-1234-
 console.log('Company logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.');
 
 await import('./row-presentation-contract-test.mjs');
+await import('./dialog-trigger-test.mjs');

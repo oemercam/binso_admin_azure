@@ -39,7 +39,7 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
     if(open)return;
     const rememberTrigger = () => {
       const active = document.activeElement;
-      if(active instanceof HTMLElement && !active.closest('[aria-modal="true"]') && !dialogRef.current?.contains(active)) triggerRef.current = active;
+      if(active instanceof HTMLElement && active !== document.body && active !== document.documentElement && !active.closest('[aria-modal="true"]') && !dialogRef.current?.contains(active)) triggerRef.current = active;
     };
     rememberTrigger();
     document.addEventListener("focusin", rememberTrigger);
@@ -48,14 +48,16 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
   useEffect(() => {
     if (!open || !dialogRef.current) return;
     const dialog = dialogRef.current;
+    // Making the page inert can move focus to body. Capture the real trigger first.
+    const active = document.activeElement;
+    const trigger = active instanceof HTMLElement && active !== document.body && !dialog.contains(active) ? active : triggerRef.current;
+    if(trigger&&!trigger.closest('[aria-modal="true"]'))triggerRef.current=trigger;
     const unlockScroll=lockPageScroll(()=>dialog);
     const unlockBackground=headerPanel?()=>{}:lockDialogBackground(dialog);
     const uncoverSheets=coverParentSheets(dialog);
     modalStack.push(dialog);
     if(!headerPanel)document.documentElement.dataset.modalOverlay="true";
     if(!headerPanel)window.dispatchEvent(new Event("binso-modal-open"));
-    const active = document.activeElement;
-    const trigger = active instanceof HTMLElement && !dialog.contains(active) ? active : triggerRef.current;
     // clip prevents a new body scroll container from breaking sticky app headers.
     const viewport=window.visualViewport;
     let resizeFrame=0;
@@ -106,15 +108,20 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       viewport?.removeEventListener("resize",resize);viewport?.removeEventListener("scroll",resize);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("focusin", onFocus);
-      if(modalStack.length&&trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
       if(!modalStack.length){
         document.documentElement.style.removeProperty("--dialog-viewport-height");document.documentElement.style.removeProperty("--dialog-viewport-top");
-        // An action menu may unmount its row after opening the next sheet.
-        // Retain the last stable page trigger for that modal handoff.
-        const returnTrigger=trigger?.isConnected?trigger:triggerRef.current;
-        if (returnTrigger?.isConnected) returnTrigger.focus({preventScroll:true});
       }
       unlockScroll();
+      // Header panels also release their own background lock during cleanup.
+      // Restore only after every owner has released it, respecting a new modal.
+      queueMicrotask(()=>{
+        if(modalStack.length){
+          if(trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
+          return;
+        }
+        const returnTrigger=trigger?.isConnected?trigger:triggerRef.current;
+        if(returnTrigger?.isConnected&&!returnTrigger.closest('[inert]'))returnTrigger.focus({preventScroll:true});
+      });
     };
   }, [open,headerPanel,headerSelector]);
   return dialogRef;

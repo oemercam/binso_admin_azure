@@ -179,7 +179,7 @@
 .operator-ticket-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px}
 .operator-reply{margin-top:14px;padding-top:12px;border-top:1px solid var(--color-line)}
 .context-block{display:grid;gap:5px;padding:14px 0;border-top:1px solid var(--color-line)}
-.context-block small,.context-block span{color:var(--color-muted);font-size:var(--type-secondary)}
+.context-block small,.context-block span:not(.status){color:var(--color-muted);font-size:var(--type-secondary)}
 .monitoring-panel{
   padding:0;
   border:0;
