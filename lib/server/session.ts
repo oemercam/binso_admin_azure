@@ -77,7 +77,7 @@ export async function getSession(options:{allowMfaEnrollment?:boolean}={}):Promi
    const context=(await client.query<{user_id:string;organization_id:string}>("select user_id,organization_id from auth_sessions where token_hash=$1 and expires_at>now() limit 1",[tokenHash(token)])).rows[0];
    if(!context)return {rows:[] as SessionUser[]};
    await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
-   return client.query<SessionUser>(
+   const authenticated=await client.query<SessionUser>(
    `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled",o.employee_mfa_required as "mfaRequired"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
@@ -88,9 +88,19 @@ export async function getSession(options:{allowMfaEnrollment?:boolean}={}):Promi
      limit 1`,
    [tokenHash(token)]
  );
+   const session=authenticated.rows[0];
+   if(session){
+     await expireUnpaidTrials(session.organizationId,session.userId,client);
+     // A concurrent request may have expired the trial while this one waited on
+     // its update. Re-read after that statement, rather than trusting old joins
+     // or only the rows changed by this particular request.
+     const organization=(await client.query<{status:string}>("select status from organizations where id=$1",[session.organizationId])).rows[0];
+     if(!organization||!["trial","active","grace_period","read_only"].includes(organization.status))authenticated.rows=[];
+     else session.organizationStatus=organization.status;
+   }
+   return authenticated;
  });
  const session=result.rows[0]||null;
- if(session){const expired=await expireUnpaidTrials(session.organizationId,session.userId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  if(session?.mfaRequired&&!session.mfaEnabled&&!options.allowMfaEnrollment)return null;
  return session;

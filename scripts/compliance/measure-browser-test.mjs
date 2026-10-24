@@ -1,3 +1,4 @@
+import {verifyStartupGeometry} from '../pwa-startup-geometry-browser-test.mjs';
 import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';
 import fs from 'node:fs/promises';
@@ -10,6 +11,7 @@ const engine=process.env.BINSO_UX_BROWSER??'chromium';
 const browser=await engines[engine].launch({headless:true,...(engine==='chromium'&&process.env.BINSO_CHROMIUM_EXECUTABLE?{executablePath:process.env.BINSO_CHROMIUM_EXECUTABLE}: {})});
 const output=await fs.mkdtemp(path.join(os.tmpdir(),'binso-header-measure-'));
 try{
+ await verifyStartupGeometry(browser);
  const page=await browser.newPage({viewport:{width:320,height:1000}});
  const fixture=padding=>`<style>body{margin:0}.page-container{padding-top:1200px;padding-bottom:${padding}px}.bottom-nav{position:fixed;bottom:0;height:76px;width:100%;background:#eee}button{height:44px}</style><main class="page-container"><button>Action</button></main><nav class="bottom-nav"></nav>`;
  await page.setContent(fixture(160));

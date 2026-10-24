@@ -1,7 +1,8 @@
 import "server-only";
+import type {PoolClient} from "pg";
 import {query,withTenant} from "@/lib/server/db";
 
-export async function expireUnpaidTrials(organizationId?:string,userId?:string){
+export async function expireUnpaidTrials(organizationId?:string,userId?:string,transaction?:PoolClient){
   const sql=`
     with expired as (
       update organization_subscriptions s
@@ -29,6 +30,9 @@ export async function expireUnpaidTrials(organizationId?:string,userId?:string){
     returning p.organization_id)
     select organization_id from expired
   `;
+  // A caller may reuse its already tenant-bound transaction; never acquire a
+  // second pool connection while holding the authenticated session connection.
+  if(transaction){if(!organizationId||!userId)throw new Error("Tenant context required");return transaction.query(sql,[organizationId]);}
   if(organizationId&&userId)return withTenant(organizationId,userId,client=>client.query(sql,[organizationId]));
   return query(sql,[organizationId??null]);
 }

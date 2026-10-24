@@ -45,6 +45,7 @@ assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,
 session={...session,user:{id:'two'}};
 assert.notEqual(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key,'A new person resets private page state');
 
+const verifiedSession=session;session=undefined;assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'An invalidated identity cannot retain the previous private subtree');session={authenticated:false};assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'A signed-out response cannot mount private pages or their reads');session=verifiedSession;
 session={...session,security:{enrollmentRequired:true}};
 assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'Mandatory enrollment never mounts a private business page');await boundaryHooks.flush();assert.equal(boundaryRedirects.at(-1),'/einstellungen/sicherheit?next=%2Fdashboard');
 boundaryPath='/einstellungen/sicherheit';assert.ok(boundaryHooks.render(()=>SessionDataBoundary({children:page})),'Existing security setup remains accessible');
