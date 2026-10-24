@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "routes": [{
+    "file": "app/hilfe/page.tsx",
+    "source": "docs/architecture/master-phase1/source.md",
+    "authorization": "app/hilfe/layout.tsx",
+    "status": "nicht_abgenommen",
+    "states": ["Fehler", "Speichern/Reload/neue Sitzung"],
+    "limitation": "Authentifizierte Hilfe-Verlinkung aus dem freigegebenen Phase-1-Mehr-Menü. Keine neue Support- oder Zugriffslogik; visuelle und Geräteabnahme bleiben offen."
+  }]
+}

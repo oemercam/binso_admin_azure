@@ -1,8 +1,9 @@
 "use client";
 
-import {LocalizedText} from "@/lib/client/locale";
+import {LocalizedText,useLocale} from "@/lib/client/locale";
 import {useCallback,useEffect,useRef,useState} from "react";
 import {useRouter,useSearchParams} from "next/navigation";
+import {localeTags} from '@/lib/locales';
 import ConfirmDialog from "./confirm-dialog";
 import {AppShell} from "./app-shell";
 import {ActionRow,FormSheet,SettingsGroup} from "./binso-ux";
@@ -21,13 +22,14 @@ function sessionLabel(userAgent:string|null){
   const device=/iPhone/.test(ua)?"iPhone":/iPad/.test(ua)?"iPad":/Android/.test(ua)?"Android":/Macintosh/.test(ua)?"Mac":/Windows/.test(ua)?"Windows":"Gerät";
   return browser+" · "+device;
 }
-function sessionDate(value:string|null){
+function sessionDate(value:string|null,locale="de-CH"){
   if(!value)return "Noch keine Aktivität";
   const date=new Date(value);
-  return Number.isNaN(date.getTime())?"Unbekannt":date.toLocaleString("de-CH",{dateStyle:"short",timeStyle:"short"});
+  return Number.isNaN(date.getTime())?"Unbekannt":date.toLocaleString(locale,{dateStyle:"short",timeStyle:"short"});
 }
 
 export function SecuritySettingsPage(){
+  const {locale}=useLocale();
   const router=useRouter();
   const search=useSearchParams();
   const next=search.get("next");
@@ -116,7 +118,7 @@ export function SecuritySettingsPage(){
 
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={!!(currentPassword||newPassword||confirmPassword||code||setup||recovery.length)}>
     {mfaError&&panel!=="mfa"&&<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>}
-    <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":"Optional"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
+    <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":mfa.required?"Verpflichtend":"Optional"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
     {mfa&&<PasskeySettings demo={mfa.demo===true} onChanged={()=>void loadSessions()}/>}
     <FormSheet open={panel==="password"} label="Passwort ändern" onClose={()=>setPanel(null)} busy={busy} dirty={!!(currentPassword||newPassword||confirmPassword)}><section className="settings-form">
       <div className="form-grid">
@@ -128,7 +130,7 @@ export function SecuritySettingsPage(){
     </section></FormSheet>
     <FormSheet busy={busy} open={panel==="mfa"} label="Zwei-Faktor-Authentifizierung" onClose={()=>setPanel(null)} dirty={!!(setup||code||recovery.length)}><section className="settings-form">
       {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>:<LoadingState><LocalizedText>{"Sicherheitsstatus wird geladen…"}</LocalizedText></LoadingState>:mfa.demo?<div className="context-block"><Status tone="info"><LocalizedText>{"Demo"}</LocalizedText></Status><b><LocalizedText>{"Keine Authenticator-Einrichtung für die Demo nötig"}</LocalizedText></b><span><LocalizedText>{"Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login."}</LocalizedText></span></div>:mfa.enabled?<div className="context-block"><Status tone="success"><LocalizedText>{"Aktiv"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App ist eingerichtet"}</LocalizedText></b><span><LocalizedText>{"Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt."}</LocalizedText></span></div>:<>
-        <div className="context-block"><Status tone="info"><LocalizedText>{"Optional"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{"Der Authenticator ist optional. Für sicherheitsrelevante Änderungen ist eine erneute Bestätigung erforderlich."}</LocalizedText></span></div>
+        <div className="context-block"><Status tone="info"><LocalizedText>{mfa.required?"Verpflichtend":"Optional"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{mfa.required?"Dein Unternehmen verlangt eine Authenticator-App. Richte sie ein, um Binso One zu verwenden.":"Der Authenticator ist optional. Für sicherheitsrelevante Änderungen ist eine erneute Bestätigung erforderlich."}</LocalizedText></span></div>
         {!setup&&<Button disabled={busy} onClick={()=>void startSetup()}><LocalizedText>{"Authenticator einrichten"}</LocalizedText></Button>}
       </>}
       {setup&&<div className="form-grid">
@@ -140,22 +142,22 @@ export function SecuritySettingsPage(){
         <Button onClick={()=>void confirmSetup()} disabled={busy||code.length!==6}><LocalizedText>{"Authenticator bestätigen"}</LocalizedText></Button>
       </div>}
       {recovery.length>0&&<div className="context-block"><Status tone="warning"><LocalizedText>{"Einmal anzeigen"}</LocalizedText></Status><b><LocalizedText>{"Recovery Codes sicher speichern"}</LocalizedText></b><span><LocalizedText>{"Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf."}</LocalizedText></span><pre>{recovery.join("\n")}</pre></div>}
-      {mfa?.enabled&&<ActionRow icon="lock" title="Authenticator deaktivieren" onClick={()=>setDisableMfa(true)}/>}
+      {mfa?.enabled&&!mfa.required&&<ActionRow icon="lock" title="Authenticator deaktivieren" onClick={()=>setDisableMfa(true)}/>}
       {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}><LocalizedText>{"Weiter zu Binso One"}</LocalizedText></Button>}
     </section></FormSheet>
 
     <section className="surface security-card">
       <SectionTitle title="Anmeldeschutz"/>
-      {mfa||mfaError?<p><LocalizedText>{mfa?mfa.enabled?"Dein Konto ist zusätzlich mit einer Authenticator-App geschützt.":"Ein persönlicher E-Mail-Code schützt jede neue Anmeldung.":"Anmeldeschutzstatus nicht verfügbar."}</LocalizedText></p>:<LoadingState/>}
+      {mfa||mfaError?<p><LocalizedText>{mfa?mfa.enabled?"Dein Konto ist zusätzlich mit einer Authenticator-App geschützt.":"Dein Konto verwendet Passwort oder Passkey.":"Anmeldeschutzstatus nicht verfügbar."}</LocalizedText></p>:<LoadingState/>}
     </section>
 
-    <section className="surface security-card">
+    <section className="surface security-card" id="sitzungen">
       <SectionTitle title="Aktive Sitzungen" action={sessions.some(item=>!item.current)?<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget("all")}><LocalizedText>{"Alle anderen abmelden"}</LocalizedText></Button>:undefined}/>
       {sessionsLoading?<LoadingState/>:sessionsError?<ErrorState onRetry={()=>{setSessionsLoading(true);setSessionsError("");void loadSessions()}} retryLabel="Erneut versuchen"><LocalizedText>{sessionsError}</LocalizedText></ErrorState>:sessions.length===0?<EmptyState title="Keine aktive Sitzung gefunden."/>:<div className="session-list">
         {sessions.map(item=><div key={item.id}>
           <div>
             <b>{sessionLabel(item.userAgent)}</b>
-            <small><LocalizedText>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt)}</LocalizedText><LocalizedText>{" · Ablauf: "}</LocalizedText>{sessionDate(item.expiresAt)}</small>
+            <small><LocalizedText>{item.current?"Dieses Gerät":"Zuletzt aktiv: "+sessionDate(item.lastSeenAt,localeTags[locale])}</LocalizedText><LocalizedText>{" · Ablauf: "}</LocalizedText>{sessionDate(item.expiresAt,localeTags[locale])}</small>
           </div>
           {item.current?<Status tone="success"><LocalizedText>{"Aktuell"}</LocalizedText></Status>:<Button variant="secondary" disabled={busy} onClick={()=>setRevokeTarget(item.id)}><LocalizedText>{"Abmelden"}</LocalizedText></Button>}
         </div>)}

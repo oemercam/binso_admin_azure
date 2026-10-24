@@ -49,17 +49,13 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     await toggle.click();await page.waitForFunction(before=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')===before,expanded);await settle();
    }
    if(route==='/kunden/customer-one'){
-    const development=page.locator('details.financial-snapshot');await development.locator('summary').click();
-    await development.getByRole('button',{name:t('Zeitverlauf anzeigen'),exact:true}).click();await settle();
-    const chart=development.locator('.bo-statistics-line').first();await chart.waitFor({state:'visible'});
-    const bounds=await chart.locator('xpath=ancestor::*[local-name()="svg"]').boundingBox();
-    assert.ok(bounds.width>0&&bounds.height>0&&bounds.x>=0&&bounds.x+bounds.width<=width+1,'Expanded real chart fits the content viewport');
-    await inspect();await capture(page,name+'-chart');
+    assert.deepEqual(await page.getByRole('tab').allTextContents(),['Übersicht','Dokumente','Verlauf'].map(t),'Approved dossier has three tabs');
+    assert.equal(await page.locator('details.financial-snapshot').count(),0,'Retired customer chart is absent');
+    for(const tab of ['Dokumente','Verlauf']){await page.getByRole('tab',{name:t(tab),exact:true}).click();await settle();await inspect();await capture(page,name+'-'+tab);}
    }
    if(route==='/rechnungen/neu'){
-    const form=page.getByRole('dialog',{name:t('Rechnung erstellen'),exact:true});await form.waitFor();await footer(form);
+    const form=page.locator('.app-editing .document-entry-page');await form.waitFor();await footer(form);
     await form.getByRole('button',{name:t('Weiter'),exact:true}).click();
-    await page.getByRole('button',{name:t('Rabattoptionen'),exact:true}).click();
     await page.getByRole('button',{name:t('Gesamtrabatt'),exact:true}).click();
     const sheet=page.getByRole('dialog',{name:t('Gesamtrabatt'),exact:true});await sheet.waitFor();
     await selectAppOption(sheet.getByLabel(t('Rabattart'),{exact:true}),'percent');
@@ -67,7 +63,7 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     await sheet.getByRole('button',{name:t('Abbrechen'),exact:true}).click();
     const discard=page.getByRole('alertdialog');await discard.waitFor();
     assert.equal(await sheet.isVisible(),true,'Dirty dialog stays open until the user confirms discarding changes');
-    await discard.getByRole('button',{name:t('Änderungen verwerfen'),exact:true}).click();await sheet.waitFor({state:'hidden'});
+    await discard.getByRole('button',{name:t('Verwerfen'),exact:true}).click();await sheet.waitFor({state:'hidden'});
    }
    results.push({locale,theme,width,route,passed:true,geometry,browserZoom:'not-tested',physicalDevice:false});
   }

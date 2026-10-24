@@ -33,8 +33,8 @@ function hooks(){
  const react={Fragment:Symbol('Fragment'),useState(initial){const index=position++;if(!(index in cells))cells[index]=typeof initial==='function'?initial():initial;return [cells[index],next=>{cells[index]=typeof next==='function'?next(cells[index]):next}];},useRef(value){const index=position++;return cells[index]??=({current:value});},useEffect(callback,deps){const index=position++,previous=cells[index];if(!previous||!deps||deps.some((value,i)=>!Object.is(value,previous[i]))){cells[index]=deps;effects.push(callback);}}};
  return {react,render(fn){position=0;return fn();},async flush(){for(const effect of effects.splice(0))effect();await new Promise(resolve=>queueMicrotask(resolve));}};
 }
-let session;
-const boundaryHooks=hooks(),{SessionDataBoundary}=compile('components/session-data-boundary.tsx',{react:boundaryHooks.react,'./ui':{ErrorState:()=>null},'@/lib/client/use-api-query':{useApiQuery:()=>({data:session})}});
+let session,boundaryPath="/dashboard";const boundaryRedirects=[],boundaryRouter={replace:path=>boundaryRedirects.push(path)};
+const boundaryHooks=hooks(),{SessionDataBoundary}=compile('components/session-data-boundary.tsx',{react:boundaryHooks.react,'next/navigation':{usePathname:()=>boundaryPath,useRouter:()=>boundaryRouter},'./ui':{ErrorState:()=>null},'@/lib/client/use-api-query':{useApiQuery:()=>({data:session})}});
 const page={type:'private-page'};
 assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'Initial identity must not mount then remount a page');
 session={authenticated:true,user:{id:'one'},tenant:{id:'tenant'}};
@@ -44,6 +44,11 @@ session={...session,tenant:{...session.tenant,role:'admin'}};
 assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key,'Same-person permission refresh preserves draft identity');
 session={...session,user:{id:'two'}};
 assert.notEqual(boundaryHooks.render(()=>SessionDataBoundary({children:page})).key,first.key,'A new person resets private page state');
+
+session={...session,security:{enrollmentRequired:true}};
+assert.equal(boundaryHooks.render(()=>SessionDataBoundary({children:page})),null,'Mandatory enrollment never mounts a private business page');await boundaryHooks.flush();assert.equal(boundaryRedirects.at(-1),'/einstellungen/sicherheit?next=%2Fdashboard');
+boundaryPath='/einstellungen/sicherheit';assert.ok(boundaryHooks.render(()=>SessionDataBoundary({children:page})),'Existing security setup remains accessible');
+session={...session,security:{enrollmentRequired:false}};boundaryPath='/dashboard';assert.ok(boundaryHooks.render(()=>SessionDataBoundary({children:page})),'Enrolled session can resume without a new sign-in');
 
 const storage=new Map([['binso.statistics:finance',JSON.stringify({months:6,from:'',to:''})]]),savedStorage=globalThis.sessionStorage;
 try{

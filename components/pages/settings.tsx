@@ -2,7 +2,7 @@
 import {useSetupField} from "../use-setup-field";
 import {setupFieldIds} from "@/lib/action-readiness";
 import {SetupGuidePreference} from "../setup-guide";
-import {notificationChannels} from "@/config/notification-channels";
+import {PushDeviceSettings} from "../push-device-settings";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
 import {useBrowserBackGuard,allowDraftNavigation} from "../use-browser-back-guard";
@@ -354,21 +354,24 @@ export function SubscriptionSettingsPage() {
 
 export function NotificationSettingsPage() {
   const labels=useId();
+  const [channels,setChannels]=useState({email:true,push:false});
   const rows = [
     ["Rechnungen","Zahlungen, Überfälligkeit und Mahnungen"],
     ["Angebote","Angenommen, abgelehnt oder abgelaufen"],
     ["Support","Neue Antworten und Statusänderungen"],
     ["Zeiterfassung","Erinnerungen und laufende Timer"],
+    ["Spesen","Freigaben"],
+    ["Sicherheit",""],
     ["Produktupdates","Neue Funktionen und wichtige Hinweise"],
   ] as const;
   const [prefs,setPrefs] = useState<Record<string,{email:boolean;push:boolean}>>({
-    Rechnungen:{email:true,push:true}, Angebote:{email:true,push:true}, Support:{email:true,push:true}, Zeiterfassung:{email:false,push:true}, Produktupdates:{email:true,push:false}
+    Rechnungen:{email:true,push:false}, Angebote:{email:true,push:false}, Support:{email:true,push:false}, Zeiterfassung:{email:false,push:false}, Spesen:{email:false,push:false}, Sicherheit:{email:false,push:false}, Produktupdates:{email:true,push:false}
   });
   const pending=useRef(new Set<string>());
   const [saving,setSaving]=useState<string[]>([]);
   const [ready,setReady]=useState(false);
   const [error,setError]=useState("");
-  useEffect(()=>{{}apiGet<{items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})).then(()=>setReady(true)).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
+  useEffect(()=>{{}apiGet<{channels:{email:boolean;push:boolean};items:Array<{kind:string;email:boolean;push:boolean}>}>("/api/settings/notifications").then(data=>{setChannels(data.channels);setPrefs(current=>{const next={...current};for(const item of data.items)if(next[item.kind])next[item.kind]={email:item.email,push:item.push};return next})}).then(()=>setReady(true)).catch(()=>setError("Einstellungen konnten nicht geladen werden."));},[]);
   const toggle=async(title:string,channel:"email"|"push")=>{
     const key=title+channel;if(!ready||pending.current.has(key))return;
     const before=prefs[title][channel],enabled=!before;
@@ -383,7 +386,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <SettingsGroup title="Zustellung">{rows.map(([title,text],index)=><Fragment key={title}>{(["email","push"] as const).filter(channel=>notificationChannels[channel]).map(channel=><ListRow information key={title+channel} title={<span id={labels+index+channel}><LocalizedText>{title}</LocalizedText> · <LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span>} meta={text} value={<Toggle labelledBy={labels+index+channel} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={title}/>}/>)}</Fragment>)}</SettingsGroup>
+    <PushDeviceSettings/><SettingsGroup title="Zustellung">{rows.map(([title,text],index)=><Fragment key={title}>{(["email","push"] as const).filter(channel=>channels[channel]).map(channel=><ListRow information key={title+channel} title={<span id={labels+index+channel}><LocalizedText>{title}</LocalizedText> · <LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span>} meta={text} value={<Toggle labelledBy={labels+index+channel} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={title}/>}/>)}</Fragment>)}</SettingsGroup>
   </AppShell>;
 }
 
@@ -412,7 +415,7 @@ export function AppearanceSettingsPage(){
  const choose=(next:ThemeMode)=>{setError("");void saveTheme(next).catch(()=>setError("Darstellung konnte nicht gespeichert werden."))};
  return <AppShell title="Darstellung" subtitle="Binso One passt sich deiner Arbeitsweise an." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
   {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
-  <SettingsGroup title="Darstellung"><SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/></SettingsGroup>
+  <SelectionRows label="Darstellung" value={theme} options={themeOptions} onChange={choose}/>
 
  </AppShell>;
 }

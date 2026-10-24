@@ -1,3 +1,7 @@
+import {verifyWebPush} from './phase1-push-cases.mjs';
+import {pathToFileURL} from 'node:url';
+import {createRequire} from 'node:module';
+import {verifyTimeReview} from './phase1-time-review-cases.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
@@ -7,6 +11,7 @@ import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import pg from 'pg';
 import {randomBytes} from 'node:crypto';
 import {spawn} from 'node:child_process';
+import {verifyCompanyMfaPolicy} from './phase1-policy-cases.mjs';
 
 const native=process.argv.includes('--postgres');
 let db;
@@ -18,10 +23,11 @@ if(native){
 const jar=new Map(),sent=[];
 const data=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const adapters={
+ 'web-push':pathToFileURL(createRequire(import.meta.url).resolve('web-push')).href,
  'server-only':data(''),
  'next/server':data('export class NextResponse{static json(value,init){return Response.json(value,init)}}'),
  'next/headers':data('export async function cookies(){return globalThis.__registrationCookies} export async function headers(){return new Headers({"user-agent":"registration-test"})}'),
- 'lib/server/db.ts':data('export async function query(sql,params){return globalThis.__registrationQuery(sql,params)} export async function withTransaction(fn){return globalThis.__registrationTransaction(fn)} export async function withTenant(org,user,fn){return globalThis.__registrationTransaction(async c=>{await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);return fn(c)})}'),
+ 'lib/server/db.ts':data('export async function query(sql,params){return globalThis.__registrationQuery(sql,params)} export async function withTransaction(fn){return globalThis.__registrationTransaction(fn)} export async function withPlatform(fn){return globalThis.__registrationTransaction(async c=>{await c.query("select set_config(\'app.platform_operator\',\'true\',true)");return fn(c)})} export async function withTenant(org,user,fn){return globalThis.__registrationTransaction(async c=>{await c.query("select set_config(\'app.organization_id\',$1,true),set_config(\'app.user_id\',$2,true)",[org,user]);return fn(c)})}'),
  'lib/server/rate-limit.ts':data('export async function enforceRateLimit(request,bucket){globalThis.__registrationLimits.push(bucket)}'),
  'lib/server/env.ts':data('export const env={databaseUrl:"isolated-test",appUrl:"https://example.invalid",appMode:"production",appEncryptionKey:"synthetic-test-key-not-a-production-secret",sessionTtlHours:168,sessionCookieName:"binso_session"}'),
  'lib/server/email.ts':data('export function mailLayout(title,body,cta,locale){return `<html lang="${locale}">${title}${body}<a href="${cta?.url??""}">${cta?.label??""}</a></html>`} export async function sendMail(mail){globalThis.__registrationMail.push(mail);return {delivered:globalThis.__registrationDelivered}}'),
@@ -29,12 +35,13 @@ const adapters={
 const modules=new Map();
 async function load(file){
  file=file.replaceAll('\\','/');if(adapters[file])return adapters[file];if(modules.has(file))return modules.get(file);
+ if(file.endsWith('.json'))return data('export default '+await fs.readFile(file,'utf8'));
  let source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
  const imports=[...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)];
- for(const match of imports){const name=match[2];let dependency;if(adapters[name])dependency=adapters[name];else if(name.startsWith('@/')||name.startsWith('.')){let resolved=name.startsWith('@/')?name.slice(2):path.join(path.dirname(file),name);if(!resolved.endsWith('.ts'))resolved+='.ts';dependency=await load(resolved);}else continue;source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(dependency)));}
+ for(const match of imports){const name=match[2];let dependency;if(adapters[name])dependency=adapters[name];else if(name.startsWith('@/')||name.startsWith('.')){let resolved=name.startsWith('@/')?name.slice(2):path.join(path.dirname(file),name);if(!resolved.endsWith('.json')&&!resolved.endsWith('.ts')){try{await fs.access(resolved+'.ts');resolved+='.ts'}catch{resolved=path.join(resolved,'index.ts')}}dependency=await load(resolved);}else continue;source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(dependency)));}
  const uri=data(source);modules.set(file,uri);return uri;
 }
-const asClient=connection=>({query:async(sql,params)=>{const result=await connection.query(sql,params);return {...result,rowCount:result.rowCount??result.affectedRows??result.rows.length}}});
+const asClient=connection=>({query:async(sql,params)=>{const result=await connection.query(sql,params);return {...result,rowCount:result.rowCount??(result.fields?.length?result.rows.length:result.affectedRows??result.rows.length)}}});
 globalThis.__registrationTransaction=async fn=>{
  if(!native)return db.transaction(async connection=>{await connection.query('set local role binso_runtime');return fn(asClient(connection))});
  const connection=await db.connect();
@@ -233,6 +240,9 @@ try{
  assert.equal(await actualSession.getSession(),null,'Unknown bearer cannot establish tenant context');
  jar.set('binso_session',validSessionCookie);
  const current=await actualSession.getSession();assert.ok(current);
+ await verifyCompanyMfaPolicy({db,load,actualSession,request,jar,current,foreignOrganizationId:secondSession.organizationId});
+ await verifyTimeReview({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
+ await verifyWebPush({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
  await assert.rejects(()=>db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'member','active')",[secondSession.organizationId,current.userId,body.email]),e=>e.code==='23514'&&e.constraint==='single_active_company_identity','Database rejects a second active company without deleting the original');
  // Deliberately seed historical ambiguity as schema administrator in this
  // disposable fixture only. The new guard must preserve it but deny login.

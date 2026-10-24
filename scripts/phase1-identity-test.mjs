@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+const code=ts.transpileModule(fs.readFileSync('lib/server/operator/entra-proof.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText;
+const {hasEntraMfaProof}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+for(const values of [['pwd','mfa'],['ngcmfa']])assert.equal(hasEntraMfaProof(values.map(val=>({typ:'amr',val}))),true);
+assert.equal(hasEntraMfaProof([{typ:'amr',val:'["pwd","mfa"]'}]),true);
+assert.equal(hasEntraMfaProof([{typ:'http://schemas.microsoft.com/claims/authnmethodsreferences',val:'mfa'}]),true);
+for(const claims of [[],[{typ:'roles',val:'mfa'}],[{typ:'amr',val:'pwd'}],[{typ:'amr',val:'otp'}],[{typ:'amr',val:'fido2'}],[{typ:'amr',val:'wiaormfa'}],[{typ:'amr',val:'not-mfa'}],[{typ:'amr',val:'["mfa"'}],[{typ:'amr',val:'{"mfa":true}'}],[{typ:'amr',val:true}],[{typ:'acrs',val:'c1'}]])assert.equal(hasEntraMfaProof(claims),false,'No role, ambiguous method, malformed claim or unverified policy substitutes for explicit MFA');
+console.log('Phase 1 Entra proof: multifactor claims accepted; password/OTP/device/role/context-only and malformed claims denied.');

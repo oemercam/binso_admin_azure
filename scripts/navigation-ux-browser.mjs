@@ -14,7 +14,7 @@ export async function assertFlatMobileNavigation(page){
   assert.ok(nav.targets.every(t=>t.width>=44&&t.height>=44),'Existing navigation touch targets remain at least 44px');
   assert.equal(nav.labels.length,nav.targets.length,'Every navigation target keeps a visible label');
   assert.ok(nav.labels.every(label=>label.name.includes(label.text)),"Navigation accessible names include their visible localized label");
-  assert.ok(nav.labels.every(label=>label.font>=12&&label.scroll<=label.height+1&&label.width<=label.targetWidth+1&&label.scrollWidth<=label.clientWidth+1),'Flat navigation labels remain readable without clipping: '+JSON.stringify(nav.labels));
+  assert.ok(nav.labels.every(label=>Math.abs(label.font-11)<.1&&label.scroll<=label.height+1&&label.width<=label.targetWidth+1&&label.scrollWidth<=label.clientWidth+1),'Flat navigation labels remain readable without clipping: '+JSON.stringify(nav.labels));
   assert.ok(nav.left>=0&&nav.right<=nav.viewport+1,'Navigation stays inside its safe viewport');
  }
 }
@@ -31,7 +31,7 @@ export async function verifyFlatNavigationAdversaries(page){
   }
   const targets=nav.locator(':scope > a, :scope > button');
   const labelTarget=targets.first(),labelStyle=await labelTarget.getAttribute('style');
-  try{await labelTarget.evaluate(el=>el.style.setProperty('font-size','9px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Tiny navigation labels must fail at runtime');}
+  try{await labelTarget.evaluate(el=>el.style.setProperty('font-size','9px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Tiny navigation labels must fail at runtime');await labelTarget.evaluate(el=>el.style.setProperty('font-size','16px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Oversized labels violate the approved Phase 1 11px navigation contract');}
   finally{await labelTarget.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),labelStyle);}
   const label=labelTarget.locator(':scope > span'),spanStyle=await label.getAttribute('style');
   try{await label.evaluate(el=>el.style.setProperty('max-width','10px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Horizontally clipped navigation labels must fail at runtime');}

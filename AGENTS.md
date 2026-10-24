@@ -1,6 +1,6 @@
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
@@ -108,6 +108,22 @@ Legal translations, real devices, domains and provider configuration need actual
 external evidence; do not present a generated register as executed acceptance.
 
 # Codex workflow and context (canonical project instructions)
+
+## Master Implementation Phase 1 (24 October 2026)
+
+The user supplied the complete `docs/architecture/master-phase1/source.md` after
+the initially truncated paste. It supersedes conflicting presentation and MFA
+rules below: Navigation V2 changes the customer destinations to overview,
+customers, orders, time and More with its named icons, retaining the existing
+dock geometry/material/safe area and blue FAB. The typography table is binding.
+Company administrators may require employee MFA; operator MFA is mandatory,
+including direct APIs. Use existing identity and i18n infrastructure. Preserve
+all financial, tenant, authorization and integrity boundaries. Update obsolete
+UX contracts with explicit new requirements and real countercases, never blanket
+bypasses. Work locally only: no production writes, pushes, merge or deployment.
+Current matrix, implementation evidence and unresolved decisions are recorded in
+`docs/architecture/master-phase1/implementation.md`. Real external provider/device
+and legal approval remain evidence requirements, never invented passes.
 
 V25.5 follows the existing V25.4 handoff, never an assumed integrated Main.
 Use docs/architecture/v25-5-platform-lifecycle.md and its single traceability CSV.

@@ -11,9 +11,10 @@ import {ActionRow,SettingsGroup,ListSearch} from "./binso-ux";
 
 /** One destination catalogue for the settings overview and every settings page. */
 export const settingsGroups:Array<{title:string;rows:Array<readonly [string,string,string]>}>=[
- {title:"Persönlich",rows:[["/einstellungen/konto","user","Persönliche Daten"],["/einstellungen/abwesenheiten","calendar","Meine Abwesenheiten"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","sun","Darstellung"],["/einstellungen/datenschutz","lock","Datenschutz & Cookies"]]},
+ {title:"Persönlich",rows:[["/einstellungen/konto","user","Profil"],["/einstellungen/sicherheit","lock","Sicherheit"],["/einstellungen/benachrichtigungen","bell","Benachrichtigungen"],["/einstellungen/darstellung","sun","Darstellung"],["/einstellungen/datenschutz","lock","Persönlicher Datenschutz"]]},
  {title:"Unternehmen",rows:[["/einstellungen/firma","users","Firma"],["/einstellungen/team","users","Benutzer & Rollen"],["/einstellungen/abonnement","card","Abonnement"],["/einstellungen/rechtliches","file","Rechtliches"]]},
- {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"]]},
+ {title:"Geschäftsprozesse",rows:[["/einstellungen/dokumente","receipt","Rechnungen & Dokumente"],["/einstellungen/zeiterfassung","clock","Zeiterfassung"],["/einstellungen/abwesenheiten","calendar","Meine Abwesenheiten"]]},
+ {title:"Fachmodule",rows:[["/zahlungen","wallet","Zahlungen"],["/produkte","box","Produkte"],["/mitarbeiter","users","Mitarbeiter"],["/abwesenheiten","calendar","Abwesenheiten"],["/lieferanten","building","Lieferanten"],["/vertraege","file","Verträge"]]},
 ];
 
 export function SettingsNavigation({context=false}:{context?:boolean}){

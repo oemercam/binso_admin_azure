@@ -13,7 +13,7 @@ export async function POST(request:NextRequest){
   try{
     assertSameOrigin(request);
     await enforceRateLimit(request,"mfa-setup",5,15*60_000);
-    const session=await getSession();
+    const session=await getSession({allowMfaEnrollment:true});
     if(!session||session.isDemo)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
     await requireFreshAuthentication(session);
     const secret=generateTotpSecret();

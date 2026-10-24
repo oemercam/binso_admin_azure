@@ -10,11 +10,11 @@ import {mailLayout,sendMail} from '@/lib/server/email';
 export const runtime="nodejs";
 export async function GET(){
   try{
-    const session=await getSession();
+    const session=await getSession({allowMfaEnrollment:true});
     if(!session)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
     const user=await query<{mfa_enabled:boolean}>("select mfa_enabled from app_users where id=$1 limit 1",[session.userId]);
     const enabled=user.rows[0]?.mfa_enabled===true;
-    return json({enabled,required:false,role:session.role,demo:session.isDemo===true});
+    return json({enabled,required:session.mfaRequired===true,role:session.role,demo:session.isDemo===true});
   }catch(error){return apiError(error);}
 }
 export async function DELETE(request:NextRequest){try{
@@ -22,6 +22,8 @@ export async function DELETE(request:NextRequest){try{
  const session=await getSession();if(!session)throw new ApiError(401,'unauthorized','Anmeldung erforderlich.');
  await requireFreshAuthentication(session);
  await withTenant(session.organizationId,session.userId,async client=>{
+  const policy=(await client.query('select employee_mfa_required from organizations where id=$1 for update',[session.organizationId])).rows[0];
+  if(policy?.employee_mfa_required)throw new ApiError(403,'mfa_required','Dein Unternehmen verlangt den Authenticator. Er kann nicht einzeln deaktiviert werden.');
   const user=(await client.query("select mfa_enabled from app_users where id=$1 and status='active' for update",[session.userId])).rows[0];
   if(!user?.mfa_enabled)throw new ApiError(409,'mfa_not_enabled','Der Authenticator ist nicht aktiviert.');
   await client.query('update app_users set mfa_enabled=false,mfa_secret_enc=null,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,recovery_code_hashes=\'[]\'::jsonb,updated_at=now() where id=$1',[session.userId]);

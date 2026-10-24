@@ -52,7 +52,7 @@ async function verifyNotificationPreference(page,{base,locale,text}){
  let enabled=true,phase='fail',updates=0,release,started;
  const pending=new Promise(resolve=>release=resolve),received=new Promise(resolve=>started=resolve);
  const handler=async route=>{
-  if(route.request().method()==='GET')return route.fulfill({json:{items:[{kind:'Rechnungen',email:enabled,push:false}]}});
+  if(route.request().method()==='GET')return route.fulfill({json:{channels:{email:true,push:false},items:[{kind:'Rechnungen',email:enabled,push:false}]}});
   assert.equal(route.request().method(),'PATCH');updates++;assert.deepEqual(route.request().postDataJSON(),{kind:'Rechnungen',channel:'email',enabled:false});
   if(phase==='fail')return route.fulfill({status:503,json:{message:'Synthetic preference failure'}});
   started();await pending;enabled=false;return route.fulfill({json:{ok:true}});

@@ -26,8 +26,16 @@ assert.match(modal,/role="dialog"/);assert.match(modal,/aria-modal="true"/);asse
 render(true,false,true);assert.deepEqual(guard,{active:true,unload:true},'A pending pristine save protects browser back/unload too');
 render(true,false,false);assert.deepEqual(guard,{active:false,unload:false},'A pristine idle workspace does not trap back/unload');
 const access=navigationAccess(read);
-assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('canOpen("/kunden")','canOpen("/zahlungen")'):read(file)),access,'A changed destination permission cannot pass the layout migration');
-assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('href="/dashboard" className={active===','href="/zahlungen" className={active==='):read(file)),access,'A changed bottom navigation target cannot pass');
+const discardConditions=[];
+const findDiscard=node=>{if(ts.isIfStatement(node)&&node.thenStatement.getText(ast).includes('binso-draft-discard'))discardConditions.push(node.expression.getText(ast));ts.forEachChild(node,findDiscard)};
+findDiscard(ast);
+assert.equal(discardConditions.length,1,'One central page-draft discard owner');
+for(const [sheets,parent,expected] of [[1,false,true],[2,false,false],[1,true,false],[2,true,false]]){
+ const doc={querySelectorAll:()=>Array(sheets),querySelector:selector=>parent&&selector==='.app-editing .document-entry-page'?{}:null};
+ assert.equal(Function('document','return ('+discardConditions[0]+')')(doc),expected,'Only a sole sheet without a full-page parent may clear page recovery');
+}
+assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replaceAll('mainNavigation.filter(item=>canOpen(item.href))','mainNavigation.filter(item=>true)'):read(file)),access,'A changed destination permission cannot pass the layout migration');
+assert.notDeepEqual(navigationAccess(file=>file==='components/app-shell.tsx'?read(file).replace('href={item.href} className={primaryNavigationSection','href="/zahlungen" className={primaryNavigationSection'):read(file)),access,'A changed bottom navigation target cannot pass');
 const display={};Function('require','exports',compile(read('lib/display-format.ts').replace('import {formatCurrency} from "./financial-status";','')))(require,display);
 assert.equal(display.messageDay('2026-10-17T22:30:00Z'),'18.10.2026','Zurich midnight is a new chat day');
 assert.equal(display.messageDay('2026-01-17T22:30:00Z'),'17.01.2026','Winter offset is respected');

@@ -4,7 +4,7 @@ import {writeTestOutput} from '../test-output.mjs';
 import {identity} from './identity.mjs';
 import {createHash} from 'node:crypto';
 const runIdentity=identity();
-const baselineFile='ux-compliance/navigation-baseline.v4.json';
+const baselineFile='ux-compliance/navigation-baseline.phase1.json';
 const navigationBaseline=await fs.readFile(baselineFile,'utf8').then(JSON.parse).catch(()=>null);
 export async function measureActionClearance(page){
  return page.evaluate(async()=>{
@@ -57,7 +57,7 @@ export async function measureCompliance(page,{output,route,theme,width,state='no
   if(dividers.length)add('LAY-005',doubled.length?'failed':'passed',{dividers:dividers.length,doubled},'hr,[role=separator]');
   for(const el of all('.toolbar:has(.searchbox):has(.filter-button),.record-controls,.records-inline-controls')){
    const search=all('.searchbox').find(x=>el.contains(x)),filter=el.querySelector('.filter-button,.records-filter-action');const tabs=el.querySelector('.chips,.tabs');
-   if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs(a.y-b.y)<=2&&Math.abs(a.height-b.height)<=2&&(!t||t.y>=a.bottom-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls,.records-inline-controls');}
+   if(innerWidth<=760&&search&&filter&&visible(filter)){const a=rect(search),b=rect(filter),t=tabs&&visible(tabs)?rect(tabs):null;add('CTL-001',b.x>=a.right-2&&Math.abs((a.y+a.height/2)-(b.y+b.height/2))<=2&&a.height>=44&&a.height<=50&&b.height>=44&&b.height<=50&&(!t||t.y>=Math.max(a.bottom,b.bottom)-1)?'passed':'failed',{search:a,filter:b,tabs:t},'.toolbar,.record-controls,.records-inline-controls');}
    const sort=[...el.querySelectorAll('.records-sort-control [role=combobox],select[aria-label*=Sort],button[aria-label*=Sort]:not(.records-filter-action,.filter-button,.filter-chip,.records-reset)')].filter(visible);
    add('CTL-003',sort.length<=1?'passed':'failed',{visibleSorts:sort.length,controls:sort.map(item)},'.record-controls,.records-inline-controls');
   }

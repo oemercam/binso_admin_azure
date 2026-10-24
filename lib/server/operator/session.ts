@@ -25,9 +25,12 @@ export async function createOperatorSession(input:{userId:string;email:string;na
  return result.rows[0]?.id;
 }
 export async function getOperatorSession():Promise<OperatorSession|null>{
+ const identity=env.appMode==='production'?await getEntraOperatorIdentity():null;
+ if(env.appMode==='production'&&!identity)return null;
  const jar=await cookies();const token=jar.get(env.operatorSessionCookieName)?.value;if(!token)return null;
  const result=await query<OperatorSession>(`select s.id as "sessionId",u.user_id as "userId",u.email,coalesce(u.display_name,u.email) as name,u.role,u.entra_object_id as "entraObjectId",u.entra_tenant_id as "entraTenantId",u.auth_source as "authSource" from platform_auth_sessions s join platform_operator_assignments u on u.user_id=s.user_id where s.token_hash=$1 and s.expires_at>now() and u.status='active'`,[tokenHash(token)]);
  const session=result.rows[0]||null;
+ if(session&&env.appMode==='production'&&(!identity||session.authSource!=='entra'||identity.tenantId!==session.entraTenantId||identity.objectId!==session.entraObjectId||identity.role!==session.role))return null;
  if(session)void query(`update platform_auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
  return session;
 }

@@ -60,3 +60,7 @@ self.addEventListener("fetch", event => {
 });
 
 self.addEventListener("message",event=>{if(event.origin!==self.location.origin||event.source?.type!=="window")return;if(event.data?.type==="SKIP_WAITING")self.skipWaiting();});
+
+// Generic lock-screen content only. Navigation always re-authenticates in the app.
+self.addEventListener('push',event=>{let data={};try{data=event.data?.json()??{}}catch{}event.waitUntil(self.registration.showNotification('Binso One',{body:typeof data.body==='string'?data.body:'Binso One',icon:'/brand/pwa-icon-192.png',tag:typeof data.tag==='string'?data.tag:'binso-notification',data:{url:'/benachrichtigungen'}}))});
+self.addEventListener('notificationclick',event=>{event.notification.close();event.waitUntil(self.clients.openWindow(new URL('/benachrichtigungen',self.location.origin).href))});

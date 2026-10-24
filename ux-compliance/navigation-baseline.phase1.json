@@ -1,0 +1,542 @@
+{
+  "schemaVersion": 5,
+  "commit": "1a2813d01a9024bd367acff9b3fe61e599e6ed54",
+  "approval": "24 October 2026 Master Phase 1 section 3 explicitly replaces Finanzen with Aufträge (/projekte) in Navigation V2. Preserve all historical v4 geometry, safe-area and creation expectations. This is a source-defined destination change, not an output-derived screenshot update.",
+  "provenance": "docs/architecture/master-phase1/source.md sections 1-3; unchanged geometry from navigation-baseline.v4.json. Physical PWA acceptance remains open.",
+  "toleranceCssPixels": 1,
+  "cases": [
+    {
+      "theme": "light",
+      "width": 320,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 320,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 320,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 360,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 360,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 360,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 375,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 375,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 390,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 390,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 430,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 430,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 540,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 540,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 540,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 540,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 760,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 760,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "light",
+      "width": 760,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 760,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 320,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 320,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 320,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 360,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 360,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 360,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 375,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 375,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 390,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 390,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 390,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 430,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 430,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 430,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 540,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 540,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 540,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 540,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 760,
+      "withCreate": true,
+      "navigation": {
+        "x": 0,
+        "width": 760,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    },
+    {
+      "theme": "dark",
+      "width": 760,
+      "withCreate": false,
+      "navigation": {
+        "x": 0,
+        "width": 760,
+        "height": 68,
+        "bottomOffset": 0,
+        "position": "static",
+        "borderRadius": "0px",
+        "links": [
+          "/dashboard",
+          "/kunden",
+          "/projekte",
+          "/zeit"
+        ]
+      }
+    }
+  ],
+  "geometrySourceCommit": "1a2813d01a9024bd367acff9b3fe61e599e6ed54"
+}

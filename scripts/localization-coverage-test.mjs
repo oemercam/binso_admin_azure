@@ -49,3 +49,7 @@ for(const [file,names] of [['components/app-shell.tsx',['desktopNav','desktopNav
 }
 assert.deepEqual([...missing].sort(),[],'All actual tenant/operator navigation and group labels require translations');
 console.log('Data-driven tenant/operator navigation labels and group headings have catalogue coverage.');
+
+// The authorized V2 navigation is data-driven in its canonical owner.
+const phase1Navigation=await import((await import('./data-test-modules.mjs')).moduleUrl(fs.readFileSync('config/workspace-navigation.ts','utf8')));
+for(const label of [...phase1Navigation.mainNavigation.map(item=>item.label),...phase1Navigation.moreNavigation.flatMap(group=>[group.title,...group.items.map(item=>item.label)])]){assert.ok(messages[label]?.length>=3,'V2 navigation EN/FR/IT catalogue: '+label);assert.ok(JSON.parse(fs.readFileSync('lib/locales/messages.json','utf8'))[label]?.[3]?.trim(),'V2 navigation actual Turkish translation: '+label)}

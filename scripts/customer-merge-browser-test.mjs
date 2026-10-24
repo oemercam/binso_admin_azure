@@ -62,7 +62,7 @@ try{
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await page.screenshot({path:path.join(output,`${theme}-${width}-preview.png`),animations:'disabled'});
   await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).click();await dialog.getByText('Synthetic unknown response',{exact:true}).waitFor();assert.equal(writes,1,'No automatic retry after an uncertain response');
   await dialog.getByRole('button',{name:text('Status prüfen'),exact:true}).click();await dialog.getByRole('button',{name:text('Erneut bestätigen'),exact:true}).waitFor();assert.equal(statusReads,1);assert.equal(writes,1,'Status reads cannot repeat a mutation');
-  await dialog.getByRole('button',{name:text('Abbrechen'),exact:true}).click();await page.getByRole('button',{name:text('Änderungen verwerfen'),exact:true}).click();
+  await dialog.getByRole('button',{name:text('Abbrechen'),exact:true}).click();await page.getByRole('button',{name:text('Verwerfen'),exact:true}).click();
   await dialog.waitFor({state:'hidden'});assert.equal(keys.length,2);assert.equal(keys[0],keys[1],'Cancellation settles exactly the original uncertain intent');
   results.push({theme,width,locale,passed:true,scope:'Synthetic transport; real migrated persistence and runtime RLS are verified separately'});await context.close();
  }

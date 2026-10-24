@@ -40,7 +40,7 @@ export async function verifyListFrameMeasurement(page){
  }finally{await detached.dispose();}
 }
 
-/** Current global UX audit: 48px fields, 15px desktop text and 16px mobile text (iOS focus zoom).
+/** Current global UX audit: 48px fields, 14px desktop text and 16px mobile text (iOS focus zoom).
  * Textareas and checkbox/radio controls have their own semantic geometry. */
 export async function assertCanonicalClosedFields(page,route=''){
  const fields=await page.evaluate(()=>[...document.querySelectorAll('.form-field>.form-control:not(textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),.form-field .app-select-trigger')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{height:box.height,padding:css.paddingLeft,radius:css.borderRadius,font:css.fontSize,mobile:matchMedia('(max-width:760px)').matches}]:[]}));
@@ -48,7 +48,7 @@ export async function assertCanonicalClosedFields(page,route=''){
   assert.equal(geometry.height,48,route+': canonical closed field height');
   assert.equal(geometry.padding,'16px',route+': canonical field inset');
   assert.equal(geometry.radius,'12px',route+': canonical field radius');
-  assert.equal(geometry.font,geometry.mobile?'16px':'15px',route+': canonical field text');
+  assert.equal(geometry.font,geometry.mobile?'16px':'14px',route+': canonical field text');
  }
 }
 
@@ -132,17 +132,23 @@ export async function assertChatTargets(page){
 export async function assertPresentationControls(page){
  const measured=await page.locator('.status,.toggle').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{
   const css=getComputedStyle(el),box=el.getBoundingClientRect();
-  return {toggle:el.matches('.toggle'),font:parseFloat(css.fontSize),gap:parseFloat(css.columnGap),width:box.width,height:box.height,overflow:el.scrollWidth>el.clientWidth+1};
+  return {path:location.pathname,classes:el.className,toggle:el.matches('.toggle'),font:parseFloat(css.fontSize),gap:parseFloat(css.columnGap),width:box.width,height:box.height,overflow:el.scrollWidth>el.clientWidth+1};
  }));
  for(const control of measured){
   if(control.toggle)assert.ok(control.width>=44&&control.height>=44,'Shared switches retain a 44px target');
-  else {assert.ok(control.font>=12,'Status labels remain at least 12px');assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
+  else {assert.ok(Math.abs(control.font-11)<.1,'Status labels remain at the approved Phase 1 11px: '+JSON.stringify(control));assert.ok(control.gap>=6,'Status marker and label remain separated');assert.equal(control.overflow,false,'Status labels must wrap instead of overflowing');}
  }
 }
 
 export async function verifyPresentationControlRegression(page){
+ const status=page.locator('.status').filter({visible:true}).first();
+ if(await status.count()){
+  await status.evaluate(el=>{const context=document.createElement('div');context.id='binso-context-status-probe';context.className='context-block compact-list';context.append(el.cloneNode(true));document.body.append(context)});
+  try{await assertPresentationControls(page);}finally{await page.locator('#binso-context-status-probe').evaluate(el=>el.remove());}
+ }
  for(const [selector,properties,expected] of [
   ['.status',[['font-size','9px']],/Status labels remain/],
+  ['.status',[['font-size','16px']],/Status labels remain/],
   ['.status',[['gap','0px']],/Status marker and label/],
   ['.toggle',[['height','24px'],['min-height','24px']],/44px target/],
  ]){

@@ -14,7 +14,7 @@ const require=createRequire(import.meta.url);
 const messages=JSON.parse(fs.readFileSync('lib/locales/messages.json','utf8'));
 const templates=JSON.parse(fs.readFileSync('lib/locales/templates.json','utf8'));
 for(const [key,values] of Object.entries({...messages,...templates})){
- assert.equal(values.length,3,'EN/FR/IT required: '+key);
+ assert.ok(values.length===3||values.length===4,'EN/FR/IT required; optional fourth entry is actual Turkish: '+key);
  for(const value of values)assert.ok(typeof value==='string'&&value.trim(),key);
  const tokens=value=>[...value.matchAll(/\{\d+\}/g)].map(m=>m[0]).sort();
  if(templates[key])for(const value of values)assert.deepEqual(tokens(value),tokens(key),'Template values must survive translation');
@@ -30,6 +30,8 @@ for(const [language,expected] of [['de','Umsatz 2026'],['en','Revenue 2026'],['f
 assert.deepEqual(config.locales,['de','fr','it','en','tr']);
 assert.equal(locale.translateMessage('Individueller Zeitraum','tr'),'Özel dönem');
 assert.equal(config.asLocale('tr-TR'),'tr');
+for(const [key,expected]of [['Kunden','Müşteriler'],['Zurückgewiesen','Reddedildi'],['Verwerfen','Sil'],['Authenticator-Pflicht','Doğrulayıcı zorunluluğu']])assert.equal(locale.translateMessage(key,'tr'),expected,'Actual Turkish app translation, never accidental Italian fallback');
+assert.equal(locale.translateMessage('Acme AG','tr'),'Acme AG','Unrecognized user content stays verbatim');
 const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/money.ts')});
 for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');
 assert.equal(financialDates.formatDate('2026-01-02','en-US'),'01/02/2026','Explicit locale is honored rather than ignored');
@@ -120,14 +122,16 @@ const notificationSource=settingsAst.statements.find(node=>ts.isFunctionDeclarat
 const wrapper=({children})=>React.createElement('div',null,children);
 const rowSource=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),99,true,4).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ListRow').getText();
 const rowExports={};Function('require','exports','LocalizedText','Status','Icon','Link',ts.transpileModule(rowSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,rowExports,client.LocalizedText,()=>null,()=>null,wrapper);
-Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','notificationChannels',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,{email:true,push:false});
+const pushDevice=compile('components/push-device-settings.tsx',{'react':React,'@/lib/client/locale':client,'@/lib/client/backend':{},'./ui':{Button:wrapper,ErrorState:wrapper,LoadingState:wrapper}});
+const preferenceCount=compile('config/notification-channels.ts').notificationPreferenceKinds.length;
+Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','PushDeviceSettings',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,pushDevice.PushDeviceSettings);
 for(const language of config.locales){
  const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
  const labels=new Map([...markup.matchAll(/<(?:b|span) id="([^"]+)">([^<]+)<\/(?:b|span)>/g)].map(match=>[match[1],match[2]]));
- const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,5);
+ const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,preferenceCount);
  const names=switches.map(([tag])=>{assert.doesNotMatch(tag,/aria-label=/,'Do not shadow translated visible labels with a concatenated German name');const ids=tag.match(/aria-labelledby="([^"]+)"/)[1].split(' ');assert.equal(ids.length,1,'Compact preference uses its one complete visible naming reference');return ids.map(id=>{assert.ok(labels.has(id),'Every naming reference exists in the actual page');return labels.get(id)}).join(' ')});
  assert.equal(names[0],locale.translateMessage('Rechnungen',language)+' · '+locale.translateMessage('E-Mail',language));
- assert.equal(new Set(names).size,5,'Every preference has a unique channel and topic');
+ assert.equal(new Set(names).size,preferenceCount,'Every preference has a unique channel and topic');
 }
 for(const checked of [false,true]){
  const markup=renderToStaticMarkup(React.createElement(toggleExports.Toggle,{checked,label:'Fallback',busy:true}));

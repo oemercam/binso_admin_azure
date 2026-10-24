@@ -19,6 +19,7 @@ export type SessionUser={
  name:string;
  role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader";
  mfaEnabled:boolean;
+ mfaRequired?:boolean;
 };
 
 const tokenHash=(token:string)=>createHash("sha256").update(token).digest("hex");
@@ -68,7 +69,7 @@ export async function endDemoSession(){
  jar.delete("binso_demo");
 }
 
-export async function getSession():Promise<SessionUser|null>{
+export async function getSession(options:{allowMfaEnrollment?:boolean}={}):Promise<SessionUser|null>{
  const jar=await cookies();
  const token=jar.get(env.sessionCookieName)?.value;
  if(!token)return null;
@@ -77,7 +78,7 @@ export async function getSession():Promise<SessionUser|null>{
    if(!context)return {rows:[] as SessionUser[]};
    await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
    return client.query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled"
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled",o.employee_mfa_required as "mfaRequired"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'
@@ -91,15 +92,17 @@ export async function getSession():Promise<SessionUser|null>{
  const session=result.rows[0]||null;
  if(session){const expired=await expireUnpaidTrials(session.organizationId,session.userId);if(expired?.rows?.length)session.organizationStatus="read_only";}
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
+ if(session?.mfaRequired&&!session.mfaEnabled&&!options.allowMfaEnrollment)return null;
  return session;
 }
 
 export async function requireSession(options:{allowMfaEnrollment?:boolean;freshAuthentication?:boolean}={}){
  if((await maintenanceState()).enabled)throw new ApiError(503,"maintenance","Binso One wird gewartet");
- const session=await getSession();
+ const session=await getSession({allowMfaEnrollment:true});
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
- // TOTP is voluntary under the 21 October master. Sensitive mutations invoke
- // the session-bound fresh proof explicitly; ordinary access retains RBAC/RLS.
+ // Phase 1: only the existing enrollment/security flow is reachable until a
+ // required factor is enrolled. No role or alternate login exempts the policy.
+ if(session.mfaRequired&&!session.mfaEnabled&&!options.allowMfaEnrollment)throw new ApiError(403,'mfa_enrollment_required','Dein Unternehmen verlangt eine Authenticator-App. Bitte richte sie unter Sicherheit ein.');
   if(options.freshAuthentication)await requireFreshAuthentication(session);
   return session;
 }

@@ -402,3 +402,6 @@ for(const source of ['javascript:alert(1)','data:image/svg+xml,<svg onload=alert
 assert.equal(companyLogoSource('/api/files/12345678-1234-1234-1234-123456789abc/download'),'/api/files/12345678-1234-1234-1234-123456789abc/download');
 assert.equal(companyLogoSource('blob:https://example.invalid/12345678-1234-1234-1234-123456789abc'),'blob:https://example.invalid/12345678-1234-1234-1234-123456789abc');
 console.log('Company logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.');
+
+await import('./row-presentation-contract-test.mjs');
+await import('./dialog-trigger-test.mjs');

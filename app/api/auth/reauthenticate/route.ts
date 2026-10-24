@@ -14,7 +14,7 @@ import {audit} from '@/lib/server/audit';
 export const runtime='nodejs';
 export async function POST(request:NextRequest){try{
  assertSameOrigin(request);await enforceRateLimit(request,'fresh-authentication',10,15*60_000);
- const session=await getSession();if(!session)throw new ApiError(401,'unauthorized','Anmeldung erforderlich.');
+ const session=await getSession({allowMfaEnrollment:true});if(!session)throw new ApiError(401,'unauthorized','Anmeldung erforderlich.');
  const body=asObject(await readJson(request,8192)),password=stringField(body,'password',{min:1,max:256});
  const identity=(await query<{password_hash:string|null;mfa_enabled:boolean;mfa_secret_enc:string|null;email:string}>("select password_hash,mfa_enabled,mfa_secret_enc,email from app_users where id=$1 and status='active'",[session.userId])).rows[0];
  if(!identity?.password_hash||!await verifyPassword(password,identity.password_hash))throw new ApiError(403,'reauthentication_invalid','Die Bestätigung ist nicht gültig.');
