@@ -15,13 +15,17 @@ const browser=await engines[process.env.BINSO_UX_BROWSER??'webkit'].launch({head
 try{
  for(const viewport of [{width:390,height:844},{width:1440,height:1000}])for(const theme of ['light','dark']){
   const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
-  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));let authCalls=0,delay=350,authMode='valid',showCustomer=false;const calls={};
+  await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));let authCalls=0,delay=350,authMode='valid',showCustomer=false,profileGate=null,dashboardGate=null;const calls={};
   await context.route('**/api/**',async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
    if(p==='/api/customers'&&showCustomer)return route.fulfill({json:{items:[{id:'fixture',name:'Prüffirma AG',status:'active',city:'Bern'}]}});
    if(p==='/api/finance/overview')return route.fulfill({json:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}});
    if(p==='/api/settings/company')return route.fulfill({json:{item:{name:'Synthetic Startup Company'}}});
-   if(p==='/api/settings/profile')return route.fulfill({json:{item:{display_name:'Prüfung',theme,language:'de'}}});
+   if(p==='/api/settings/profile'){if(profileGate)await profileGate;return route.fulfill({json:{item:{id:'fixture-profile',first_name:'Fixture',display_name:'Prüfung',theme,language:'de'}}});}
+   if(p==='/api/dashboard'){
+    if(dashboardGate)await dashboardGate;
+    return route.fulfill({json:{canFinance:true,canInvoices:true,cash:{payments:[],refunds:[],outflows:[],incomplete:false,financial:{revenueEvents:[],snapshot:{as_of:'2026-10-24',paid:0,open:0,overdue:0,receivables:0,open_count:0,overdue_count:0,credit_balance:0}}},stats:{customer_count:1},work:null,recent:[]}});
+   }
    if(p==='/api/customers/fixture')return route.fulfill({json:{item:{id:'fixture',name:'Prüffirma AG',status:'active',street:'Teststrasse 1',postal_code:'3000',city:'Bern'},contacts:[],documents:[],statistics:[],activity:[],summary:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}}});
    await new Promise(r=>setTimeout(r,150));return route.fulfill({json:{items:[],tracker:null}});
   });
@@ -37,6 +41,29 @@ try{
    await page.screenshot({path:output+'/'+theme+'-'+viewport.width+'-'+label+'.png'});
   }
   await measure('cold',()=>page.goto(base+'/kunden'));
+  if(!baseline){
+   // Separate real readiness events, not fixed sleeps: the profile may arrive
+   // well before the ledger. Neither may reveal an empty first dashboard.
+   let releaseProfile,releaseDashboard;
+   profileGate=new Promise(resolve=>{releaseProfile=resolve});dashboardGate=new Promise(resolve=>{releaseDashboard=resolve});
+   const profileRequested=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/settings/profile');
+   const dashboardRequested=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/dashboard');
+   try{
+    await page.goto(base+'/dashboard');await Promise.all([profileRequested,dashboardRequested]);
+    assert.equal(await page.locator('.app-root').isVisible(),false,'Identity alone cannot reveal placeholder identity or an empty dashboard');
+    assert.equal(await page.locator('.app-launch-screen').isVisible(),true,'Existing launch surface covers first-page readiness');
+    releaseProfile();
+    await page.waitForFunction(()=>document.querySelector('.bo-page-heading h1')?.textContent.includes('Fixture'));
+    assert.equal(await page.locator('.app-root').isVisible(),false,'A ready greeting cannot expose an unfinished ledger');
+    releaseDashboard();await page.locator('.bo-cash-overview').waitFor({state:'visible'});
+    await page.waitForFunction(()=>!document.querySelector('.app-launch-screen'));
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.locator('.bo-dashboard-overview .loading-state').count(),0,'The first visible dashboard already includes its restored KPI period');
+    const exposed=await page.evaluate(()=>window.loadingFrames.filter(frame=>frame.phase.includes('.app-root')&&frame.content.includes('Fixture')));
+    assert(exposed.length>0);assert(exposed.every(frame=>frame.content.includes('Umsatz')),'No visible greeting-only intermediate dashboard');
+   }finally{releaseProfile();releaseDashboard();profileGate=null;dashboardGate=null;}
+   await page.goto(base+'/kunden');await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
+  }
   assert.equal(await page.locator('.records-inline-controls').count(),1,'The allowed customer controls are actually mounted before the expiry check');
   if(!baseline)assert.equal(await page.locator('link[rel="manifest"]').getAttribute('href'),'/manifest-app.webmanifest','Actual customer routes use the app manifest');
   if(!baseline){const startup=results.at(-1).startup;assert.equal(startup?.iconWidth,80,'The approved original icon keeps one size on every viewport');assert.equal(startup?.iconAnimation,'none','Startup never pulses or scales');assert.ok((await page.evaluate(()=>window.loadingFrames)).filter(frame=>frame.iconWidth).every(frame=>frame.iconWidth===80&&frame.iconAnimation==='none'),'Every sampled startup frame retains the same icon geometry');}

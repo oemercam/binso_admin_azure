@@ -16,7 +16,7 @@ export type DashboardData={setup?:SetupGuide|null;work?:{hours:number|null;pendi
 export function DashboardPage(){
  const query=useApiQuery<DashboardData>('/api/dashboard');
  const greeting=useDashboardGreeting(),translate=useTranslation();
- return <AppShell headingPlacement="content" title={greeting} titleIsUserContent subtitle={greeting?translate('Dein Unternehmen auf einen Blick'):undefined} active="dashboard" actions={<QuickCreateAction/>}>{query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<DashboardOverview data={query.data}/>}</AppShell>;
+ return <AppShell loading={query.loading||!greeting} headingPlacement="content" title={greeting} titleIsUserContent subtitle={greeting?translate('Dein Unternehmen auf einen Blick'):undefined} active="dashboard" actions={<QuickCreateAction/>}>{query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}><LocalizedText>{query.error}</LocalizedText></ErrorState>:<DashboardOverview data={query.data}/>}</AppShell>;
 }
 export function DashboardOverview({data}:{data:DashboardData|undefined}){
  const attention=(data?.attention??[]).filter(item=>financialStatus(item)==='overdue');
