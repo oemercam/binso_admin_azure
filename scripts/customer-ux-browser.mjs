@@ -40,8 +40,7 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   mode='normal';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();
   await page.locator('.detail-grid[data-layout="dossier"]').waitFor();
   await assertCustomerDossier(page);
-  await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');
-  await page.locator('.contact-main').waitFor();assert.equal(await page.getByRole('tab',{name:'Kontakte',exact:true}).getAttribute('aria-selected'),'true');
+  await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('tab',{name:'Dokumente',exact:true}).getAttribute('aria-selected'),'true');await page.keyboard.press('ArrowLeft');assert.equal(await page.getByRole('tab',{name:'Übersicht',exact:true}).getAttribute('aria-selected'),'true');await page.locator('.contact-main').waitFor();
   const contact=page.locator('button.contact-main');await contact.focus();await contact.press('Enter');
   const actions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await actions.waitFor();await actions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Kontakt bearbeiten',exact:true});await dialog.waitFor();await capture('contact');
@@ -55,13 +54,13 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   const readOnly=route=>route.fulfill({json:{authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:true}}});
   await page.route(session,readOnly);
   try{
-   await page.goto(url+'?tab=contacts');await page.locator('button.contact-main').waitFor();
+   await page.goto(url+'?tab=overview');await page.locator('button.contact-main').waitFor();
    assert.equal(await page.locator('button.contact-main').isDisabled(),false,'Read-only contacts retain communication actions');await page.locator('button.contact-main').click();const readActions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await readActions.waitFor();assert.equal(await readActions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).isDisabled(),true,'Read-only cannot enter the editor');assert.equal(await readActions.getByRole('button',{name:'Kontakt entfernen',exact:true}).isDisabled(),true,'Read-only cannot remove a contact');await page.keyboard.press('Escape');await readActions.waitFor({state:'hidden'});
    assert.equal(await page.getByRole('button',{name:'Kontakt hinzufügen',exact:true}).isDisabled(),true,'Read-only cannot create contacts');
    assert.equal(await page.getByRole('dialog').count(),0);await capture('read-only');
   }finally{await page.unroute(session,readOnly)}
-  mode='empty';await page.goto(url);await page.getByText('Keine Kontakte erfasst',{exact:true}).waitFor();
+  mode='empty';await page.goto(url);await page.getByText('Keine Kontakte erfasst',{exact:true}).first().waitFor();
   await page.getByText('Keine Rechnungen erfasst',{exact:true}).waitFor();await capture('empty');
-  await page.getByRole('tab',{name:'Aktivitäten',exact:true}).click();await page.getByText('Keine Geschäftsaktivität vorhanden',{exact:true}).waitFor();
+  await page.getByRole('tab',{name:'Verlauf',exact:true}).click();await page.getByText('Keine Geschäftsaktivität vorhanden',{exact:true}).waitFor();
  }finally{release();await page.unroute(endpoint,handler)}
 }
