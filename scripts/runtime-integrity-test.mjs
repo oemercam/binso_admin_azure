@@ -43,8 +43,8 @@ const logger=await import(moduleUrl((await fs.readFile('lib/server/logger.ts','u
 const error=console.error,captured=[];console.error=(...args)=>captured.push(args);
 try{logger.log('error','fixed_event',{detail:'synthetic-sensitive-marker',nested:{access_token:'synthetic-token',email:'fixture@fixture.invalid'},status:503});http.apiError(new Error('synthetic-sensitive-marker'));}finally{console.error=error}
 assert.ok(!JSON.stringify(captured).includes('synthetic-sensitive-marker'));assert.ok(!JSON.stringify(captured).includes('synthetic-token'));assert.ok(JSON.stringify(captured).includes('503'));
-const events={},deleted=[],keys=['binso-one-shell-v6','binso-one-shell-v7','other-app-cache','binso-other-feature'];let claimed=false;
+const events={},deleted=[],keys=['binso-one-shell-v6','binso-one-shell-v7','binso-one-shell-v8','other-app-cache','binso-other-feature'];let claimed=false;
 vm.runInNewContext(await fs.readFile('public/sw.js','utf8'),{self:{location:{origin:'https://fixture.invalid'},clients:{claim:()=>{claimed=true}},addEventListener:(name,fn)=>events[name]=fn},caches:{keys:async()=>keys,delete:async key=>deleted.push(key)},URL});
-let activated;events.activate({waitUntil:promise=>activated=promise});await activated;assert.deepEqual(deleted,['binso-one-shell-v6']);assert.ok(claimed);
+let activated;events.activate({waitUntil:promise=>activated=promise});await activated;assert.deepEqual(deleted,['binso-one-shell-v6','binso-one-shell-v7']);assert.ok(claimed);
 await import('./package-patches-test.mjs');
 console.log('Bounded chunked/UTF-8/declared-size/JSON reads, sensitive-log suppression and service-worker owned-cache cleanup passed.');
