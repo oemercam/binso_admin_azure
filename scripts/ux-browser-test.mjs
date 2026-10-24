@@ -1458,7 +1458,7 @@ try{
    if(!await tabs.list.getByText(/2[’']561\.97/).count())console.log('Pending read diagnostics:',await tabs.list.locator('body').innerText());
    assert.ok(await tabs.list.getByText(/2[’']561\.97/).count(),'A confirmed invoice stays visible while a background request is pending');
    holdDataRefresh=false;dataRefreshWaiters.splice(0).forEach(resolve=>resolve());await tabs.list.waitForLoadState('networkidle');
-   await tabs.customer.getByRole('tab',{name:'Dokumente',exact:true}).click();await tabs.activity.getByRole('tab',{name:'Aktivitäten',exact:true}).click();
+   await tabs.customer.getByRole('tab',{name:'Dokumente',exact:true}).click();await tabs.activity.getByRole('tab',{name:'Verlauf',exact:true}).click();
    for(const consumer of Object.values(tabs))await consumer.evaluate(()=>{window.v215ConsumerChanges=[]});
    await tabs.form.getByLabel('Zahlungsbetrag CHF',{exact:true}).fill('1000');
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');

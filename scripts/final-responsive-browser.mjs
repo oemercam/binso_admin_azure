@@ -56,7 +56,6 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
    if(route==='/rechnungen/neu'){
     const form=page.locator('.app-editing .document-entry-page');await form.waitFor();await footer(form);
     await form.getByRole('button',{name:t('Weiter'),exact:true}).click();
-    await page.getByRole('button',{name:t('Rabattoptionen'),exact:true}).click();
     await page.getByRole('button',{name:t('Gesamtrabatt'),exact:true}).click();
     const sheet=page.getByRole('dialog',{name:t('Gesamtrabatt'),exact:true});await sheet.waitFor();
     await selectAppOption(sheet.getByLabel(t('Rabattart'),{exact:true}),'percent');

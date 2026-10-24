@@ -40,7 +40,7 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   mode='normal';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();
   await page.locator('.detail-grid[data-layout="dossier"]').waitFor();
   await assertCustomerDossier(page);
-  await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');assert.equal(await page.getByRole('tab',{name:'Dokumente',exact:true}).getAttribute('aria-selected'),'true');await page.keyboard.press('ArrowLeft');assert.equal(await page.getByRole('tab',{name:'Übersicht',exact:true}).getAttribute('aria-selected'),'true');await page.locator('.contact-main').waitFor();
+  await page.getByRole('tab',{name:'Übersicht',exact:true}).focus();await page.keyboard.press('ArrowRight');await page.getByRole('tab',{name:'Dokumente',exact:true,selected:true}).waitFor();assert.equal(await page.getByRole('tab',{name:'Dokumente',exact:true}).getAttribute('aria-selected'),'true');await page.getByRole('tab',{name:'Dokumente',exact:true}).focus();await page.keyboard.press('ArrowLeft');await page.getByRole('tab',{name:'Übersicht',exact:true,selected:true}).waitFor();assert.equal(await page.getByRole('tab',{name:'Übersicht',exact:true}).getAttribute('aria-selected'),'true');await page.locator('.contact-main').waitFor();
   const contact=page.locator('button.contact-main');await contact.focus();await contact.press('Enter');
   const actions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await actions.waitFor();await actions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Kontakt bearbeiten',exact:true});await dialog.waitFor();await capture('contact');
