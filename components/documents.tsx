@@ -7,7 +7,8 @@ import {safeAppPath} from "@/lib/navigation";
 import {OfferHistory} from "./offer-history";
 import {OfferFollowup} from "./offer-followup";
 import {deliveryLabel} from "@/lib/offer-activity";
-import {EntityFiles} from "./entity-files";
+import {EntityFiles,type EntityFilesHandle} from "./entity-files";
+import {setupDestination} from "@/lib/action-readiness";
 import {DocumentPositionRow} from "./document-position-row";
 import ConfirmDialog from "./confirm-dialog";
 import {DirectorySelect} from "./directory-select";
@@ -23,7 +24,7 @@ import {businessDate,financialStatus,financialStatusTone,financialStatusText,inv
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import {tenantCan} from "@/lib/permissions";
-import { invoicePaymentIssue } from "@/lib/qr-bill";
+import { invoicePaymentRequirements } from "@/lib/qr-bill";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { AppShell } from "./app-shell";
@@ -271,8 +272,9 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const router=useRouter();
   const searchParams=useSearchParams();
   const plural=kind==="Angebot"?"angebote":"rechnungen";
-  const returnTo=!existing?safeAppPath(searchParams.get("returnTo"),"/"+plural):"/"+plural;
+  const returnTo=safeAppPath(searchParams.get("returnTo"),"/"+plural);
 
+  const attachmentUpload=useRef<EntityFilesHandle>(null);
   const [preview,setPreview]=useState(false);
   const [editing,setEditing]=useState(!existing);
   const [wizardStep,setWizardStep]=useState(0);
@@ -312,7 +314,8 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const company=useDocumentCompany();
   useEffect(()=>{if(existing||dirty||company.loading||searchParams.get("sourceOffer"))return;setDraft(current=>({...current,...documentDefaults(company.raw,resolveCustomer(current,directory),kind,current.date||businessDate())}));},[existing,dirty,company.loading,company.raw,draft.customerId,directory,kind,setDraft,searchParams]);
   const companyPending=editing&&company.loading;
-  const paymentIssue=kind==="Rechnung"&&!company.loading&&!company.error?invoicePaymentIssue(company.raw):null;
+  const paymentRequirement=kind==="Rechnung"&&!company.loading&&!company.error?invoicePaymentRequirements(company.raw)[0]:undefined;
+  const paymentIssue=paymentRequirement?.message??null;
   const documentLoad=useExistingDocument(kind,existing?documentKey:undefined,setDraft,editing);
   useEffect(()=>{if(existing)return;queueMicrotask(()=>setDraft(current=>({...current,date:current.date||new Date().toLocaleDateString("en-CA"),customer:current.customer})))},[existing,directory,setDraft]);
   const selectedProductId=!existing?searchParams.get("productId"):null;
@@ -445,13 +448,13 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {!moreOpen&&readinessFeedback}
     {editing&&company.error&&<ErrorState onRetry={company.refresh}>{company.error}</ErrorState>}
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
-    {editing&&paymentIssue&&<div className="document-source-note" role="status"><span><LocalizedText>{paymentIssue}</LocalizedText></span>{tenantCan(documentRole,"organization:write")&&<Link href="/einstellungen/dokumente"><LocalizedText>{"Einstellungen"}</LocalizedText></Link>}</div>}
+    {editing&&paymentIssue&&<div className="document-source-note" role="status"><span><LocalizedText>{paymentIssue}</LocalizedText></span>{tenantCan(documentRole,"organization:write")&&(existing?<Link href={setupDestination(paymentRequirement?.field??"iban","/"+plural+"/"+encodeURIComponent(documentKey??draft.number)+"?"+searchParams.toString())}><LocalizedText>Angaben ergänzen</LocalizedText></Link>:<Button variant="ghost" disabled={!recovery.ready} onClick={()=>{if(dirty)recovery.persist({draft,step:wizardStep,replay:draftReplay});allowDraftNavigation();router.push(setupDestination(paymentRequirement?.field??"iban","/"+plural+"/neu?"+searchParams.toString()))}}><LocalizedText>Angaben ergänzen</LocalizedText></Button>)}</div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
     {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceLoading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh()}}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite} followup={kind==="Angebot"&&canWrite?<OfferFollowup number={draft.number} open={followupOpen} onClose={()=>setFollowupOpen(false)}/>:undefined}/>
-            {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id}/>}
+            {draft.id&&<EntityFiles purpose={kind==="Rechnung"?"invoice_attachment":"offer_attachment"} entityId={draft.id} uploadRef={attachmentUpload}/>}
           </div>
 
         </div>
@@ -459,11 +462,11 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button variant="secondary" onClick={requestCloseEditor}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={saving||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
-  return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={editing?<IconButton label="Schliessen" icon="close" onClick={requestCloseEditor}/>:desktopActions} mobileActions={editing?<IconButton label="Schliessen" icon="close" onClick={requestCloseEditor}/>:existing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={editing&&dirty}>
+  return <AppShell title={existing?editing?kind+" bearbeiten":kind:title} titleIsUserContent={false} status={undefined} statusTone={presentation.statusTone} subtitle={undefined} active={plural} backHref={returnTo} backLabel={returnTo.startsWith("/kunden/")?"Kunde":returnTo==="/dashboard"?"Übersicht":kind==="Angebot"?"Angebote":"Rechnungen"} actions={editing?<IconButton label="Schliessen" icon="close" onClick={requestCloseEditor}/>:desktopActions} mobileActions={editing?<IconButton label="Schliessen" icon="close" onClick={requestCloseEditor}/>:existing?headerActions:undefined} preview={preview} editing={editing} unsavedChanges={editing&&dirty}>
     <section className="document-entry-page" aria-busy={saving||undefined} aria-label={title} onKeyDown={event=>{if(editing&&event.key==="Escape"&&!event.defaultPrevented&&!(event.target as Element).closest('[role="dialog"],[role="listbox"]')){event.preventDefault();requestCloseEditor()}}}>{documentContent}</section>
     <ConfirmDialog open={confirmCloseEditor} busy={saving} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Verwerfen" onCancel={()=>setConfirmCloseEditor(false)} onConfirm={finishCloseEditor}/>
     {preview&&<DocumentModal previewDraft={documentPreviewPayload(kind,draft,existing&&editing?documentKey:undefined)} pdfNumber={existing&&!editing?documentKey??draft.number:undefined} title={kind==="Angebot"?"Angebotsvorschau":"Rechnungsvorschau"} onClose={()=>setPreview(false)}/>}
-    <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">
+    <ActionSheet label="Weitere Aktionen" open={moreOpen} busy={actionBusy} onClose={()=>setMoreOpen(false)}><div className="action-list">{canWrite&&draft.id&&<ActionRow requiresWrite icon="upload" title="Datei hinzufügen" onClick={()=>{setMoreOpen(false);attachmentUpload.current?.chooseFile()}}/>}
       {canEdit&&<ActionRow icon="edit" title="Bearbeiten" onClick={()=>{draftBaseline.current=editableDocumentSnapshot(draft);setMoreOpen(false);setEditing(true)}} navigation/>}
       <ActionRow icon="copy" title="Nummer kopieren" onClick={()=>{void navigator.clipboard.writeText(draft.number).then(()=>{setMoreOpen(false);show("Nummer kopiert.")}).catch(()=>{setActionError("Nummer konnte nicht kopiert werden.")})}}/>
       {canRecordPayment&&<ActionRow href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)} icon="wallet" title="Zahlung erfassen"/>}

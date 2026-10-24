@@ -156,7 +156,7 @@ function AppShellFrame({
   const bodyControls=listControls?cloneElement(listControls,{children:undefined}):inlineControls;
   const pageChildren=inlineControls?childNodes.filter(child=>child!==inlineControls):children;
   const mobileHeading=pathname==='/dashboard'?'Übersicht':title;
-  const orientation=preview?undefined:pageOrientation(pathname,editing,access?.role);
+  const orientation=preview||pathname==='/dashboard'&&loading?undefined:pageOrientation(pathname,editing,access?.role);
   const headingSubtitle=orientation&&!(subtitle&&/^\d+\s/.test(subtitle))?undefined:subtitle;
   const headingCreate=contentCreate&&pathname==="/dashboard";
   const headingActions=contentCreate&&!headingCreate?undefined:visibleActions;

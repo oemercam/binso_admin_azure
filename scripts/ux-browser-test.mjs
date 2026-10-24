@@ -1386,7 +1386,7 @@ try{
   if(hasInteraction('billing')){
    await page.setViewportSize({width:390,height:740});
    await navigate(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
-   await page.locator('.invoices-panel').getByText('Noch keine Billing-Daten',{exact:true}).waitFor();
+   await page.locator('.invoices-panel').getByText('Noch keine Abrechnungen',{exact:true}).waitFor();
    assert.equal(await page.locator('.invoices-panel .document-summary-row').count(),0,'Unconnected billing never fabricates SaaS invoice history');
    const connected=route=>route.fulfill({json:{item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:129,billing_customer_ref:'synthetic-customer',billing_subscription_ref:'synthetic-subscription'}}});
    await context.route('**/api/settings/subscription',connected);await page.reload();

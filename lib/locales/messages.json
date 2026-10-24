@@ -1,4 +1,112 @@
 {
+  "Keine Einträge verfügbar": [
+    "No entries available",
+    "Aucune entrée disponible",
+    "Nessuna voce disponibile",
+    "Kullanılabilir kayıt yok"
+  ],
+  "Keine passenden Einträge": [
+    "No matching entries",
+    "Aucune entrée correspondante",
+    "Nessuna voce corrispondente",
+    "Eşleşen kayıt yok"
+  ],
+  "Keine ausgestellte Rechnung verfügbar": [
+    "No issued invoice available",
+    "Aucune facture émise disponible",
+    "Nessuna fattura emessa disponibile",
+    "Düzenlenmiş fatura yok"
+  ],
+  "Ausgewählter Auftrag": [
+    "Selected order",
+    "Mandat sélectionné",
+    "Mandato selezionato",
+    "Seçili iş"
+  ],
+  "Ausgewählter Kunde": [
+    "Selected customer",
+    "Client sélectionné",
+    "Cliente selezionato",
+    "Seçili müşteri"
+  ],
+  "Auftragsfilter zurücksetzen": [
+    "Reset order filter",
+    "Réinitialiser le filtre de mandat",
+    "Reimposta filtro mandato",
+    "İş filtresini sıfırla"
+  ],
+  "Kundenfilter zurücksetzen": [
+    "Reset customer filter",
+    "Réinitialiser le filtre client",
+    "Reimposta filtro cliente",
+    "Müşteri filtresini sıfırla"
+  ],
+  "< 1 Min.": [
+    "< 1 min",
+    "< 1 min",
+    "< 1 min",
+    "< 1 dk."
+  ],
+  "Keine offenen Aufgaben": [
+    "No pending tasks",
+    "Aucune tâche en attente",
+    "Nessuna attività in sospeso",
+    "Bekleyen görev yok"
+  ],
+  "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Rechnungen und Dokumente erfassen.": [
+    "First enter your company IBAN under Settings → Invoices and documents.",
+    "Saisis d’abord l’IBAN de ton entreprise dans Paramètres → Factures et documents.",
+    "Inserisci prima l’IBAN della tua azienda in Impostazioni → Fatture e documenti.",
+    "Önce Ayarlar → Faturalar ve belgeler bölümüne şirket IBAN’ını gir."
+  ],
+  "Abonnement starten": [
+    "Start subscription",
+    "Démarrer l’abonnement",
+    "Avvia abbonamento",
+    "Aboneliği başlat"
+  ],
+  "Wähle deinen Plan. Preis und Laufzeit werden vor dem Abschluss angezeigt.": [
+    "Choose your plan. The price and term are shown before purchase.",
+    "Choisis ton forfait. Le prix et la durée sont affichés avant la souscription.",
+    "Scegli il piano. Prezzo e durata sono mostrati prima della sottoscrizione.",
+    "Planını seç. Ücret ve süre, onaydan önce gösterilir."
+  ],
+  "Steuerangaben und allfällige Steuern werden vor dem Abschluss angezeigt.": [
+    "Tax details and any taxes are shown before purchase.",
+    "Les informations fiscales et les éventuelles taxes sont affichées avant la souscription.",
+    "I dati fiscali e le eventuali imposte sono mostrati prima della sottoscrizione.",
+    "Vergi bilgileri ve varsa vergiler, onaydan önce gösterilir."
+  ],
+  "Allfällige Steuern werden vor dem Abschluss angezeigt.": [
+    "Any taxes are shown before purchase.",
+    "Les éventuelles taxes sont affichées avant la souscription.",
+    "Le eventuali imposte sono mostrate prima della sottoscrizione.",
+    "Varsa vergiler, onaydan önce gösterilir."
+  ],
+  "Noch keine Abrechnungen": [
+    "No billing statements yet",
+    "Aucun décompte pour le moment",
+    "Nessun conteggio disponibile",
+    "Henüz hesap özeti yok"
+  ],
+  "Du hast noch kein kostenpflichtiges Abonnement.": [
+    "You do not have a paid subscription yet.",
+    "Tu n’as pas encore d’abonnement payant.",
+    "Non hai ancora un abbonamento a pagamento.",
+    "Henüz ücretli bir aboneliğin yok."
+  ],
+  "Abonnement aktiv": [
+    "Subscription active",
+    "Abonnement actif",
+    "Abbonamento attivo",
+    "Abonelik etkin"
+  ],
+  "Für Rechnung festgelegt": [
+    "Required for this invoice",
+    "Défini pour cette facture",
+    "Fissato per questa fattura",
+    "Bu fatura için sabit"
+  ],
   "Rapportaktionen": [
     "Report actions",
     "Actions du rapport",

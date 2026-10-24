@@ -76,7 +76,7 @@ const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
  Function('require','exports','LocalizedText',code)(require,exports,client.LocalizedText);
  const qr=compile('lib/qr-bill.ts',{'swissqrbill/utils':await import('swissqrbill/utils')});
  const company={name:'Synthetic Issuer',street:'Teststrasse',postal_code:'3000',city:'Bern'},before=structuredClone(company),issue=qr.invoicePaymentIssue(company);
- assert.equal(issue,'Bitte zuerst die IBAN deiner Firma unter Einstellungen → Finanzen erfassen.');
+ assert.equal(issue,'Bitte zuerst die IBAN deiner Firma unter Einstellungen → Rechnungen und Dokumente erfassen.');
  for(const language of config.locales){
   const actual=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(exports.ActualReadinessNotice,{paymentIssue:issue})));
   const expected=renderToStaticMarkup(React.createElement('span',null,locale.translateMessage(issue,language)));
