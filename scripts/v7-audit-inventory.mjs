@@ -23,7 +23,11 @@ const patterns={explicitAny:/\bany\b/g,localeLiteral:/(?:toLocaleString|DateTime
 const candidates=sourceFiles.map(file=>{const text=fs.readFileSync(file,'utf8'),matches={};for(const [name,expression] of Object.entries(patterns)){const count=[...text.matchAll(expression)].length;if(count)matches[name]=count;}return {file,matches};}).filter(row=>Object.keys(row.matches).length);
 const apis=sourceFiles.filter(file=>/^app\/api\/.*\/route\.ts$/.test(file)).map(file=>{
  const text=fs.readFileSync(file,'utf8'),ast=ts.createSourceFile(file,text,99,true);
- const methods=ast.statements.filter(node=>ts.isFunctionDeclaration(node)&&node.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword)&&/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$/.test(node.name?.text??'')).map(node=>({method:node.name.text,line:ast.getLineAndCharacterOfPosition(node.getStart()).line+1}));
+ const methods=ast.statements.flatMap(node=>{
+  if(!node.modifiers?.some(modifier=>modifier.kind===ts.SyntaxKind.ExportKeyword))return [];
+  const declarations=ts.isFunctionDeclaration(node)?[node]:ts.isVariableStatement(node)?Array.from(node.declarationList.declarations):[];
+  return declarations.filter(entry=>/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$/.test(entry.name?.text??'')).map(entry=>({method:entry.name.text,line:ast.getLineAndCharacterOfPosition(entry.getStart()).line+1}));
+ });
  const indicators=['requireSession','getSession','requireUser','requireOperator','authorize','assertSameOrigin','readJson','withTenant','enforceRateLimit','idempotency','audit'].filter(name=>text.includes(name));
  return {file,route:'/'+file.replace(/^app\//,'').replace(/\/route\.ts$/,''),methods,indicators,qualification:'Static call indicators only; delegated guards and runtime cases require owner tests.'};
 });

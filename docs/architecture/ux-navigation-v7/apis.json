@@ -773,37 +773,102 @@
   {
     "file": "app/api/demo/dashboard/route.ts",
     "route": "/api/demo/dashboard",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/demo/data/route.ts",
     "route": "/api/demo/data",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/demo/finance/route.ts",
     "route": "/api/demo/finance",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/demo/platform-finance/route.ts",
     "route": "/api/demo/platform-finance",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/demo/session/route.ts",
     "route": "/api/demo/session",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/documents/[number]/credits/route.ts",
@@ -1654,9 +1719,22 @@
   {
     "file": "app/api/operator/demo-session/route.ts",
     "route": "/api/operator/demo-session",
-    "methods": [],
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
     "indicators": [],
-    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
   },
   {
     "file": "app/api/operator/finance/route.ts",
