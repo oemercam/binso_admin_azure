@@ -114,3 +114,26 @@ freigegebene Rechtsübersetzungen bleiben eigenständige offene Nachweise.
 Keine produktiven Datenänderungen, Migrationen, GitHub-Pushes, Merges oder
 Deployments wurden in diesem Auftrag ausgeführt. Lokale Tests verwenden
 ausschließlich ausgewiesene isolierte Testdatenbanken und synthetische Konten.
+
+## Nachtrag zur freigegebenen Releaseprüfung
+
+PR #319 wurde nach ausdrücklicher Exact-SHA-Freigabe als Main-Commit
+`e95a8b2e99311849c158784d24b157a2b5fce2a1` zusammengeführt. Der Inhaltsvergleich
+mit `f061f01857b663ca6e9408276be44057e32a010e` ist leer. Die anschliessenden
+Main-Läufe 40234316462 und 40234330940 meldeten bei der Projektdetailseite einen
+Titel mit Nullgeometrie (760 beziehungsweise 320 px). Das Deployment wurde
+deshalb nicht gestartet.
+
+Die Titel- und Zurück-Prüfung verwendete noch getrennte Elementauflösung und
+Geometriemessung. Ein isolierter Browser-Gegenversuch reproduziert nach
+Headerersetzung exakt `visible:false,x:0,width:0,height:0` am abgetrennten
+Element, während der aktuelle Titel sichtbar bleibt. Die zentrale Prüffunktion
+fragt und misst nun den aktuellen DOM in derselben Browseraufgabe. Dieselben
+Grenzen bleiben verbindlich: Titelmitte ±1,5 px, Zurück-Ziel mindestens 44 px,
+Icon mindestens 18 px und nicht links abgeschnitten. Deterministische
+Headerersetzung sowie absichtlich verschobener Titel, zu kleines Ziel und
+zu kleines Icon werden als Gegenprüfungen ausgeführt. Dies ist eine
+Testkorrektur; Anwendung, CSS, Migrationen und Berechtigungen bleiben identisch.
+Die vollständigen Pflichtprüfungen dieses neuen Teststands bleiben bis zu
+ihrem tatsächlichen Abschluss offen. Geräte-/Sprach-/Zustellungsgrenzen des
+Auditberichts gelten unverändert.

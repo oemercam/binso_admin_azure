@@ -178,6 +178,23 @@ export async function assertMobileHeaderTargets(page){
  return targets;
 }
 
+/** Resolve and measure live detail elements in one task, including after hydration. */
+export async function assertMobileDetailHeaderGeometry(page,width,route){
+ const title=page.locator('.mobile-header-detail .mobile-header-title');
+ if(await title.count()){
+  await title.waitFor({state:'visible'});
+  const box=await page.evaluate(()=>{const el=document.querySelector('.mobile-header-detail .mobile-header-title');if(!el)return null;const r=el.getBoundingClientRect();return {visible:el.checkVisibility(),x:r.x,width:r.width,height:r.height}});
+  assert.ok(box?.visible&&box.width>0&&box.height>0&&Math.abs(box.x+box.width/2-width/2)<=1.5,`${route} ${width}px: visible detail title is geometrically centered ${JSON.stringify(box)}`);
+ }
+ const back=page.locator('.mobile-back');
+ if(await back.count()){
+  await back.waitFor({state:'visible'});
+  const box=await page.evaluate(()=>{const el=document.querySelector('.mobile-back');if(!el)return null;const r=el.getBoundingClientRect(),icon=el.querySelector('svg')?.getBoundingClientRect();return {visible:el.checkVisibility(),width:r.width,height:r.height,icon:icon?{x:icon.x,width:icon.width,height:icon.height}:null}});
+  assert.ok(box?.visible&&box.width>=44&&box.height>=44,`${route} ${width}px: detail back control is visible and touchable ${JSON.stringify(box)}`);
+  assert.ok(box.icon&&box.icon.width>=18&&box.icon.height>=18&&box.icon.x>=0,`${route}: back icon is not clipped`);
+ }
+}
+
 export async function assertChatTargets(page){
  const targets=page.locator('.thread-composer>label,.thread-composer>button').filter({visible:true});
  const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
@@ -251,6 +268,35 @@ export async function verifyHeaderMeasurementHydrationRegression(page){
  assert.deepEqual(await racingPage.locator('.mobile-back').filter({visible:true}).evaluateAll(elements=>elements.map(el=>({connected:el.isConnected,width:el.getBoundingClientRect().width}))),[{connected:false,width:0}],'Hydration invalidates an element resolved before the measurement task');
  await assertMobileHeaderTargets(racingPage);
  await verifyHeaderTargetRegression(page);
+ await page.setContent('<header class="mobile-header-detail"><a class="mobile-back" href="#"><svg width="18" height="18"></svg></a><span class="mobile-header-title">Projekt</span></header><style>body{margin:0}.mobile-header-detail{display:flex;justify-content:center}.mobile-header-title{display:block}.mobile-back{position:absolute;left:0;display:flex;min-width:44px;width:44px;height:44px}</style>');
+ const width=await page.evaluate(()=>innerWidth);
+ const replace=()=>page.evaluate(()=>{const header=document.querySelector('header');header.replaceWith(header.cloneNode(true));});
+ for(const selector of ['.mobile-header-title','.mobile-back']){
+  const previous=await page.locator(selector).elementHandle();
+  try{await replace();assert.deepEqual(await previous.evaluate(el=>({connected:el.isConnected,width:el.getBoundingClientRect().width})),{connected:false,width:0},'Title/back element resolution can become stale before measurement');}
+  finally{await previous.dispose();}
+ }
+ const detailRace=new Proxy(page,{get(object,key){
+  if(key==='locator')return selector=>{const locator=object.locator(selector);return new Proxy(locator,{get(target,method){
+   if(method==='waitFor')return async options=>{await target.waitFor(options);await replace();};
+   const value=Reflect.get(target,method);return typeof value==='function'?value.bind(target):value;
+  }});};
+  const value=Reflect.get(object,key);return typeof value==='function'?value.bind(object):value;
+ }});
+ await assertMobileDetailHeaderGeometry(detailRace,width,'synthetic hydration');
+ await page.locator('.mobile-header-title').evaluate(el=>el.style.transform='translateX(10px)');
+ await assert.rejects(()=>assertMobileDetailHeaderGeometry(page,width,'offset countercase'),/geometrically centered/);
+ await page.locator('.mobile-header-title').evaluate(el=>el.style.removeProperty('transform'));
+ await page.locator('.mobile-back').evaluate(el=>{el.style.width='18px';el.style.minWidth='18px'});
+ await assert.rejects(()=>assertMobileDetailHeaderGeometry(page,width,'touch countercase'),/visible and touchable/);
+ await page.locator('.mobile-back').evaluate(el=>el.removeAttribute('style'));
+ await page.locator('.mobile-back svg').evaluate(el=>el.setAttribute('width','10'));
+ await assert.rejects(()=>assertMobileDetailHeaderGeometry(page,width,'icon countercase'),/back icon is not clipped/);
+ await page.locator('.mobile-back svg').evaluate(el=>el.setAttribute('width','18'));
+ await page.locator('.mobile-back svg').evaluate(el=>el.style.transform='translateX(-100px)');
+ await assert.rejects(()=>assertMobileDetailHeaderGeometry(page,width,'clipped icon countercase'),/back icon is not clipped/);
+ await page.locator('.mobile-back svg').evaluate(el=>el.style.removeProperty('transform'));
+ await assertMobileDetailHeaderGeometry(page,width,'restored countercase');
 }
 
 /** Development Lab has a persistent HMR connection; await actual hydration and fonts. */
