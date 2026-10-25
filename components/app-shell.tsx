@@ -9,6 +9,7 @@ import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import Link from "next/link";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
 import {AppStart} from "./app-start";
+import {WorkspaceStartup} from './workspace-startup';
 import {useNavigationScroll} from "./use-navigation-scroll";
 import {TimerResumeNotice} from "./timer-resume-notice";
 import { hasBlockingModal } from "./use-dialog-focus";
@@ -70,6 +71,7 @@ function AppShellFrame({
   headingPlacement="content",
   recordLabel,
   subtitle,
+  orientationText,
   active,
   children,
   actions,
@@ -82,6 +84,7 @@ function AppShellFrame({
   unsavedChanges,
   status,
   statusTone,
+  loading=false,
 }: {
   title: string;
   titleIsUserContent?:boolean;
@@ -89,7 +92,9 @@ function AppShellFrame({
   recordLabel?:string;
   status?: React.ReactNode;
   statusTone?: "neutral"|"success"|"warning"|"danger"|"info";
+  loading?:boolean;
   subtitle?: string;
+  orientationText?:string|null;
   active: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
@@ -153,7 +158,7 @@ function AppShellFrame({
   const bodyControls=listControls?cloneElement(listControls,{children:undefined}):inlineControls;
   const pageChildren=inlineControls?childNodes.filter(child=>child!==inlineControls):children;
   const mobileHeading=pathname==='/dashboard'?'Übersicht':title;
-  const orientation=preview?undefined:pageOrientation(pathname,editing,access?.role);
+  const orientation=preview||orientationText===null||pathname==='/dashboard'&&loading?undefined:orientationText??pageOrientation(pathname,editing,access?.role);
   const headingSubtitle=orientation&&!(subtitle&&/^\d+\s/.test(subtitle))?undefined:subtitle;
   const headingCreate=contentCreate&&pathname==="/dashboard";
   const headingActions=contentCreate&&!headingCreate?undefined:visibleActions;
@@ -218,7 +223,8 @@ function AppShellFrame({
   const profileQuery=useApiQuery<{item?:Record<string,unknown>|null;email?:string}>(workspaceReady?"/api/settings/profile":null);
   const profileItem=profileQuery.data?.item;
   const {choose:chooseLocale}=useLocale(),lastProfileLocale=useRef('');
-  useEffect(()=>{if(!profileItem?.id||!profileItem.language)return;const key=String(profileItem.id)+':'+String(profileItem.language);if(lastProfileLocale.current===key)return;lastProfileLocale.current=key;chooseLocale(asLocale(profileItem.language));},[profileItem?.id,profileItem?.language,chooseLocale]);
+  useLayoutEffect(()=>{if(!profileItem?.id||!profileItem.language)return;const key=String(profileItem.id)+':'+String(profileItem.language);if(lastProfileLocale.current===key)return;lastProfileLocale.current=key;chooseLocale(asLocale(profileItem.language));},[profileItem?.id,profileItem?.language,chooseLocale]);
+  const profileReady=profileQuery.data!==undefined||profileQuery.error!==null;
   const profile={name:String(profileItem?.display_name||[profileItem?.first_name,profileItem?.last_name].filter(Boolean).join(" ")||""),identity:String(profileQuery.data?.email||""),avatar:String(profileItem?.avatar_url||"")};
   const [timerNotice,setTimerNotice]=useState<string|null>(null);
 
@@ -315,8 +321,8 @@ function AppShellFrame({
 
 
   return <UserProfileContext.Provider value={profileItem??(profileQuery.data||profileQuery.error?{}:null)}><WorkspaceActionContext.Provider value={registerContextActions}><PageAccessContext.Provider value={pageAccess}>
-    {!access&&!accessError&&<AppStart/>}
-    <div hidden={!access&&!accessError} ref={shellRef} data-ux={(["/dashboard","/kunden","/finanzen","/zeit","/einstellungen"].includes(pathname)||pathname.startsWith("/einstellungen/"))?"master-v3":undefined} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""} ${chatActive ? "app-chat" : ""}`}>
+    <WorkspaceStartup identityReady={!!access||!!accessError} contentReady={!!accessError||profileReady&&!loading}>
+    <div ref={shellRef} data-ux={(["/dashboard","/kunden","/finanzen","/zeit","/einstellungen"].includes(pathname)||pathname.startsWith("/einstellungen/"))?"master-v3":undefined} data-unsaved={dirty||undefined} data-navigation-collapsed={navigationCollapsed||undefined} className={`app-root app-section-${active} ${preview ? "app-preview" : ""} ${formActive ? "app-editing" : ""} ${chatActive ? "app-chat" : ""}`}>
     <ConfirmDialog open={confirmLogout} busy={logoutBusy} title="Änderungen verwerfen und abmelden?" message="Deine Änderungen sind noch nicht gespeichert." confirmLabel="Abmelden" onCancel={()=>setConfirmLogout(false)} onConfirm={()=>void logout(true)}/>
     <TimerResumeNotice enabled={workspaceReady&&!preview} onOpenTimer={()=>{if(dirty)setLeaveHref(new URL('/zeit',window.location.origin).href);else router.push('/zeit');}}/>
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
@@ -379,7 +385,7 @@ function AppShellFrame({
         {moreNavigation.map(group=>group.items.some(item=>canOpen(item.href))&&<SettingsGroup key={group.title} title={group.title}><div className="action-list">{group.items.filter(item=>canOpen(item.href)).map(item=><ActionRow key={item.href} href={item.href} icon={item.icon} title={item.label} navigation onClick={()=>setSheet(null)}/>)}</div></SettingsGroup>)}
       </ActionSheet>
     </div>
-  </div></PageAccessContext.Provider></WorkspaceActionContext.Provider></UserProfileContext.Provider>;
+  </div></WorkspaceStartup></PageAccessContext.Provider></WorkspaceActionContext.Provider></UserProfileContext.Provider>;
 }
 
 type ShellProps=Parameters<typeof AppShellFrame>[0];
@@ -390,11 +396,14 @@ const ShellRegistration=createContext<((configuration:ShellConfiguration)=>void)
  * the mounted frame, navigation, session and timer across route transitions. */
 export function AppShell(props:ShellProps){
  const register=useContext(ShellRegistration),pathname=usePathname();
- const {title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone}=props;
+ const {title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading}=props;
+ let inlineControls:React.ReactNode;
+ if(!actions)Children.forEach(props.children,child=>{if(!inlineControls&&isValidElement(child)&&child.type===RecordsControls)inlineControls=child;});
+ const shellActions=actions??inlineControls;
  useLayoutEffect(()=>{
-  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone});
- },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone]);
- return register?props.children:<AppShellFrame {...props}/>;
+  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions:shellActions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading});
+ },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,shellActions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading]);
+ return register?(inlineControls?Children.map(props.children,child=>child===inlineControls?null:child):props.children):<AppShellFrame {...props}/>;
 }
 const appSections:Record<string,string>={hilfe:"Hilfe & Informationen",vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
@@ -402,7 +411,7 @@ export function AppShellLayout({children}:{children:React.ReactNode}){
  const [configuration,setConfiguration]=useState<ShellConfiguration|null>(null);
  if(!Object.hasOwn(appSections,section))return children;
  const routeTitle=settingsGroups.flatMap(group=>group.rows).find(([href])=>href===pathname)?.[2]??appSections[section];
- const props=configuration?.pathname===pathname?configuration:{title:routeTitle,active:section};
+ const props=configuration?.pathname===pathname?configuration:{title:routeTitle,active:section,loading:true};
  return <ShellRegistration.Provider value={setConfiguration}><AppShellFrame {...props}>{children}</AppShellFrame></ShellRegistration.Provider>;
 }
 /** Root suspense sits inside the persistent frame on an app route. */

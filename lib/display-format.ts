@@ -13,6 +13,13 @@ export function withPriceUnit(price:string,unit:unknown,translate:(label:string)
 export function timeMetadata(description:unknown,project:unknown,person:unknown,date:string){
  return [...new Set([project,person,date].map(v=>String(v??"").trim()).filter(v=>v&&v!==String(description??"").trim()))].join(" · ");
 }
+/** Display only: retain sub-minute work instead of presenting it as zero. */
+export function formatTimeDuration(minutes:number,translate:(text:string)=>string=text=>text){
+ if(!Number.isFinite(minutes)||minutes<0)return '—';
+ if(minutes>0&&minutes<1)return translate('< 1 Min.');
+ const rounded=Math.round(minutes);
+ return `${Math.floor(rounded/60)}:${String(rounded%60).padStart(2,'0')} h`;
+}
 
 /** Human-readable Swiss business time and timestamp formatting. */
 export function formatHours(value:unknown){

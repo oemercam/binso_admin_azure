@@ -1,4 +1,112 @@
 {
+  "Keine Einträge verfügbar": [
+    "No entries available",
+    "Aucune entrée disponible",
+    "Nessuna voce disponibile",
+    "Kullanılabilir kayıt yok"
+  ],
+  "Keine passenden Einträge": [
+    "No matching entries",
+    "Aucune entrée correspondante",
+    "Nessuna voce corrispondente",
+    "Eşleşen kayıt yok"
+  ],
+  "Keine ausgestellte Rechnung verfügbar": [
+    "No issued invoice available",
+    "Aucune facture émise disponible",
+    "Nessuna fattura emessa disponibile",
+    "Düzenlenmiş fatura yok"
+  ],
+  "Ausgewählter Auftrag": [
+    "Selected order",
+    "Mandat sélectionné",
+    "Mandato selezionato",
+    "Seçili iş"
+  ],
+  "Ausgewählter Kunde": [
+    "Selected customer",
+    "Client sélectionné",
+    "Cliente selezionato",
+    "Seçili müşteri"
+  ],
+  "Auftragsfilter zurücksetzen": [
+    "Reset order filter",
+    "Réinitialiser le filtre de mandat",
+    "Reimposta filtro mandato",
+    "İş filtresini sıfırla"
+  ],
+  "Kundenfilter zurücksetzen": [
+    "Reset customer filter",
+    "Réinitialiser le filtre client",
+    "Reimposta filtro cliente",
+    "Müşteri filtresini sıfırla"
+  ],
+  "< 1 Min.": [
+    "< 1 min",
+    "< 1 min",
+    "< 1 min",
+    "< 1 dk."
+  ],
+  "Keine offenen Aufgaben": [
+    "No pending tasks",
+    "Aucune tâche en attente",
+    "Nessuna attività in sospeso",
+    "Bekleyen görev yok"
+  ],
+  "Bitte zuerst die IBAN deiner Firma unter Einstellungen → Rechnungen und Dokumente erfassen.": [
+    "First enter your company IBAN under Settings → Invoices and documents.",
+    "Saisis d’abord l’IBAN de ton entreprise dans Paramètres → Factures et documents.",
+    "Inserisci prima l’IBAN della tua azienda in Impostazioni → Fatture e documenti.",
+    "Önce Ayarlar → Faturalar ve belgeler bölümüne şirket IBAN’ını gir."
+  ],
+  "Abonnement starten": [
+    "Start subscription",
+    "Démarrer l’abonnement",
+    "Avvia abbonamento",
+    "Aboneliği başlat"
+  ],
+  "Wähle deinen Plan. Preis und Laufzeit werden vor dem Abschluss angezeigt.": [
+    "Choose your plan. The price and term are shown before purchase.",
+    "Choisis ton forfait. Le prix et la durée sont affichés avant la souscription.",
+    "Scegli il piano. Prezzo e durata sono mostrati prima della sottoscrizione.",
+    "Planını seç. Ücret ve süre, onaydan önce gösterilir."
+  ],
+  "Steuerangaben und allfällige Steuern werden vor dem Abschluss angezeigt.": [
+    "Tax details and any taxes are shown before purchase.",
+    "Les informations fiscales et les éventuelles taxes sont affichées avant la souscription.",
+    "I dati fiscali e le eventuali imposte sono mostrati prima della sottoscrizione.",
+    "Vergi bilgileri ve varsa vergiler, onaydan önce gösterilir."
+  ],
+  "Allfällige Steuern werden vor dem Abschluss angezeigt.": [
+    "Any taxes are shown before purchase.",
+    "Les éventuelles taxes sont affichées avant la souscription.",
+    "Le eventuali imposte sono mostrate prima della sottoscrizione.",
+    "Varsa vergiler, onaydan önce gösterilir."
+  ],
+  "Noch keine Abrechnungen": [
+    "No billing statements yet",
+    "Aucun décompte pour le moment",
+    "Nessun conteggio disponibile",
+    "Henüz hesap özeti yok"
+  ],
+  "Du hast noch kein kostenpflichtiges Abonnement.": [
+    "You do not have a paid subscription yet.",
+    "Tu n’as pas encore d’abonnement payant.",
+    "Non hai ancora un abbonamento a pagamento.",
+    "Henüz ücretli bir aboneliğin yok."
+  ],
+  "Abonnement aktiv": [
+    "Subscription active",
+    "Abonnement actif",
+    "Abbonamento attivo",
+    "Abonelik etkin"
+  ],
+  "Für Rechnung festgelegt": [
+    "Required for this invoice",
+    "Défini pour cette facture",
+    "Fissato per questa fattura",
+    "Bu fatura için sabit"
+  ],
   "Rapportaktionen": [
     "Report actions",
     "Actions du rapport",
@@ -17980,5 +18088,119 @@
     "Activer les notifications push sur cet appareil",
     "Attiva le notifiche push su questo dispositivo",
     "Bu cihazda anlık bildirimleri etkinleştir"
+  ],
+  "Bereit für deine erste Rechnung": [
+    "Ready for your first invoice",
+    "Prêt pour votre première facture",
+    "Pronto per la tua prima fattura",
+    "İlk faturana hazır"
+  ],
+  "Vollständige Pflichtbereiche": [
+    "Required sections complete",
+    "Sections obligatoires complètes",
+    "Sezioni obbligatorie complete",
+    "Tamamlanan zorunlu bölümler"
+  ],
+  "Rechnungsangaben": [
+    "Invoice details",
+    "Informations de facturation",
+    "Dati di fatturazione",
+    "Fatura bilgileri"
+  ],
+  "Einrichtungsbereiche": [
+    "Setup sections",
+    "Sections de configuration",
+    "Sezioni di configurazione",
+    "Kurulum bölümleri"
+  ],
+  "Vollständig": [
+    "Complete",
+    "Complet",
+    "Completo",
+    "Tamamlandı"
+  ],
+  "Ergänzen": [
+    "Complete details",
+    "Compléter",
+    "Completa",
+    "Tamamla"
+  ],
+  "Pflichtangaben für Rechnungen": [
+    "Required invoice details",
+    "Informations requises pour les factures",
+    "Dati obbligatori per le fatture",
+    "Faturalar için gerekli bilgiler"
+  ],
+  "Optional ergänzen": [
+    "Add optional details",
+    "Ajouter des informations facultatives",
+    "Aggiungi dati facoltativi",
+    "İsteğe bağlı bilgiler ekle"
+  ],
+  "QR-IBAN verwenden": [
+    "Use a QR-IBAN",
+    "Utiliser un QR-IBAN",
+    "Utilizza un QR-IBAN",
+    "QR-IBAN kullan"
+  ],
+  "Nur ausfüllen, wenn deine Bank eine QR-IBAN bereitstellt.": [
+    "Only complete this if your bank provides a QR-IBAN.",
+    "À remplir uniquement si votre banque fournit un QR-IBAN.",
+    "Compila solo se la tua banca fornisce un QR-IBAN.",
+    "Yalnızca bankan QR-IBAN sağlıyorsa doldur."
+  ],
+  "Nur ausfüllen, wenn der rechtliche Name vom Firmennamen abweicht.": [
+    "Only complete this if the legal name differs from the company name.",
+    "À remplir uniquement si la raison sociale diffère du nom de l’entreprise.",
+    "Compila solo se la ragione sociale è diversa dal nome aziendale.",
+    "Yalnızca yasal ad şirket adından farklıysa doldur."
+  ],
+  "Land (Ländercode)": [
+    "Country (country code)",
+    "Pays (code pays)",
+    "Paese (codice paese)",
+    "Ülke (ülke kodu)"
+  ],
+  "Für Rechnungen erforderlich": [
+    "Required for invoices",
+    "Requis pour les factures",
+    "Obbligatorio per le fatture",
+    "Faturalar için gerekli"
+  ],
+  "Teilstand gespeichert. Für Rechnungen fehlen noch gültige Pflichtangaben.": [
+    "Progress saved. Valid required invoice details are still missing.",
+    "Progression enregistrée. Des informations obligatoires valides manquent encore pour les factures.",
+    "Progressi salvati. Mancano ancora dati obbligatori validi per le fatture.",
+    "İlerleme kaydedildi. Faturalar için geçerli zorunlu bilgiler hâlâ eksik."
+  ],
+  "Speichern und weiter": [
+    "Save and continue",
+    "Enregistrer et continuer",
+    "Salva e continua",
+    "Kaydet ve devam et"
+  ],
+  "Angaben bestätigen": [
+    "Confirm details",
+    "Confirmer les informations",
+    "Conferma i dati",
+    "Bilgileri onayla"
+  ],
+  "Rechnungsangaben vollständig": [
+    "Invoice details complete",
+    "Informations de facturation complètes",
+    "Dati di fatturazione completi",
+    "Fatura bilgileri tamamlandı"
+  ],
+  "Deine Rechnungsangaben sind vollständig": [
+    "Your invoice details are complete",
+    "Vos informations de facturation sont complètes",
+    "I tuoi dati di fatturazione sono completi",
+    "Fatura bilgilerin tamamlandı"
+  ],
+  "Abrechnungen": [
+    "Billing statements",
+    "Décomptes",
+    "Rendiconti",
+    "Hesap dökümleri"
   ]
 }

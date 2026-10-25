@@ -836,7 +836,7 @@ try{
   if(hasInteraction('time')){
   await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
   const group=page.locator('details.time-group').first();await group.waitFor();
-  assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
+  assert.equal(await group.locator('summary strong').textContent(),'2:15 h','Grouped duration uses exact minutes and the approved explicit hour unit');
   assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
   await group.locator('summary').click();await group.locator('.time-record-list').waitFor();
   assert.equal(await group.locator('.time-record-list>div').count(),2,'Expansion shows both entries');
@@ -1211,7 +1211,8 @@ try{
    await navigate(base+route);await page.waitForLoadState('networkidle');const field=page.locator('input').first();await field.fill(route.startsWith('/einladung')?'Einladung Entwurf':'SyntheticPassword!123');await page.waitForFunction(()=>typeof history.state?.binsoDraftBoundary==='string',{},{timeout:3000});await page.goBack();const discard=page.getByRole('alertdialog');await discard.waitFor();await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.ok((await appControlValue(field)).length>0,'Auth creation drafts survive canceled browser back');await field.fill('');await page.waitForFunction(()=>!history.state?.binsoDraftBoundary,{},{timeout:3000});assert.equal(await page.getByRole('alertdialog').count(),0,'Reverting a draft removes the warning');
   }
   for(const scenario of [
-   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Kundenname *',back:'/kunden'},
+   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Kundenname *',back:'/kunden/customer-one'},
+   {group:'customers',route:'/kunden/customer-one/bearbeiten?returnTo='+encodeURIComponent('/kunden/customer-one?tab=activity'),field:'Kundenname *',back:'/kunden/customer-one?tab=activity'},
    {group:'products',route:'/produkte/product-one',menu:'Produktaktionen',field:'Name',back:'/produkte'},
    {group:'employees',route:'/mitarbeiter/employee-one',menu:'Mitarbeiteraktionen',field:'Vorname',back:'/mitarbeiter'},
   ]){
@@ -1386,7 +1387,7 @@ try{
   if(hasInteraction('billing')){
    await page.setViewportSize({width:390,height:740});
    await navigate(base+'/einstellungen/abonnement');await page.waitForLoadState('networkidle');
-   await page.locator('.invoices-panel').getByText('Noch keine Billing-Daten',{exact:true}).waitFor();
+   await page.locator('.invoices-panel').getByText('Noch keine Abrechnungen',{exact:true}).waitFor();
    assert.equal(await page.locator('.invoices-panel .document-summary-row').count(),0,'Unconnected billing never fabricates SaaS invoice history');
    const connected=route=>route.fulfill({json:{item:{plan:'pro',subscription_status:'active',account_status:'active',unit_amount_chf:129,billing_customer_ref:'synthetic-customer',billing_subscription_ref:'synthetic-subscription'}}});
    await context.route('**/api/settings/subscription',connected);await page.reload();

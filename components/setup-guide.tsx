@@ -5,13 +5,18 @@ import type {SetupGuide} from '@/lib/action-readiness';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {apiPatch} from '@/lib/client/backend';
 import {usePageAccess} from '@/lib/client/page-access';
-import {LocalizedText} from '@/lib/client/locale';
+import {LocalizedText,useTranslation} from '@/lib/client/locale';
 import {ListRow,SettingsGroup} from './binso-ux';
-import {LoadingState,ErrorState,Toggle,ProgressBar} from './ui';
+import {LoadingState,ErrorState,Toggle,ProgressBar,Icon} from './ui';
+export function SetupProgress({tasks,active}:{tasks:SetupGuide['tasks'];active?:string}){
+ const t=useTranslation();
+ const required=tasks.filter(task=>task.importance==='required'),complete=required.filter(task=>task.complete).length;
+ return <section className="bo-setup-card" aria-label={t('Rechnungsangaben')}><div className="bo-setup-card-head"><h2><LocalizedText>Bereit für deine erste Rechnung</LocalizedText></h2><span>{complete} / {required.length}</span></div><p className="settings-note"><LocalizedText>Vollständige Pflichtbereiche</LocalizedText></p><ProgressBar value={complete} max={required.length} label="Vollständige Pflichtbereiche"/><nav aria-label={t('Einrichtungsbereiche')}>{required.map(task=><Link key={task.id} href={task.href} className="setup-progress-row" aria-current={active===task.id?'step':undefined}><Icon name={task.complete?'check':'arrow'}/><LocalizedText>{task.title}</LocalizedText><span><LocalizedText>{task.complete?'Vollständig':'Ergänzen'}</LocalizedText></span></Link>)}</nav></section>;
+}
 export function SetupGuideView({item}:{item:SetupGuide}){
  const next=item.tasks.find(task=>task.importance==='required'&&!task.complete);
  if(item.dismissed||item.requiredComplete>=item.requiredTotal||!next)return null;
- return <Link href={next.href} className="bo-setup-card"><div className="bo-setup-card-head"><h2><LocalizedText>{'Einrichtung abschliessen'}</LocalizedText></h2><span>{item.requiredComplete}{' '}<LocalizedText>{'von'}</LocalizedText>{' '}{item.requiredTotal}</span></div><ProgressBar value={item.requiredComplete} max={item.requiredTotal} label="Pflichtangaben"/><div className="bo-setup-card-next"><span><LocalizedText>{next.title}</LocalizedText></span><span><LocalizedText>{'Fortsetzen'}</LocalizedText>{' ›'}</span></div></Link>;
+ return <SetupProgress tasks={item.tasks} active={next.id}/>;
 }
 export function SetupGuidePreference(){
  const {hasPermission}=usePageAccess();

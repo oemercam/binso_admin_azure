@@ -39,7 +39,8 @@ try{
  const scopedDb=moduleUrl('export const withTenant=async(_org,_user,fn)=>fn(globalThis.__readinessClient); export const query=(...args)=>globalThis.__readinessClient.query(...args)');
  const plans=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':planAccessModuleUrl,'@/config/plans':planCatalogModuleUrl,'./http':http});
  const navigation=await compile('lib/navigation.ts'),actions=await compile('lib/action-readiness.ts',{'./navigation':navigation});
- const readiness=await import(await compile('lib/server/business-readiness.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions}));
+ const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation});
+ const readiness=await import(await compile('lib/server/business-readiness.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
  const pdf=await compile('lib/server/document-pdf.ts',{'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
  const logo=moduleUrl('export async function documentLogo(){return undefined}'); // Synthetic fixture has no company logo; rendering and issuance remain real.
  const versions=await compile('lib/server/offer-versions.ts',{'./http':http,'./repositories/business-api':business,'./document-pdf':pdf,'./document-logo':logo});

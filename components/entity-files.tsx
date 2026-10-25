@@ -2,7 +2,7 @@
 import {limitsConfig} from "@/config/limits";
 import {fileSelectionError} from '@/lib/file-selection';
 import {LocalizedText} from "@/lib/client/locale";
-import {useRef,useState} from 'react';
+import {useRef,useState,useImperativeHandle,type Ref} from 'react';
 import {fileRelations} from '@/lib/file-associations';
 import {tenantCan} from '@/lib/permissions';
 import {apiDelete,apiUpload} from '@/lib/client/backend';
@@ -13,14 +13,16 @@ import {DocumentModal} from './pdf-preview';
 import ConfirmDialog from './confirm-dialog';
 
 type Attachment={id:string;createdBy?:string;fileName:string;mimeType?:string;sizeBytes?:number;createdAt?:string;scanStatus?:string};
+export type EntityFilesHandle={chooseFile:()=>void};
 
 /** Entity association is mandatory; every attachment uses the existing file API. */
-export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emptyTitle="Keine Dateien vorhanden",className=""}:{purpose:string;entityId:string;readOnly?:boolean;title?:string;emptyTitle?:string;className?:string}){
+export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emptyTitle="Keine Dateien vorhanden",className="",uploadRef}:{purpose:string;entityId:string;readOnly?:boolean;title?:string;emptyTitle?:string;className?:string;uploadRef?:Ref<EntityFilesHandle>}){
  const relation=fileRelations[purpose],input=useRef<HTMLInputElement>(null),busy=useRef(false);
  const [uploading,setUploading]=useState(false),[error,setError]=useState<string|null>(null);
  const [search,setSearch]=useState(''),[selected,setSelected]=useState<Attachment|null>(null),[preview,setPreview]=useState<Attachment|null>(null),[removing,setRemoving]=useState<Attachment|null>(null),[deleting,setDeleting]=useState(false);
  const session=useApiQuery<{user?:{id:string};tenant?:{role?:string;readOnly?:boolean}}>('/api/auth/session');
  const allowed=Boolean(!readOnly&&relation&&session.data&&!session.data.tenant?.readOnly&&tenantCan(session.data.tenant?.role??'reader',relation.write));
+ useImperativeHandle(uploadRef,()=>({chooseFile:()=>{if(allowed&&!busy.current)input.current?.click()}}),[allowed]);
  const files=useApiQuery<{items:Attachment[]}>(relation&&entityId?'/api/files?'+relation.filter+'='+encodeURIComponent(entityId):null);
  const remove=async()=>{if(!removing||busy.current)return;busy.current=true;setDeleting(true);setError(null);try{await apiDelete('/api/files/'+encodeURIComponent(removing.id));setRemoving(null);files.refresh();}catch(reason){setError(reason instanceof Error?reason.message:'Datei konnte nicht entfernt werden.');setRemoving(null);}finally{busy.current=false;setDeleting(false);}};
  const upload=async(file:File|undefined)=>{
@@ -32,7 +34,7 @@ export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emp
   finally{busy.current=false;setUploading(false);if(input.current)input.current.value='';}
  };
  if(!relation||!entityId)return null;
- return <section className={["surface",className].filter(Boolean).join(" ")}><SectionTitle title={title} action={allowed?<ActionsMenu label="Dateiaktionen" busy={uploading}><ActionRow requiresWrite icon="upload" title="Datei hinzufügen" onClick={()=>input.current?.click()}/></ActionsMenu>:undefined}/>
+ return <section className={["surface",className].filter(Boolean).join(" ")}><SectionTitle title={title} action={allowed&&!uploadRef?<ActionsMenu label="Dateiaktionen" busy={uploading}><ActionRow requiresWrite icon="upload" title="Datei hinzufügen" onClick={()=>input.current?.click()}/></ActionsMenu>:undefined}/>
   <Input ref={input} hidden type="file" accept="application/pdf,image/png,image/jpeg,image/webp,text/plain,text/csv" aria-label="Anhang auswählen" onChange={e=>{const file=e.target.files?.[0];e.target.value="";void upload(file)}}/>
   {files.loading&&<LoadingState><LocalizedText>{"Anhänge werden geladen …"}</LocalizedText></LoadingState>}
   {(error||files.error)&&<ErrorState onRetry={()=>{setError(null);files.refresh()}} retryLabel="Erneut laden"><LocalizedText>{error||files.error}</LocalizedText></ErrorState>}

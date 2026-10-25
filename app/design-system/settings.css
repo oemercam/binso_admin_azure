@@ -18,6 +18,16 @@
 .settings-list{max-width:820px;border-top:1px solid var(--color-line)}
 .settings-detail-grid{max-width:900px;display:grid;gap:18px}
 .company-setup-page{width:100%;display:grid;gap:var(--field-group-gap)}
+.setup-process{max-width:760px;display:grid;gap:var(--field-group-gap)}
+.setup-process .bo-setup-card{margin:0}
+.setup-progress-row{display:flex;align-items:center;gap:10px;min-height:44px;border-top:1px solid var(--color-line);color:var(--color-fg);text-decoration:none}
+.setup-progress-row>span:last-child{margin-left:auto;font-size:var(--type-secondary);color:var(--color-muted)}
+.setup-progress-row[aria-current=step]{color:var(--app-action-accent);font-weight:600}
+.setup-process-form{display:grid;gap:var(--field-group-gap);border-bottom:0}
+.setup-process-actions{position:sticky;bottom:0;z-index:12;background:var(--color-bg);border-top:1px solid var(--color-line);padding-block:12px}
+.setup-process-actions .mobile-sticky-save{display:flex;gap:var(--field-group-gap);margin:0;padding:0}
+.setup-process-actions .button{flex:1;min-width:0;white-space:normal;height:auto}
+@media(max-width:760px){.setup-process-actions{bottom:calc(var(--mobile-nav-h) + var(--safe-bottom))}}
 .settings-readonly{max-width:820px;border-top:1px solid var(--color-line)}
 .company-logo-card{
   min-height:86px;
