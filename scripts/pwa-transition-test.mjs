@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
+import http from 'node:http';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 function load(file,deps={}){
@@ -121,3 +122,29 @@ tree.props.value({pathname:'/produkte',title:'Produkte',active:'produkte',action
 route='/kunden';tree=renderShell();assert.equal(tree.props.children.props.actions,customerTools);assert.equal(tree.props.children.props.loading,true,'The returning toolbar is only a pending placeholder, made inert by the actual frame');
 identity='two';tree=renderShell();assert.equal(tree.props.children.props.actions,undefined,'No toolbar or private search can survive the session fence');
 console.log('Actual persistent shell: destination-specific toolbar retention, pending interaction lock and session eviction passed.');
+
+// Exercise the real fixture owner, including absolute HTTP request targets.
+{
+ const source=fs.readFileSync('scripts/loading-browser-test.mjs','utf8');
+ const ast=ts.createSourceFile('loading-browser-test.mjs',source,99,true);
+ const declaration=ast.statements.find(node=>ts.isVariableStatement(node)&&node.declarationList.declarations.some(item=>item.name.getText(ast)==='fixtureServer'));
+ assert.ok(declaration,'Exercise the actual fixture server owner');
+ let upstreamHits=0,foreignHits=0;
+ const upstreamServer=http.createServer((request,response)=>{upstreamHits++;response.end(request.url)});
+ const foreignServer=http.createServer((_request,response)=>{foreignHits++;response.end('foreign')});
+ const listen=server=>new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const close=server=>new Promise(resolve=>server.close(resolve));
+ let fixture;
+ try{
+  await listen(upstreamServer);await listen(foreignServer);
+  const upstream='http://127.0.0.1:'+upstreamServer.address().port;
+  fixture=Function('http','upstream','handleApi',declaration.getText(ast)+';return fixtureServer;')(http,upstream,null);
+  await listen(fixture);
+  for(const target of ['/kunden?lang=de','http://127.0.0.1:'+foreignServer.address().port+'/kunden?lang=de','//127.0.0.1:'+foreignServer.address().port+'/kunden?lang=de']){
+   const body=await new Promise((resolve,reject)=>{const request=http.request({hostname:'127.0.0.1',port:fixture.address().port,path:target},response=>{let body='';response.on('data',chunk=>body+=chunk);response.on('end',()=>resolve(body));});request.on('error',reject);request.end();});
+   assert.equal(body,'/kunden?lang=de','Only path/query are forwarded to the validated upstream');
+  }
+  assert.equal(upstreamHits,3);assert.equal(foreignHits,0,'Untrusted authorities never receive fixture requests');
+ }finally{if(fixture)await close(fixture);await close(upstreamServer);await close(foreignServer);}
+ console.log('Actual loading HTTP fixture: relative, absolute and protocol-relative requests retain the fixed local upstream; foreign target receives zero requests.');
+}

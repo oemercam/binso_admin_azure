@@ -18,7 +18,9 @@ const fixtureServer=http.createServer((request,response)=>{
  if(target.pathname.startsWith('/api/')&&handleApi){
   Promise.resolve(handleApi({request:()=>({url:()=>target.href}),fulfill:({status=200,json})=>{response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(json));}})).catch(()=>{if(!response.headersSent)response.writeHead(503);response.end('Synthetic API fixture failed');});return;
  }
- const forward=http.request(target,{method:request.method,headers:{...request.headers,host:new URL(upstream).host}},remote=>{response.writeHead(remote.statusCode,remote.headers);remote.pipe(response)});
+ // Absolute request targets may only supply a path, never an upstream authority.
+ const local=new URL(upstream);
+ const forward=http.request({hostname:local.hostname,port:local.port,path:target.pathname+target.search,method:request.method,headers:{...request.headers,host:local.host}},remote=>{response.writeHead(remote.statusCode,remote.headers);remote.pipe(response)});
  forward.on('error',()=>{if(!response.headersSent)response.writeHead(503);response.end('Synthetic upstream unavailable');});request.pipe(forward);
 });
 await new Promise((resolve,reject)=>{fixtureServer.once('error',reject);fixtureServer.listen(3360,'127.0.0.1',resolve)});

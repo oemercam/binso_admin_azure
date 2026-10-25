@@ -272,7 +272,7 @@ function recordGrid(columns?:number):CSSProperties|undefined{
  if(columns==null)return undefined;
  const count=Math.max(1,Math.trunc(columns));
  return {"--record-grid":count===1?'minmax(0,1fr) 25px':
-  'minmax(180px,1fr) repeat('+(count-1)+',minmax(80px,110px)) 25px'} as CSSProperties;
+  'minmax(0,1fr) repeat('+(count-1)+',minmax(80px,110px)) 25px'} as CSSProperties;
 }
 
 /** Same identity and secondary line for customer, employee and other directories. */
