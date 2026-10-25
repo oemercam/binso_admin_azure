@@ -28,3 +28,16 @@ Rulesets im sichtbaren Ruleset-Endpunkt. Der Connector unterstützt die angefrag
 Workflow-Sammlung nicht; die vorhandenen Workflow-Dateien werden lokal geprüft.
 Azure-Schreibaktionen, produktives Schema und reale Provider-/Geräteabnahme sind
 damit nicht qualifiziert.
+
+## Umsetzungsstand nach Gegenprüfung
+
+V7-01 bis V7-08 und V7-10 sind lokal korrigiert. V7-09 bleibt teilweise: die Referenznavigation ist in allen fünf Sprachen vorhanden, der globale türkische Katalog und Rechtsfreigaben sind nicht vollständig.
+
+| ID | Priorität | Nachweis | Sichere zentrale Korrektur / Status |
+|---|---|---|---|
+| V7-11 | P2 | Echter mobiler Titel: 18 px / 23,4 px; Dashboard-Override 20 px | Bestehende Layout-Owner auf V7 18/24 und Abschnitte 14/20 korrigiert. Sechs zusätzliche Token-/CSS-Verträge, bestehende Negativtests erhalten. |
+| V7-12 | P1 QA | WebKit mit aktivem Service Worker umgeht Browser-API-Mocks; gehaltene Antworten kamen tatsächlich aus dem Backend | Synthetische Antworten an den realen lokalen HTTP-Rand verlegt. Echter aktiver SW, 20 Start-/Navigationsmessfälle, keine Abschwächung der Bereitschaftsassertionen. |
+| V7-13 | P1 QA | Alte Browserverträge erwarten drei Kunden-Tabs, 13-px-Aktionszeilen und alte Menütexte; Records-Hook-Fixture kennt useSyncExternalStore nicht | Konkrete freigegebene Verträge aktualisiert, echte Unteransichten und Finanz-/Rollen-/Entwurfgegenfälle erhalten. Globale Linux-/Geräteabnahme bleibt offen. |
+| V7-14 | P1 | Auftragsdetail reicht seinen gefilterten Listenrückweg nicht an verwandte Rechnungen weiter | Gemeinsamer safeAppPath-basierter Return-Owner, genau ein returnTo, verschachtelte Kette und fremde Ziele gegengeprüft. Keine Finanz-/Rechteänderung. |
+
+Windows-Umgebung: jq fehlte; offizielles Windows-jq 1.8.2 mit veröffentlichtem SHA-256 im Workspace geprüft, unveränderte Azure-Predicate-Gegenfälle erfolgreich. Quelle: https://jqlang.org/download/ ; Hash a6fc67fedaf9128a3309a1e2ebb8b986aeccf70122ee46d2cb4849e423f0c627. Keine globale Installation. POSIX-Manifestprüfung bleibt wegen getuid/Unix-Dateirechten offen. Ein zusätzliches Linux-Node-Image wurde von der automatischen Freigabeprüfung wegen der Workspace-Laufzeitregel abgelehnt; keine Umgehung. Eine ausdrückliche Ausnahme wurde angefragt.

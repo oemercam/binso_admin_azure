@@ -59,3 +59,11 @@ allowed.clear();queries=[];const restricted=await backend.customerWorkspace(clie
 foreign=true;await assert.rejects(()=>backend.customerWorkspace(client,session,'one','hub'),error=>error.status===404);
 params=new URLSearchParams();const support=load('components/pages/support.tsx',{react,'next/navigation':routing});assert.equal(support.SupportTicketPage({ticketId:'one'}).type.name,'SupportTicketDetail');params=new URLSearchParams('view=conversation');assert.equal(support.SupportTicketPage({ticketId:'one'}).type.name,'SupportChat');
 console.log('V7 actual owners: scoped/global list boundaries, safe return/reset, eight-row hub, real bounded counts, permission/foreign-tenant negatives, one-row semantics and support detail-before-chat passed.');
+
+const filteredList='/projekte?customerId=customer-one&returnTo='+encodeURIComponent('/kunden/customer-one');
+const projectReturn=safe.withAppReturnTo('/projekte/one',filteredList);
+const relatedDocument=safe.withAppReturnTo('/rechnungen/one?returnTo=obsolete',projectReturn);
+const parsedReturn=new URL(relatedDocument,'https://fixture.invalid');assert.deepEqual(parsedReturn.searchParams.getAll('returnTo'),[projectReturn]);assert.equal(new URL(projectReturn,'https://fixture.invalid').searchParams.get('returnTo'),filteredList);
+assert.equal(new URL(safe.withAppReturnTo('/kunden/one','//foreign.invalid'),'https://fixture.invalid').searchParams.get('returnTo'),'/dashboard');
+assert.equal(new URL(safe.withAppReturnTo('/kunden/one#context','/projekte'),'https://fixture.invalid').hash,'#context');
+console.log('V7 nested return chains: customer-scoped list → project → related record, unique return parameter, fragment preservation and foreign-return denial passed.');

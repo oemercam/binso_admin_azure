@@ -110,7 +110,7 @@
 }
 .page-head h1{margin:0;font-size:var(--page-heading-size);line-height:var(--page-heading-line-height);letter-spacing:var(--page-heading-letter-spacing);font-weight:var(--workspace-title-weight)}
 @media(max-width:760px){
- .page-container:has(.bo-dashboard-overview){--page-heading-size:var(--type-subtitle);--page-heading-letter-spacing:-.3px}
+ .page-container:has(.bo-dashboard-overview){--page-heading-size:var(--workspace-title-size);--page-heading-letter-spacing:-.3px}
  .page-container:has(.bo-dashboard-overview) .page-head{margin-bottom:16px}
  .page-container:has(.bo-dashboard-overview) .page-head p{font-size:var(--type-label);line-height:1.5;margin-top:4px}
 }
@@ -591,7 +591,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .sidebar-logo .logo.logo-compact{width:28px;height:28px}
 @media (max-width:760px){
  .mobile-header{--header-content-size:18px}
- .mobile-header :is(.mobile-section-title,.mobile-header-title,.mobile-header-brand){font-size:var(--header-content-size);line-height:1.3}
+ .mobile-header :is(.mobile-section-title,.mobile-header-title,.mobile-header-brand){font-size:var(--header-content-size);line-height:var(--app-title-line-height)}
  .mobile-header :is(.icon-button,.mobile-back,.mobile-detail-actions .button)>svg{width:var(--app-header-icon-size);height:var(--app-header-icon-size);min-width:var(--app-header-icon-size);min-height:var(--app-header-icon-size)}
  .mobile-section-title{display:block;margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
  .app-root:not(.app-section-dashboard) .page-head:not(.page-head-detail) .bo-page-heading-main>h1{display:none}
@@ -643,7 +643,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 
 }
 
-@media(max-width:760px){.page-container:has(.bo-dashboard-overview)>.bo-page-heading{margin-bottom:16px}.page-container:has(.bo-dashboard-overview)>.bo-page-heading h1{font-size:var(--type-subtitle)}.page-container:has(.bo-dashboard-overview)>.bo-page-heading p{font-size:var(--type-label)}}
+@media(max-width:760px){.page-container:has(.bo-dashboard-overview)>.bo-page-heading{margin-bottom:16px}.page-container:has(.bo-dashboard-overview)>.bo-page-heading h1{font-size:var(--workspace-title-size)}.page-container:has(.bo-dashboard-overview)>.bo-page-heading p{font-size:var(--type-label)}}
 
 /* Dashboard reference keeps personal headings and information compact. */
 .page-container:has(.bo-dashboard-overview) .bo-page-heading-main{min-width:0}
@@ -657,8 +657,8 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 /* Page grid follows Master V3 without changing the protected navigation/FAB inset. */
 .app-root[data-ux="master-v3"] .page-container{padding-inline:var(--ux-page-inset);font-size:var(--body-font-size);line-height:var(--body-line-height)}
 .app-root[data-ux="master-v3"] .desktop-appbar{padding-inline:var(--ux-page-inset)}
-.app-root[data-ux="master-v3"] .page-head .bo-page-heading h1{font-size:var(--ux-page-title);line-height:1.25;font-weight:600}
-.app-root[data-ux="master-v3"] .section-title h2{font-size:var(--ux-card-title);line-height:1.35}
+.app-root[data-ux="master-v3"] .page-head .bo-page-heading h1{font-size:var(--ux-page-title);line-height:var(--app-title-line-height);font-weight:600}
+.app-root[data-ux="master-v3"] .section-title h2{font-size:var(--ux-card-title);line-height:var(--section-title-line-height)}
 .app-root[data-ux="master-v3"] .page-container[data-section="dashboard"] .bo-page-heading>p{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-label)}
 .app-root[data-ux="master-v3"] .bo-dashboard-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .app-root[data-ux="master-v3"] .bo-overview-task-grid,.app-root[data-ux="master-v3"] .bo-overview-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-block:16px;min-width:0}
@@ -676,7 +676,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 }
 
 /* Shared audit hierarchy; navigation and floating actions retain their own geometry. */
-.app-root .page-head-detail h1{font-size:var(--type-mobile-detail);line-height:1.3}
+.app-root .page-head-detail h1{font-size:var(--type-mobile-detail);line-height:var(--app-title-line-height)}
 .app-root[data-ux="master-v3"] .page-head-detail .bo-page-heading h1{font-size:var(--type-mobile-detail)}
 .bo-workspace-section>h2{font-size:var(--type-section);font-weight:600;line-height:1.3}
 

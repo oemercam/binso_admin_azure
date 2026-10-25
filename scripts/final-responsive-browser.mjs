@@ -49,9 +49,9 @@ export async function verifyFinalResponsiveSample({page,base,theme,locale,naviga
     await toggle.click();await page.waitForFunction(before=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')===before,expanded);await settle();
    }
    if(route==='/kunden/customer-one'){
-    assert.deepEqual(await page.getByRole('tab').allTextContents(),['Übersicht','Dokumente','Verlauf'].map(t),'Approved dossier has three tabs');
+    assert.equal(await page.getByRole('tab').count(),0,'V7 customer hub has no tabs');assert.deepEqual((await page.locator('.navigation-group .action-row-label').allTextContents()).map(x=>x.trim()),['Aufträge','Angebote','Rechnungen','Zahlungen','Kontakte','Dateien','Verlauf','Stammdaten'].map(t),'V7 hub preserves eight localized destinations');
     assert.equal(await page.locator('details.financial-snapshot').count(),0,'Retired customer chart is absent');
-    for(const tab of ['Dokumente','Verlauf']){await page.getByRole('tab',{name:t(tab),exact:true}).click();await settle();await inspect();await capture(page,name+'-'+tab);}
+    for(const section of ['contacts','files','activity','details']){page=await navigate(base+route+'?lang='+locale+'&section='+section);await settle();await inspect();await capture(page,name+'-'+section);}
    }
    if(route==='/rechnungen/neu'){
     const form=page.locator('.app-editing .document-entry-page');await form.waitFor();await footer(form);

@@ -21172,6 +21172,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/financial-status.ts#documentFilters",
         "lib/financial-status.ts#documentFilterStates",
         "lib/financial-status.ts#financialStatusText",
@@ -21741,6 +21742,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/financial-status.ts#documentFilters",
         "lib/financial-status.ts#documentFilterStates",
         "lib/financial-status.ts#financialStatusText",
@@ -152160,6 +152162,7 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "lib/projects.ts#projectAllowsTime",
+        "lib/navigation.ts#withAppReturnTo",
         "components/binso-ux.tsx#WorkspaceSection",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
@@ -152742,6 +152745,7 @@
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
         "lib/projects.ts#projectAllowsTime",
+        "lib/navigation.ts#withAppReturnTo",
         "components/binso-ux.tsx#WorkspaceSection",
         "components/binso-ux.tsx#MetricTiles",
         "components/binso-ux.tsx#MetricTile",
@@ -153809,32 +153813,32 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
           "tag": "form",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "component": "components/pages/projects.tsx#ProjectDetail"
         },
         {
@@ -156273,6 +156277,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/client/locale.tsx#useLocale",
         "lib/client/locale.tsx#LocaleContext",
         "components/records.tsx#useRecordsController",
@@ -156812,6 +156817,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/client/locale.tsx#useLocale",
         "lib/client/locale.tsx#LocaleContext",
         "components/records.tsx#useRecordsController",
@@ -164287,6 +164293,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/financial-status.ts#documentFilters",
         "lib/financial-status.ts#documentFilterStates",
         "lib/financial-status.ts#financialStatusText",
@@ -164856,6 +164863,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "lib/financial-status.ts#documentFilters",
         "lib/financial-status.ts#documentFilterStates",
         "lib/financial-status.ts#financialStatusText",
@@ -195502,6 +195510,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "components/records.tsx#useRecordsController",
         "components/records.tsx#RecordsColumns",
         "components/records.tsx#subscribeReadiness",
@@ -196057,6 +196066,7 @@
         "lib/client/query-snapshot.ts#writeQuerySnapshot",
         "lib/client/query-snapshot.ts#clearQuerySnapshots",
         "lib/navigation.ts#safeAppPath",
+        "lib/navigation.ts#withAppReturnTo",
         "components/records.tsx#useRecordsController",
         "components/records.tsx#RecordsColumns",
         "components/records.tsx#subscribeReadiness",
@@ -200978,7 +200988,7 @@
             "statusPlacement={headingPlacement===\"content\"?\"subtitle\":\"title\"}",
             "mobileAction={undefined}",
             "action={(headingActions||contextActions)&&allowed?<div className=\"page-actions\">{headingActions}{contextActions&&<div className=\"context-actions-inline\">{contextActions.content}</div>}</div>:undefined}",
-            "leading={!formActive?<Link scroll={false} className=\"desktop-back\" href={backHref} aria-label={backLabel}><Icon name=\"back\" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>:undefined}"
+            "leading={!formActive&&backHref?<Link scroll={false} className=\"desktop-back\" href={backHref} aria-label={backLabel}><Icon name=\"back\" size={16}/><LocalizedText>{backLabel}</LocalizedText></Link>:undefined}"
           ]
         },
         {
@@ -201679,7 +201689,7 @@
         },
         {
           "line": 375,
-          "expression": "!formActive"
+          "expression": "!formActive&&backHref"
         },
         {
           "line": 375,
@@ -222103,12 +222113,20 @@
         {
           "line": 14,
           "expression": "customerId"
-        },
-        {
-          "line": 14,
-          "expression": "href.includes('?')"
         }
       ]
+    },
+    {
+      "key": "lib/navigation.ts#withAppReturnTo",
+      "file": "lib/navigation.ts",
+      "name": "withAppReturnTo",
+      "line": 11,
+      "classes": [],
+      "apis": [],
+      "collections": [],
+      "widgets": [],
+      "elements": [],
+      "conditions": []
     },
     {
       "key": "lib/financial-status.ts#documentFilters",
@@ -265062,33 +265080,33 @@
       "widgets": [
         {
           "tag": "FormSheet",
-          "line": 56
+          "line": 57
         },
         {
           "tag": "form",
-          "line": 56
+          "line": 57
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 57
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 57
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 57
         },
         {
           "tag": "Field",
-          "line": 56
+          "line": 57
         }
       ],
       "elements": [
         {
           "tag": "AppShell",
-          "line": 49,
+          "line": 50,
           "props": [
             "title=\"Auftrag\"",
             "active=\"projekte\"",
@@ -265097,19 +265115,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 49,
+          "line": 50,
           "props": [
             "onRetry={resource.refresh}"
           ]
         },
         {
           "tag": "LoadingState",
-          "line": 49,
+          "line": 50,
           "props": []
         },
         {
           "tag": "AppShell",
-          "line": 51,
+          "line": 52,
           "props": [
             "title={item.name}",
             "titleIsUserContent",
@@ -265118,19 +265136,19 @@
             "backLabel={returnTo.startsWith(\"/kunden/\")?\"Kunde\":\"Aufträge\"}",
             "status={labels[item.status]??item.status}",
             "statusTone={item.status==='completed'?'success':item.status==='blocked'?'warning':'neutral'}",
-            "actions={<ActionsMenu label=\"Auftragsaktionen\">{access.write&&<ActionRow title=\"Bearbeiten\" icon=\"edit\" navigation requiresWrite onClick={edit}/>}{projectAllowsTime(item.status)&&<ActionRow title=\"Zeit erfassen\" icon=\"clock\" href={'/zeit?manual=1&projectId='+encodeURIComponent(id)+(item.customer_id?'&customerId='+encodeURIComponent(item.customer_id):'')} navigation/>}{item.customer_id&&<ActionRow title=\"Kunde öffnen\" icon=\"users\" href={'/kunden/'+encodeURIComponent(item.customer_id)} navigation/>}{item.source_offer&&<ActionRow title=\"Angebot öffnen\" icon=\"file\" href={'/angebote/'+encodeURIComponent(item.source_offer)} navigation/>}</ActionsMenu>}"
+            "actions={<ActionsMenu label=\"Auftragsaktionen\">{access.write&&<ActionRow title=\"Bearbeiten\" icon=\"edit\" navigation requiresWrite onClick={edit}/>}{projectAllowsTime(item.status)&&<ActionRow title=\"Zeit erfassen\" icon=\"clock\" href={withAppReturnTo('/zeit?manual=1&projectId='+encodeURIComponent(id)+(item.customer_id?'&customerId='+encodeURIComponent(item.customer_id):''),detailReturnTo)} navigation/>}{item.customer_id&&<ActionRow title=\"Kunde öffnen\" icon=\"users\" href={withAppReturnTo('/kunden/'+encodeURIComponent(item.customer_id),detailReturnTo)} navigation/>}{item.source_offer&&<ActionRow title=\"Angebot öffnen\" icon=\"file\" href={withAppReturnTo('/angebote/'+encodeURIComponent(item.source_offer),detailReturnTo)} navigation/>}</ActionsMenu>}"
           ]
         },
         {
           "tag": "ActionsMenu",
-          "line": 51,
+          "line": 52,
           "props": [
             "label=\"Auftragsaktionen\""
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 51,
+          "line": 52,
           "props": [
             "title=\"Bearbeiten\"",
             "icon=\"edit\"",
@@ -265141,110 +265159,110 @@
         },
         {
           "tag": "ActionRow",
-          "line": 51,
+          "line": 52,
           "props": [
             "title=\"Zeit erfassen\"",
             "icon=\"clock\"",
-            "href={'/zeit?manual=1&projectId='+encodeURIComponent(id)+(item.customer_id?'&customerId='+encodeURIComponent(item.customer_id):'')}",
+            "href={withAppReturnTo('/zeit?manual=1&projectId='+encodeURIComponent(id)+(item.customer_id?'&customerId='+encodeURIComponent(item.customer_id):''),detailReturnTo)}",
             "navigation"
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 51,
+          "line": 52,
           "props": [
             "title=\"Kunde öffnen\"",
             "icon=\"users\"",
-            "href={'/kunden/'+encodeURIComponent(item.customer_id)}",
+            "href={withAppReturnTo('/kunden/'+encodeURIComponent(item.customer_id),detailReturnTo)}",
             "navigation"
           ]
         },
         {
           "tag": "ActionRow",
-          "line": 51,
+          "line": 52,
           "props": [
             "title=\"Angebot öffnen\"",
             "icon=\"file\"",
-            "href={'/angebote/'+encodeURIComponent(item.source_offer)}",
+            "href={withAppReturnTo('/angebote/'+encodeURIComponent(item.source_offer),detailReturnTo)}",
             "navigation"
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "dl",
-          "line": 52,
+          "line": 53,
           "props": [
             "className=\"detail-list\""
           ]
         },
         {
           "tag": "div",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 52,
+          "line": 53,
           "props": [
             "translate=\"no\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "div",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "dt",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "dd",
-          "line": 52,
+          "line": 53,
           "props": []
         },
         {
           "tag": "p",
-          "line": 52,
+          "line": 53,
           "props": [
             "translate=\"no\""
           ]
         },
         {
           "tag": "MetricTiles",
-          "line": 53,
+          "line": 54,
           "props": [
             "columns={2}"
           ]
         },
         {
           "tag": "MetricTile",
-          "line": 53,
+          "line": 54,
           "props": [
             "label=\"Arbeitszeit\"",
             "value={formatMinutes(Number(data.totals.hours)*60)+' h'}"
@@ -265252,7 +265270,7 @@
         },
         {
           "tag": "MetricTile",
-          "line": 53,
+          "line": 54,
           "props": [
             "label=\"Verrechnet\"",
             "value={formatMinutes(Number(data.totals.invoiced_hours)*60)+' h'}"
@@ -265260,26 +265278,26 @@
         },
         {
           "tag": "WorkspaceSection",
-          "line": 54,
+          "line": 55,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 54,
+          "line": 55,
           "props": [
             "title=\"Letzte Zeiteinträge\""
           ]
         },
         {
           "tag": "div",
-          "line": 54,
+          "line": 55,
           "props": [
             "className=\"time-record-list\""
           ]
         },
         {
           "tag": "TimeEntryRow",
-          "line": 54,
+          "line": 55,
           "props": [
             "key={entry.id}",
             "title={entry.description||\"—\"}",
@@ -265289,50 +265307,50 @@
         },
         {
           "tag": "EmptyState",
-          "line": 54,
+          "line": 55,
           "props": [
             "title=\"Keine Zeiteinträge\""
           ]
         },
         {
           "tag": "WorkspaceSection",
-          "line": 55,
+          "line": 56,
           "props": []
         },
         {
           "tag": "SectionTitle",
-          "line": 55,
+          "line": 56,
           "props": [
             "title=\"Rechnungen\""
           ]
         },
         {
           "tag": "div",
-          "line": 55,
+          "line": 56,
           "props": [
             "className=\"records\""
           ]
         },
         {
           "tag": "DocumentSummaryRow",
-          "line": 55,
+          "line": 56,
           "props": [
             "key={invoice.number}",
             "item={invoice}",
             "compact",
-            "returnTo={'/projekte/'+encodeURIComponent(id)}"
+            "returnTo={detailReturnTo}"
           ]
         },
         {
           "tag": "EmptyState",
-          "line": 55,
+          "line": 56,
           "props": [
             "title=\"Keine Rechnungen\""
           ]
         },
         {
           "tag": "FormSheet",
-          "line": 56,
+          "line": 57,
           "props": [
             "label=\"Auftrag bearbeiten\"",
             "dirty={editDirty}",
@@ -265343,28 +265361,28 @@
         },
         {
           "tag": "form",
-          "line": 56,
+          "line": 57,
           "props": [
             "onSubmit={event=>{event.preventDefault();void save()}}"
           ]
         },
         {
           "tag": "div",
-          "line": 56,
+          "line": 57,
           "props": [
             "className=\"form-grid\""
           ]
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "props": [
             "label=\"Bezeichnung\""
           ]
         },
         {
           "tag": "Input",
-          "line": 56,
+          "line": 57,
           "props": [
             "required",
             "minLength={2}",
@@ -265376,14 +265394,14 @@
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "props": [
             "label=\"Status\""
           ]
         },
         {
           "tag": "Select",
-          "line": 56,
+          "line": 57,
           "props": [
             "disabled={busy}",
             "value={draft.status}",
@@ -265392,7 +265410,7 @@
         },
         {
           "tag": "option",
-          "line": 56,
+          "line": 57,
           "props": [
             "key={key}",
             "value={key}"
@@ -265400,19 +265418,19 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 57,
           "props": []
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "props": [
             "label=\"Stundenbudget\""
           ]
         },
         {
           "tag": "Input",
-          "line": 56,
+          "line": 57,
           "props": [
             "type=\"number\"",
             "min=\"0\"",
@@ -265426,14 +265444,14 @@
         },
         {
           "tag": "Field",
-          "line": 56,
+          "line": 57,
           "props": [
             "label=\"Notizen\""
           ]
         },
         {
           "tag": "Textarea",
-          "line": 56,
+          "line": 57,
           "props": [
             "maxLength={10000}",
             "disabled={busy}",
@@ -265443,19 +265461,19 @@
         },
         {
           "tag": "ErrorState",
-          "line": 56,
+          "line": 57,
           "props": []
         },
         {
           "tag": "FormActions",
-          "line": 56,
+          "line": 57,
           "props": [
             "sheet"
           ]
         },
         {
           "tag": "Button",
-          "line": 56,
+          "line": 57,
           "props": [
             "variant=\"secondary\"",
             "disabled={busy}",
@@ -265464,12 +265482,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 57,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 56,
+          "line": 57,
           "props": [
             "requiresWrite",
             "disabled={busy||!recovery.ready}",
@@ -265478,61 +265496,65 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 56,
+          "line": 57,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 42,
+          "line": 38,
+          "expression": "params.toString()"
+        },
+        {
+          "line": 43,
           "expression": "item"
         },
         {
-          "line": 45,
+          "line": 46,
           "expression": "!value||value.version!==item?.version||[value.name,value.status,value.notes,value.hoursBudget].some(field=>typeof field!=='string'||field.length>10000)"
         },
         {
-          "line": 48,
+          "line": 49,
           "expression": "pending.current||!draft||!recovery.ready"
         },
         {
-          "line": 48,
+          "line": 49,
           "expression": "error instanceof Error"
         },
         {
-          "line": 49,
+          "line": 50,
           "expression": "!item"
         },
         {
-          "line": 49,
+          "line": 50,
           "expression": "resource.error"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "returnTo.startsWith(\"/kunden/\")"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "item.status==='completed'"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "item.status==='blocked'"
         },
         {
-          "line": 51,
+          "line": 52,
           "expression": "item.customer_id"
         },
         {
-          "line": 54,
+          "line": 55,
           "expression": "data.time.length"
         },
         {
-          "line": 55,
+          "line": 56,
           "expression": "data.invoices.length"
         },
         {
-          "line": 56,
+          "line": 57,
           "expression": "busy"
         }
       ]
@@ -285605,6 +285627,16 @@
           "important": false
         },
         {
+          "property": "--app-title-line-height",
+          "value": "24px",
+          "important": false
+        },
+        {
+          "property": "--section-title-line-height",
+          "value": "20px",
+          "important": false
+        },
+        {
           "property": "--mobile-title-tracking",
           "value": "-.8px",
           "important": false
@@ -286799,7 +286831,7 @@
     {
       "id": 1,
       "file": "app/design-system/theme.css",
-      "line": 268,
+      "line": 270,
       "selector": ":root",
       "context": "@media (display-mode:standalone)",
       "declarations": [
@@ -286818,7 +286850,7 @@
     {
       "id": 2,
       "file": "app/design-system/theme.css",
-      "line": 273,
+      "line": 275,
       "selector": "html[data-theme=\"dark\"]",
       "context": "",
       "declarations": [
@@ -287067,7 +287099,7 @@
     {
       "id": 3,
       "file": "app/design-system/theme.css",
-      "line": 324,
+      "line": 326,
       "selector": ":root",
       "context": "@media (prefers-reduced-motion:reduce)",
       "declarations": [
@@ -287091,7 +287123,7 @@
     {
       "id": 4,
       "file": "app/design-system/theme.css",
-      "line": 325,
+      "line": 327,
       "selector": "html",
       "context": "@media (prefers-reduced-motion:reduce)",
       "declarations": [
@@ -287105,7 +287137,7 @@
     {
       "id": 5,
       "file": "app/design-system/theme.css",
-      "line": 328,
+      "line": 330,
       "selector": ":root",
       "context": "@media (min-width:761px) and (max-width:1100px)",
       "declarations": [
@@ -287124,7 +287156,7 @@
     {
       "id": 6,
       "file": "app/design-system/theme.css",
-      "line": 331,
+      "line": 333,
       "selector": ":root",
       "context": "@media (min-width:761px)",
       "declarations": [
@@ -287168,7 +287200,7 @@
     {
       "id": 7,
       "file": "app/design-system/theme.css",
-      "line": 342,
+      "line": 344,
       "selector": ":root",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -287182,7 +287214,7 @@
     {
       "id": 8,
       "file": "app/design-system/theme.css",
-      "line": 347,
+      "line": 349,
       "selector": ":root",
       "context": "@media (max-height:520px) and (orientation:landscape)",
       "declarations": [
@@ -287196,7 +287228,7 @@
     {
       "id": 9,
       "file": "app/design-system/theme.css",
-      "line": 350,
+      "line": 352,
       "selector": ":root",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -287210,7 +287242,7 @@
     {
       "id": 10,
       "file": "app/design-system/theme.css",
-      "line": 354,
+      "line": 356,
       "selector": ":root",
       "context": "@media (pointer:coarse)",
       "declarations": [
@@ -287239,7 +287271,7 @@
     {
       "id": 11,
       "file": "app/design-system/theme.css",
-      "line": 359,
+      "line": 361,
       "selector": ":root",
       "context": "",
       "declarations": [
@@ -287288,7 +287320,7 @@
     {
       "id": 12,
       "file": "app/design-system/theme.css",
-      "line": 369,
+      "line": 371,
       "selector": ".app-root[data-ux=\"master-v3\"]",
       "context": "",
       "declarations": [
@@ -287342,7 +287374,7 @@
     {
       "id": 13,
       "file": "app/design-system/theme.css",
-      "line": 381,
+      "line": 383,
       "selector": ".app-root[data-ux=\"master-v3\"]",
       "context": "@media (max-width:760px)",
       "declarations": [
@@ -287371,7 +287403,7 @@
     {
       "id": 14,
       "file": "app/design-system/theme.css",
-      "line": 384,
+      "line": 386,
       "selector": ".app-root[data-ux=\"master-v3\"]",
       "context": "@media (min-width:761px) and (max-width:1199px)",
       "declarations": [
@@ -287390,7 +287422,7 @@
     {
       "id": 15,
       "file": "app/design-system/theme.css",
-      "line": 386,
+      "line": 388,
       "selector": ".app-root[data-ux=\"master-v3\"]",
       "context": "@media (min-width:1920px)",
       "declarations": [
@@ -294418,7 +294450,7 @@
       "declarations": [
         {
           "property": "--page-heading-size",
-          "value": "var(--type-subtitle)",
+          "value": "var(--workspace-title-size)",
           "important": false
         },
         {
@@ -299119,7 +299151,7 @@
         },
         {
           "property": "line-height",
-          "value": "1.3",
+          "value": "var(--app-title-line-height)",
           "important": false
         }
       ]
@@ -299935,7 +299967,7 @@
       "declarations": [
         {
           "property": "font-size",
-          "value": "var(--type-subtitle)",
+          "value": "var(--workspace-title-size)",
           "important": false
         }
       ]
@@ -300102,7 +300134,7 @@
         },
         {
           "property": "line-height",
-          "value": "1.25",
+          "value": "var(--app-title-line-height)",
           "important": false
         },
         {
@@ -300126,7 +300158,7 @@
         },
         {
           "property": "line-height",
-          "value": "1.35",
+          "value": "var(--section-title-line-height)",
           "important": false
         }
       ]
@@ -300394,7 +300426,7 @@
         },
         {
           "property": "line-height",
-          "value": "1.3",
+          "value": "var(--app-title-line-height)",
           "important": false
         }
       ]
@@ -307025,7 +307057,7 @@
         },
         {
           "property": "gap",
-          "value": "12px",
+          "value": "var(--space-12)",
           "important": false
         },
         {
