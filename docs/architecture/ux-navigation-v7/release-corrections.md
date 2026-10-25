@@ -75,3 +75,18 @@ mobile reference widths and both themes, including compliance measurements.
 These local checks do not replace all mandatory fresh CI gates.
 This follow-up changes tests/documentation only, with unchanged application and
 migration source relative to approved `3aa8b4c1` / `a56def1b`.
+
+## Atomic shared target measurements
+
+Run `40206653613` subsequently exposed the same asynchronous locator pattern in
+`assertMobileHeaderTargets`: a visible nth-locator list changed before separate
+bounding-box calls, yielding null instead of a measured undersized target.
+Header and chat target geometry now use the existing DOM-snapshot pattern in
+one browser task. The visible selectors, 44-px minima, minimum two chat controls,
+finite-animation guard and negative controls remain unchanged. No retry or
+ignored error is introduced. Local Chromium passes 24 dashboard/project cases
+over six mobile widths and both themes, including the real 18-px header negative
+control; complete chat interactions pass both themes, including the real 40-px
+chat negative control and draft/viewport/send-error/retry checks.
+Application and migration source remain identical to the approved application.
+Fresh mandatory CI and exact-SHA approval still apply to this test-only follow-up.

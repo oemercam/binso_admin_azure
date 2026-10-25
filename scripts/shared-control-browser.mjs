@@ -167,19 +167,21 @@ async function verifyAnimationStabilityRegression(page){
 export async function assertMobileHeaderTargets(page){
  await waitForFiniteAnimations(page);
  const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back').filter({visible:true});
- for(const target of await targets.all()){
-  const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify({label:await target.getAttribute('aria-label'),width:box.width,height:box.height}));
+ // Hydration may replace the header between awaited nth-locator operations.
+ // Snapshot the same visible targets and all their dimensions in one DOM task.
+ const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
+ for(const box of measured){
+  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify(box));
  }
  return targets;
 }
 
 export async function assertChatTargets(page){
  const targets=page.locator('.thread-composer>label,.thread-composer>button').filter({visible:true});
- assert.ok(await targets.count()>=2,'Chat exposes attachment and send controls');
- for(const target of await targets.all()){
-  const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,`Chat actions retain at least 44px touch targets (${await target.getAttribute('aria-label')}: ${box.width}×${box.height})`);
+ const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
+ assert.ok(measured.length>=2,'Chat exposes attachment and send controls');
+ for(const box of measured){
+  assert.ok(box.width>=44&&box.height>=44,`Chat actions retain at least 44px touch targets (${box.label}: ${box.width}×${box.height})`);
  }
 }
 
