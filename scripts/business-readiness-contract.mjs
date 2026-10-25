@@ -13,6 +13,9 @@ export async function verifyBusinessReadiness({service,sql,transaction,session,c
    if(['owner','admin'].includes(role)){const guide=await run((c,s)=>service.readSetupGuide(c,s),{...actor,role});assert.equal(guide.requiredComplete,3);assert.ok(guide.tasks.every(task=>typeof task.complete==='boolean'));assert.ok(!JSON.stringify(guide).includes('CH9300'),'Metadata must not disclose account values');}
    else await assert.rejects(()=>run((c,s)=>service.readSetupGuide(c,s),{...actor,role}),error=>error.status===403);
   }
+  let guideQueries=0;
+  await run((c,s)=>service.readSetupGuide({query:(text,args)=>{guideQueries++;return c.query(text,args);}},s));
+  assert.equal(guideQueries,1,'Dashboard setup guide uses one scoped round trip without a permission or preference cache');
   assert.equal((await run((c,s)=>service.readSetupGuide(c,s),{...actor,organizationStatus:'read_only'})).editable,false);
   await assert.rejects(()=>run((c,s)=>service.setSetupGuideDismissed(c,s,true),{...actor,organizationStatus:'read_only'}),e=>e.status===403);
   await assert.rejects(()=>run((c,s)=>service.setSetupGuideDismissed(c,s,true),{...actor,isDemo:true}),e=>e.status===403);

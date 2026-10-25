@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {moduleUrl} from './data-test-modules.mjs';
+import ts from 'typescript';
+import {createRequire} from 'node:module';
 const {timeEntryStatus}=await import(moduleUrl(await fs.readFile('lib/time-entry-status.ts','utf8')));
 const {filterTimeEntries,timeEntryQuery}=await import(moduleUrl(await fs.readFile('lib/time-entry-filter.ts','utf8')));
 const fixtures=[
@@ -18,5 +20,14 @@ for(const [status,ids,api]of [['Erfasst',['recorded','internal'],'recorded'],['Z
  assert.equal(timeEntryQuery({...filter,status}).get('status'),api,'Actual remote and local filters name the same states');
 }
 assert.equal(timeEntryStatus({review_note:'  '}),'Erfasst');
+// Execute the actual employee-row JSX, so a second inline status mapping cannot regress.
+{
+ const source=await fs.readFile('components/pages/employees.tsx','utf8'),ast=ts.createSourceFile('employees.tsx',source,99,true,ts.ScriptKind.TSX),rows=[];
+ const visit=node=>{if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='TimeEntryRow')rows.push(node);ts.forEachChild(node,visit);};visit(ast);
+ assert.equal(rows.length,1);const actual={};
+ const compiled=ts.transpileModule('export function ActualEmployeeRow({item}){return '+rows[0].getText(ast)+';}',{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ Function('exports','require','TimeEntryRow','timeEntryStatus','swissDate','timeMetadata','formatMinutes','localeTags','locale',compiled)(actual,createRequire(import.meta.url),()=>null,timeEntryStatus,()=>'',()=>'',()=>'',{de:'de-CH'},'de');
+ assert.deepEqual(fixtures.map(item=>actual.ActualEmployeeRow({item}).props.status),fixtures.map(timeEntryStatus),'Employee details and time workspace show identical review evidence, including internal and resubmitted time');
+}
 assert.deepEqual(filterTimeEntries(fixtures,{...filter,status:'Zur Prüfung'}),filterTimeEntries(fixtures,{...filter,status:'Eingereicht'}),'Existing submitted deep-link label stays compatible');
 console.log('Phase 1 time statuses: actual review evidence, resubmission precedence, disjoint states, internal classification and remote/local filter correspondence passed.');

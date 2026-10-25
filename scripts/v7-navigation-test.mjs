@@ -8,7 +8,7 @@ const require=createRequire(import.meta.url);
 const dummy=new Proxy(()=>null,{get:()=>()=>null});
 function load(file,deps={}){const result={};Function('require','exports',ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,target:ts.ScriptTarget.ES2022}}).outputText)(name=>Object.hasOwn(deps,name)?deps[name]:name==='react/jsx-runtime'?require(name):dummy,result);return result;}
 const navigation=load('config/workspace-navigation.ts');
-assert.deepEqual(navigation.moreNavigation[0].items.map(item=>item.href),['/angebote','/rechnungen','/zahlungen','/spesen','/finanzen']);
+assert.deepEqual(navigation.moreNavigation[0].items.map(item=>item.href),['/angebote','/rechnungen','/zahlungen','/spesen','/finanzen','/produkte','/lieferanten','/vertraege']);
 assert.equal(navigation.mainNavigation.length,4);assert.equal(navigation.primaryNavigationSection('/kunden/one'),'kunden');
 
 let params=new URLSearchParams('customerId=customer-one&returnTo=%2Fkunden%2Fcustomer-one&q=kept&status=Offen'),path='/rechnungen',destination,readPath;

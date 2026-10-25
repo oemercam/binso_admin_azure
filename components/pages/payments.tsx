@@ -1,7 +1,8 @@
 "use client";
 import {DirectorySelect} from "../directory-select";
 import {ContextActions} from "../binso-ux";
-import {LocalizedText,useTranslation} from "@/lib/client/locale";
+import {localeTags} from '@/lib/locales/config';
+import {LocalizedText,useTranslation,useLocale} from "@/lib/client/locale";
 import {safeAppPath} from "@/lib/navigation";
 
 import { FinancialSummaryRow, FinanceTabs } from "../document-list";
@@ -104,6 +105,7 @@ export function PaymentForm() {
 }
 
 export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
+  const {locale}=useLocale();
 
   const returnTo=safeAppPath(useSearchParams().get("returnTo"),"/zahlungen");
   const {data,error:paymentError}=useApiQuery<{item:Record<string,unknown>}>("/api/payments/"+encodeURIComponent(paymentId));
@@ -120,8 +122,8 @@ export function PaymentDetail({paymentId="1"}:{paymentId?:string}) {
   return <AppShell title="Zahlung" subtitle={[invoice?.number,customer?.name].filter(Boolean).join(" · ")} active="zahlungen" backHref={returnTo} backLabel={returnTo.startsWith("/kunden/")?"Kunde":"Zahlungen"}>
     <div className="entity-detail-workspace">
 
-      <div className="desktop-detail-main"><div className="payment-detail-summary"><h2>{formatCurrency(Number(payment.amount??0),String(payment.currency??"CHF"))}</h2><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}><LocalizedText>{statusLabel[status]??status}</LocalizedText></Status></div>
-      <section className="surface detail-card"><dl className="detail-list"><div><dt><LocalizedText>{"Datum"}</LocalizedText></dt><dd>{swissDate(payment.paid_on)}</dd></div><div><dt><LocalizedText>{"Rechnung"}</LocalizedText></dt><dd>{invoice?.number?<AccessLink fallback={invoice.number} href={"/rechnungen/"+encodeURIComponent(invoice.number)}>{invoice.number}</AccessLink>:(invoice?.number??"—")}</dd></div><div><dt><LocalizedText>{"Kunde"}</LocalizedText></dt><dd>{payment.customer_id?<AccessLink fallback={customer?.name??"Kunde"} href={"/kunden/"+encodeURIComponent(String(payment.customer_id))}><LocalizedText verbatim={!!customer?.name}>{customer?.name??"Kunde"}</LocalizedText></AccessLink>:(customer?.name??"—")}</dd></div><div><dt><LocalizedText>{"Zahlungsart"}</LocalizedText></dt><dd>{paymentMethodLabel(payment.method)}</dd></div>{Boolean(payment.note)&&<div><dt><LocalizedText>{/^RF[- ]/i.test(String(payment.note))?"Referenz":"Notiz"}</LocalizedText></dt><dd>{String(payment.note).replace(/DEMO-/gi,"")}</dd></div>}</dl></section></div>
+      <div className="desktop-detail-main"><div className="payment-detail-summary"><h2>{formatCurrency(Number(payment.amount??0),String(payment.currency??"CHF"),localeTags[locale])}</h2><Status tone={status==="booked"?"success":status==="reversed"?"danger":"warning"}><LocalizedText>{statusLabel[status]??status}</LocalizedText></Status></div>
+      <section className="surface detail-card"><dl className="detail-list"><div><dt><LocalizedText>{"Datum"}</LocalizedText></dt><dd>{swissDate(payment.paid_on,localeTags[locale])}</dd></div><div><dt><LocalizedText>{"Rechnung"}</LocalizedText></dt><dd>{invoice?.number?<AccessLink fallback={invoice.number} href={"/rechnungen/"+encodeURIComponent(invoice.number)}>{invoice.number}</AccessLink>:(invoice?.number??"—")}</dd></div><div><dt><LocalizedText>{"Kunde"}</LocalizedText></dt><dd>{payment.customer_id?<AccessLink fallback={customer?.name??"Kunde"} href={"/kunden/"+encodeURIComponent(String(payment.customer_id))}><LocalizedText verbatim={!!customer?.name}>{customer?.name??"Kunde"}</LocalizedText></AccessLink>:(customer?.name??"—")}</dd></div><div><dt><LocalizedText>{"Zahlungsart"}</LocalizedText></dt><dd><LocalizedText>{paymentMethodLabel(payment.method)}</LocalizedText></dd></div>{Boolean(payment.note)&&<div><dt><LocalizedText>{/^RF[- ]/i.test(String(payment.note))?"Referenz":"Notiz"}</LocalizedText></dt><dd>{String(payment.note).replace(/DEMO-/gi,"")}</dd></div>}</dl></section></div>
       <ContextActions><section className="context-action-group"><span className="compact-section-label"><LocalizedText>{"Zugehörig"}</LocalizedText></span>{invoice?.number&&<AccessLink href={"/rechnungen/"+encodeURIComponent(invoice.number)}><Icon name="receipt"/><span><b><LocalizedText>{"Rechnung öffnen"}</LocalizedText></b><small>{invoice.number}</small></span><Icon name="arrow" size={15}/></AccessLink>}<AccessLink href={payment.customer_id?"/kunden/"+encodeURIComponent(String(payment.customer_id)):"/kunden"}><Icon name="users"/><span><b><LocalizedText>{payment.customer_id?"Kunde öffnen":"Kundenübersicht"}</LocalizedText></b><small><LocalizedText verbatim={!!customer?.name}>{customer?.name??"Kunde"}</LocalizedText></small></span><Icon name="arrow" size={15}/></AccessLink><AccessLink href="/zahlungen"><Icon name="wallet"/><span><b><LocalizedText>{"Alle Zahlungen"}</LocalizedText></b><small><LocalizedText>{"Zahlungsverlauf öffnen"}</LocalizedText></small></span><Icon name="arrow" size={15}/></AccessLink></section></ContextActions>
     </div>
   </AppShell>;

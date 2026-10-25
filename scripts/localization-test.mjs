@@ -1,10 +1,13 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {matchesLocalizedRoute} from './localized-route-contract.mjs';
-for(const locale of ['de','fr','it','en']){
+import {translationCoverage} from './full-app-audit-report.mjs';
+assert.equal(translationCoverage({messages:{Beispiel:['English','Français','Italiano']}}).tr.complete,false,'Three existing translations never qualify Turkish');
+assert.equal(translationCoverage({messages:{Beispiel:['English','Français','Italiano','Türkçe']},plurals:{Zeilen:{tr:{one:'satır',other:'satır'}}}}).tr.complete,true,'Actual Turkish text and plural forms qualify catalogue availability only');
+for(const locale of ['de','fr','it','en','tr']){
  const target='https://fixture.invalid/kunden?page=2';
  for(const actual of [target,target+'&lang='+locale])assert.equal(matchesLocalizedRoute(actual,target,locale),true);
- for(const actual of ['https://foreign.invalid/kunden?page=2','https://fixture.invalid/kunden/other?page=2',target+'&extra=1',target+'&lang='+(locale==='en'?'fr':'en'),target+'&lang=tr',target+'&lang='+locale+'&lang='+locale,target+'#other','https://fixture.invalid/kunden?page=1'])assert.equal(matchesLocalizedRoute(actual,target,locale),false,'Language reflection must not hide a different route/query: '+actual);
+ for(const actual of ['https://foreign.invalid/kunden?page=2','https://fixture.invalid/kunden/other?page=2',target+'&extra=1',target+'&lang='+(locale==='en'?'fr':'en'),target+'&lang=ja',target+'&lang='+locale+'&lang='+locale,target+'#other','https://fixture.invalid/kunden?page=1'])assert.equal(matchesLocalizedRoute(actual,target,locale),false,'Language reflection must not hide a different route/query: '+actual);
 }
 import {createRequire} from 'node:module';
 import ts from 'typescript';
@@ -43,6 +46,10 @@ for(const [language,unit] of [['de','Std.'],['en','hr'],['fr','h'],['it','ore']]
  const tag=config.localeTags[language],translate=value=>locale.translateMessage(value,language),options={locale:tag,translateUnit:translate};
  const row=sharedRows.mapRemoteRows('products',[productFixture],options)[0];
  assert.equal(row[0],'Stück','Actual product names remain verbatim even when matching a catalogue key');
+ assert.equal(row[1],translate('Produkt'),'Data-driven product types use the selected language');
+ const payment=sharedRows.mapRemoteRows('payments',[{id:'payment',paid_on:'2026-01-02',customer:{name:'Kunde'},method:'bank',amount:1,status:'booked'}],options)[0];
+ assert.equal(payment[2],'Kunde','Actual customer name is preserved even when it matches a UI label');assert.equal(payment[3],translate('Banküberweisung'),'Payment method is translated before joining user-authored references');
+ assert.equal(sharedRows.swissDate('2026-01-02',tag),financialDates.formatDate('2026-01-02',tag));
  assert.equal(row[2],'CHF '+Number(productFixture.unit_price).toLocaleString(tag,{minimumFractionDigits:2,maximumFractionDigits:2})+' / '+unit,'Actual remote rows use locale numbers and translated standard units');
  assert.equal(sharedRows.mapRemoteRows('employees',[{id:'fixture-employee',first_name:'Tag',last_name:'Jahr',workload_percent:'83.75'}],options)[0][2],Number('83.75').toLocaleString(tag)+' %');
  assert.equal(timestampDates.withPriceUnit('CHF 10','Stück',translate),'CHF 10 / Stück','Custom units remain user content even when they collide with a translated label');
@@ -118,14 +125,26 @@ const uiAst=ts.createSourceFile('ui.tsx',fs.readFileSync('components/ui.tsx','ut
 const toggleSource=uiAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='Toggle').getText(uiAst);
 Function('require','exports','LocalizedElement',ts.transpileModule(toggleSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,toggleExports,client.LocalizedElement);
 const settingsAst=ts.createSourceFile('settings.tsx',fs.readFileSync('components/pages/settings.tsx','utf8'),99,true,4),notificationExports={};
-const notificationSource=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage').getText(settingsAst);
+const notificationNode=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage');
+const notificationSource=notificationNode.getText(settingsAst);
+const notificationStateDeclarations=notificationNode.body.statements.filter(ts.isVariableStatement).flatMap(statement=>[...statement.declarationList.declarations]).filter(declaration=>ts.isCallExpression(declaration.initializer)&&declaration.initializer.expression.getText(settingsAst)==='useState');
+const readyStateIndex=notificationStateDeclarations.findIndex(declaration=>ts.isArrayBindingPattern(declaration.name)&&declaration.name.elements[0].name.getText(settingsAst)==='ready');
+assert.ok(readyStateIndex>=0,'The actual notification owner declares its loading boundary');
+assert.equal(notificationStateDeclarations[readyStateIndex].initializer.arguments[0].kind,ts.SyntaxKind.FalseKeyword,'Notifications start unconfirmed');
+let notificationStateIndex=0,confirmedNotificationRender=false;
+const useNotificationState=initial=>React.useState(notificationStateIndex++===readyStateIndex?confirmedNotificationRender:initial);
 const wrapper=({children})=>React.createElement('div',null,children);
 const rowSource=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),99,true,4).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ListRow').getText();
 const rowExports={};Function('require','exports','LocalizedText','Status','Icon','Link',ts.transpileModule(rowSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,rowExports,client.LocalizedText,()=>null,()=>null,wrapper);
 const pushDevice=compile('components/push-device-settings.tsx',{'react':React,'@/lib/client/locale':client,'@/lib/client/backend':{},'./ui':{Button:wrapper,ErrorState:wrapper,LoadingState:wrapper}});
 const preferenceCount=compile('config/notification-channels.ts').notificationPreferenceKinds.length;
-Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','PushDeviceSettings',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,pushDevice.PushDeviceSettings);
+Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','PushDeviceSettings',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,useNotificationState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,pushDevice.PushDeviceSettings);
 for(const language of config.locales){
+ notificationStateIndex=0;confirmedNotificationRender=false;
+ const pending=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
+ assert.doesNotMatch(pending,/role="switch"/,'Unconfirmed defaults never appear as saved notification settings');
+ assert.ok(pending.includes(locale.translateMessage('Einstellungen werden geladen …',language)),'The pending state retains its localized announcement');
+ notificationStateIndex=0;confirmedNotificationRender=true;
  const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
  const labels=new Map([...markup.matchAll(/<(?:b|span) id="([^"]+)">([^<]+)<\/(?:b|span)>/g)].map(match=>[match[1],match[2]]));
  const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,preferenceCount);

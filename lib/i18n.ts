@@ -1,6 +1,9 @@
 export type MailLocale="de"|"en"|"fr"|"it"|"tr";
 
 const messages={
+ "Einladung zu Binso One":{en:"Invitation to Binso One",fr:"Invitation à Binso One",it:"Invito a Binso One",tr:"Binso One daveti"},
+ "Du wurdest zu einem Binso One Firmenkonto eingeladen.":{en:"You have been invited to a Binso One company account.",fr:"Vous avez reçu une invitation à un compte d’entreprise Binso One.",it:"Hai ricevuto un invito a un account aziendale Binso One.",tr:"Bir Binso One şirket hesabına davet edildiniz."},
+ "Einladung annehmen":{en:"Accept invitation",fr:"Accepter l’invitation",it:"Accetta invito",tr:"Daveti kabul et"},
  "E-Mail für Binso One bestätigen":{en:"Confirm your email for Binso One",fr:"Confirmez votre e-mail pour Binso One",it:"Conferma la tua e-mail per Binso One",tr:"Binso One için e-postanızı doğrulayın"},
  "Bitte bestätige deine E-Mail-Adresse:":{en:"Please confirm your email address:",fr:"Veuillez confirmer votre adresse e-mail :",it:"Conferma il tuo indirizzo e-mail:",tr:"Lütfen e-posta adresinizi doğrulayın:"},
  "E-Mail-Adresse bestätigen":{en:"Confirm email address",fr:"Confirmer l’adresse e-mail",it:"Conferma indirizzo e-mail",tr:"E-posta adresini doğrula"},

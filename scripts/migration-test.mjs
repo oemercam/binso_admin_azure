@@ -743,6 +743,8 @@ try{
  globalThis.__processSession={...session,role:'project_manager'};
  await assert.rejects(()=>databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'}),e=>e.code==='self_approval_forbidden');
  globalThis.__processSession=session;
+ const invitationLocaleModule=dataModule(await fs.readFile('lib/locales/config.ts','utf8'));
+ const invitationMailTextModule=dataModule(await fs.readFile('lib/i18n.ts','utf8'));
  await assert.rejects(()=>databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'}),e=>e.code==='self_approval_forbidden');
  globalThis.__processSession={...session,userId:'independent-expense-reviewer'};
  await databaseProcess.tenantUpdate('expenses',expenseId,{...expenseBody,status:'approved'});
@@ -768,9 +770,9 @@ try{
  const inviteMail=dataModule('export function mailLayout(title,body,cta){return body+cta.url} export async function sendMail(mail){globalThis.__invitationMails.push(mail);if(globalThis.__invitationMailMode==="uncertain")throw new Error("ambiguous transport");return {delivered:globalThis.__invitationMailMode!=="unavailable"}}');
  let invitationServiceSource=(await fs.readFile('lib/server/invitations.ts','utf8')).replace('import "server-only";','');
  for(const [specifier,url] of Object.entries({'./http':processHttp,'./db':processDb,'./password':invitePasswords,'./email':inviteMail,'./env':dataModule('export const env={appUrl:"https://fixture.invalid"}'),'./rbac':processRbac,'./audit':audit,'./business-idempotency':idempotencyModule})){invitationServiceSource=invitationServiceSource.replaceAll(JSON.stringify(specifier),JSON.stringify(url));}
- const invitationService=dataModule(invitationServiceSource);
+ const invitationService=dataModule(invitationServiceSource.replace("'./mail-i18n'",JSON.stringify(invitationMailTextModule)));
  globalThis.__invitationMails=[];globalThis.__invitationMailMode='accepted';
- const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace("'@/lib/server/fresh-authentication'",JSON.stringify(freshProofModule)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(invitationService));
+ const teamSource=(await fs.readFile('app/api/settings/team/invitations/route.ts','utf8')).replace("'@/lib/locales/config'",JSON.stringify(invitationLocaleModule)).replace('"@/lib/money"',JSON.stringify(moneyModule)).replace('"@/lib/server/http"',JSON.stringify(processHttp)).replace('"@/lib/server/session"',JSON.stringify(processSession)).replace("'@/lib/server/fresh-authentication'",JSON.stringify(freshProofModule)).replace('"@/lib/server/rbac"',JSON.stringify(processRbac)).replace('"@/lib/server/db"',JSON.stringify(processDb)).replace('"@/lib/server/invitations"',JSON.stringify(invitationService));
  const team=await import(dataModule(teamSource));const teamResult=await team.GET();assert.equal(teamResult.status,200);assert.ok(teamResult.data.members.every(m=>m.email&&m.name));assert.equal(teamResult.data.capacityConfigured,false,"Missing subscription cannot imply a guessed seat quota");assert.equal(teamResult.data.userLimit,null);assert.equal(teamResult.data.plan,"unknown");
  await db.query("select set_config('app.organization_id',$1,false)",[demo]);
  await globalThis.__processTransaction(demo,c=>c.query("insert into organization_entitlements(organization_id,max_users) values($1,50) on conflict(organization_id) do update set max_users=50",[demo]));

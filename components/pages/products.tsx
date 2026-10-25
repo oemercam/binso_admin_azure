@@ -14,7 +14,7 @@ import { useRouter,useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
-import { apiPatch, apiPost, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import { apiPatch, apiPost } from "@/lib/client/backend";
 import {Button, Field, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState} from "../ui";
 import {allowDraftNavigation} from "../use-browser-back-guard";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
@@ -25,7 +25,7 @@ export function ProductsPage() {
   const chips=["Alle","Dienstleistungen","Produkte","Aktiv","Inaktiv"];
   const {rows:productRows,total,controller,pagination,loading,error}=useRecordList("products",{placeholder:"Produkte suchen...",chips,columns,sortFields:{0:"name",1:"kind",2:"unit_price",4:"status"},defaultOrder:"name.asc",filterValues:{Dienstleistungen:{field:"kind",value:"service"},Produkte:{field:"kind",value:"product"},Aktiv:{field:"status",value:"active"},Inaktiv:{field:"status",value:"inactive"}}});
   return <AppShell title="Produkte" subtitle={loading?undefined:`${total} Produkte`} active="produkte" actions={<RecordsControls controller={controller} placeholder="Produkte suchen..." chips={chips} columns={columns}><CreateAction href="/produkte/neu" label="Neues Produkt"/></RecordsControls>}>
-    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Produkte" loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={chips} columns={columns} rowHref={row=>`/produkte/${row[4]?row[3]:"beratung"}`}>{(row)=>{const [name,type,price,idOrStatus,statusMaybe]=row;const id=statusMaybe?idOrStatus:"beratung";const status=statusMaybe??idOrStatus;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
+    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Produkte" loading={loading} error={error} items={productRows} placeholder="Produkte suchen..." chips={chips} columns={columns} rowHref={row=>"/produkte/"+encodeURIComponent(row[3])}>{(row)=>{const [name,type,price,id,status]=row;return <RecordRow href={"/produkte/"+id} icon="box" title={name} meta={type} value={price} status={status}/>}}</RecordsView>
   </AppShell>;
 }
 
@@ -104,7 +104,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
   };
 
   if(loadingRecord||recordError)return <AppShell title="Produkt" active="produkte" backHref={returnTo}>{loadingRecord?<LoadingState><LocalizedText>{"Produkt wird geladen …"}</LocalizedText></LoadingState>:<ErrorState onRetry={recordQuery.refresh} retryLabel="Erneut versuchen"><LocalizedText>{recordError}</LocalizedText></ErrorState>}</AppShell>;
-  return <AppShell titleIsUserContent={existing&&!!name} unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? type : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href={"/angebote/neu?productId="+encodeURIComponent(productId??"")} icon="file" title="Angebot erstellen" navigation/><ActionRow href={"/rechnungen/neu?productId="+encodeURIComponent(productId??"")} icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
+  return <AppShell titleIsUserContent={existing&&!!name} unsavedChanges={false} title={existing ? name||"Produkt" : "Produkt erstellen"} status={existing?status:undefined} statusTone={status==="Aktiv"?"success":"neutral"} editing={editingRecord} subtitle={existing ? translateUnit(type) : "Für Angebote und Rechnungen wiederverwendbar."} active="produkte" backHref={returnTo} backLabel="Produkte" actions={existing?<><ActionsMenu label="Produktaktionen" busy={savingRecord}>{!editingRecord&&<ActionRow requiresWrite icon="edit" onClick={()=>setEditingRecord(true)} title="Bearbeiten" navigation/>}<ActionRow href={"/angebote/neu?productId="+encodeURIComponent(productId??"")} icon="file" title="Angebot erstellen" navigation/><ActionRow href={"/rechnungen/neu?productId="+encodeURIComponent(productId??"")} icon="receipt" title="Rechnung erstellen" navigation/></ActionsMenu></>:undefined}>
     <div className={existing?"entity-detail-workspace":"form-page"} inert={savingRecord}>
 
       <div className={existing?"entity-edit-main":"entity-edit-main form-main-new"}>
@@ -112,7 +112,7 @@ export function ProductForm({ existing = false, productId }: { existing?: boolea
           <div><dt><LocalizedText>{"Verkaufspreis"}</LocalizedText></dt><dd>{withPriceUnit(formatCurrency(price,"CHF",localeTags[locale]),unit,translateUnit)}</dd></div>
           <div><dt><LocalizedText>{"MwSt."}</LocalizedText></dt><dd>{formatQuantity(vatRate,"%",localeTags[locale])}</dd></div>
           {sku&&<div><dt><LocalizedText>{"Artikelnummer"}</LocalizedText></dt><dd>{sku}</dd></div>}
-          {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText>{description}</LocalizedText></dd></div>}
+          {description&&<div><dt><LocalizedText>{"Beschreibung"}</LocalizedText></dt><dd><LocalizedText verbatim>{description}</LocalizedText></dd></div>}
         </dl>:<FormSheet workspace label={existing?"Produkt bearbeiten":"Produkt erstellen"} open={editingRecord} onClose={()=>{recovery.clear();allowDraftNavigation();if(existing)setEditingRecord(false);else router.push(returnTo)}} busy={savingRecord} dirty={dirty&&!savedRecord}><form onSubmit={event=>{event.preventDefault();void save()}}><div className="form-grid two"><Field label="Name"><Input required maxLength={200} value={name} onChange={e=>setName(e.target.value)} placeholder={type==="Produkt"?"z. B. Bürostuhl":"z. B. IT-Beratung"}/></Field>
 <Field label="Typ"><Select value={type} onChange={e=>setType(e.target.value)}><option value={"Dienstleistung"}><LocalizedText>{"Dienstleistung"}</LocalizedText></option><option value={"Produkt"}><LocalizedText>{"Produkt"}</LocalizedText></option></Select></Field>
 <Field label="Einheit"><Select value={unit} onChange={e=>setUnit(e.target.value)}><option value="hour"><LocalizedText>{"Stunde"}</LocalizedText></option><option value="piece"><LocalizedText>{"Stück"}</LocalizedText></option><option value="flat"><LocalizedText>{"Pauschal"}</LocalizedText></option></Select></Field>

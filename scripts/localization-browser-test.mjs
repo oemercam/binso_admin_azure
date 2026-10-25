@@ -15,12 +15,12 @@ const uiAuth=await createUiAuthFixture();
 const server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3370'],{env:{...process.env,...uiAuth.env,PORT:'3370',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});
 let logs='',browser;server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);
 const messages=JSON.parse(await fs.readFile('lib/locales/messages.json','utf8'));
-const text=(source,locale)=>locale==='de'?source:messages[source][{en:0,fr:1,it:2}[locale]];
+const text=(source,locale)=>locale==='de'?source:messages[source][{en:0,fr:1,it:2,tr:3}[locale]];
 const results=[];
 try{
  for(let attempt=0;;attempt++){try{if((await fetch(base+'/api/health')).ok)break}catch{}if(attempt>240||server.exitCode!==null)throw Error(logs);await new Promise(resolve=>setTimeout(resolve,250));}
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true});
- for(const width of [390,768,1440])for(const locale of ['de','fr','it','en']){
+ for(const width of [390,768,1440])for(const locale of ['de','fr','it','en','tr']){
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
   await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:pathname==='/api/settings/company'?{item:{name:'Synthetic Localization Company'}}:{items:[],tracker:null}})});
@@ -34,10 +34,10 @@ try{
   });next.on('console',message=>{if(/hydration|hydrated|server rendered HTML|react\.dev\/errors\/\d+/i.test(message.text()))faults.push('React hydration/runtime: '+message.text());});return next};
   let page=await trackedPage();
   await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
-  assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
+  assert.equal(await page.locator('html').getAttribute('lang'),(locale==='tr'?'tr-TR':locale+'-CH'));
   await verifyConsentRejection(page,text,locale);
   const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
-  const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===code+'-CH',chosen);
+  const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===(code==='tr'?'tr-TR':code+'-CH'),chosen);
   await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
    await page.waitForLoadState('networkidle');assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
@@ -45,7 +45,7 @@ try{
    console.log('Localization route',locale,width,route);
    await page.goto(base+route,{waitUntil:'networkidle'});await page.locator('h1:visible').first().waitFor();
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
-   assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');
+   assert.equal(await page.locator('html').getAttribute('lang'),(locale==='tr'?'tr-TR':locale+'-CH'));
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,route+' '+locale+' '+width+' overflow');
    if(route.startsWith('/dashboard')){
     const navigation=page.locator(width<=760?'.bottom-nav':'.app-sidebar');
@@ -65,5 +65,5 @@ try{
   await verifyLanguagePreference(page,{base,locale,text});
   assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches,profilePreference:'failure, pending lock, confirmation, reload and account-menu storage verified'});await context.close();
  }
- await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Four-language landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
+ await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Five-language selection and core landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill();await uiAuth.close()}

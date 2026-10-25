@@ -37,6 +37,7 @@ export async function verifyFlatNavigationAdversaries(page){
   try{await label.evaluate(el=>el.style.setProperty('max-width','10px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Horizontally clipped navigation labels must fail at runtime');}
   finally{await label.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),spanStyle);}
   await targets.first().focus();await targets.first().press('Tab');
+  if(!await targets.nth(1).evaluate(el=>el===document.activeElement))console.log('Navigation keyboard diagnostics',await page.evaluate(()=>({active:document.activeElement?.outerHTML,targets:[...document.querySelectorAll('.bottom-nav>a,.bottom-nav>button')].map(el=>({name:el.textContent,tabIndex:el.tabIndex,visible:el.checkVisibility()}))})));
   assert.equal(await targets.nth(1).evaluate(el=>el===document.activeElement),true,'Native keyboard navigation retains destination order');
   await targets.nth(1).evaluate(el=>el.blur());await assertFlatMobileNavigation(page);
  }finally{await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);}

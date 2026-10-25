@@ -392,7 +392,7 @@ export function NotificationSettingsPage() {
   return <AppShell title="Benachrichtigungen" subtitle="Bestimme, wie Binso One dich informiert." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
     {error&&<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>}
     {!ready&&!error&&<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>}
-    <PushDeviceSettings/><SettingsGroup title="Zustellung">{rows.map(([title,text],index)=><Fragment key={title}>{(["email","push"] as const).filter(channel=>channels[channel]).map(channel=><ListRow information key={title+channel} title={<span id={labels+index+channel}><LocalizedText>{title}</LocalizedText> · <LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span>} meta={text} value={<Toggle labelledBy={labels+index+channel} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={title}/>}/>)}</Fragment>)}</SettingsGroup>
+    {ready&&<><PushDeviceSettings/><SettingsGroup title="Zustellung">{rows.map(([title,text],index)=><Fragment key={title}>{(["email","push"] as const).filter(channel=>channels[channel]).map(channel=><ListRow information key={title+channel} title={<span id={labels+index+channel}><LocalizedText>{title}</LocalizedText> · <LocalizedText>{channel==="email"?"E-Mail":"Push"}</LocalizedText></span>} meta={text} value={<Toggle labelledBy={labels+index+channel} checked={prefs[title][channel]} disabled={!ready} busy={saving.includes(title+channel)} onChange={()=>void toggle(title,channel)} label={title}/>}/>)}</Fragment>)}</SettingsGroup></>}
   </AppShell>;
 }
 

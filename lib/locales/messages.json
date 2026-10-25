@@ -356,7 +356,8 @@
   "Verträge suchen...": [
     "Search contracts...",
     "Rechercher des contrats...",
-    "Cerca contratti..."
+    "Cerca contratti...",
+    "Sözleşme ara..."
   ],
   "Verträge öffnen": [
     "Open contracts",
@@ -366,7 +367,8 @@
   "Vertrag erstellen": [
     "Create contract",
     "Créer un contrat",
-    "Crea contratto"
+    "Crea contratto",
+    "Sözleşme oluştur"
   ],
   "Vertragsentwurf bearbeiten": [
     "Edit contract draft",
@@ -486,7 +488,8 @@
   "Einkaufspreis": [
     "Purchase price",
     "Prix d’achat",
-    "Prezzo d’acquisto"
+    "Prezzo d’acquisto",
+    "Alış fiyatı"
   ],
   "Steuerbehandlung": [
     "Tax treatment",
@@ -816,7 +819,8 @@
   "Meine Abwesenheiten": [
     "My absences",
     "Mes absences",
-    "Le mie assenze"
+    "Le mie assenze",
+    "İzin ve devamsızlıklarım"
   ],
   "Abwesenheitsanträge": [
     "Absence requests",
@@ -991,7 +995,8 @@
   "Familie und Zulagen": [
     "Family and allowances",
     "Famille et allocations",
-    "Famiglia e assegni"
+    "Famiglia e assegni",
+    "Aile ve ödenekler"
   ],
   "Familienaktionen": [
     "Family actions",
@@ -1161,7 +1166,8 @@
   "Lohnvertrag": [
     "Salary contract",
     "Contrat salarial",
-    "Contratto salariale"
+    "Contratto salariale",
+    "Ücret sözleşmesi"
   ],
   "Lohnvertragsaktionen": [
     "Salary contract actions",
@@ -1781,7 +1787,8 @@
   "Anstellung": [
     "Employment",
     "Emploi",
-    "Impiego"
+    "Impiego",
+    "İstihdam"
   ],
   "Anstellungsperioden": [
     "Employment periods",
@@ -1836,12 +1843,14 @@
   "Arbeitsort": [
     "Workplace",
     "Lieu de travail",
-    "Luogo di lavoro"
+    "Luogo di lavoro",
+    "Çalışma yeri"
   ],
   "Austritt": [
     "Leaving date",
     "Date de départ",
-    "Data di uscita"
+    "Data di uscita",
+    "İşten ayrılış"
   ],
   "Optional · erstellt keinen App-Zugang": [
     "Optional · does not create app access",
@@ -2521,7 +2530,8 @@
   "Abgelehnt": [
     "Rejected",
     "Refusé",
-    "Rifiutato"
+    "Rifiutato",
+    "Reddedildi"
   ],
   "Abgeschlossen": [
     "Completed",
@@ -2557,7 +2567,8 @@
   "Abonnement": [
     "Subscription",
     "Abonnement",
-    "Abbonamento"
+    "Abbonamento",
+    "Abonelik"
   ],
   "Abonnement endet am": [
     "Subscription ends on",
@@ -2637,7 +2648,8 @@
   "Abwesenheiten": [
     "Absences",
     "Absences",
-    "Assenze"
+    "Assenze",
+    "İzin ve devamsızlıklar"
   ],
   "Abzüge": [
     "Deductions",
@@ -2869,7 +2881,8 @@
   "Alle": [
     "All",
     "Tous",
-    "Tutti"
+    "Tutti",
+    "Tümü"
   ],
   "Alle als gelesen": [
     "Mark all as read",
@@ -2950,7 +2963,8 @@
   "Alle Zahlungen": [
     "All payments",
     "Tous les paiements",
-    "Tutti i pagamenti"
+    "Tutti i pagamenti",
+    "Tüm ödemeler"
   ],
   "ALLES AN EINEM ORT": [
     "EVERYTHING IN ONE PLACE",
@@ -3096,7 +3110,8 @@
   "Angebot": [
     "Quote",
     "Devis",
-    "Offerta"
+    "Offerta",
+    "Teklif"
   ],
   "ANGEBOT": [
     "QUOTE",
@@ -3121,7 +3136,8 @@
   "Angebot erstellen": [
     "Create quote",
     "Créer un devis",
-    "Crea offerta"
+    "Crea offerta",
+    "Teklif oluştur"
   ],
   "Angebot Nr.": [
     "Quote no.",
@@ -3252,7 +3268,8 @@
   "Anmelden": [
     "Sign in",
     "Se connecter",
-    "Accedi"
+    "Accedi",
+    "Giriş yap"
   ],
   "Anmeldeschutz": [
     "Sign-in protection",
@@ -3362,12 +3379,14 @@
   "Arbeitsverhältnis": [
     "Employment",
     "Rapport de travail",
-    "Rapporto di lavoro"
+    "Rapporto di lavoro",
+    "İş ilişkisi"
   ],
   "Arbeitszeit": [
     "Working time",
     "Temps de travail",
-    "Orario di lavoro"
+    "Orario di lavoro",
+    "Çalışma süresi"
   ],
   "Arbeitszeit direkt dem richtigen Auftrag zuordnen.": [
     "Assign working time directly to the right job.",
@@ -3412,7 +3431,8 @@
   "Artikelnummer": [
     "Item number",
     "Numéro d’article",
-    "Numero articolo"
+    "Numero articolo",
+    "Ürün numarası"
   ],
   "Audit durchsuchen...": [
     "Search audit...",
@@ -3462,7 +3482,8 @@
   "Auftrag": [
     "Job",
     "Mandat",
-    "Commessa"
+    "Commessa",
+    "İş"
   ],
   "Auftrag / Projekt": [
     "Job / project",
@@ -3544,7 +3565,8 @@
   "Ausstehend": [
     "Pending",
     "En attente",
-    "In sospeso"
+    "In sospeso",
+    "Beklemede"
   ],
   "Auswahl": [
     "Selection",
@@ -3679,7 +3701,8 @@
   "Banküberweisung": [
     "Bank transfer",
     "Virement bancaire",
-    "Bonifico bancario"
+    "Bonifico bancario",
+    "Banka havalesi"
   ],
   "Bankverbindung": [
     "Bank details",
@@ -3689,7 +3712,8 @@
   "Bar": [
     "Cash",
     "Espèces",
-    "Contanti"
+    "Contanti",
+    "Nakit"
   ],
   "Basisberichte": [
     "Basic reports",
@@ -3704,7 +3728,8 @@
   "Bearbeiten": [
     "Edit",
     "Modifier",
-    "Modifica"
+    "Modifica",
+    "Düzenle"
   ],
   "Bearbeitungsort": [
     "Processing location",
@@ -3900,12 +3925,14 @@
   "Benutzer & Rollen": [
     "Users & roles",
     "Utilisateurs et rôles",
-    "Utenti e ruoli"
+    "Utenti e ruoli",
+    "Kullanıcılar ve roller"
   ],
   "Benutzerkonto": [
     "User account",
     "Compte utilisateur",
-    "Account utente"
+    "Account utente",
+    "Kullanıcı hesabı"
   ],
   "Benutzerlimit": [
     "User limit",
@@ -4013,7 +4040,8 @@
   "Betrag": [
     "Amount",
     "Montant",
-    "Importo"
+    "Importo",
+    "Tutar"
   ],
   "Betreff": [
     "Subject",
@@ -4058,7 +4086,8 @@
   "Bezahlt": [
     "Paid",
     "Payé",
-    "Pagato"
+    "Pagato",
+    "Ödendi"
   ],
   "Bezahlt am": [
     "Paid on",
@@ -4328,7 +4357,8 @@
   "Bis": [
     "To",
     "Au",
-    "Al"
+    "Al",
+    "Bitiş"
   ],
   "Bis *": [
     "To *",
@@ -4738,7 +4768,8 @@
   "Cookie-/Datenschutz-Einstellungen": [
     "Cookie/privacy settings",
     "Paramètres des cookies et de confidentialité",
-    "Impostazioni cookie e privacy"
+    "Impostazioni cookie e privacy",
+    "Çerez ve gizlilik ayarları"
   ],
   "Darstellung": [
     "Appearance",
@@ -5041,7 +5072,8 @@
   "Datenschutzerklärung": [
     "Privacy notice",
     "Déclaration de protection des données",
-    "Informativa sulla privacy"
+    "Informativa sulla privacy",
+    "Gizlilik politikası"
   ],
   "Datenschutzerklärung der Binso GmbH für Binso One.": [
     "Binso GmbH privacy notice for Binso One.",
@@ -5051,7 +5083,8 @@
   "Datum": [
     "Date",
     "Date",
-    "Data"
+    "Data",
+    "Tarih"
   ],
   "Datum / Fälligkeit": [
     "Date / due date",
@@ -5061,7 +5094,8 @@
   "Dauer": [
     "Duration",
     "Durée",
-    "Durata"
+    "Durata",
+    "Süre"
   ],
   "Dauer in Stunden und Minuten": [
     "Duration in hours and minutes",
@@ -5782,7 +5816,8 @@
   "Dienstleistung": [
     "Service",
     "Prestation",
-    "Prestazione"
+    "Prestazione",
+    "Hizmet"
   ],
   "Dienstleistungen": [
     "Services",
@@ -5927,7 +5962,8 @@
   "Dokument": [
     "Document",
     "Document",
-    "Documento"
+    "Documento",
+    "Belge"
   ],
   "Dokument als PDF versendet.": [
     "Document sent as PDF.",
@@ -6028,7 +6064,8 @@
   "Dunkel": [
     "Dark",
     "Sombre",
-    "Scuro"
+    "Scuro",
+    "Koyu"
   ],
   "Dunkle Oberfläche": [
     "Dark interface",
@@ -6038,7 +6075,8 @@
   "E-Mail": [
     "Email",
     "E-mail",
-    "E-mail"
+    "E-mail",
+    "E-posta"
   ],
   "E-Mail bestätigen": [
     "Verify email",
@@ -6239,7 +6277,8 @@
   "Einheit": [
     "Unit",
     "Unité",
-    "Unità"
+    "Unità",
+    "Birim"
   ],
   "Einladen": [
     "Invite",
@@ -6259,7 +6298,8 @@
   "Einladung annehmen": [
     "Accept invitation",
     "Accepter l’invitation",
-    "Accetta invito"
+    "Accetta invito",
+    "Daveti kabul et"
   ],
   "Einladung annehmen:": [
     "Accept invitation:",
@@ -6304,7 +6344,8 @@
   "Einladung zu Binso One": [
     "Invitation to Binso One",
     "Invitation à Binso One",
-    "Invito a Binso One"
+    "Invito a Binso One",
+    "Binso One daveti"
   ],
   "Einladungen sind in der Demo deaktiviert.": [
     "Invitations are disabled in the demo.",
@@ -6415,7 +6456,8 @@
   "Einstellung konnte nicht gespeichert werden.": [
     "Setting could not be saved.",
     "Le paramètre n’a pas pu être enregistré.",
-    "Impossibile salvare l’impostazione."
+    "Impossibile salvare l’impostazione.",
+    "Ayar kaydedilemedi."
   ],
   "Einstellung wird geladen …": [
     "Loading setting…",
@@ -6425,7 +6467,8 @@
   "Einstellungen": [
     "Settings",
     "Paramètres",
-    "Impostazioni"
+    "Impostazioni",
+    "Ayarlar"
   ],
   "Einstellungen konnten nicht geladen werden.": [
     "Settings could not be loaded.",
@@ -6445,7 +6488,8 @@
   "Einstellungen suchen": [
     "Search settings",
     "Rechercher dans les paramètres",
-    "Cerca impostazioni"
+    "Cerca impostazioni",
+    "Ayarlarda ara"
   ],
   "Einstellungen werden geladen …": [
     "Loading settings…",
@@ -6475,7 +6519,8 @@
   "Eintritt": [
     "Start date",
     "Date d’entrée",
-    "Data di entrata"
+    "Data di entrata",
+    "İşe giriş"
   ],
   "Einzelmessung": [
     "Single measurement",
@@ -6520,7 +6565,8 @@
   "Empfohlen": [
     "Recommended",
     "Recommandé",
-    "Consigliato"
+    "Consigliato",
+    "Önerilen"
   ],
   "Empfohlen für KMU": [
     "Recommended for SMEs",
@@ -6551,7 +6597,8 @@
   "Entwurf": [
     "Draft",
     "Brouillon",
-    "Bozza"
+    "Bozza",
+    "Taslak"
   ],
   "ENTWURF - nicht zur Zahlung / nicht versenden": [
     "DRAFT - not payable / do not send",
@@ -6682,7 +6729,8 @@
   "Erneut versuchen": [
     "Try again",
     "Réessayer",
-    "Riprova"
+    "Riprova",
+    "Tekrar dene"
   ],
   "Erreichbare Dienste": [
     "Reachable services",
@@ -6802,7 +6850,8 @@
   "Fakturiertes Volumen": [
     "Invoiced volume",
     "Volume facturé",
-    "Volume fatturato"
+    "Volume fatturato",
+    "Faturalanan tutar"
   ],
   "Fällig": [
     "Due",
@@ -6872,7 +6921,8 @@
   "Ferientage": [
     "Holiday days",
     "Jours de vacances",
-    "Giorni di ferie"
+    "Giorni di ferie",
+    "Yıllık izin günü"
   ],
   "Ferientage / Jahr": [
     "Holiday days / year",
@@ -6887,7 +6937,8 @@
   "Filter und Sortierung": [
     "Filter and sort",
     "Filtrer et trier",
-    "Filtra e ordina"
+    "Filtra e ordina",
+    "Filtre ve sıralama"
   ],
   "Filter zurücksetzen": [
     "Reset filters",
@@ -6939,7 +6990,8 @@
   "Firma": [
     "Company",
     "Entreprise",
-    "Azienda"
+    "Azienda",
+    "Şirket"
   ],
   "Firma oder Name": [
     "Company or name",
@@ -6999,7 +7051,8 @@
   "Firmenname": [
     "Company name",
     "Nom de l’entreprise",
-    "Nome azienda"
+    "Nome azienda",
+    "Şirket adı"
   ],
   "Firmenname *": [
     "Company name *",
@@ -7050,7 +7103,8 @@
   "Freigeben": [
     "Approve",
     "Approuver",
-    "Approva"
+    "Approva",
+    "Onayla"
   ],
   "Freigegeben": [
     "Approved",
@@ -7066,7 +7120,8 @@
   "Funktion": [
     "Feature",
     "Fonction",
-    "Funzione"
+    "Funzione",
+    "Görev"
   ],
   "Funktionen": [
     "Features",
@@ -7196,7 +7251,8 @@
   "Gelöst": [
     "Resolved",
     "Résolu",
-    "Risolto"
+    "Risolto",
+    "Çözüldü"
   ],
   "Gemessen": [
     "Measured",
@@ -7211,7 +7267,8 @@
   "Genehmigt": [
     "Approved",
     "Approuvé",
-    "Approvato"
+    "Approvato",
+    "Onaylandı"
   ],
   "Genehmigte Spesen sind gesperrt.": [
     "Approved expenses are locked.",
@@ -7281,12 +7338,14 @@
   "Geschäftsprozesse": [
     "Business processes",
     "Processus métier",
-    "Processi aziendali"
+    "Processi aziendali",
+    "İş süreçleri"
   ],
   "Geschlossen": [
     "Closed",
     "Fermé",
-    "Chiuso"
+    "Chiuso",
+    "Kapalı"
   ],
   "Geschützter Wert": [
     "Protected value",
@@ -7296,7 +7355,8 @@
   "Gesendet": [
     "Sent",
     "Envoyé",
-    "Inviato"
+    "Inviato",
+    "Gönderildi"
   ],
   "Gespeichert": [
     "Saved",
@@ -7316,7 +7376,8 @@
   "Gestern": [
     "Yesterday",
     "Hier",
-    "Ieri"
+    "Ieri",
+    "Dün"
   ],
   "Gezählter Status active.": [
     "Counted status: active.",
@@ -7421,7 +7482,8 @@
   "Hell": [
     "Light",
     "Clair",
-    "Chiaro"
+    "Chiaro",
+    "Açık"
   ],
   "Hell / Dunkel": [
     "Light / dark",
@@ -7436,7 +7498,8 @@
   "Heute": [
     "Today",
     "Aujourd’hui",
-    "Oggi"
+    "Oggi",
+    "Bugün"
   ],
   "Heutige Einträge": [
     "Today’s entries",
@@ -7531,7 +7594,8 @@
   "In Bearbeitung": [
     "In progress",
     "En cours",
-    "In elaborazione"
+    "In elaborazione",
+    "İşlemde"
   ],
   "In der Demo werden keine produktiven Messwerte oder simulierten Systemzustände angezeigt.": [
     "The demo does not display production measurements or simulated system states.",
@@ -7582,7 +7646,8 @@
   "Intern": [
     "Internal",
     "Interne",
-    "Interno"
+    "Interno",
+    "Dahili"
   ],
   "Interne Begründung": [
     "Internal reason",
@@ -7832,7 +7897,8 @@
   "Keine Arbeitszeiten erfasst": [
     "No working time recorded",
     "Aucune heure de travail saisie",
-    "Nessuna ora di lavoro registrata"
+    "Nessuna ora di lavoro registrata",
+    "Henüz çalışma kaydı yok"
   ],
   "Keine Authenticator-Einrichtung für die Demo nötig": [
     "No authenticator setup required for the demo",
@@ -7897,7 +7963,8 @@
   "Keine Dokumente erfasst": [
     "No documents recorded",
     "Aucun document enregistré",
-    "Nessun documento registrato"
+    "Nessun documento registrato",
+    "Henüz belge yok"
   ],
   "Keine dringenden Vorgänge in den verfügbaren Rechnungen.": [
     "No urgent actions in the available invoices.",
@@ -8029,7 +8096,8 @@
   "Keine passenden Einstellungen": [
     "No matching settings",
     "Aucun paramètre correspondant",
-    "Nessuna impostazione corrispondente"
+    "Nessuna impostazione corrispondente",
+    "Eşleşen ayar yok"
   ],
   "Keine positiven Anteile für": [
     "No positive shares for",
@@ -8054,7 +8122,8 @@
   "Keine Spesen erfasst": [
     "No expenses recorded",
     "Aucun frais saisi",
-    "Nessuna spesa registrata"
+    "Nessuna spesa registrata",
+    "Henüz masraf kaydı yok"
   ],
   "Keine Tickets": [
     "No tickets",
@@ -8174,7 +8243,8 @@
   "Kontakt": [
     "Contact",
     "Contact",
-    "Contatto"
+    "Contatto",
+    "İlgili kişi"
   ],
   "Kontakt bearbeiten": [
     "Edit contact",
@@ -8292,7 +8362,8 @@
   "Kreditkarte": [
     "Credit card",
     "Carte de crédit",
-    "Carta di credito"
+    "Carta di credito",
+    "Kredi kartı"
   ],
   "Kritisch": [
     "Critical",
@@ -8307,7 +8378,8 @@
   "Kunde": [
     "Customer",
     "Client",
-    "Cliente"
+    "Cliente",
+    "Müşteri"
   ],
   "KUNDE": [
     "CUSTOMER",
@@ -8332,12 +8404,14 @@
   "Kunde erfassen": [
     "Record customer",
     "Saisir un client",
-    "Registra cliente"
+    "Registra cliente",
+    "Müşteri kaydet"
   ],
   "Kunde erstellen": [
     "Create customer",
     "Créer un client",
-    "Crea cliente"
+    "Crea cliente",
+    "Müşteri oluştur"
   ],
   "Kunde gespeichert.": [
     "Customer saved.",
@@ -8362,7 +8436,8 @@
   "Kunde öffnen": [
     "Open customer",
     "Ouvrir le client",
-    "Apri cliente"
+    "Apri cliente",
+    "Müşteriyi aç"
   ],
   "Kunde speichern": [
     "Save customer",
@@ -8418,7 +8493,8 @@
   "Kunden suchen...": [
     "Search customers...",
     "Rechercher des clients…",
-    "Cerca clienti…"
+    "Cerca clienti…",
+    "Müşteri ara..."
   ],
   "Kunden und Kontakte": [
     "Customers and contacts",
@@ -8463,7 +8539,8 @@
   "Kundenaktionen": [
     "Customer actions",
     "Actions du client",
-    "Azioni cliente"
+    "Azioni cliente",
+    "Müşteri işlemleri"
   ],
   "Kundenanfrage prüfen und beantworten.": [
     "Review and answer the customer request.",
@@ -8549,7 +8626,8 @@
   "Kundenübersicht": [
     "Customer overview",
     "Vue d’ensemble des clients",
-    "Panoramica clienti"
+    "Panoramica clienti",
+    "Müşteri listesi"
   ],
   "Kundenzahlungen": [
     "Customer payments",
@@ -8690,7 +8768,8 @@
   "Lieferant": [
     "Supplier",
     "Fournisseur",
-    "Fornitore"
+    "Fornitore",
+    "Tedarikçi"
   ],
   "Lieferant erfassen": [
     "Record supplier",
@@ -8700,7 +8779,8 @@
   "Lieferanten": [
     "Suppliers",
     "Fournisseurs",
-    "Fornitori"
+    "Fornitori",
+    "Tedarikçiler"
   ],
   "Lieferanten und Eingangsrechnungen": [
     "Suppliers and supplier invoices",
@@ -8795,7 +8875,8 @@
   "Löschen": [
     "Delete",
     "Supprimer",
-    "Elimina"
+    "Elimina",
+    "Sil"
   ],
   "Löschen konnte nicht ausgeführt werden.": [
     "Deletion could not be completed.",
@@ -8815,7 +8896,8 @@
   "Manuell erfassen": [
     "Enter manually",
     "Saisir manuellement",
-    "Inserisci manualmente"
+    "Inserisci manualmente",
+    "Elle kaydet"
   ],
   "Manuelle Prüfung": [
     "Manual review",
@@ -8872,7 +8954,8 @@
   "Menge": [
     "Quantity",
     "Quantité",
-    "Quantità"
+    "Quantità",
+    "Miktar"
   ],
   "MENGE": [
     "QUANTITY",
@@ -9017,7 +9100,8 @@
   "Mitarbeiter": [
     "Employees",
     "Collaborateurs",
-    "Collaboratori"
+    "Collaboratori",
+    "Çalışanlar"
   ],
   "Mitarbeiter bearbeiten": [
     "Edit employee",
@@ -9042,7 +9126,8 @@
   "Mitarbeiter hinzufügen": [
     "Add employee",
     "Ajouter un collaborateur",
-    "Aggiungi collaboratore"
+    "Aggiungi collaboratore",
+    "Çalışan ekle"
   ],
   "Mitarbeiter konnte nicht geladen werden": [
     "Employee could not be loaded",
@@ -9057,7 +9142,8 @@
   "Mitarbeiter suchen...": [
     "Search employees...",
     "Rechercher des collaborateurs…",
-    "Cerca collaboratori…"
+    "Cerca collaboratori…",
+    "Çalışan ara..."
   ],
   "Mitarbeiter wird geladen": [
     "Loading employee",
@@ -9192,7 +9278,8 @@
   "MwSt.": [
     "VAT",
     "TVA",
-    "IVA"
+    "IVA",
+    "KDV"
   ],
   "Nach Vertragsende kann der Kunde seine Daten im Rahmen der verfügbaren Exportfunktionen sichern. Binso darf nicht mehr benötigte Kundendaten nach einer angemessenen Übergangs- und Sicherungsfrist löschen, soweit keine gesetzlichen Aufbewahrungspflichten, laufenden Verfahren oder berechtigten Sicherheitsgründe entgegenstehen. Daten, die Binso selbst als Verantwortlicher aus gesetzlichen Gründen aufbewahren muss, bleiben für die erforderliche Dauer gespeichert.": [
     "After the contract ends, the customer may back up their data using available export functions. Binso may delete data no longer needed after a reasonable transition and backup period, unless retention duties, ongoing proceedings or legitimate security reasons prevent this. Data Binso must retain as controller for legal reasons remains stored for the required period.",
@@ -9212,7 +9299,8 @@
   "Nachname": [
     "Last name",
     "Nom",
-    "Cognome"
+    "Cognome",
+    "Soyad"
   ],
   "Nachricht": [
     "Message",
@@ -9267,7 +9355,8 @@
   "Name": [
     "Name",
     "Nom",
-    "Nome"
+    "Nome",
+    "Ad"
   ],
   "Name und Funktion sind erforderlich.": [
     "Name and role are required.",
@@ -9292,12 +9381,14 @@
   "Neu": [
     "New",
     "Nouveau",
-    "Nuovo"
+    "Nuovo",
+    "Yeni"
   ],
   "Neu erstellen": [
     "Create new",
     "Créer",
-    "Crea nuovo"
+    "Crea nuovo",
+    "Yeni oluştur"
   ],
   "Neue Aktivitäten erscheinen hier automatisch.": [
     "New activity appears here automatically.",
@@ -9392,7 +9483,8 @@
   "Neues Produkt": [
     "New product",
     "Nouveau produit",
-    "Nuovo prodotto"
+    "Nuovo prodotto",
+    "Yeni ürün"
   ],
   "Neues Ticket": [
     "New ticket",
@@ -9497,7 +9589,8 @@
   "Notiz": [
     "Note",
     "Note",
-    "Nota"
+    "Nota",
+    "Not"
   ],
   "NOTIZ": [
     "NOTE",
@@ -9612,7 +9705,8 @@
   "Offen": [
     "Open",
     "Ouvert",
-    "Aperto"
+    "Aperto",
+    "Açık"
   ],
   "Offen / in Bearbeitung / gelöst": [
     "Open / in progress / resolved",
@@ -9783,7 +9877,8 @@
   "Ort": [
     "City",
     "Localité",
-    "Località"
+    "Località",
+    "Şehir"
   ],
   "österreich": [
     "Austria",
@@ -9808,22 +9903,26 @@
   "Passwort": [
     "Password",
     "Mot de passe",
-    "Password"
+    "Password",
+    "Parola"
   ],
   "Passwort ändern": [
     "Change password",
     "Modifier le mot de passe",
-    "Cambia password"
+    "Cambia password",
+    "Parolayı değiştir"
   ],
   "Passwort anzeigen": [
     "Show password",
     "Afficher le mot de passe",
-    "Mostra password"
+    "Mostra password",
+    "Parolayı göster"
   ],
   "Passwort ausblenden": [
     "Hide password",
     "Masquer le mot de passe",
-    "Nascondi password"
+    "Nascondi password",
+    "Parolayı gizle"
   ],
   "Passwort bestätigen": [
     "Confirm password",
@@ -9858,7 +9957,8 @@
   "Passwort vergessen?": [
     "Forgot password?",
     "Mot de passe oublié ?",
-    "Password dimenticata?"
+    "Password dimenticata?",
+    "Parolanızı mı unuttunuz?"
   ],
   "Passwort zurücksetzen": [
     "Reset password",
@@ -9868,7 +9968,8 @@
   "Pauschal": [
     "Flat rate",
     "Forfait",
-    "Forfait"
+    "Forfait",
+    "Sabit tutar"
   ],
   "Pause": [
     "Pause",
@@ -9920,7 +10021,8 @@
   "Pensum": [
     "Workload",
     "Taux d’activité",
-    "Grado d’occupazione"
+    "Grado d’occupazione",
+    "Çalışma oranı"
   ],
   "Pensum (%)": [
     "Workload (%)",
@@ -10093,7 +10195,8 @@
   "PLZ": [
     "Postcode",
     "NPA",
-    "NPA"
+    "NPA",
+    "Posta kodu"
   ],
   "Position bearbeiten": [
     "Edit line item",
@@ -10138,7 +10241,8 @@
   "Preis": [
     "Price",
     "Prix",
-    "Prezzo"
+    "Prezzo",
+    "Fiyat"
   ],
   "Preise": [
     "Pricing",
@@ -10173,7 +10277,8 @@
   "Produkt": [
     "Product",
     "Produit",
-    "Prodotto"
+    "Prodotto",
+    "Ürün"
   ],
   "PRODUKT": [
     "PRODUCT",
@@ -10188,12 +10293,14 @@
   "Produkt bearbeiten": [
     "Edit product",
     "Modifier le produit",
-    "Modifica prodotto"
+    "Modifica prodotto",
+    "Ürün düzenle"
   ],
   "Produkt erstellen": [
     "Create product",
     "Créer un produit",
-    "Crea prodotto"
+    "Crea prodotto",
+    "Ürün oluştur"
   ],
   "Produkt gespeichert.": [
     "Product saved.",
@@ -10218,7 +10325,8 @@
   "Produktaktionen": [
     "Product actions",
     "Actions du produit",
-    "Azioni prodotto"
+    "Azioni prodotto",
+    "Ürün işlemleri"
   ],
   "Produktangaben sind ungültig.": [
     "Product details are invalid.",
@@ -10228,12 +10336,14 @@
   "Produkte": [
     "Products",
     "Produits",
-    "Prodotti"
+    "Prodotti",
+    "Ürünler"
   ],
   "Produkte suchen...": [
     "Search products...",
     "Rechercher des produits…",
-    "Cerca prodotti…"
+    "Cerca prodotti…",
+    "Ürün ara..."
   ],
   "Produkte und Dienstleistungen pflegen.": [
     "Maintain products and services.",
@@ -10403,7 +10513,8 @@
   "Rechnung": [
     "Invoice",
     "Facture",
-    "Fattura"
+    "Fattura",
+    "Fatura"
   ],
   "RECHNUNG": [
     "INVOICE",
@@ -10433,7 +10544,8 @@
   "Rechnung erstellen": [
     "Create invoice",
     "Créer une facture",
-    "Crea fattura"
+    "Crea fattura",
+    "Fatura oluştur"
   ],
   "Rechnung ist einem anderen Stripe-Kunden zugeordnet.": [
     "The invoice is assigned to a different Stripe customer.",
@@ -10448,7 +10560,8 @@
   "Rechnung öffnen": [
     "Open invoice",
     "Ouvrir la facture",
-    "Apri fattura"
+    "Apri fattura",
+    "Faturayı aç"
   ],
   "Rechnung stellen": [
     "Issue invoice",
@@ -10579,7 +10692,8 @@
   "Referenz": [
     "Reference",
     "Référence",
-    "Riferimento"
+    "Riferimento",
+    "Referans"
   ],
   "Referenz A": [
     "Reference A",
@@ -10614,7 +10728,8 @@
   "Rolle": [
     "Role",
     "Rôle",
-    "Ruolo"
+    "Ruolo",
+    "Rol"
   ],
   "Rolle ändern": [
     "Change role",
@@ -10842,7 +10957,8 @@
   "Sortierung": [
     "Sort order",
     "Tri",
-    "Ordinamento"
+    "Ordinamento",
+    "Sıralama"
   ],
   "sowie": [
     "and",
@@ -10878,7 +10994,8 @@
   "Spese erfassen": [
     "Record expense",
     "Saisir des frais",
-    "Registra spesa"
+    "Registra spesa",
+    "Masraf kaydet"
   ],
   "Spese gespeichert.": [
     "Expense saved.",
@@ -10955,7 +11072,8 @@
   "Sprache konnte nicht gespeichert werden.": [
     "Language could not be saved.",
     "La langue n’a pas pu être enregistrée.",
-    "Impossibile salvare la lingua."
+    "Impossibile salvare la lingua.",
+    "Dil kaydedilemedi."
   ],
   "Stammdaten einmal erfassen": [
     "Enter master data once",
@@ -11011,7 +11129,8 @@
   "Status": [
     "Status",
     "Statut",
-    "Stato"
+    "Stato",
+    "Durum"
   ],
   "Status / Typ": [
     "Status / type",
@@ -11052,7 +11171,8 @@
   "Storniert": [
     "Cancelled",
     "Annulé",
-    "Annullato"
+    "Annullato",
+    "İptal edildi"
   ],
   "STORNIERT - keine Zahlung erforderlich": [
     "CANCELLED - no payment required",
@@ -11067,7 +11187,8 @@
   "Strasse": [
     "Street",
     "Rue",
-    "Via"
+    "Via",
+    "Sokak"
   ],
   "Strasse und Nummer": [
     "Street and number",
@@ -11192,17 +11313,20 @@
   "Stück": [
     "piece",
     "pièce",
-    "pezzo"
+    "pezzo",
+    "Adet"
   ],
   "Stunde": [
     "Hour",
     "Heure",
-    "Ora"
+    "Ora",
+    "Saat"
   ],
   "Stunden": [
     "Hours",
     "Heures",
-    "Ore"
+    "Ore",
+    "Saat"
   ],
   "Stundensatz CHF": [
     "Hourly rate CHF",
@@ -11227,7 +11351,8 @@
   "Suche": [
     "Search",
     "Recherche",
-    "Ricerca"
+    "Ricerca",
+    "Arama"
   ],
   "Suche konnte nicht geladen werden.": [
     "Search could not be loaded.",
@@ -11354,7 +11479,8 @@
   "System": [
     "System",
     "Système",
-    "Sistema"
+    "Sistema",
+    "Sistem"
   ],
   "Systemstatus": [
     "System status",
@@ -11449,12 +11575,14 @@
   "Teilweise bezahlt": [
     "Partially paid",
     "Partiellement payé",
-    "Parzialmente pagato"
+    "Parzialmente pagato",
+    "Kısmen ödendi"
   ],
   "Telefon": [
     "Phone",
     "Téléphone",
-    "Telefono"
+    "Telefono",
+    "Telefon"
   ],
   "Telefon:": [
     "Phone:",
@@ -11584,12 +11712,14 @@
   "Typ": [
     "Type",
     "Type",
-    "Tipo"
+    "Tipo",
+    "Tür"
   ],
   "Überfällig": [
     "Overdue",
     "En retard",
-    "Scaduto"
+    "Scaduto",
+    "Gecikmiş"
   ],
   "Überfällige Abonnemente": [
     "Overdue subscriptions",
@@ -11651,7 +11781,8 @@
   "Unbekannt": [
     "Unknown",
     "Inconnu",
-    "Sconosciuto"
+    "Sconosciuto",
+    "Bilinmiyor"
   ],
   "Unbekannter Abostatus.": [
     "Unknown subscription status.",
@@ -11978,7 +12109,8 @@
   "Verbucht": [
     "Posted",
     "Comptabilisé",
-    "Contabilizzato"
+    "Contabilizzato",
+    "Muhasebeleştirildi"
   ],
   "Verbunden": [
     "Connected",
@@ -12013,7 +12145,8 @@
   "Verkaufspreis": [
     "Selling price",
     "Prix de vente",
-    "Prezzo vendita"
+    "Prezzo vendita",
+    "Satış fiyatı"
   ],
   "Verkaufspreis (CHF)": [
     "Selling price (CHF)",
@@ -12079,7 +12212,8 @@
   "Versendet": [
     "Sent",
     "Envoyé",
-    "Inviato"
+    "Inviato",
+    "Gönderildi"
   ],
   "Versuche einen anderen Suchbegriff.": [
     "Try a different search term.",
@@ -12089,7 +12223,8 @@
   "Vertrag": [
     "Contract",
     "Contrat",
-    "Contratto"
+    "Contratto",
+    "Sözleşme"
   ],
   "VERTRAG": [
     "CONTRACT",
@@ -12104,7 +12239,8 @@
   "Verträge": [
     "Contracts",
     "Contrats",
-    "Contratti"
+    "Contratti",
+    "Sözleşmeler"
   ],
   "Verträge und Dokumente": [
     "Contracts and documents",
@@ -12174,7 +12310,8 @@
   "Von": [
     "From",
     "Du",
-    "Dal"
+    "Dal",
+    "Başlangıç"
   ],
   "Von *": [
     "From *",
@@ -12189,7 +12326,8 @@
   "Vorname": [
     "First name",
     "Prénom",
-    "Nome"
+    "Nome",
+    "Ad"
   ],
   "Vorname und Nachname sind erforderlich.": [
     "First and last name are required.",
@@ -12199,7 +12337,8 @@
   "Vorschau": [
     "Preview",
     "Aperçu",
-    "Anteprima"
+    "Anteprima",
+    "Ön izleme"
   ],
   "Vorschau schliessen": [
     "Close preview",
@@ -12229,7 +12368,8 @@
   "Währung": [
     "Currency",
     "Devise",
-    "Valuta"
+    "Valuta",
+    "Para birimi"
   ],
   "Wallboard öffnen": [
     "Open wallboard",
@@ -12309,7 +12449,8 @@
   "Weiter": [
     "Continue",
     "Continuer",
-    "Continua"
+    "Continua",
+    "Devam"
   ],
   "Weiter bearbeiten": [
     "Keep editing",
@@ -12335,7 +12476,8 @@
   "Weitere Aktionen": [
     "More actions",
     "Autres actions",
-    "Altre azioni"
+    "Altre azioni",
+    "Diğer işlemler"
   ],
   "Weitere Anfrage erstellen": [
     "Create another request",
@@ -12345,7 +12487,8 @@
   "Weitere Angaben": [
     "Additional details",
     "Informations complémentaires",
-    "Ulteriori dati"
+    "Ulteriori dati",
+    "Diğer bilgiler"
   ],
   "Weitere Datenquellen sind noch nicht angebunden.": [
     "Additional data sources are not connected yet.",
@@ -12445,7 +12588,8 @@
   "Wochenstunden": [
     "Weekly hours",
     "Heures hebdomadaires",
-    "Ore settimanali"
+    "Ore settimanali",
+    "Haftalık çalışma saati"
   ],
   "Wochenstunden (h/Woche)": [
     "Weekly hours (h/week)",
@@ -12495,12 +12639,14 @@
   "Zahlung": [
     "Payment",
     "Paiement",
-    "Pagamento"
+    "Pagamento",
+    "Ödeme"
   ],
   "Zahlung erfassen": [
     "Record payment",
     "Saisir un paiement",
-    "Registra pagamento"
+    "Registra pagamento",
+    "Ödeme kaydet"
   ],
   "Zahlung erhalten": [
     "Payment received",
@@ -12606,7 +12752,8 @@
   "Zahlungsart": [
     "Payment type",
     "Type de paiement",
-    "Tipo pagamento"
+    "Tipo pagamento",
+    "Ödeme yöntemi"
   ],
   "Zahlungsausstand": [
     "Outstanding payment",
@@ -12651,7 +12798,8 @@
   "Zahlungsfrist": [
     "Payment term",
     "Délai de paiement",
-    "Termine pagamento"
+    "Termine pagamento",
+    "Ödeme süresi"
   ],
   "Zahlungsfrist:": [
     "Payment term:",
@@ -12706,7 +12854,8 @@
   "Zahlungsverlauf öffnen": [
     "Open payment history",
     "Ouvrir l’historique des paiements",
-    "Apri cronologia pagamenti"
+    "Apri cronologia pagamenti",
+    "Ödeme geçmişini aç"
   ],
   "Zahlungsvolumen": [
     "Payment volume",
@@ -12727,7 +12876,8 @@
   "Zeit erfassen": [
     "Track time",
     "Saisir du temps",
-    "Registra ore"
+    "Registra ore",
+    "Zaman kaydet"
   ],
   "Zeit freigegeben.": [
     "Time approved.",
@@ -12742,7 +12892,8 @@
   "Zeit für Rechnung auswählen": [
     "Select time for invoice",
     "Sélectionner les heures pour la facture",
-    "Seleziona ore per fattura"
+    "Seleziona ore per fattura",
+    "Fatura için zaman kaydı seç"
   ],
   "Zeit konnte nicht eingereicht werden.": [
     "Time could not be submitted.",
@@ -12762,7 +12913,8 @@
   "Zeiteintrag": [
     "Time entry",
     "Entrée de temps",
-    "Registrazione oraria"
+    "Registrazione oraria",
+    "Zaman kaydı"
   ],
   "Zeiteintrag gespeichert.": [
     "Time entry saved.",
@@ -12807,7 +12959,8 @@
   "Zeiterfassung": [
     "Time tracking",
     "Suivi du temps",
-    "Rilevamento ore"
+    "Rilevamento ore",
+    "Zaman kaydı"
   ],
   "Zeiterfassung KMU": [
     "Time tracking for SMEs",
@@ -12817,7 +12970,8 @@
   "Zeiterfassung öffnen": [
     "Open time tracking",
     "Ouvrir le suivi du temps",
-    "Apri rilevamento ore"
+    "Apri rilevamento ore",
+    "Zaman kaydını aç"
   ],
   "Zeiterfassung und Spesen": [
     "Time tracking and expenses",
@@ -12852,7 +13006,8 @@
   "Zeitraum": [
     "Period",
     "Période",
-    "Periodo"
+    "Periodo",
+    "Dönem"
   ],
   "Zeitraum filtern": [
     "Filter period",
@@ -12922,7 +13077,8 @@
   "Zugehörig": [
     "Related",
     "Associé",
-    "Associato"
+    "Associato",
+    "İlgili"
   ],
   "Zugriff": [
     "Access",
@@ -13344,7 +13500,8 @@
   "Notizen": [
     "Notes",
     "Notes",
-    "Note"
+    "Note",
+    "Notlar"
   ],
   "Projekt bearbeiten": [
     "Edit project",
@@ -13429,7 +13586,8 @@
   "Eingegangene Zahlungen": [
     "Payments received",
     "Paiements reçus",
-    "Pagamenti ricevuti"
+    "Pagamenti ricevuti",
+    "Alınan ödemeler"
   ],
   "Erstattete Spesen": [
     "Reimbursed expenses",
@@ -13689,7 +13847,8 @@
   "Rückerstattungen": [
     "Refunds",
     "Remboursements",
-    "Rimborsi"
+    "Rimborsi",
+    "İadeler"
   ],
   "Rückerstattungsdatum": [
     "Refund date",
@@ -13850,7 +14009,8 @@
   "Dein Geschäft.": [
     "Your business.",
     "Votre activité.",
-    "La tua attività."
+    "La tua attività.",
+    "İşletmen."
   ],
   "Ein klarer Überblick.": [
     "A clear overview.",
@@ -13960,7 +14120,8 @@
   "Ein klarer": [
     "One clear",
     "Une vue",
-    "Una chiara"
+    "Una chiara",
+    "Net bir"
   ],
   "Eine grosszügige Desktop-Arbeitsfläche und eine eigene mobile Bedienung für Smartphone und PWA.": [
     "A spacious desktop workspace and dedicated mobile controls for smartphones and PWA.",
@@ -14060,7 +14221,8 @@
   "Überblick.": [
     "overview.",
     "d’ensemble.",
-    "visione d’insieme."
+    "visione d’insieme.",
+    "genel bakış."
   ],
   "Mit offenen Beträgen": [
     "With outstanding balances",
@@ -14070,7 +14232,8 @@
   "Kunden & Verkauf": [
     "Customers & sales",
     "Clients et ventes",
-    "Clienti e vendite"
+    "Clienti e vendite",
+    "Müşteriler ve satış"
   ],
   "Zeit & Team": [
     "Time & team",
@@ -14442,7 +14605,8 @@
   "Details": [
     "Details",
     "Détails",
-    "Dettagli"
+    "Dettagli",
+    "Ayrıntılar"
   ],
   "Die Zeit wird direkt dem gewählten Auftrag zugeordnet.": [
     "Time is assigned directly to the selected order.",
@@ -14487,7 +14651,8 @@
   "Herunterladen": [
     "Download",
     "Télécharger",
-    "Scarica"
+    "Scarica",
+    "İndir"
   ],
   "Händler": [
     "Merchant",
@@ -14522,7 +14687,8 @@
   "Monatsrapport": [
     "Monthly timesheet",
     "Rapport mensuel",
-    "Rapporto mensile"
+    "Rapporto mensile",
+    "Aylık çalışma raporu"
   ],
   "Rapport": [
     "Timesheet",
@@ -14657,7 +14823,8 @@
   "Auftrag erstellen": [
     "Create order",
     "Créer un mandat",
-    "Crea incarico"
+    "Crea incarico",
+    "İş oluştur"
   ],
   "Auftrag bearbeiten": [
     "Edit order",
@@ -14737,7 +14904,8 @@
   "Auftragsaktionen": [
     "Order actions",
     "Actions du mandat",
-    "Azioni del incarico"
+    "Azioni del incarico",
+    "İş işlemleri"
   ],
   "Nummer kopieren": [
     "Copy number",
@@ -15185,12 +15353,14 @@
   "Letzte Arbeitszeiten": [
     "Recent time entries",
     "Derniers temps de travail",
-    "Ultime registrazioni del tempo"
+    "Ultime registrazioni del tempo",
+    "Son çalışma kayıtları"
   ],
   "Letzte Spesen": [
     "Recent expenses",
     "Derniers frais",
-    "Ultime spese"
+    "Ultime spese",
+    "Son masraflar"
   ],
   "Funktionen ansehen": [
     "Explore features",
@@ -15664,12 +15834,14 @@
   "Alle ablehnen": [
     "Reject all",
     "Tout refuser",
-    "Rifiuta tutti"
+    "Rifiuta tutti",
+    "Tümünü reddet"
   ],
   "Alle akzeptieren": [
     "Accept all",
     "Tout accepter",
-    "Accetta tutti"
+    "Accetta tutti",
+    "Tümünü kabul et"
   ],
   "Support-Ticket erstellen": [
     "Create support ticket",
@@ -17045,7 +17217,8 @@
   "Beendet": [
     "Ended",
     "Terminé",
-    "Terminato"
+    "Terminato",
+    "Sona erdi"
   ],
   "Arbeit & Team": [
     "Work & team",
@@ -17295,7 +17468,8 @@
   "Pflicht": [
     "Required",
     "Obligatoire",
-    "Obbligatorio"
+    "Obbligatorio",
+    "Zorunlu"
   ],
   "Automatische Nummerierung": [
     "Automatic numbering",

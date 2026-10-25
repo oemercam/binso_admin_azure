@@ -1,0 +1,116 @@
+# Gesamtaudit und zentrale Korrekturen – 25. Oktober 2026
+
+## Auftrag und Basis
+
+Zweistündiger lokaler Auftrag ab 17:56:51 UTC, spätestens 19:56:51 UTC beenden.
+Basis ist der veröffentlichte Main-Commit `28686510c822afd8da70c15aa2d36d8d27697210`.
+Branch: `fix/full-app-audit-20261025`. Verbindlich bleiben V7.1 und das freigegebene
+Kundendetail-Kartenmuster; Geschäftsprozesse, Finanzdefinitionen, RLS, MFA,
+Navigation/FAB und Tarife werden erhalten. Fachmodule bekommen ihren Hauptort
+unter Mehr, ihre Datensätze und Berechtigungen ändern sich nicht.
+
+Die [frisch aus dem Code abgeleitete Inventur](full-app-audit-20261025/inventory.json)
+enthält sämtliche Quellrouten, Admin-Varianten, APIs und konkrete Übersetzungslücken.
+Die Inventur ist kein Nachweis, dass jeder dynamische Zustand ausgeführt wurde.
+
+## Belegte Befunde und Umsetzung
+
+| ID | Problem / Codebeleg | Korrektur / Nachweis |
+| --- | --- | --- |
+| A01 | Freistehende `.detail-list`, `.action-list` und `.plan-hero` fehlen im Material-Owner. Produkt-/Vertragsdetails und Sonderansichten bleiben flach. | Vorhandenen Owner in `app/design-system/layout.css` erweitert. Ein Rahmen je Gruppe; verschachtelte Gruppen bleiben ohne zweiten Rahmen. Die erweiterte Browserprüfung scheitert am alten Build nachweislich an einer rahmenlosen Datenliste. |
+| A02 | `.detail-list` verwendet alte 13-px-Texte und teils 42/44-px-Zeilen. | Zentral 14 px, 48 px Mindesthöhe, vertikal ausgerichtete und rechtsbündige Werte; mobile Formularschrift bleibt 16 px. |
+| A03 | Fachmodule stehen im Einstellungskatalog. Die mobile Mehr-Navigation bietet einige vorhandene Module nicht direkt an. | Produkte, Lieferanten, Verträge, Mitarbeiter und Abwesenheiten im vorhandenen berechtigungsgefilterten Mehr-Katalog; Fachmodule aus Einstellungen entfernt. Bottom-Navigation/FAB-Geometrie unverändert. |
+| A04 | `EmployeeForm` berechnet einen abweichenden Zeitstatus und übergeht Einreichung/Rückweisung. | Verwendet `timeEntryStatus`. Regression führt die tatsächliche Mitarbeiterzeilen-JSX mit allen kanonischen Statusfällen aus. |
+| A05 | `accessFromSession` erfindet bei fehlendem Tarif Pro. | Fehlende Rolle oder unbekannter/fehlender Tarif werden abgelehnt; sichtbarer Fehler mit Wiederholung statt Freigabe oder endlosem Start. Tatsächliche Guard-Deklaration positiv und negativ ausgeführt. Backend-Sicherheitsgrenzen unverändert. |
+| A06 | Einladungsbetreff, -inhalt und -link sind fest deutsch. | Bestehende Mail-Lokalisierung mit fünf Sprachen, gewählter UI-Sprache und sprachgebundenem Link. Gleiche persistierte Outbox wie Versand; Rollen, frische Bestätigung, Rotation, Replay und RLS bleiben geprüft. Keine echte Mail versendet. |
+| A07 | Datenabhängige Produkttypen, Zahlungsarten und Datumshelfer umgehen die gewählte Sprache. Produktbeschreibung kann mit einem Katalogwort kollidieren. | Vorhandene Übersetzungs-/Datums-Owner verwenden; Namen und Beschreibungen bleiben echte Benutzerdaten. Bestehende Zahlen, Preise und Kalendertage bleiben erhalten. |
+| A08 | `readSetupGuide` benötigt drei sequenzielle Datenbankabfragen. | Eine mandantengebundene Abfrage für Firma, eigene Ausblendung und unveränderte Kapazitätsprädikate. Echter migrierter/RLS-Test prüft Ergebnis, Rollen, eigene Präferenz und genau einen Aufruf. Keine Berechtigungs- oder Abo-Caches. |
+| A09 | Unbenutzter Modulkatalog in `lib/modules.ts` enthält veraltete, nicht vorhandene Navigationsziele; Listen enthalten alte Demo-ID-Fallbacks. | Nach Importprüfung unbenutzten Katalog entfernt, benötigten `ModuleKey` erhalten. Produkt-/Mitarbeiterlisten verwenden reale IDs. |
+| A10 | Berichte rendern bei fehlenden Zahlungs-/Spesenrechten eine leere Informationskarte. | Ganze Karte bedingt rendern; fachliche Erklärungen bleiben bei zugehörigen Daten erreichbar. |
+| A11 | Mobiler Zurück-Test misst Existenz und Sichtbarkeit in verschiedenen DOM-Zuständen. | Wartet auf sichtbaren Button und misst Sichtbarkeit, 44-px-Zielfläche sowie nicht abgeschnittenes Icon atomar. Keine Fehlerunterdrückung oder Zeitlimit-Erhöhung. |
+| A14 | Ein kurzer Feldtitel wie Verkaufspreis bricht mobil wegen der alten festen .4fr-Spalte unnötig um. | Vorhandenes Datenzeilen-Raster verwendet bis zu 50 % natürlich breite Bezeichnungen und den verbleibenden Platz für rechtsbündige Werte. Lange Inhalte bleiben umbrechbar. |
+| A13 | Desktop-Detailaktionen belegen eine eigene 68-px-Zeile samt zusätzlicher Trennlinie. | Vorhandene `DetailHeading` bringt Aktionen direkt in die Titelzeile; mobile Header und fachliche Formular-Footer bleiben erhalten. |
+| A12 | Türkisch ist in großen Teilen des Hauptkatalogs nicht vorhanden. | 174 fehlende Kerntexte ergänzt. Übrige fehlende Texte werden im Inventar vollständig aufgeführt; keine vollständige türkische oder rechtliche Abnahme behauptet. |
+| A15 | Benachrichtigungseinstellungen zeigen vor ihrer GET-Antwort voreingestellte Schalter. Ein Reload kann dadurch kurz einen falschen gespeicherten Zustand darstellen. | Zustellungs- und Gerätegruppe erscheinen erst nach bestätigtem Laden. Der tatsächliche Browsertest hält die erste Antwort an und verlangt null sichtbare Schalter; Fehler-, Wartestatus-, Tastatur- und Persistenzprüfungen bleiben erhalten. |
+
+## Prüfung und tatsächliche Grenzen
+
+Die gezielten Rollen-/Modul-/Tarifprüfungen, Registrierungsintegration,
+MFA-/RLS-/Identitätsprüfungen, Mail-MIME-Prüfung, fünfsprachiger tatsächlicher
+Einladungs-/Outbox-Ablauf, Einrichtung und Status-/Sprachregressionen bestanden
+während der Umsetzung. Frühere fehlgeschlagene Versuche werden nicht als Erfolg
+gezählt. Der erste Build fand einen bei der Bereinigung versehentlich entfernten,
+tatsächlich benötigten `domainConfig`-Import; er wurde wiederhergestellt.
+
+Eine echte lokale API-Messung ohne Antwort-Mocks ergab für acht parallele
+Anfragen 433 ms im ersten Durchgang und 175/163 ms in den Folgedurchgängen,
+jeweils HTTP 200. Einzelne warme Antworten lagen bei 66–174 ms. Das ist ein
+isolierter leerer Testmandant auf lokalem PostgreSQL, kein Azure-, Last- oder
+iPhone-PWA-Nachweis. Daraus folgt keine Zusage zu produktiven Ladezeiten.
+
+Zusätzlich antworteten acht tatsächliche angemeldete HTML-Seiten im lokalen
+Produktionsbuild mit HTTP 200 in 42–156 ms inklusive vollständigem Empfang.
+Die Datenbank hatte während der Browserprobleme keine blockierten Verbindungen.
+Das grenzt die lokale Diagnose ein, beweist aber keine Ursache der produktiven
+PWA-Probleme. Einzelne Browser-Dokumentnavigationen überschritten weiterhin
+30 Sekunden; der ausstehende Dokumentpfad wird unverändert als Fehler erfasst.
+
+Die nativen PostgreSQL-Parallel-, Authentifizierungs-, Registrierungs- und Passkey-Prüfungen bestanden. Der vollständige HTTP-Lauf bestand auf einer separaten frischen Datenbank: alle inventarisierten privaten GET-Routen über acht Rollen, 80 gültige Schreibfälle, Mandantentrennung, Finanz-/Rabatt-/Freigabegrenzen und tatsächlicher Sitzungsablauf. Ein erster HTTP-Start gegen die bereits befüllte Paralleltest-Datenbank wurde korrekt abgewiesen; nichts wurde zurückgesetzt.
+
+Die Browsermatrix scheiterte unter paralleler lokaler Last einmal beim Seitenaufbau und einmal beim Warten auf Netzwerkruhe. Zwölf anschließende isolierte öffentliche/Startansichten mit unveränderten Wartebedingungen bestanden. Die Ursache ist nicht abschließend belegt. Zusätzliche Diagnose protokolliert bei einem Fehler ausstehende Ressourcen ohne Parameter oder Zugangsdaten; keine Wiederholung oder Zeitlimit-Erhöhung im Test. Die breit angelegte Prüfung wird ressourcenschonend aufgeteilt, ohne Routen, Themes oder Assertions zu entfernen.
+
+## Abschluss des begrenzten Auftrags
+
+Der finale Anwendungsstand ist `49d13f08` auf dem oben genannten lokalen Branch.
+Der separate Produktionsbuild dieses Stands bestand. Lint, Typprüfung,
+CSS-Architektur, vollständiger Abhängigkeitssicherheitscheck, Dokumentation,
+Compliance-Gegenprüfungen, Browserplan-, Workflow- und Artefaktverträge bestanden.
+Der erste Sicherheitslauf war durch Sandbox-Netzwerkrechte blockiert; der
+unveränderte Check mit Zugriff auf das offizielle npm-Register bestand.
+
+Der vollständige Desktop-Routenlauf bestand mit 204 Kombinationen aus 102
+Referenzrouten und zwei Themes bei 1440 px, einschließlich der dort aktivierten
+Accessibility-Prüfungen. Er lief auf dem davor gebauten Anwendungsstand `e8f8605f`;
+die anschließende Anwendungsänderung betrifft ausschließlich A15. Das ist keine
+stillschweigende vollständige visuelle Abnahme des späteren Stands.
+
+Offene Abschlussgates zum Zeitlimit: vollständige mobile/Tablet-/WebKit-Matrix,
+vollständiger abschließender Linux-Gesamtlauf und alle repräsentativen UI-Flows
+auf dem finalen Stand. Der laufende Linux-Teststand `42d1c38f` bestand bis zur
+vollständigen Migrations-/Fachprozess-, Workforce- und Aufbewahrungsprüfung;
+dies ersetzt keinen abgeschlossenen Gesamtlauf. Die UI-Prüfung bestätigte die
+Überzahlungs- und verlorene-Zahlungsantwort-Abläufe mit acht Verbrauchern, war
+insgesamt aber noch nicht abgeschlossen. Keine unvollständige Lane wird grün
+gewertet. Die gezielte A15-Fünfsprachenprüfung bleibt bis zum vollständigen
+Ergebnis ebenfalls offen; ein erster Lauf wurde korrekt durch den noch offenen
+Datenschutzdialog der frischen Prüfsitzung blockiert und nach regulärer
+Consent-Vorbereitung neu gestartet, ohne die Assertion zu ändern.
+Der korrigierte A15-Lauf bestand auf dem finalen Produktionsbuild für Deutsch
+einschließlich verzögerter Antwort, Fehlerschutz, Tastatur und Reload-Persistenz;
+die übrigen vier Sprachen waren beim Abbruch noch nicht abgeschlossen.
+Unvollständige Browserprozesse und der eigene Linux-QA-Container wurden zum
+Ende des Zeitfensters gestoppt; die tatsächliche Vorschau bleibt geöffnet.
+
+Unter Windows-WebKit übersprang Tab auch in einer unabhängigen minimalen
+Vergleichsseite Links; der gleiche native Fokus-Vertrag blieb deshalb rot.
+Ein weiterer WebKit-Lauf erreichte die Authenticator-Ansicht nicht rechtzeitig.
+Die Produktions-Start-/Übergangsprobleme sind trotz schneller lokaler APIs und
+HTML-Antworten nicht abschließend erklärt oder als vollständig behoben bestätigt.
+
+Echte lokale Browserbilder liegen im Workspace-Ordner
+`Audit-Vorschau-20261025`: Produkt sowie Kundendetail auf Mobile, Tablet und
+Desktop und die Einstellungskategorien. Sie verwenden ausschließlich
+synthetische Testdaten. Die aktuelle tatsächliche Vorschau läuft auf Port 3294;
+der Einstieg über `http://127.0.0.1:3295/__qa/start` richtet die isolierte
+Prüfsitzung ein. Das ist keine Produktionsanmeldung oder Produktionseinführung.
+
+Ergebnis: zentrale belegte Korrekturen umgesetzt, ausdrücklich **keine vollständige
+Abnahme aller Seiten, Abläufe, Rollen und Sprachen** und keine Releasefreigabe.
+Die bisherigen Ergebnisse sind keine pauschale Abnahme jeder Rolle und jedes
+bedingten Formular-/Fehlerzustands. Echte iPhone/iPad-PWA, externe Zustellung,
+Providerkonfiguration, vollständige fünfsprachige Sichtprüfung und juristisch
+freigegebene Rechtsübersetzungen bleiben eigenständige offene Nachweise.
+
+Keine produktiven Datenänderungen, Migrationen, GitHub-Pushes, Merges oder
+Deployments wurden in diesem Auftrag ausgeführt. Lokale Tests verwenden
+ausschließlich ausgewiesene isolierte Testdatenbanken und synthetische Konten.
