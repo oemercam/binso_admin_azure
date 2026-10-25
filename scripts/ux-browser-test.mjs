@@ -387,7 +387,8 @@ try{
   // Hard fixture resets use a new document; real Link navigation stays on the same page.
   // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
   const waitForScenarioReady=async target=>{if(new URL(target.url()).pathname==='/dev/ux-lab'&&process.env.BINSO_UX_SERVER_MODE==='dev')await waitForLabReady(target);else await target.waitForLoadState('networkidle');};
-  const navigate=async(...args)=>{await waitForScenarioReady(page);assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);const response=await page.goto(...args);await waitForScenarioReady(page);return response};
+  const resetScenarioPage=async()=>{await waitForScenarioReady(page);assert.deepEqual(errors,[],'Runtime errors before scenario reset');const viewport=page.viewportSize();page.removeAllListeners("pageerror");await page.close();page=await trackedPage();await page.setViewportSize(viewport);};
+  const navigate=async(...args)=>{await resetScenarioPage();const response=await page.goto(...args);await waitForScenarioReady(page);return response};
   if(finalSample){
    results.push(...await verifyFinalResponsiveSample({page,base,theme,locale:finalLocale,navigate:async url=>{await navigate(url);return page;},capture:(target,name)=>capture(target,{animations:'disabled',path:path.join(output,name+'.png'),fullPage:true}),output}));
    assert.deepEqual(errors,[],'Final sample has no browser runtime errors');
@@ -495,7 +496,11 @@ try{
       const header=await page.locator('.mobile-header').boundingBox();assert.ok(header&&header.y>=-1&&header.y<=1,`${route}: primary header stays visible while scrolling`);
       await page.evaluate(()=>window.scrollTo(0,0));await settleFrames(page);
     }
-    if(width<=760&&await page.locator('.mobile-header-detail .mobile-header-title').count()){const titleBox=await page.locator('.mobile-header-detail .mobile-header-title').boundingBox();assert.ok(titleBox&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route}: detail title is geometrically centered`);}
+    if(width<=760&&await page.locator('.mobile-header-detail .mobile-header-title').count()){
+     const title=page.locator('.mobile-header-detail .mobile-header-title');await title.waitFor({state:'visible'});
+     const titleBox=await title.evaluate(el=>{const r=el.getBoundingClientRect();return {visible:el.checkVisibility(),x:r.x,width:r.width,height:r.height}});
+     assert.ok(titleBox.visible&&titleBox.width>0&&titleBox.height>0&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route} ${width}px: visible detail title is geometrically centered ${JSON.stringify(titleBox)}`);
+    }
     if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen'].includes(route)){
       const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:!!document.querySelector('.bo-cash-overview .bo-comparison-card,.bo-cash-overview .empty-state'))?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
@@ -658,7 +663,7 @@ try{
   await page.setViewportSize({width:430,height:900});
   if(process.env.BINSO_UX_DEBUG)page.on('response',async response=>{if(response.url().includes('/api/auth/session'))console.log('Session fixture response',response.status(),await response.text())});
   if(hasInteraction('customers')){
-    await verifyCustomerStates(page,{base,capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-customer-'+state+'.png'),fullPage:true})});
+    await verifyCustomerStates(page,{base,navigate:async(url,{pending=false,prepare=async()=>{}}={})=>{await resetScenarioPage();await prepare(page);await page.goto(url);if(!pending)await waitForScenarioReady(page);return page;},capture:state=>capture(page,{animations:'disabled',path:path.join(output,theme+'-customer-'+state+'.png'),fullPage:true})});
 
     customerPosts=0;customerReplays.clear();
     await navigate(base+'/kunden/neu');const customerSheet=()=>page.getByRole('dialog',{name:'Kunde erstellen',exact:true});await customerSheet().waitFor();if(page.viewportSize().width<=760){const spacing=await customerSheet().evaluate(el=>{const grid=el.querySelector('.form-section:not([hidden])>.form-grid'),fields=Array.from(grid.children).filter(child=>child.classList.contains('form-field'));return {gap:fields[1].getBoundingClientRect().top-fields[0].getBoundingClientRect().bottom,expected:parseFloat(getComputedStyle(grid).rowGap)}});assert.ok(spacing.gap>=spacing.expected-1&&spacing.expected>0,'Customer fields use the shared grid gap rather than touching the previous control');}await customerSheet().getByRole('button',{name:'Schliessen',exact:true}).click();await waitForLocalizedRoute(page,base+'/kunden');assert.equal(await page.getByRole('alertdialog').count(),0,'An unchanged customer sheet closes without warning');
@@ -1091,6 +1096,7 @@ try{
   }
   if(hasInteraction('customers')){
    await page.setViewportSize({width:320,height:740});await navigate(base+'/kunden/customer-one');await page.waitForLoadState('networkidle');
+   await assertCustomerHub(page);
    assert.equal(await page.locator('.customer-detail-workspace .surface .status').filter({hasText:/^Aktiv$/}).count(),0,'Customer status appears only in the header');
    assert.equal(await page.locator('.navigation-group>.action-row').count(),8,'V7 hub has eight canonical destinations');
    await page.getByRole('link',{name:'Kontakte 1',exact:true}).click();

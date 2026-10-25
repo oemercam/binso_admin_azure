@@ -30,21 +30,24 @@ export async function assertCustomerDossier(page){
 }
 
 /** Exercise real components using only isolated responses from the existing fixture. */
-export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
+export async function verifyCustomerStates(page,{base,navigate,capture=async()=>{}}){
  const url=base+'/kunden/customer-one';
  const endpoint='**/api/customers/customer-one?include=*';
+ const session='**/api/auth/session';
+ const readOnly=route=>route.fulfill({json:{authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:true}}});
  let mode='loading',release;
  const gate=new Promise(resolve=>{release=resolve});
- // Page routes override the context fixture; fallback delegates to it explicitly.
+ // Install held fixtures only after the old scenario document has closed.
+ // Real Link transitions below still run on the current application page.
  const handler=async route=>{
   if(mode==='loading')await gate;
   if(mode==='error')return route.fulfill({status:503,json:{message:'Synthetic dossier unavailable'}});
   if(mode==='empty')return route.fulfill({json:{item:{id:'customer-one',name:'Synthetic empty customer',status:'active'},counts:{projects:0,offers:0,invoices:0,payments:0,contacts:0,files:0},capabilities:{offers:true,invoices:true,files:true},contacts:[],documents:[],summary:{invoices:[],payments:[],credits:[]},statistics:[],activity:[]}});
   return route.fallback();
  };
- await page.route(endpoint,handler);
+ const visit=async(target,{pending=false,readonly=false}={})=>{page=await navigate(target,{pending,prepare:async next=>{await next.route(endpoint,handler);if(readonly)await next.route(session,readOnly)}})};
  try{
-  await page.goto(url);
+  await visit(url,{pending:true});
   await page.locator('.loading-state').waitFor({state:'attached'});
   assert.equal(await page.locator('.loading-state .sr-only').textContent(),'Die Kundendaten werden abgerufen.','Loading remains announced to assistive technology');
   assert.equal(await page.locator('.loading-state .sr-only').evaluate(el=>getComputedStyle(el).position),'absolute','Loading copy is visually hidden, not removed from accessibility');
@@ -59,20 +62,17 @@ export async function verifyCustomerStates(page,{base,capture=async()=>{}}){
   await verifyChoiceField(page,dialog.locator('.form-check'),{capture:width=>capture('choice-'+width)});
   await page.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   assert.equal(await contact.evaluate(el=>el===document.activeElement),true,'Contact dialog restores keyboard focus');
-  await page.goto(url+'?section=documents');
+  await visit(url+'?section=documents');
   await page.waitForFunction(()=>document.querySelectorAll('.customer-tab-panel .mobile-record-list .document-summary-row').length===2);
   await page.locator('.customer-tab-panel').getByRole('heading',{name:'Dokumente',exact:true}).waitFor();assert.equal(await page.locator('.bo-statistics').count(),0,'Documents retain files and records without a second finance analysis');assert.equal(await page.locator('.customer-tab-panel .mobile-record-list .document-summary-row').count(),2,'Actual invoice and offer remain available');assert.equal(await page.getByPlaceholder('Dokumente suchen...',{exact:true}).isVisible(),true,'Customer documents use the common searchable collection');await page.getByRole('button',{name:'Dokument erstellen',exact:true}).click();const documentActions=page.getByRole('dialog',{name:'Dokument erstellen',exact:true});await documentActions.waitFor();assert.equal(await documentActions.getByRole('link',{name:'Angebot erstellen',exact:true}).getAttribute('href'),'/angebote/neu?customerId=customer-one','New offer retains the dossier customer');assert.equal(await documentActions.getByRole('link',{name:'Rechnung erstellen',exact:true}).getAttribute('href'),'/rechnungen/neu?customerId=customer-one','New invoice retains the dossier customer');await page.keyboard.press('Escape');await documentActions.waitFor({state:'hidden'});await capture('documents');
-  const session='**/api/auth/session';
-  const readOnly=route=>route.fulfill({json:{authenticated:true,tenant:{id:'fixture-tenant',role:'owner',plan:'pro',readOnly:true}}});
-  await page.route(session,readOnly);
   try{
-   await page.goto(url+'?section=contacts');await page.locator('button.contact-main').waitFor();
+   await visit(url+'?section=contacts',{readonly:true});await page.locator('button.contact-main').waitFor();
    assert.equal(await page.locator('button.contact-main').isDisabled(),false,'Read-only contacts retain communication actions');await page.locator('button.contact-main').click();const readActions=page.getByRole('dialog',{name:'Kontaktaktionen',exact:true});await readActions.waitFor();assert.equal(await readActions.getByRole('button',{name:'Kontakt bearbeiten',exact:true}).isDisabled(),true,'Read-only cannot enter the editor');assert.equal(await readActions.getByRole('button',{name:'Kontakt entfernen',exact:true}).isDisabled(),true,'Read-only cannot remove a contact');await page.keyboard.press('Escape');await readActions.waitFor({state:'hidden'});
    assert.equal(await page.getByRole('button',{name:'Kontakt hinzufügen',exact:true}).isDisabled(),true,'Read-only cannot create contacts');
    assert.equal(await page.getByRole('dialog').count(),0);await capture('read-only');
   }finally{await page.unroute(session,readOnly)}
-  mode='empty';await page.goto(url);await assertCustomerHub(page);await page.getByRole('link',{name:'Kontakte 0',exact:true}).click();await page.getByText('Keine Kontakte erfasst',{exact:true}).first().waitFor();await capture('empty');
-  await page.goto(url+'?section=details');await page.getByText('Keine Rechnungen erfasst',{exact:true}).waitFor();
-  await page.goto(url+'?section=activity');await page.getByText('Keine Geschäftsaktivität vorhanden',{exact:true}).waitFor();
+  mode='empty';await visit(url);await assertCustomerHub(page);await page.getByRole('link',{name:'Kontakte 0',exact:true}).click();await page.getByText('Keine Kontakte erfasst',{exact:true}).first().waitFor();await capture('empty');
+  await visit(url+'?section=details');await page.getByText('Keine Rechnungen erfasst',{exact:true}).waitFor();
+  await visit(url+'?section=activity');await page.getByText('Keine Geschäftsaktivität vorhanden',{exact:true}).waitFor();
  }finally{release();await page.unroute(endpoint,handler)}
 }

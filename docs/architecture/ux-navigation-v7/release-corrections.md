@@ -43,3 +43,35 @@ and new exact-SHA owner approval; the earlier approval does not transfer.
 Physical iPhone/iPad, full role/language/legal acceptance and the documented
 intermittent WebKit startup observation remain open. No new migration or workflow
 change is included. No production deployment is asserted by this report.
+
+## Browser harness follow-up after approved a56def1b
+
+Quality run `40204371870` passed Linux tests, security/scanner qualification,
+build, both functional lanes and four responsive lanes. One Chromium lane
+observed a transient unmeasurable mobile project heading; the geometry contract
+now waits for a visible heading and measures visibility/size/centering atomically,
+preserving the 1.5-px tolerance. Customer hub checks similarly wait for their
+actual eight-row owner rather than treating network idleness as a React commit.
+
+Another WebKit lane exposed repeated hard navigations inside the customer state
+fixture. This was reproduced locally with the iPhone 13 engine profile: a prior
+document's RSC prefetches emitted access-control page errors during `page.goto`
+scenario resets. The existing central fresh-document scenario reset is now also
+used inside this helper. Held/read-only fixture routes are installed on the new
+page after closing the old scenario, avoiding interference with old prefetches.
+Actual contact links, retry, read-only denials, editors and all other application
+Link navigation remain real transitions. Runtime error assertions remain active;
+no error filtering, retry loop or timeout increase is added.
+
+The first context-wide held-fixture attempt stalled old prefetch requests and
+was discarded in favor of page-scoped setup after the reset. Failed logs remain
+private QA evidence. The original compliance report recorded zero failed checks
+but lacked Chromium evidence for `/belege`, `/preview/zeit` and `/vertraege`
+because a responsive lane exited early. These missing cases are not passes.
+Local corrected customer flows now pass in both themes with the iPhone 13 WebKit
+profile (four matrix cases plus the complete customer interaction domain, zero
+runtime errors). The project title passes twelve Chromium cases across all six
+mobile reference widths and both themes, including compliance measurements.
+These local checks do not replace all mandatory fresh CI gates.
+This follow-up changes tests/documentation only, with unchanged application and
+migration source relative to approved `3aa8b4c1` / `a56def1b`.
