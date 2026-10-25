@@ -30,7 +30,7 @@ import {monitoringFixture} from './observability-fixture.mjs';
 import {fullRoutes} from './qa-plan.mjs';
 import {saveDomEvidence} from './ux-dom-evidence.mjs';
 import {verifyMobileLoginGeometry} from './auth-ux-browser.mjs';
-import {assertCustomerDossier,verifyCustomerStates} from './customer-ux-browser.mjs';
+import {assertCustomerHub,verifyCustomerStates} from './customer-ux-browser.mjs';
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
@@ -529,25 +529,8 @@ try{
      await withNavigationPreferenceLock(async()=>{
       if(width>=761)await page.waitForFunction(()=>document.querySelector('.desktop-navigation-toggle')?.getAttribute('aria-expanded')==='true');
       await waitForFiniteAnimations(page);
-      await assertCustomerDossier(page);
-      const dossier=page.locator('.detail-grid[data-layout="dossier"]');
-      assert.equal(await dossier.count(),1,'Customer overview uses the shared reference dossier layout');
-      assert.equal(await dossier.locator('[data-area="summary"] .metric').count(),2,'Customer overview shows actual yearly volume and open receivables');
-      assert.deepEqual(await page.getByRole('tab').allTextContents(),['Übersicht','Dokumente','Verlauf'],'Phase 1 customer dossier has exactly three tabs');assert.equal(await page.locator('.financial-snapshot').count(),0,'Retired customer-development section is absent');
-      assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Reference dossier has exactly one visible primary heading');
-      const summaryBox=await dossier.locator('[data-area="summary"]').boundingBox(),factsBox=await dossier.locator('[data-area="facts"]').boundingBox(),recordsBox=await dossier.locator('[data-area="records"]').boundingBox();
-      if(width<=760)assert.ok(summaryBox.y<factsBox.y&&factsBox.y<recordsBox.y,'Mobile order: finances, contact facts, open invoices');
-      else if(await page.locator('.customer-detail-workspace').evaluate(el=>el.clientWidth)<=720){
-       assert.ok(summaryBox.y+summaryBox.height<=factsBox.y&&factsBox.y+factsBox.height<=recordsBox.y,'Compact desktop order: finances, contact facts, open invoices');
-       assert.ok(Math.abs(summaryBox.x-recordsBox.x)<=1&&Math.abs(summaryBox.width-recordsBox.width)<=1,'Compact desktop sections share the available content width');
-      }else assert.ok(factsBox.x>summaryBox.x&&recordsBox.y>summaryBox.y,'Desktop order: work on the left, contact facts on the right');
-      const supplementary=dossier.locator('.bo-data-disclosure');
-      if(width<=760){
-       assert.equal(await supplementary.getAttribute('open'),null,'Supplementary mobile facts start collapsed');
-       await supplementary.locator('summary').click();await page.waitForFunction(()=>document.querySelector('.bo-data-disclosure').open);
-       await supplementary.locator('summary').press('Enter');await page.waitForFunction(()=>!document.querySelector('.bo-data-disclosure').open);
-       await supplementary.locator('summary').evaluate(el=>el.blur());
-      }else assert.notEqual(await supplementary.getAttribute('open'),null,'Desktop supplementary facts stay visible');
+      await assertCustomerHub(page);
+      assert.equal(await page.locator('h1').filter({visible:true}).count(),1,'Customer hub has one visible heading');
      });
 
     }
@@ -1432,7 +1415,7 @@ try{
    const priorCustomer={...customer};collections.customers.push({...customer,id:'customer-two',city:'Zürich'});customerIdentityMode=true;
    const priorInvoice={...invoice},priorOpenAmount=summary.invoices[0].open_amount;
    dataPaymentMode=true;dataPaymentPosts=0;paymentReplays.clear();invoice.total=2561.97;invoice.subtotal=2370;invoice.vat=191.97;invoice.paid_amount=0;summary.invoices[0].open_amount=2561.97;
-   const tabs={};for(const [name,path] of Object.entries({detail:'/rechnungen/RE-TEST-1',list:'/rechnungen',customer:'/kunden/customer-one',customerOverview:'/kunden/customer-one?tab=overview',payments:'/zahlungen',finance:'/finanzen',dashboard:'/dashboard',activity:'/kunden/customer-one',form:'/zahlungen/neu?invoice=RE-TEST-1'})){tabs[name]=await trackedPage();await tabs[name].goto(base+path);await tabs[name].waitForLoadState('networkidle');await tabs[name].evaluate(()=>{window.v215ConsumerMarker='same-document';window.v215ConsumerChanges=[];window.v215ConsumerObserver=new BroadcastChannel('binso-data-events');window.v215ConsumerObserver.onmessage=event=>{if(event.data?.type==='changed')window.v215ConsumerChanges.push(event.data)}});}
+   const tabs={};for(const [name,path] of Object.entries({detail:'/rechnungen/RE-TEST-1',list:'/rechnungen',customer:'/kunden/customer-one',customerOverview:'/kunden/customer-one?section=details',payments:'/zahlungen',finance:'/finanzen',dashboard:'/dashboard',activity:'/kunden/customer-one',form:'/zahlungen/neu?invoice=RE-TEST-1'})){tabs[name]=await trackedPage();await tabs[name].goto(base+path);await tabs[name].waitForLoadState('networkidle');await tabs[name].evaluate(()=>{window.v215ConsumerMarker='same-document';window.v215ConsumerChanges=[];window.v215ConsumerObserver=new BroadcastChannel('binso-data-events');window.v215ConsumerObserver.onmessage=event=>{if(event.data?.type==='changed')window.v215ConsumerChanges.push(event.data)}});}
    const customerList=await trackedPage();await customerList.goto(base+'/kunden');await customerList.waitForLoadState('networkidle');
    await customerList.evaluate(()=>{window.v215CustomerListMarker='same-document';window.v215CustomerChanges=[];window.v215CustomerObserver=new BroadcastChannel('binso-data-events');window.v215CustomerObserver.onmessage=event=>{if(event.data?.type==='changed')window.v215CustomerChanges.push(event.data)}});
    const editor=await trackedPage();await editor.goto(base+'/rechnungen/neu?customerId=customer-one');await editor.waitForLoadState('networkidle');const picker=editor.getByLabel('Kunde auswählen',{exact:true});
@@ -1463,7 +1446,7 @@ try{
    if(!await tabs.list.getByText(/2[’']561\.97/).count())console.log('Pending read diagnostics:',await tabs.list.locator('body').innerText());
    assert.ok(await tabs.list.getByText(/2[’']561\.97/).count(),'A confirmed invoice stays visible while a background request is pending');
    holdDataRefresh=false;dataRefreshWaiters.splice(0).forEach(resolve=>resolve());await tabs.list.waitForLoadState('networkidle');
-   await tabs.customer.getByRole('tab',{name:'Dokumente',exact:true}).click();await tabs.activity.getByRole('tab',{name:'Verlauf',exact:true}).click();
+   await tabs.customer.goto(base+'/kunden/customer-one?section=documents');await tabs.activity.goto(base+'/kunden/customer-one?section=activity');
    for(const consumer of Object.values(tabs))await consumer.evaluate(()=>{window.v215ConsumerChanges=[]});
    await tabs.form.getByLabel('Zahlungsbetrag CHF',{exact:true}).fill('1000');
    const initialPosts=dataPaymentPosts;dataPaymentFailed=true;await tabs.form.getByRole('button',{name:'Zahlung speichern',exact:true}).click();await tabs.form.getByText('Synthetic payment failed',{exact:true}).waitFor();assert.equal(invoice.paid_amount,0);assert.equal(dataPaymentPosts,initialPosts+1);assert.equal(await tabs.detail.getByText(/1[’']561\.97/).count(),0,'Failed payment cannot create a visible fictional balance');
