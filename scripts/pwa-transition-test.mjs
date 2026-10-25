@@ -22,8 +22,10 @@ const originalWindow=globalThis.window,originalDocument=globalThis.document,orig
 try{
  // Execute the actual list hook before running any effect. No storage or API
  // access is permitted during SSR; navigation restores validated state at once.
- const h=hooks(),store=new Map();
- const {useRecordsController}=load('components/records.tsx',{react:h.react,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:(search,chips)=>{const value=new URLSearchParams(search).get('status');return chips.includes(value)?value:undefined;}}});
+ const h=hooks(),store=new Map();let routePath='/kunden',routeSearch='';
+ const navigation={usePathname:()=>routePath,useSearchParams:()=>new URLSearchParams(routeSearch)};
+ const statusOverride=(search,chips)=>{const value=new URLSearchParams(search).get('status');return chips.includes(value)?value:undefined;};
+ const {useRecordsController}=load('components/records.tsx',{react:h.react,'next/navigation':navigation,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:statusOverride}});
  const options={placeholder:'Kunden suchen...',chips:['Alle','Aktiv'],columns:[{index:0},{index:2}]};
  globalThis.window=undefined;
  assert.equal(h.render(()=>useRecordsController(options)).restored,false,'SSR does not read window or display a default query');
@@ -34,10 +36,19 @@ try{
  list.setQuery('New');list.setSort('asc');list=h.render(()=>useRecordsController(options));
  assert.deepEqual([list.query,list.sort,list.page],['New','asc',0],'Batched control changes preserve each other and reset pagination');
  list=h.render(()=>useRecordsController({...options,chips:['Alle']}));assert.equal(list.activeChip,'Alle','Removed permission-driven filters cannot survive');
- window.location.pathname='/produkte';list=h.render(()=>useRecordsController(options));assert.equal(list.query,'','A different destination never displays the previous search');
- const broken=hooks(),brokenHook=load('components/records.tsx',{react:broken.react,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:()=>undefined}}).useRecordsController;
+ routePath='/produkte';window.location.pathname='/produkte';list=h.render(()=>useRecordsController(options));assert.equal(list.query,'','A different destination never displays the previous search');
+ const broken=hooks(),brokenHook=load('components/records.tsx',{react:broken.react,'next/navigation':navigation,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:()=>undefined}}).useRecordsController;
  store.set('binso.list:/produkte:Kunden suchen...',JSON.stringify({query:42,activeChip:'Forbidden',sort:'random',sortIndex:999,page:-1}));broken.hydrate();list=broken.render(()=>brokenHook(options));
  assert.deepEqual([list.query,list.activeChip,list.sort,list.sortIndex,list.page],['','Alle','default',0,0]);
+ // Next may render the new page before committing the browser address. The old
+ // window URL must neither choose the wrong saved filter nor receive its writes.
+ const lagging=hooks(),laggingHook=load('components/records.tsx',{react:lagging.react,'next/navigation':navigation,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:statusOverride}}).useRecordsController;
+ const previousPage=store.get('binso.list:/produkte:Kunden suchen...');routePath='/kunden';lagging.hydrate();
+ list=lagging.render(()=>laggingHook(options));assert.equal(list.query,'Acme','Router destination restores its own state while window.location still names the source page');
+ lagging.effects.at(-1)();assert.equal(store.get('binso.list:/produkte:Kunden suchen...'),previousPage,'A destination effect cannot overwrite the previous page state');
+ assert.equal(JSON.parse(store.get('binso.list:/kunden:Kunden suchen...')).activeChip,'Aktiv');
+ routeSearch='status=Aktiv';const drilldown=hooks(),drilldownHook=load('components/records.tsx',{react:drilldown.react,'next/navigation':navigation,'@/lib/client/list-state':{listStateStore:store},'@/lib/list-filter':{listStatusOverride:statusOverride}}).useRecordsController;drilldown.hydrate();
+ assert.equal(drilldown.render(()=>drilldownHook(options)).activeChip,'Aktiv','A destination drilldown uses router search parameters rather than the old browser query');
 
  // Production version detection uses real component/effect code, bounded public
  // metadata reads and an explicit action; not a forced controllerchange reload.

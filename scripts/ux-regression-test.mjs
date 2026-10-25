@@ -231,7 +231,7 @@ console.log('Project-linked idle timer context survives synchronization without 
  const emptyAst=ts.createSourceFile('ui.tsx',await fs.readFile('components/ui.tsx','utf8'),99,true,4);
  const emptyFragment=emptyAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='EmptyState').getText(emptyAst);
  const listFragment=listAst.statements.filter(node=>ts.isVariableStatement(node)&&node.declarationList.declarations.some(d=>['subscribeReadiness','clientReady','serverReady'].includes(d.name.getText(listAst)))||ts.isFunctionDeclaration(node)&&['useRecordsController','RecordsControls','RecordsView','tone','DataTable','DataTableHead','DataTableRow','tableCells','recordGrid'].includes(node.name?.text)).map(node=>node.getText(listAst)).join('\n')+'\n'+emptyFragment;
- const listCompiled=ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ const listCompiled='const usePathname=()=>"/";const useSearchParams=()=>new URLSearchParams();\n'+ts.transpileModule(listFragment,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
  const fixture=[['hidden-z','First','CHF 900.00','Neu','REF-1'],['hidden-a','Second',"CHF 1’200.00",'Gelöst','REF-2']];
  const render=(chip='Alle',sort='default',sortIndex=1,filtersOpen=false,query='')=>{
   let hook=0;const states=[{key:'',value:{query,activeChip:chip,sort,sortIndex,page:0}},false,filtersOpen,{activeChip:chip,sort,sortIndex}];const exports={};

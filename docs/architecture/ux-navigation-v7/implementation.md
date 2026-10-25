@@ -35,7 +35,7 @@ Echte lokale Anwendung, synthetische Firma: Kunden-Zentrale bei 320/390/430/768/
 
 ## Finaler Prüfstand
 
-Anwendungsstand: e1ffb6e2efa3a2e6780958817d927c9c60dd0235. Danach ausschliesslich QA-Synchronisation/Diagnostik und Dokumentation; keine weitere Anwendungs-, API-, CSS-, Berechtigungs- oder Migrationsänderung.
+Erster vollständig geprüfter Anwendungsstand: e1ffb6e2efa3a2e6780958817d927c9c60dd0235. QA-Nachtrag 780f0ad2 bestand ebenfalls alle 82 Linux-Testgruppen. Im grossen Browserabschluss danach tatsächlich reproduziert: Admin-Kundenfilter wird beim Rückweg von Tickets überschrieben, weil Next die Zielseite vor der Browseradressänderung rendert. Der zentrale Records-Owner verwendet nun die Router-Route/-Suchparameter und denselben rendergebundenen Schreib-Key; gezielte Hook-/SSR-Gegenfälle erfolgreich. Keine Finanz-, Berechtigungs-, API- oder Migrationsänderung. Finaler Router-Korrekturstand und dessen Browser-/Build-Nachweis werden im QA-Protokoll nachgeführt.
 
 - Frozen-Lockfile-Installation, Lint, CSS, Typecheck, release:check, security:scan:all und optimierter Produktionsbuild: Exit 0.
 - Vollständiger unveränderter pnpm-test-Befehl: alle 82 Gruppen unter Linux erfolgreich, Exit 0. Offizielles node:24.20.0-bookworm-slim, Digest sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e, pnpm 10.17.1. Eigentümerfreigabe zur isolierten Laufzeitausnahme liegt vor. Git-Bundle des exakten Stands, keine Host-Zugangsdaten, keine Produktionsdaten. Unix-Socket-/Manifestprüfungen unverändert bestanden.

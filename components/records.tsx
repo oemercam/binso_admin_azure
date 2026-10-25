@@ -5,6 +5,7 @@ import {compareRecordValues} from "@/lib/record-sort";
 import {matchesRecordChip,listStatusOverride} from "@/lib/list-filter";
 
 import Link from "next/link";
+import {usePathname,useSearchParams} from 'next/navigation';
 import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useSyncExternalStore, useId, useRef, type ReactNode, type CSSProperties, type SetStateAction } from "react";
 import {EmptyState, Icon, Status, LoadingState, ErrorState, Button, Field, Select, Input} from "./ui";
 import { ListRow, FilterSheet, ListSearch, DetailTabs, FormSheet } from "./binso-ux";
@@ -60,25 +61,26 @@ type ListSelection={query:string;activeChip:string;sort:"default"|"asc"|"desc";s
 
 /** One committed search/filter/sort state, reusable in a page header or list toolbar. */
 export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,enabled=true}:{placeholder:string;chips?:string[];columns?:RecordsColumns;enabled?:boolean}){
+  const pathname=usePathname(),search=useSearchParams().toString();
   const firstSortIndex=columns?.[0]?.index??0;
   const statusIndex=columns?.find(column=>column.status)?.index;
   const chipsKey=JSON.stringify(chips);
   const columnIndexes=JSON.stringify(columns?.map(column=>column.index)??[]);
   const ready=useSyncExternalStore(subscribeReadiness,clientReady,serverReady);
-  const key=enabled&&ready?"binso.list:"+window.location.pathname+":"+placeholder:"";
+  const key=enabled&&ready?"binso.list:"+pathname+":"+placeholder:"";
   // Like the central period owner, SSR stays unresolved. A client navigation
   // restores synchronously, before any consumer starts its query or paints.
   const restoredSelection=useMemo<ListSelection>(()=>{
     const storedChips:string[]=JSON.parse(chipsKey),indexes:number[]=JSON.parse(columnIndexes);
     const defaults:ListSelection={query:"",activeChip:storedChips[0]??"Alle",sort:"default",sortIndex:firstSortIndex,page:0};
     if(!key)return defaults;
-    const requested=listStatusOverride(window.location.search,storedChips);
+    const requested=listStatusOverride(search,storedChips);
     try{
       const saved=JSON.parse(listStateStore.get(key)??"null");
       if(saved)return {query:typeof saved.query==="string"?saved.query:"",activeChip:requested??(storedChips.includes(saved.activeChip)?saved.activeChip:defaults.activeChip),sort:["default","asc","desc"].includes(saved.sort)?saved.sort:"default",sortIndex:Number.isInteger(saved.sortIndex)&&(!indexes.length||indexes.includes(saved.sortIndex))?saved.sortIndex:firstSortIndex,page:requested?0:Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0};
     }catch{/* Invalid page-memory state falls back to the current list contract. */}
     return {...defaults,activeChip:requested??defaults.activeChip};
-  },[key,chipsKey,columnIndexes,firstSortIndex]);
+  },[key,search,chipsKey,columnIndexes,firstSortIndex]);
   const [selection,setSelection]=useState<{key:string;value:ListSelection}|null>(null);
   const current=selection?.key===key?selection.value:restoredSelection;
   const {query,sort,sortIndex,page}=current;
@@ -98,12 +100,13 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
   const listContext=JSON.stringify({query,activeChip,sort,sortIndex,page});
   useEffect(()=>{
     if(!enabled)return;
-    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    const key="binso.list:scroll:"+pathname+":"+placeholder;
+    scrollSnapshot.current=null;
     try{const saved=JSON.parse(listStateStore.get(key)??"null");if(saved&&Number.isFinite(saved.y)&&saved.y>=0&&typeof saved.context==="string")scrollSnapshot.current=saved;}catch{}
-  },[enabled,placeholder]);
+  },[enabled,pathname,placeholder]);
   useEffect(()=>{
     if(!enabled||!restored)return;
-    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    const key="binso.list:scroll:"+pathname+":"+placeholder;
     const remember=(event:MouseEvent)=>{
       const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>(".mobile-record-list a,.desktop-record-row[href]"):null;
       if(!link||link.closest("[data-records-owner]")?.getAttribute("data-records-owner")!==placeholder||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.target==="_blank")return;
@@ -111,8 +114,10 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
     };
     document.addEventListener("click",remember,true);
     return()=>document.removeEventListener("click",remember,true);
-  },[enabled,restored,placeholder,listContext]);
-  useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
+  },[enabled,restored,pathname,placeholder,listContext]);
+  // Next renders a destination before committing window.location. Read and write
+  // the same router-owned key, never the previous page's browser URL.
+  useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set(key,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[key,restored,query,activeChip,sort,sortIndex,page,enabled]);
 
 
   const [searchOpen,setSearchOpen]=useState(false),[filterOpen,setFilterOpen]=useState(false);
