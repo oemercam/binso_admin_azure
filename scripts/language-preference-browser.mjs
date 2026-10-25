@@ -48,7 +48,7 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
 
 /** Actual switches retain confirmed state, localized names and keyboard semantics.
  * The isolated HTTP adapter never dispatches notifications or changes a real user. */
-async function verifyNotificationPreference(page,{base,locale,text}){
+export async function verifyNotificationPreference(page,{base,locale,text}){
  let enabled=true,phase='fail',updates=0,release,started;
  let releaseRead,readStarted,holdRead=true;
  const pendingRead=new Promise(resolve=>releaseRead=resolve),receivedRead=new Promise(resolve=>readStarted=resolve);

@@ -59,7 +59,48 @@ Die nativen PostgreSQL-Parallel-, Authentifizierungs-, Registrierungs- und Passk
 
 Die Browsermatrix scheiterte unter paralleler lokaler Last einmal beim Seitenaufbau und einmal beim Warten auf Netzwerkruhe. Zwölf anschließende isolierte öffentliche/Startansichten mit unveränderten Wartebedingungen bestanden. Die Ursache ist nicht abschließend belegt. Zusätzliche Diagnose protokolliert bei einem Fehler ausstehende Ressourcen ohne Parameter oder Zugangsdaten; keine Wiederholung oder Zeitlimit-Erhöhung im Test. Die breit angelegte Prüfung wird ressourcenschonend aufgeteilt, ohne Routen, Themes oder Assertions zu entfernen.
 
-Abschließende vollständige Code-/Browserprüfungen: noch in Arbeit.
+## Abschluss des begrenzten Auftrags
+
+Der finale Anwendungsstand ist `49d13f08` auf dem oben genannten lokalen Branch.
+Der separate Produktionsbuild dieses Stands bestand. Lint, Typprüfung,
+CSS-Architektur, vollständiger Abhängigkeitssicherheitscheck, Dokumentation,
+Compliance-Gegenprüfungen, Browserplan-, Workflow- und Artefaktverträge bestanden.
+Der erste Sicherheitslauf war durch Sandbox-Netzwerkrechte blockiert; der
+unveränderte Check mit Zugriff auf das offizielle npm-Register bestand.
+
+Der vollständige Desktop-Routenlauf bestand mit 204 Kombinationen aus 102
+Referenzrouten und zwei Themes bei 1440 px, einschließlich der dort aktivierten
+Accessibility-Prüfungen. Er lief auf dem davor gebauten Anwendungsstand `e8f8605f`;
+die anschließende Anwendungsänderung betrifft ausschließlich A15. Das ist keine
+stillschweigende vollständige visuelle Abnahme des späteren Stands.
+
+Offene Abschlussgates zum Zeitlimit: vollständige mobile/Tablet-/WebKit-Matrix,
+vollständiger abschließender Linux-Gesamtlauf und alle repräsentativen UI-Flows
+auf dem finalen Stand. Der laufende Linux-Teststand `42d1c38f` bestand bis zur
+vollständigen Migrations-/Fachprozess-, Workforce- und Aufbewahrungsprüfung;
+dies ersetzt keinen abgeschlossenen Gesamtlauf. Die UI-Prüfung bestätigte die
+Überzahlungs- und verlorene-Zahlungsantwort-Abläufe mit acht Verbrauchern, war
+insgesamt aber noch nicht abgeschlossen. Keine unvollständige Lane wird grün
+gewertet. Die gezielte A15-Fünfsprachenprüfung bleibt bis zum vollständigen
+Ergebnis ebenfalls offen; ein erster Lauf wurde korrekt durch den noch offenen
+Datenschutzdialog der frischen Prüfsitzung blockiert und nach regulärer
+Consent-Vorbereitung neu gestartet, ohne die Assertion zu ändern.
+
+Unter Windows-WebKit übersprang Tab auch in einer unabhängigen minimalen
+Vergleichsseite Links; der gleiche native Fokus-Vertrag blieb deshalb rot.
+Ein weiterer WebKit-Lauf erreichte die Authenticator-Ansicht nicht rechtzeitig.
+Die Produktions-Start-/Übergangsprobleme sind trotz schneller lokaler APIs und
+HTML-Antworten nicht abschließend erklärt oder als vollständig behoben bestätigt.
+
+Echte lokale Browserbilder liegen im Workspace-Ordner
+`Audit-Vorschau-20261025`: Produkt sowie Kundendetail auf Mobile, Tablet und
+Desktop und die Einstellungskategorien. Sie verwenden ausschließlich
+synthetische Testdaten. Die aktuelle tatsächliche Vorschau läuft auf Port 3294;
+der Einstieg über `http://127.0.0.1:3295/__qa/start` richtet die isolierte
+Prüfsitzung ein. Das ist keine Produktionsanmeldung oder Produktionseinführung.
+
+Ergebnis: zentrale belegte Korrekturen umgesetzt, ausdrücklich **keine vollständige
+Abnahme aller Seiten, Abläufe, Rollen und Sprachen** und keine Releasefreigabe.
 Die bisherigen Ergebnisse sind keine pauschale Abnahme jeder Rolle und jedes
 bedingten Formular-/Fehlerzustands. Echte iPhone/iPad-PWA, externe Zustellung,
 Providerkonfiguration, vollständige fünfsprachige Sichtprüfung und juristisch
