@@ -10,8 +10,9 @@ export const moreNavigation = [
  {title:'Geschäft',items:[
   {href:'/angebote',label:'Angebote',icon:'file'},
   {href:'/rechnungen',label:'Rechnungen',icon:'receipt'},
-  {href:'/finanzen',label:'Finanzen',icon:'chart'},
-  {href:'/spesen',label:'Spesen',icon:'card'},
+  {href:'/zahlungen',label:'Zahlungen',icon:'wallet'},
+  {href:'/spesen',label:'Ausgaben & Spesen',icon:'card'},
+  {href:'/finanzen',label:'Finanzübersicht',icon:'chart'},
  ]},
  {title:'Auswertung',items:[{href:'/berichte',label:'Berichte',icon:'chart'}]},
  {title:'Verwaltung',items:[

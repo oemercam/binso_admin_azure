@@ -1,5 +1,20 @@
 # Verbindliche UI-Foundation
 
+## Freigegebene Inhaltskarten vom 25. Oktober 2026
+
+Die jüngste Owner-Anweisung überträgt das bestehende Kundendetail-Muster auf
+die Inhaltsgruppen aller Kunden- und Admin-Seiten und Unterseiten. Der gemeinsame
+Owner in `app/design-system/layout.css` verwendet vorhandene Tokens: einen dünnen
+Rahmen, 16 px Rundung und 16 px Innenabstand. Navigationsgruppen behalten 48-px-Zeilen
+mit 18-px-Icons und eingerückten Trennlinien. Ihre Überschrift steht ausserhalb der
+Karte. Verschachtelte Listen, Diagramme und Abschnitte erhalten keinen zweiten
+Rahmen. Die bisherigen rahmenlosen Inhaltsverträge werden dadurch ersetzt.
+
+Bereichs-Icons stammen weiterhin aus der bestehenden Navigation. Datenzeilen,
+Formulare und Tabellen behalten ihre Semantik und Abläufe. Öffentliche Website,
+Dokumentausgabe, Dialoge sowie Bottom-Navigation und blauer Plus-Button behalten
+ihre jeweiligen Owner. Abgeleitete Seiten benötigen weiterhin visuelle Abnahme.
+
 ## Quelle und Rangfolge
 
 Die unveränderten Dateien in `docs/audit/v24/reference/` und die Ergänzungen in
@@ -25,6 +40,10 @@ Backdrop-Unschärfe und keine Schattenkapsel um Header-Aktionen. Normale
 Dialog-Abdunklung und fachlich nötige Buttonformen bleiben davon getrennt.
 `LoadingState` kündigt Wartezeiten ausschliesslich barrierefrei an; kein blauer
 Fortschrittsbalken und keine sichtbaren Ladesätze beim internen Seitenwechsel. Seine Beschreibung bleibt ausschliesslich für Screenreader vorhanden.
+Seine zentralen Varianten `layout="page"` und `layout="records"` reservieren
+ruhige Inhaltsgeometrie; eingebettete Zustände bleiben standardmässig kompakt.
+Bekannte Listensteuerungen dürfen bei der Rückkehr ausschliesslich als inerte,
+sitzungsgebundene Platzhalter bleiben, bis die aktuelle Route registriert ist.
 Seitenuntertitel und Ergebniszähler zeigen während des Abrufs keine Ersatztexte.
 Ein Startbildschirm gehört nur zum initialen Sessionaufbau, nie zum internen
 Seitenwechsel oder Zurück. Fehler und Wiederholungsaktionen bleiben sichtbar.

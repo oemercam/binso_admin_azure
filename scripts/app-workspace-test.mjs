@@ -8,14 +8,16 @@ import {withoutLocalization} from './localized-source.mjs';
 import {navigationAccess} from './navigation-foundation-test.mjs';
 const require=createRequire(import.meta.url),read=file=>fs.readFileSync(file,'utf8');
 const compile=source=>ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const catalogs={};
+for(const file of ['config/workspace-navigation.ts','config/create-actions.ts'])Function('require','exports',compile(read(file)))(require,catalogs);
 const ast=ts.createSourceFile('workspace.tsx',withoutLocalization(read('components/binso-ux.tsx')),99,true,4);
 const source="const Fragment=require('react').Fragment;\n"+ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const exports={},root={current:null};let state=0,guard;
 const control=({children,...props})=>React.createElement('button',props,children);
-Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','createPortal','document',compile(source))(
+Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','createPortal','document','mainNavigation','moreNavigation','createActions',compile(source))(
  require,exports,React.Children,React.isValidElement,React.cloneElement,
  initial=>[state++===1?true:initial,()=>{}],()=>root,()=>{},()=>({push(){}}),()=>root,(active,blocked,unload)=>{guard={active,unload};return()=>{}},()=>null,
- ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}});
+ ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}},catalogs.mainNavigation,catalogs.moreNavigation,catalogs.createActions);
 function render(workspace,dirty=true,busy=false,children=React.createElement('input',{defaultValue:'Unsaved'})){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},children));}
 const inline=render(true),modal=render(false);
 const fragmented=render(true,true,false,React.createElement(React.Fragment,null,React.createElement('input'),React.createElement('div',{className:'filter-sheet-actions'},'Save')));

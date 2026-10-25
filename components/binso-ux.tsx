@@ -1,6 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement,useLocale} from "@/lib/client/locale";
+import {mainNavigation,moreNavigation} from '@/config/workspace-navigation';
 import {localeTags} from '@/lib/locales/config';
 import {formControlSnapshot} from '@/lib/client/form-snapshot';
 import { Children, Fragment, isValidElement, cloneElement, useState, useRef, useEffect, useLayoutEffect, useContext, useId, type ReactNode, type CSSProperties } from "react";
@@ -18,15 +19,18 @@ import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard
 import ConfirmDialog from "./confirm-dialog";
 import {createActions,permittedCreateActions,createReturnHref} from "@/config/create-actions";
 
+// Reuse existing destination icons, including modules reached through settings.
+const informationDestinations=[...mainNavigation,...moreNavigation.flatMap<{href:string;icon:string}>(group=>group.items),...createActions.map(item=>({href:item.href.replace(/\/neu$/,''),icon:item.icon}))];
+
 /** Action rows have one DOM shape; navigation and destructive intent are explicit. */
-export function ActionRow({title,verbatim=false,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,current=false,description,metadata,endAdornment,selected,role,tabIndex,onKeyDown}: {
- title:string;verbatim?:boolean;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;current?:boolean;description?:string;metadata?:string;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
+export function ActionRow({title,verbatim=false,icon,href,onClick,disabled=false,requiresWrite=false,danger=false,navigation=false,current=false,description,metadata,value,endAdornment,selected,role,tabIndex,onKeyDown}: {
+ title:string;verbatim?:boolean;icon:ReactNode;href?:string;onClick?:()=>void;disabled?:boolean;requiresWrite?:boolean;danger?:boolean;navigation?:boolean;current?:boolean;description?:string;metadata?:string;value?:ReactNode;endAdornment?:ReactNode;selected?:boolean;role?:"radio";tabIndex?:number;onKeyDown?:React.KeyboardEventHandler<HTMLButtonElement>;
 }) {
  const access=usePageAccess();
  if(href&&!access.canOpen(href))return null;
  const blocked=disabled||(requiresWrite&&!access.write);
  const className=`action-row${danger?" action-row-danger":""}`;
- const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span>{description||metadata?<span><LocalizedText verbatim={verbatim}>{title}</LocalizedText></span>:<LocalizedText verbatim={verbatim}>{title}</LocalizedText>}{description&&<small className="action-row-description"><LocalizedText verbatim={verbatim}>{description}</LocalizedText></small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&role!=="radio"&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
+ const body=<>{typeof icon==='string'?<Icon name={icon} size={18}/>:icon}<span className="action-row-label">{description||metadata?<span><LocalizedText verbatim={verbatim}>{title}</LocalizedText></span>:<LocalizedText verbatim={verbatim}>{title}</LocalizedText>}{description&&<small className="action-row-description"><LocalizedText verbatim={verbatim}>{description}</LocalizedText></small>}{metadata&&<small className="action-row-description">{metadata}</small>}</span>{value!==undefined&&<span className="action-row-value">{value}</span>}{endAdornment??(selected!==undefined?<span className="action-row-selection" aria-hidden="true">{selected&&role!=="radio"&&<Icon name="check" size={16}/>}</span>:!danger&&(navigation||href)&&<Icon name="arrow" size={16}/>)}</>;
  return href&&!blocked?<Link prefetch={href.startsWith("/api/")?false:undefined} href={href} onClick={onClick} className={className} aria-current={current?"page":undefined}>{body}</Link>:<button type="button" className={className} disabled={blocked} onClick={onClick} role={role} aria-checked={role==="radio"?selected:undefined} tabIndex={tabIndex} onKeyDown={onKeyDown}>{body}</button>;
 }
 
@@ -101,14 +105,14 @@ export function MetricTile({ label, value, hint, currency, icon, trend,compactMo
   return <Metric trend={trend} icon={icon} label={label} value={currency&&typeof value==='number'?<span className="metric-money" title={currency+" "+full} aria-label={currency+" "+full}><span className="metric-money-currency">{currency}</span>{" "}<span>{amount}</span></span>:value} hint={hint}/>;
 }
 
-/** Open workspace sections share page spacing without adding nested card chrome. */
+/** Workspace sections share the customer-detail card and row boundary contract. */
 export function WorkspaceSection({children,className=""}:{children:ReactNode;className?:string}){
  return <section className={`bo-workspace-section ${className}`.trim()}>{children}</section>;
 }
 
 /** Settings groups share one label, surface and row boundary contract. */
 export function SettingsGroup({title,children}:{title:string;children:ReactNode}){
- return <section className="bo-settings-group"><h2><LocalizedText>{title}</LocalizedText></h2><div className="bo-settings-group-body">{children}</div></section>;
+ return <section className="bo-settings-group"><h2><LocalizedText>{title}</LocalizedText></h2><div className="bo-settings-group-body navigation-group">{children}</div></section>;
 }
 
 /** Route links and local detail tabs keep their behavior and share one container. */
@@ -226,7 +230,8 @@ export function ActionsMenu({label,children,busy=false,header=false,tools=false}
 
 /** Canonical two-line row shared by entity and financial lists. */
 export function ListRow({href,onClick,title,meta,value,valueLabel,status,tone="neutral",compact=false,information=false,translateTitle=true,valuePlacement="separate"}:{translateTitle?:boolean;href?:string;onClick?:()=>void;title:ReactNode;meta:ReactNode;value?:ReactNode;valueLabel?:string;status?:string;tone?:"success"|"warning"|"danger"|"neutral"|"info";compact?:boolean;information?:boolean;valuePlacement?:"separate"|"metadata"}){
- const content=<><b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small className={information?"sr-only":undefined}>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&value==null&&<span className="record-chevron"><Icon name="arrow" size={16}/></span>}</>;
- const className=`document-summary-row${value!=null?" has-value":""}${compact?" is-compact":""}${information?" is-information":""}${valuePlacement==='metadata'?' amount-in-metadata':''}`;
+ const rowIcon=information&&href?informationDestinations.find(item=>href===item.href||href.startsWith(item.href+'/')||href.startsWith(item.href+'?'))?.icon:undefined;
+ const content=<>{rowIcon&&<Icon name={rowIcon} size={18}/>}<b><LocalizedText verbatim={!translateTitle}>{title}</LocalizedText></b><small className={information?"sr-only":undefined}>{meta}</small>{status&&<Status appearance="pill" tone={tone}>{status}</Status>}{value!=null&&<span className="document-summary-amount">{valueLabel&&<small><LocalizedText>{valueLabel}</LocalizedText></small>}<strong>{value}</strong></span>}{(href||onClick)&&!status&&(value==null||!!rowIcon)&&<span className="record-chevron"><Icon name="arrow" size={16}/></span>}</>;
+ const className=`document-summary-row${rowIcon?" has-row-icon":""}${value!=null?" has-value":""}${compact?" is-compact":""}${information?" is-information":""}${valuePlacement==='metadata'?' amount-in-metadata':''}`;
  return href?<Link href={href} className={className}>{content}</Link>:onClick?<button type="button" onClick={onClick} className={className}>{content}</button>:<div className={className}>{content}</div>;
 }

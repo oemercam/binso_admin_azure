@@ -109,7 +109,7 @@ export async function verifyNavigationPersistence(page,{base,capture=async()=>{}
   // V4.1 settings is a detail header (back/title/actions), without a competing account avatar.
   await page.locator('.mobile-back').click();await page.waitForURL(base+'/dashboard');await page.waitForLoadState('networkidle');
   await page.getByRole('button',{name:'Benutzerkonto',exact:true}).filter({visible:true}).click();
-  const security=page.locator('.account-sheet').getByRole('link',{name:'Sicherheit',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(url=>url.pathname==='/einstellungen/sicherheit');
+  const security=page.locator('.account-sheet').getByRole('link',{name:'Sicherheit & Anmeldung',exact:true});await security.focus();await security.press('Enter');await page.waitForURL(url=>url.pathname==='/einstellungen/sicherheit');
   await page.getByRole('button',{name:'Passwort ändern',exact:true}).click();
   const password=page.getByRole('dialog',{name:'Passwort ändern',exact:true});
   assert.equal(await password.locator('input[type="password"]').count(),3,'Existing current/new/confirm password fields stay in the real shared form');

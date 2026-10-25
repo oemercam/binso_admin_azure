@@ -3,20 +3,34 @@ import {writeTestOutput} from './test-output.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
+import http from 'node:http';
 import {pathToFileURL} from 'node:url';
 const engines=await import(process.env.BINSO_PLAYWRIGHT_MODULE?pathToFileURL(process.env.BINSO_PLAYWRIGHT_MODULE).href:'playwright');
 const baseline=process.env.BINSO_LOADING_BASELINE==='1',output=process.env.BINSO_LOADING_OUTPUT??'/tmp/binso-loading-after';
 await fs.mkdir(output,{recursive:true});
-const base=process.env.BINSO_BASE_URL??'http://127.0.0.1:3360';assert.ok(['127.0.0.1','localhost'].includes(new URL(base).hostname),'Synthetic browser authentication requires a loopback app server');
+const upstream=process.env.BINSO_BASE_URL??'http://127.0.0.1:3361',base='http://127.0.0.1:3360';assert.ok(['127.0.0.1','localhost'].includes(new URL(upstream).hostname),'Synthetic browser authentication requires a loopback app server');
 const uiAuth=await createUiAuthFixture();
-let server,logs='';
-if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3360'],{env:{...process.env,...uiAuth.env,PORT:'3360',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);for(let i=0;;i++){try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i===100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,100));}}
+let server,logs='',handleApi;
+// A service worker can bypass Playwright route mocks. Put synthetic API responses
+// on the real local HTTP boundary so an active worker sees the same held gates.
+const fixtureServer=http.createServer((request,response)=>{
+ const target=new URL(request.url,upstream);
+ if(target.pathname.startsWith('/api/')&&handleApi){
+  Promise.resolve(handleApi({request:()=>({url:()=>target.href}),fulfill:({status=200,json})=>{response.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});response.end(JSON.stringify(json));}})).catch(()=>{if(!response.headersSent)response.writeHead(503);response.end('Synthetic API fixture failed');});return;
+ }
+ // Absolute request targets may only supply a path, never an upstream authority.
+ const local=new URL(upstream);
+ const forward=http.request({hostname:local.hostname,port:local.port,path:target.pathname+target.search,method:request.method,headers:{...request.headers,host:local.host}},remote=>{response.writeHead(remote.statusCode,remote.headers);remote.pipe(response)});
+ forward.on('error',()=>{if(!response.headersSent)response.writeHead(503);response.end('Synthetic upstream unavailable');});request.pipe(forward);
+});
+await new Promise((resolve,reject)=>{fixtureServer.once('error',reject);fixtureServer.listen(3360,'127.0.0.1',resolve)});
+if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_UX_SERVER_FILE?[process.env.BINSO_UX_SERVER_FILE]:['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3361'],{env:{...process.env,...uiAuth.env,PORT:'3361',HOSTNAME:'127.0.0.1'},stdio:['ignore','pipe','pipe']});server.stdout.on('data',v=>logs+=v);server.stderr.on('data',v=>logs+=v);for(let i=0;;i++){try{if((await fetch(upstream+'/api/health')).ok)break;}catch{}if(i===100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,100));}}
 const browser=await engines[process.env.BINSO_UX_BROWSER??'webkit'].launch({headless:true});const results=[];
 try{
  for(const viewport of [{width:390,height:844},{width:1440,height:1000}])for(const theme of ['light','dark']){
-  const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
+  const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:baseline?'block':'allow'});
   await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));let authCalls=0,delay=350,authMode='valid',showCustomer=false,profileGate=null,dashboardGate=null;const calls={};
-  await context.route('**/api/**',async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
+  handleApi=async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
    if(p==='/api/customers'&&showCustomer)return route.fulfill({json:{items:[{id:'fixture',name:'Prüffirma AG',status:'active',city:'Bern'}]}});
    if(p==='/api/finance/overview')return route.fulfill({json:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}});
@@ -28,11 +42,18 @@ try{
    }
    if(p==='/api/customers/fixture')return route.fulfill({json:{item:{id:'fixture',name:'Prüffirma AG',status:'active',street:'Teststrasse 1',postal_code:'3000',city:'Bern'},contacts:[],documents:[],statistics:[],activity:[],summary:{invoices:[],offers:[],time:{hours:0,invoiced_hours:0}}}});
    await new Promise(r=>setTimeout(r,150));return route.fulfill({json:{items:[],tracker:null}});
-  });
+  };
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-09'}));window.loadingFrames=[];const capture=()=>{const visible=selector=>{const el=document.querySelector(selector);return !!el&&el.getBoundingClientRect().height>0&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none';};window.loadingFrames.push({at:performance.now(),phase:['.app-launch-screen','.app-session-loading','.app-launch','.app-root'].filter(visible),content:document.querySelector('.page-container')?.innerText??'',visibleLoadingCopy:[...document.querySelectorAll('.page-container *')].some(el=>el.childElementCount===0&&/\b(?:wird|werden)\b.*\b(?:geladen|abgerufen)\b/i.test(el.textContent??'')&&!el.closest('.sr-only,.visually-hidden')&&el.checkVisibility()),iconWidth:document.querySelector('.app-start-icon')?parseFloat(getComputedStyle(document.querySelector('.app-start-icon')).width):null,iconAnimation:document.querySelector('.app-start-icon')?getComputedStyle(document.querySelector('.app-start-icon')).animationName:null});requestAnimationFrame(capture)};requestAnimationFrame(capture)},theme);
   let page=await context.newPage();
   async function measure(label,action,ready='Keine Kunden erfasst'){
-   const before=authCalls,requestsBefore={...calls};await action();await page.getByText(ready,{exact:true}).waitFor();await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   const before=authCalls,requestsBefore={...calls},pending=new Set();
+   const requested=request=>pending.add(request),finished=request=>pending.delete(request);
+   page.on('request',requested);page.on('requestfinished',finished);page.on('requestfailed',finished);
+   try{await action();}catch(error){
+    console.error('Navigation failure diagnostics',JSON.stringify({theme,viewport,label,path:new URL(page.url()).pathname,pending:[...pending].map(request=>({path:new URL(request.url()).pathname,type:request.resourceType()}))}));
+    throw error;
+   }finally{page.off('request',requested);page.off('requestfinished',finished);page.off('requestfailed',finished);}
+   await page.getByText(ready,{exact:true}).waitFor();await page.waitForFunction(()=>!document.querySelector('.app-launch-screen,.app-session-loading,.app-launch'));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
    const frames=await page.evaluate(()=>window.loadingFrames),readyFrame=frames.find(f=>f.content.includes(ready)&&!f.phase.includes('.app-launch-screen')&&!f.phase.includes('.app-launch'));
    const phases=[...new Set(frames.map(f=>f.phase.join(',')))];const durations={};
    for(let i=0;i<frames.length-1;i++)for(const phase of frames[i].phase)if(phase!=='.app-root')durations[phase]=(durations[phase]||0)+frames[i+1].at-frames[i].at;
@@ -42,6 +63,8 @@ try{
   }
   await measure('cold',()=>page.goto(base+'/kunden'));
   if(!baseline){
+   await page.waitForFunction(()=>navigator.serviceWorker?.controller?.scriptURL.endsWith('/sw.js'),undefined,{timeout:20000});
+   assert.equal(await page.evaluate(()=>Boolean(navigator.serviceWorker.controller)),true,'The current loading regression must actually run under its active service worker');
    // Separate real readiness events, not fixed sleeps: the profile may arrive
    // well before the ledger. Neither may reveal an empty first dashboard.
    let releaseProfile,releaseDashboard;
@@ -49,7 +72,7 @@ try{
    const profileRequested=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/settings/profile');
    const dashboardRequested=page.waitForRequest(request=>new URL(request.url()).pathname==='/api/dashboard');
    try{
-    await page.goto(base+'/dashboard');await Promise.all([profileRequested,dashboardRequested]);
+    await page.goto(base+'/dashboard');await Promise.all([profileRequested,dashboardRequested]);await page.locator('.app-launch-screen').waitFor({state:'visible'});
     assert.equal(await page.locator('.app-root').isVisible(),false,'Identity alone cannot reveal placeholder identity or an empty dashboard');
     assert.equal(await page.locator('.app-launch-screen').isVisible(),true,'Existing launch surface covers first-page readiness');
     const profileReceived=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/settings/profile');
@@ -92,5 +115,5 @@ try{
   authMode='error';await page.reload();await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   await context.close();
  }
- await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
-}finally{await browser.close();server?.kill();await uiAuth.close();}
+ await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',activeServiceWorker:!baseline,syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
+}finally{await browser.close();fixtureServer.closeAllConnections();await new Promise(resolve=>fixtureServer.close(resolve));server?.kill();await uiAuth.close();}

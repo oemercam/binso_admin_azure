@@ -9,12 +9,12 @@ fullRoutes.push('/lieferanten','/lieferanten/neu','/lieferanten/supplier-one');
 fullRoutes.push('/abwesenheiten','/einstellungen/abwesenheiten');
 fullRoutes.push('/vertraege','/vertraege/contract-one');
 const appLegalRoutes=['/einstellungen/rechtliches',...['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter'].map(document=>'/einstellungen/rechtliches/'+document)];
-fullRoutes.push(...appLegalRoutes,'/hilfe');
+fullRoutes.push(...appLegalRoutes,'/hilfe','/support/ticket-one?view=conversation');
 export const webkitFullRoutes=['/bericht','/angebot','/berichte','/projekte','/projekte/project-one','/dashboard','/finanzen','/support/ticket-one','/rechnungen','/zeit','/mitarbeiter/neu','/mitarbeiter/employee-one','/projekte/neu','/rechnungen/RE-TEST-1','/kunden/neu','/produkte/neu','/spesen/neu','/angebote/neu','/zahlungen/neu'];
 webkitFullRoutes.push('/lieferanten/neu','/lieferanten/supplier-one');
 webkitFullRoutes.push('/abwesenheiten','/einstellungen/abwesenheiten');
 webkitFullRoutes.push('/vertraege','/vertraege/contract-one');
-webkitFullRoutes.push(...appLegalRoutes,'/hilfe');
+webkitFullRoutes.push(...appLegalRoutes,'/hilfe','/support/ticket-one?view=conversation');
 const groups={
  contracts:{match:/commercial-contract|contract-document|vertraege|app\/api\/contracts/,routes:['/vertraege','/vertraege/contract-one'],interactions:[]},
  absences:{match:/absence|abwesenheit/,routes:['/abwesenheiten','/einstellungen/abwesenheiten'],interactions:[]},
@@ -60,6 +60,8 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/lieferanten')?'supplier-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(global||paths.some(p=>/customer-workspace|workspace-navigation|v7-navigation|pages\/(customers|finance|projects|payments|support)/.test(p)))suites.add('v7-navigation-test');
+ if(global||paths.some(p=>/pwa-|startup|app\/api\/dashboard|components\/pages\/time/.test(p)))suites.add('pwa-transition-test');
  if(global||paths.some(p=>/components\/(setup-process|setup-guide|directory-select|select-control|documents|document-settings|entity-files|offer-history|pages\/(customers|time|dashboard|payments))|lib\/(setup-readiness|display-format|server\/repositories\/customer-activity)|scripts\/audit-corrections-test/.test(p)))suites.add('audit-corrections-test');
  if(paths.some(p=>/employee|employment|wage-definition|absence|abwesenheit|commercial-contract|contract-condition|app\/api\/contracts|mitarbeiter|supplier|lieferanten|expense|spesen|workforce|external-resource|sensitive-access|invitation|team-settings|lib\/server\/(database|repositories\/business-api)\.ts/.test(p)))suites.add('employee-dossier-test');
  if(global||paths.some(p=>/customer|kunden|business-api|financial/.test(p)))suites.add('customer-financial-projection-test');

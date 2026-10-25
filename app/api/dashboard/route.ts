@@ -3,7 +3,7 @@ import {cashStatisticsData} from '@/lib/server/repositories/finance';
 import {tenantCan} from '@/lib/permissions';
 import {dashboardAttention,dashboardWork} from '@/lib/server/repositories/dashboard';
 import {listApiBusiness} from '@/lib/server/repositories/business-api';
-import {assertModuleEntitlement,getOrganizationPlan} from '@/lib/server/plan-access';
+import {assertModuleEntitlement,organizationPlanInTransaction} from '@/lib/server/plan-access';
 import {planAllowsModule} from '@/config/plan-access';
 import {authorize} from '@/lib/server/rbac';
 import {requireSession} from '@/lib/server/session';
@@ -13,12 +13,13 @@ export async function GET(){
  try{
   const session=await requireSession();
   if(session.moduleProfile==='time_only')authorize(session,'organization:read');
-  const plan=await getOrganizationPlan(session.organizationId);
   const canFinance=tenantCan(session.role,'accounting:read');
   const canInvoices=tenantCan(session.role,'invoices:read'),canPayments=tenantCan(session.role,'payments:read');
   if(canInvoices)authorize(session,'documents:read');
-  if(canPayments){authorize(session,'payments:read');assertModuleEntitlement(plan,'zahlungen');}
+  if(canPayments)authorize(session,'payments:read');
   return json(await withTenant(session.organizationId,session.userId,async c=>{
+   const plan=await organizationPlanInTransaction(c,session.organizationId);
+   if(canPayments)assertModuleEntitlement(plan,'zahlungen');
    const attention=await dashboardAttention(c,session);
    const recent=canInvoices?await listApiBusiness(c,session,'documents','kind=eq.invoice&order=updated_at.desc&limit=5'):[];
    const cash=canFinance?await cashStatisticsData(c,session.organizationId):null;

@@ -2687,7 +2687,8 @@
   "Adresse": [
     "Address",
     "Adresse",
-    "Indirizzo"
+    "Indirizzo",
+    "Adres"
   ],
   "AGB": [
     "Terms",
@@ -3981,7 +3982,8 @@
   "Beschreibung": [
     "Description",
     "Description",
-    "Descrizione"
+    "Descrizione",
+    "Açıklama"
   ],
   "Bestand wieder 0 bei frischer Messung": [
     "Count back to 0 with a fresh measurement",
@@ -5022,8 +5024,9 @@
   ],
   "Datenschutz & Cookies": [
     "Privacy & cookies",
-    "Protection des données et cookies",
-    "Privacy e cookie"
+    "Confidentialité et cookies",
+    "Privacy e cookie",
+    "Gizlilik ve çerezler"
   ],
   "Datenschutz-Einstellung gespeichert.": [
     "Privacy preference saved.",
@@ -6930,7 +6933,8 @@
   "Finanzübersicht": [
     "Financial overview",
     "Vue d’ensemble financière",
-    "Panoramica finanziaria"
+    "Panoramica finanziaria",
+    "Finansal genel bakış"
   ],
   "Firma": [
     "Company",
@@ -8257,7 +8261,8 @@
   "Konto": [
     "Account",
     "Compte",
-    "Account"
+    "Account",
+    "Hesap"
   ],
   "Konto erstellen": [
     "Create account",
@@ -8477,8 +8482,9 @@
   ],
   "Kundenbereiche": [
     "Customer sections",
-    "Rubriques client",
-    "Sezioni cliente"
+    "Rubriques du client",
+    "Sezioni del cliente",
+    "Müşteri bölümleri"
   ],
   "Kundendaten einmal sauber erfassen.": [
     "Enter customer details correctly once.",
@@ -9975,7 +9981,8 @@
   "Persönliche Daten": [
     "Personal details",
     "Données personnelles",
-    "Dati personali"
+    "Dati personali",
+    "Kişisel bilgiler"
   ],
   "Persönliche Daten gespeichert.": [
     "Personal details saved.",
@@ -9990,7 +9997,8 @@
   "Persönliches Konto": [
     "Personal account",
     "Compte personnel",
-    "Account personale"
+    "Account personale",
+    "Kişisel hesap"
   ],
   "Plan": [
     "Plan",
@@ -10783,7 +10791,8 @@
   "Sitzung": [
     "Session",
     "Session",
-    "Sessione"
+    "Sessione",
+    "Oturum"
   ],
   "Sitzung abgemeldet.": [
     "Session signed out.",
@@ -12546,7 +12555,8 @@
   "Zahlungen": [
     "Payments",
     "Paiements",
-    "Pagamenti"
+    "Pagamenti",
+    "Ödemeler"
   ],
   "Zahlungen letzte 30 Tage": [
     "Payments in the last 30 days",
@@ -13027,7 +13037,8 @@
   "Zurück": [
     "Back",
     "Retour",
-    "Indietro"
+    "Indietro",
+    "Geri"
   ],
   "Zurück zu Binso One": [
     "Back to Binso One",
@@ -14179,7 +14190,14 @@
   "Neue Version verfügbar": [
     "New version available",
     "Nouvelle version disponible",
-    "Nuova versione disponibile"
+    "Nuova versione disponibile",
+    "Yeni sürüm mevcut"
+  ],
+  "Bitte offene Änderungen zuerst speichern oder verwerfen.": [
+    "Please save or discard pending changes first.",
+    "Veuillez d’abord enregistrer ou abandonner les modifications en cours.",
+    "Prima salva o annulla le modifiche in sospeso.",
+    "Lütfen önce bekleyen değişiklikleri kaydedin veya iptal edin."
   ],
   "Dokumentdaten": [
     "Document details",
@@ -14784,7 +14802,8 @@
   "Dateien": [
     "Files",
     "Fichiers",
-    "File"
+    "File",
+    "Dosyalar"
   ],
   "Dokument erstellen": [
     "Create document",
@@ -18202,5 +18221,35 @@
     "Décomptes",
     "Rendiconti",
     "Hesap dökümleri"
+  ],
+  "Ausgaben & Spesen": [
+    "Expenses & reimbursements",
+    "Dépenses et frais",
+    "Uscite e spese",
+    "Giderler ve masraflar"
+  ],
+  "Sicherheit & Anmeldung": [
+    "Security & sign-in",
+    "Sécurité et connexion",
+    "Sicurezza e accesso",
+    "Güvenlik ve giriş"
+  ],
+  "Geräte & Sitzungen": [
+    "Devices & sessions",
+    "Appareils et sessions",
+    "Dispositivi e sessioni",
+    "Cihazlar ve oturumlar"
+  ],
+  "Unterhaltung": [
+    "Conversation",
+    "Conversation",
+    "Conversazione",
+    "Görüşme"
+  ],
+  "Zahlungskonto": [
+    "Payment account",
+    "Compte de paiement",
+    "Conto di pagamento",
+    "Ödeme hesabı"
   ]
 }

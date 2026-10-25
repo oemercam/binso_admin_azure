@@ -1,12 +1,67 @@
 import assert from 'node:assert/strict';
 
+// Owner-approved customer-detail material applies to these existing content owners.
+// Menus, forms, navigation chrome and public output keep their own geometry.
+export const contentGroupSelector=':is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block)';
+
+export async function assertContentGroups(page){
+ const groups=await page.evaluate(selector=>[...document.querySelectorAll(':is(.app-root,.operator-root) '+selector)].filter(el=>el.checkVisibility()).map(el=>{
+  const css=getComputedStyle(el),nested=!!el.parentElement?.closest(selector);
+  return {name:el.className,nested,borders:[css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth],radius:css.borderRadius,padding:[css.paddingTop,css.paddingRight,css.paddingBottom,css.paddingLeft],navigation:el.matches('.navigation-group,.bo-settings-group-body'),shadow:css.boxShadow};
+ }),contentGroupSelector);
+ for(const group of groups){
+  assert.ok(group.borders.every(value=>value===(group.nested?'0px':'1px')),'One card perimeter, no nested or doubled borders: '+JSON.stringify(group));
+  assert.equal(group.radius,group.nested?'0px':'16px','Shared customer-detail card radius: '+JSON.stringify(group));
+  assert.deepEqual(group.padding,group.nested?['0px','0px','0px','0px']:group.navigation?['0px','16px','0px','16px']:['16px','16px','16px','16px'],'Shared customer-detail card inset: '+JSON.stringify(group));
+  assert.equal(group.shadow,'none','Quiet shared card material');
+ }
+ const information=await page.locator('.document-summary-row.is-information[href]').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>({label:el.textContent,icon:el.querySelector(':scope>svg')?.getBoundingClientRect().width,height:el.getBoundingClientRect().height,gap:getComputedStyle(el).columnGap,line:getComputedStyle(el,'::after').content==='none'?null:parseFloat(getComputedStyle(el,'::after').left),labelOffset:el.querySelector(':scope>b').getBoundingClientRect().left-el.getBoundingClientRect().left})));
+ for(const row of information){
+  assert.equal(row.icon,18,'Shared information navigation retains its existing 18px area icon: '+row.label);
+  assert.equal(row.height,48,'Shared information navigation retains a compact 48px row');
+  assert.equal(row.gap,'12px','Shared information navigation retains its column alignment');
+  if(row.line!==null)assert.equal(row.line,row.labelOffset,'Information separators start at the label column, like the customer hub');
+ }
+ const files=await page.locator('.document-detail-view + .surface').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>el.getBoundingClientRect().top-el.previousElementSibling.getBoundingClientRect().bottom));
+ for(const gap of files)assert.equal(gap,16,'File sections retain the shared workspace gap after document details');
+}
+
+export async function verifyContentGroupRegression(page){
+ const card=page.locator(':is(.app-root,.operator-root) '+contentGroupSelector).filter({visible:true}).first();
+ if(!await card.count())return;
+ const original=await card.getAttribute('style');
+ for(const [property,value,message] of [['border-width','2px',/One card perimeter/],['border-radius','7px',/Shared customer-detail card radius/],['padding-left','11px',/Shared customer-detail card inset/]]){
+  try{await card.evaluate((el,{property,value})=>el.style.setProperty(property,value,'important'),{property,value});await assert.rejects(()=>assertContentGroups(page),message);}
+  finally{await card.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),original);}
+ }
+ await card.evaluate(el=>{const nested=document.createElement('section');nested.className='surface';nested.id='content-group-regression-probe';nested.textContent='Layout probe';el.append(nested);});
+ try{
+  await assertContentGroups(page);
+  await page.locator('#content-group-regression-probe').evaluate(el=>el.style.setProperty('border','1px solid','important'));
+  await assert.rejects(()=>assertContentGroups(page),/One card perimeter/,'A nested second card perimeter is rejected');
+ }finally{await page.locator('#content-group-regression-probe').evaluate(el=>el.remove());}
+ const informationIcon=page.locator('.document-summary-row.is-information[href]>svg').filter({visible:true}).first();
+ if(await informationIcon.count()){
+  const iconStyle=await informationIcon.getAttribute('style');
+  try{await informationIcon.evaluate(el=>el.style.setProperty('width','17px','important'));await assert.rejects(()=>assertContentGroups(page),/18px area icon/,'An inconsistent area-icon column is rejected');}
+  finally{await informationIcon.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),iconStyle);}
+ }
+ const fileSection=page.locator('.document-detail-view + .surface').filter({visible:true}).first();
+ if(await fileSection.count()){
+  const fileStyle=await fileSection.getAttribute('style');
+  try{await fileSection.evaluate(el=>el.style.setProperty('margin-top','0px','important'));await assert.rejects(()=>assertContentGroups(page),/shared workspace gap/,'Touching document and file cards are rejected');}
+  finally{await fileSection.evaluate((el,value)=>value===null?el.removeAttribute('style'):el.setAttribute('style',value),fileStyle);}
+ }
+ await assertContentGroups(page);
+}
+
 /** Resolve visibility and styles in one DOM turn: a rerender can detach locator handles. */
 export async function measureListFrameBorders(page){
- return page.evaluate(()=>[...document.querySelectorAll('.records,.desktop-record-table')].flatMap(el=>{
+ return page.evaluate(selector=>[...document.querySelectorAll('.records,.desktop-record-table')].flatMap(el=>{
   const css=getComputedStyle(el),rect=el.getBoundingClientRect();
   return el.isConnected&&rect.width>0&&rect.height>0&&css.visibility!=='hidden'&&css.visibility!=='collapse'
-   ?[{top:css.borderTopWidth,bottom:css.borderBottomWidth}]:[];
- }));
+   ?[{top:css.borderTopWidth,bottom:css.borderBottomWidth,expected:el.closest('.app-root,.operator-root')&&el.matches(selector)&&!el.parentElement?.closest(selector)?'1px':'0px'}]:[];
+ }),contentGroupSelector);
 }
 
 /** Query and read KPI borders atomically, without carrying handles across a rerender. */
@@ -15,7 +70,7 @@ export async function measureMetricDividers(page){
 }
 
 export async function measureOpenSectionShapes(page){
- return page.evaluate(()=>[...document.querySelectorAll('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{radius:css.borderRadius,compactTimeCard:el.matches('.app-root[data-ux="master-v3"] .page-container[data-section="zeit"] .time-section')&&matchMedia('(max-width:760px)').matches}]:[]}));
+ return page.evaluate(selector=>[...document.querySelectorAll('.page-container :is(.surface,.detail-card,.timer-card,.invoice-form)')].flatMap(el=>{const css=getComputedStyle(el),box=el.getBoundingClientRect();return box.width>0&&box.height>0&&!['hidden','collapse'].includes(css.visibility)?[{radius:css.borderRadius,expectedRadius:el.closest('.app-root,.operator-root')&&el.matches(selector)&&!el.parentElement?.closest(selector)?'16px':'0px'}]:[];}),contentGroupSelector);
 }
 
 /** Real-browser countercases: detached snapshots, live borders and hidden tables. */
@@ -26,7 +81,7 @@ export async function verifyListFrameMeasurement(page){
   await page.evaluate(()=>{const next=document.querySelector('.records').cloneNode(true);document.querySelector('.records').replaceWith(next);});
   const stale=await detached.evaluate(el=>({top:getComputedStyle(el).borderTopWidth,bottom:getComputedStyle(el).borderBottomWidth}));
   if(page.context().browser().browserType().name()==='chromium')assert.deepEqual(stale,{top:'',bottom:''},'Chromium detached locator snapshots have no computed border styles');
-  assert.deepEqual(await measureListFrameBorders(page),[{top:'0px',bottom:'0px'}],'Measure the connected replacement, excluding the hidden table');
+  assert.deepEqual(await measureListFrameBorders(page),[{top:'0px',bottom:'0px',expected:'0px'}],'Measure the connected replacement, excluding the hidden table');
   await page.locator('.records').evaluate(el=>{el.style.borderTop='1px solid';});
   assert.equal((await measureListFrameBorders(page))[0].top,'1px','A real leading separator remains a failing measurement');
   await page.locator('.records').evaluate(el=>{el.style.borderTop='0';el.style.borderBottom='1px solid';});
@@ -34,9 +89,9 @@ export async function verifyListFrameMeasurement(page){
   assert.deepEqual(await measureMetricDividers(page),[{left:'0px',compact:false}],'KPI measurement queries the connected replacement in the same DOM turn');
   await page.locator('.metric').evaluate(el=>{el.style.borderLeft='1px solid';});
   assert.deepEqual(await measureMetricDividers(page),[{left:'1px',compact:false}],'A real noncompact KPI divider remains visible to the strict zero-border assertion');
-  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'0px',compactTimeCard:false}],'Section measurement reads the connected replacement');
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'0px',expectedRadius:'0px'}],'Section measurement reads the connected replacement');
   await page.locator('.surface').evaluate(el=>{el.style.borderRadius='7px';});
-  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'7px',compactTimeCard:false}],'A real incorrect section radius remains visible to the strict shape assertion');
+  assert.deepEqual(await measureOpenSectionShapes(page),[{radius:'7px',expectedRadius:'0px'}],'A real incorrect section radius remains visible to the strict shape assertion');
  }finally{await detached.dispose();}
 }
 
@@ -112,19 +167,21 @@ async function verifyAnimationStabilityRegression(page){
 export async function assertMobileHeaderTargets(page){
  await waitForFiniteAnimations(page);
  const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back').filter({visible:true});
- for(const target of await targets.all()){
-  const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify({label:await target.getAttribute('aria-label'),width:box.width,height:box.height}));
+ // Hydration may replace the header between awaited nth-locator operations.
+ // Snapshot the same visible targets and all their dimensions in one DOM task.
+ const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
+ for(const box of measured){
+  assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify(box));
  }
  return targets;
 }
 
 export async function assertChatTargets(page){
  const targets=page.locator('.thread-composer>label,.thread-composer>button').filter({visible:true});
- assert.ok(await targets.count()>=2,'Chat exposes attachment and send controls');
- for(const target of await targets.all()){
-  const box=await target.boundingBox();
-  assert.ok(box.width>=44&&box.height>=44,`Chat actions retain at least 44px touch targets (${await target.getAttribute('aria-label')}: ${box.width}×${box.height})`);
+ const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
+ assert.ok(measured.length>=2,'Chat exposes attachment and send controls');
+ for(const box of measured){
+  assert.ok(box.width>=44&&box.height>=44,`Chat actions retain at least 44px touch targets (${box.label}: ${box.width}×${box.height})`);
  }
 }
 

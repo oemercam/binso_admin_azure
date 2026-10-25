@@ -7,6 +7,17 @@ import {clearQuerySnapshots,readQuerySnapshot,writeQuerySnapshot} from './query-
 let snapshotSession=dataRevision([]);
 subscribeClientData(()=>{const session=dataRevision([]);if(session!==snapshotSession){clearQuerySnapshots();snapshotSession=session;}});
 
+/** Intent/bootstrap preloading shares the exact same memory owner and fences.
+ * A response arriving after a mutation or identity change is never installed. */
+export async function prefetchApiQuery(path:string){
+ const session=dataRevision([]),revision=dataRevision([path]);
+ if(readQuerySnapshot(path,revision,session)!==undefined)return;
+ try{
+  const data=await apiGet(path);
+  if(session===dataRevision([])&&revision===dataRevision([path]))writeQuerySnapshot(path,revision,session,data);
+ }catch{/* A preload never hides the owning view's real error/retry state. */}
+}
+
 /** Revalidate mounted consumers only; an obsolete response cannot overwrite newer state. */
 export function useDataRevision(paths:readonly string[]){
  const key=JSON.stringify(paths);

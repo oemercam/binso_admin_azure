@@ -6,3 +6,10 @@ export function safeAppPath(value:unknown,fallback="/dashboard"):string{
  if(/%(?:2f|5c|0[0-9a-f]|1[0-9a-f]|7f)/i.test(value.split(/[?#]/,1)[0]))return fallback;
  try{const origin="https://binso.invalid",url=new URL(value,origin);return url.origin===origin?url.pathname+url.search+url.hash:fallback}catch{return fallback}
 }
+
+/** Preserve one safe local return chain, replacing an obsolete return parameter. */
+export function withAppReturnTo(href:string,returnTo:string):string{
+ const target=new URL(safeAppPath(href),'https://binso.invalid');
+ target.searchParams.set('returnTo',safeAppPath(returnTo));
+ return target.pathname+target.search+target.hash;
+}

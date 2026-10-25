@@ -9,8 +9,9 @@ export function LocaleProvider({initialLocale,children}:{initialLocale:Locale;ch
   const next=asLocale(value);setLocale(next);
   document.cookie=`${localeCookie}=${next}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;
   document.documentElement.lang=localeTags[next];
-  const url=new URL(location.href);url.searchParams.set('lang',next);history.replaceState(history.state,'',url);
-  window.dispatchEvent(new CustomEvent('binso-locale',{detail:next}));
+  const url=new URL(location.href);
+  if(url.searchParams.get('lang')!==next&&(url.searchParams.has('lang')||next!==locale)){url.searchParams.set('lang',next);history.replaceState(history.state,'',url);}
+  if(next!==locale)window.dispatchEvent(new CustomEvent('binso-locale',{detail:next}));
  }}),[locale]);
  return <LocaleContext.Provider value={context}>{children}</LocaleContext.Provider>;
 }

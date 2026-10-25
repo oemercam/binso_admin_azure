@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-25",
+  "scope": "Local customer-detail card material transfer; no external writes or production release",
+  "source": {
+    "baseCommit": "582f502c527a53721c71fd5f6f17b6ca26310b8b",
+    "uncommitted": true,
+    "appSourceFingerprint": "6eb3313479b32bf9fbc1bf2736f126df8b686717ef0f5832f86393e49cfc14d5"
+  },
+  "baselineMatrix": {
+    "combinations": 1020,
+    "routes": 102,
+    "widths": [
+      375,
+      430,
+      820,
+      1024,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "errors": 0,
+    "scope": "Existing synthetic API fixtures; no production writes; standard matrix split into bounded batches with unchanged assertions and timeouts.",
+    "sourceFingerprint": "9e8fb658f0e43e1154b742b8c946eeb7703be759bcf26a041fd8e3ece5c8397b"
+  },
+  "baselineFunctionalFlows": {
+    "combinations": 2,
+    "errors": 0,
+    "interactions": [
+      "data",
+      "customers",
+      "products",
+      "employees",
+      "documents",
+      "finance",
+      "time",
+      "expenses",
+      "chat",
+      "billing",
+      "header",
+      "operator",
+      "settings",
+      "chrome"
+    ]
+  },
+  "lastPresentationChange": {
+    "file": "components/entity-files.tsx",
+    "description": "Existing shared workspace-section class gives file sections the standard spacing; data/actions remain unchanged",
+    "finalMatrixCombinations": 50,
+    "finalFunctionalFlows": {
+      "combinations": 4,
+      "errors": 0,
+      "interactions": [
+        "documents",
+        "employees"
+      ]
+    }
+  },
+  "finalWebKit": {
+    "combinations": 12,
+    "errors": 0,
+    "interactions": [
+      "data",
+      "customers",
+      "products",
+      "employees",
+      "documents",
+      "finance",
+      "time",
+      "expenses",
+      "chat",
+      "billing",
+      "header",
+      "operator",
+      "settings",
+      "chrome"
+    ],
+    "widths": [
+      390,
+      768
+    ],
+    "physicalDevice": false
+  },
+  "finalChecks": {
+    "qaFastPassed": true,
+    "packages": [
+      "v7-navigation-test",
+      "pwa-transition-test",
+      "audit-corrections-test",
+      "customer-financial-projection-test",
+      "ux-contract-check",
+      "foundation-integration-test",
+      "ux-regression-test",
+      "theme-selfcheck",
+      "creation-chrome-test",
+      "app-workspace-test",
+      "task-focused-ux-test",
+      "ui-build-cache-test",
+      "ui-foundation-test",
+      "navigation-foundation-test",
+      "check-css-architecture",
+      "presentation-consistency-test",
+      "document-presentation-test",
+      "pwa-preview-test",
+      "qa-plan-test"
+    ],
+    "changedFileLint": true,
+    "optimizedBuildPassed": true,
+    "typecheckInBuildPassed": true,
+    "releaseCheckPassed": true,
+    "diffCheckPassed": true
+  },
+  "actualBackendScreenshots": {
+    "count": 8,
+    "widths": [
+      390,
+      1440
+    ],
+    "themes": [
+      "light"
+    ],
+    "files": [
+      "karten-final-einstellungen-mobile.png",
+      "karten-final-kunden-mobile.png",
+      "karten-final-rechnung-mobile.png",
+      "karten-final-admin-mobile.png",
+      "karten-final-einstellungen-desktop.png",
+      "karten-final-kunden-desktop.png",
+      "karten-final-rechnung-desktop.png",
+      "karten-final-admin-desktop.png"
+    ],
+    "apiMocks": false,
+    "presentationInjection": false,
+    "isolatedTestData": true
+  },
+  "manualImageReview": [
+    "settings mobile",
+    "settings desktop",
+    "invoice mobile",
+    "admin mobile"
+  ],
+  "earlierFailure": {
+    "parallelMatrix": "Startup wait timed out; the original diagnostic then timed out reading body. Preserved as a failed run, not a pass.",
+    "correction": "Diagnostic now preserves the original failure; full coverage executed in bounded batches. No readiness timeout, assertion or mandatory gate weakened.",
+    "rootCause": "Not conclusively established; no claim of a production startup/performance fix."
+  },
+  "remaining": [
+    "Owner visual acceptance of derived pages",
+    "Real installed iPhone/iPad PWA and physical device measurements",
+    "Complete language and role acceptance; legal/TR gaps remain unchanged",
+    "All conditional monthly-report/receipt modal states not individually revisited",
+    "GitHub CI and production release authorization not part of this local change"
+  ]
+}

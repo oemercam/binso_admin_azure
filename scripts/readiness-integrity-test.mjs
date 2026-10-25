@@ -26,21 +26,32 @@ try {
  config.properties.identityProviders.azureActiveDirectory.registration.openIdIssuer='https://login.microsoftonline.com/foreign-tenant/v2.0';
  await fs.writeFile(fixture,JSON.stringify(config));assert.notEqual(auth().status,0);
  await fs.writeFile(fixture,JSON.stringify({properties:null}));assert.notEqual(auth().status,0);
- // Exercise actual Bash quoting and fail-closed handling against a bounded CLI peer.
- const az=path.join(temp,'az');
- await fs.writeFile(az,`#!/usr/bin/env python3
-import sys,os
-args=sys.argv[1:]
-if os.getenv('DENIED')=='yes': sys.exit(3)
-if '--query' not in args: sys.exit(4)
-q=args[args.index('--query')+1]
-if q not in ['length(@)','length([?enabled==\u0060true\u0060])','id']: sys.exit(5)
-print('/test/app' if q=='id' else os.getenv('COUNT','1'))
-`,{mode:0o755});
- const monitor=extra=>spawnSync('bash',['scripts/production-monitoring-check.sh'],{env:{...process.env,PATH:temp+':'+process.env.PATH,...extra},encoding:'utf8'});
- assert.equal(monitor({}).status,0);
- assert.notEqual(monitor({DENIED:'yes'}).status,0);
- assert.notEqual(monitor({COUNT:'0'}).status,0);
- assert.notEqual(monitor({COUNT:'garbage'}).status,0);
+ // Execute the actual Bash script with a shell-function peer. This avoids a
+ // Python dependency and platform-specific PATH joining while retaining exact
+ // argument/quoting and denial checks. No Azure CLI is invoked.
+ const harness=path.join(temp,'monitor-fixture.sh');
+ await fs.writeFile(harness,`#!/usr/bin/env bash
+set -euo pipefail
+az() {
+ [ "\${DENIED:-no}" != yes ] || return 3
+ local query='' next=no arg
+ for arg in "$@"; do
+  if [ "$next" = yes ]; then query="$arg"; break; fi
+  if [ "$arg" = --query ]; then next=yes; fi
+ done
+ case "$query" in
+  'length(@)'|'length([?enabled==\u0060true\u0060])') printf '%s\\n' "\${COUNT:-1}" ;;
+  id) printf '%s\\n' '/test/app' ;;
+  *) return 5 ;;
+ esac
+}
+source "$1"
+`);
+ const bash=process.platform==='win32'?path.resolve(process.env.GIT_EXEC_PATH??'', '../../../bin/bash.exe'):'bash';
+ if(process.platform==='win32')await fs.access(bash);
+ const shellPath=file=>process.platform==='win32'?file.replace(/\\/g,'/').replace(/^([A-Za-z]):/,(_,drive)=>'/'+drive.toLowerCase()):file;
+ const monitor=extra=>spawnSync(bash,[shellPath(harness),shellPath(path.resolve('scripts/production-monitoring-check.sh'))],{env:{...process.env,...extra},encoding:'utf8'});
+ const valid=monitor({});assert.equal(valid.status,0,valid.error?.message??valid.stderr);
+ for(const extra of [{DENIED:'yes'},{COUNT:'0'},{COUNT:'garbage'}]){const result=monitor(extra);assert.equal(result.error,undefined);assert.notEqual(result.status,0);}
  console.log('Runtime role, inherited bypass/ownership, public-schema creation denial, pinned Azure issuer and real Bash monitoring failure gates passed.');
 } finally {await db.close();await fs.rm(temp,{recursive:true,force:true});}

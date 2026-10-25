@@ -109,6 +109,32 @@ external evidence; do not present a generated register as executed acceptance.
 
 # Codex workflow and context (canonical project instructions)
 
+## UX Navigation Master V7.1 (25 October 2026)
+
+The owner explicitly adopted the complete byte-preserved
+`docs/architecture/ux-navigation-v7/source-v7-1.md`, including V7 chapters 1–11.
+It supersedes conflicting older presentation/navigation rules: compact shared
+14-px rows, eight-row customer hub without tabs, customer-scoped global lists,
+personal-only avatar, categorized More, and ticket detail before conversation.
+Preserve mobile dock/FAB appearance and geometry, authentication/MFA, RLS,
+financial calculations and existing business processes. Reuse central owners;
+no route-local styles or parallel design/data models. The full inventory and
+findings are evidence, not acceptance. Keep missing TR/legal/device/provider
+qualification explicit. Perform targeted changes and final mandatory gates;
+no production migration, external mutation, GitHub push/merge or Azure deployment
+without separate explicit authorization. Local commits for the final QA identity
+are allowed. Historical migration files must not be rewritten.
+
+## Customer-detail card material (25 October 2026)
+
+The owner's subsequent explicit request extends the existing customer-detail
+card, icon and separator pattern to content groups across customer and Admin
+pages and subpages. `docs/architecture/ux-navigation-v7/content-cards.md` records
+this addition. It supersedes older flat/open-section appearance contracts;
+reuse the existing central components, tokens and CSS owners. Keep one perimeter
+per group, no nested card chrome, and preserve navigation/FAB, data and security.
+Derived views still require visual approval; this authorizes no external writes.
+
 ## Master Implementation Phase 1 (24 October 2026)
 
 The user supplied the complete `docs/architecture/master-phase1/source.md` after

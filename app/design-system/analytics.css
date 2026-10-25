@@ -2,8 +2,10 @@
 /* Approved overview reference: scoped to the mobile dashboard only. */
 @media(max-width:760px){
  .bo-dashboard-overview{display:grid;gap:12px;min-width:0}
- .bo-dashboard-overview>.bo-workspace-section,.bo-dashboard-overview>.bo-cash-overview{margin:0}
- .bo-dashboard-overview>.bo-workspace-section,.bo-dashboard-overview .bo-cash-trend{border:1px solid var(--color-line);border-radius:var(--shape-panel);padding:14px;background:var(--color-bg);min-width:0}
+ .bo-dashboard-overview>.bo-workspace-section{margin:0}
+ .bo-dashboard-overview>.bo-cash-overview{margin:0}
+ .bo-dashboard-overview>.bo-workspace-section{min-width:0}
+ .bo-dashboard-overview .bo-cash-trend{min-width:0}
  .bo-dashboard-overview .section-title{margin:0 0 10px;min-height:0}
  .bo-dashboard-overview .section-title h2{font-size:var(--type-body);line-height:1.4}
  .bo-dashboard-overview .bo-cash-overview>.metrics-grid{grid-auto-rows:1fr;gap:10px;margin:0 0 12px;align-items:stretch}
@@ -54,7 +56,7 @@
 .bo-overview-bars small{font-size:var(--type-secondary)}
 .bo-overview-selection,.bo-overview-explanation{font-size:var(--type-label);color:var(--color-muted);line-height:1.5}
 .bo-metric-tiles .metric-top>span{white-space:normal;overflow:visible}
-.bo-statistics{--statistics-bg:var(--color-bg);--statistics-fg:var(--color-fg);--statistics-muted:var(--color-muted);--statistics-control:var(--color-muted);--statistics-selected:var(--app-accent-soft);--statistics-grid:var(--color-line);--statistics-focus:var(--color-line);min-width:0;width:100%;box-sizing:border-box;background:var(--statistics-bg);color:var(--statistics-fg);border-radius:0;padding:0;margin-block:var(--field-group-gap);overflow:hidden}
+.bo-statistics{--statistics-bg:var(--color-bg);--statistics-fg:var(--color-fg);--statistics-muted:var(--color-muted);--statistics-control:var(--color-muted);--statistics-selected:var(--app-accent-soft);--statistics-grid:var(--color-line);--statistics-focus:var(--color-line);min-width:0;width:100%;box-sizing:border-box;color:var(--statistics-fg);margin-block:var(--field-group-gap);overflow:hidden}
 .bo-ring-chart{display:flex;align-items:center;gap:var(--field-group-gap);padding-block:var(--field-group-gap);min-width:0}
 .bo-ring-visual{position:relative;flex:none;width:var(--chart-ring-size);height:var(--chart-ring-size)}
 .bo-ring-chart svg{width:var(--chart-ring-size);height:var(--chart-ring-size);flex:none;overflow:visible}
@@ -167,13 +169,13 @@
  .bo-dashboard-overview .bo-overview-bar-track{height:88px}
 }
 
-.bo-dashboard-overview .document-summary-row.is-information{height:46px;min-height:46px;padding-block:0;gap:12px}
+.bo-dashboard-overview .document-summary-row.is-information{height:auto;min-height:var(--navigation-row-height);padding-block:0;gap:12px}
 .bo-dashboard-overview .document-summary-row.is-information b{font-weight:400}
 
 @media(min-width:761px){
  .bo-dashboard-overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-width:0}
  .bo-dashboard-overview>.bo-cash-overview{grid-column:1/-1;margin-block:0}
- .bo-dashboard-overview>.bo-workspace-section{margin:0;padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel);min-width:0}
+ .bo-dashboard-overview>.bo-workspace-section{margin:0;min-width:0}
  .bo-dashboard-overview .bo-overview-bar-track{height:88px}
  .bo-dashboard-overview .section-title{margin-bottom:10px}
 }
@@ -188,7 +190,6 @@
  .bo-finance-workspace .metric-money{display:inline-flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap}
  .bo-finance-workspace .metric-money-currency{font-size:var(--type-secondary);font-weight:400;color:var(--color-muted)}
  .bo-finance-workspace .metric-top{font-size:var(--kpi-label-font);line-height:1.4;align-items:center}
- .bo-finance-workspace .bo-cash-trend{padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel)}
  .bo-finance-workspace .bo-overview-bar-track{height:88px}
  .bo-finance-workspace .bo-overview-bars{gap:8px;margin-block:12px 0}
  .bo-finance-workspace .bo-overview-bars>button{gap:8px}
@@ -206,7 +207,7 @@
 :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric strong{font-size:var(--kpi-value-font);line-height:1.25;font-weight:600;margin:0}
 :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric-money{display:inline-flex;flex-direction:row;align-items:baseline;gap:4px;white-space:nowrap}
 :is(.app-root[data-ux="master-v3"] .bo-cash-overview,.bo-statistics)[data-compact] .metric-money-currency{font-size:var(--type-secondary);font-weight:400;color:var(--color-muted)}
-.app-root[data-ux="master-v3"] .bo-cash-trend{padding:var(--ux-card-inset);border:1px solid var(--color-line);border-radius:var(--shape-panel);margin-top:16px}
+.app-root[data-ux="master-v3"] .bo-cash-trend{margin-top:16px}
 .bo-chart-legend{display:flex;align-items:center;gap:6px;font-size:var(--type-secondary);color:var(--color-muted);margin:0 0 12px}
 .bo-chart-legend>span{display:block;width:8px;height:8px;border-radius:var(--shape-mark);background:var(--app-action-accent)}
 .bo-chart-legend>span[data-category="income"]{background:var(--ux-chart-income)}

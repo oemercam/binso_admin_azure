@@ -31,11 +31,12 @@
     {
       "id": "UX24-SURFACE",
       "scope": "Cards/Listen/Settings",
-      "requirement": "Offene Abschnitte und Listen gemäss ZIP. Trennlinien nur zwischen Einträgen. Keine frei erfundenen Kartenraster.",
+      "requirement": "Owner-Freigabe 25.10.2026: Darstellung der Kundendetailseite zentral auf Inhaltsgruppen aller Kunden- und Admin-Seiten und Unterseiten übertragen: eine dünne Umrandung, 16 px Rundung/Innenabstand, bestehende dezente Bereichs-Icons und Trennlinien ausschliesslich zwischen Zeilen. Eingebettete Listen/Diagramme erhalten keine zweite Kartenumrandung. Öffentliche Website, Ausgabedokumente, Overlay- und Navigationsgeometrie bleiben eigenständige Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "Einzelner, letzter und mehrzeiliger Eintrag ohne Schlusslinie",
+      "acceptance": "Browser: äusserer Rahmen 1 px, Rundung 16 px, Innenabstand 16 px; Navigation ohne vertikalen Zusatzabstand; verschachtelte Inhaltsgruppen ohne eigenen Rahmen/Radius/Inset. Letzte Zeile ohne Schlusslinie. Gegenproben für falsche Rahmen, Rundung und Insets müssen fehlschlagen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "decision": "Neueste ausdrückliche Owner-Anweisung ersetzt den historischen Vertrag rahmenloser Inhaltsabschnitte. Visuelle Abnahme aller abgeleiteten Seiten bleibt offen."
     },
     {
       "id": "UX24-CONTROL",
@@ -331,6 +332,60 @@
       "acceptance": "Positiv/Negativ: Pflichtfelder, Typ, Schrittwechsel ohne POST/Datenverlust, Retry/Replay inklusive alter Entwürfe, unveränderte Bestandsdaten sowie serverseitige Tenant-/Rollenprüfung.",
       "status": "offen",
       "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-001",
+      "scope": "Navigation – Mindesthöhe",
+      "requirement": "V7: Navigation – Mindesthöhe zentral 48px.",
+      "owner": "app/design-system/overlays.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung min-height: var(--navigation-row-height) und deren Root-Definition 48px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-002",
+      "scope": "Navigation – Schrift",
+      "requirement": "V7: Navigation – Schrift zentral 14px.",
+      "owner": "app/design-system/overlays.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung font-size: var(--type-body) und deren Root-Definition 14px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-003",
+      "scope": "Navigation – Iconabstand",
+      "requirement": "V7: Navigation – Iconabstand zentral 12px.",
+      "owner": "app/design-system/overlays.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung gap: var(--space-12) und deren Root-Definition 12px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-004",
+      "scope": "Mobile Titel – Zeilenhöhe",
+      "requirement": "V7: Mobile Titel – Zeilenhöhe zentral 24px.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--app-title-line-height) und deren Root-Definition 24px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-005",
+      "scope": "Abschnitte – Zeilenhöhe",
+      "requirement": "V7: Abschnitte – Zeilenhöhe zentral 20px.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--section-title-line-height) und deren Root-Definition 20px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
+    },
+    {
+      "id": "UX7-STYLE-006",
+      "scope": "Seitentitel – Zeilenhöhe",
+      "requirement": "V7: Seitentitel – Zeilenhöhe zentral 24px.",
+      "owner": "app/design-system/layout.css",
+      "acceptance": "PostCSS prüft die zentrale Bindung line-height: var(--app-title-line-height) und deren Root-Definition 24px; Browser prüfen die berechnete Darstellung je Theme/Viewport.",
+      "status": "offen",
+      "evidence": []
     }
   ],
   "styleBindings": [
@@ -503,6 +558,66 @@
       "property": "letter-spacing",
       "token": "--metric-value-letter-spacing",
       "value": "-1px"
+    },
+    {
+      "id": "UX7-STYLE-001",
+      "file": "app/design-system/overlays.css",
+      "selector": ".action-row",
+      "context": "",
+      "property": "min-height",
+      "token": "--navigation-row-height",
+      "value": "48px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
+    },
+    {
+      "id": "UX7-STYLE-002",
+      "file": "app/design-system/overlays.css",
+      "selector": ".action-row",
+      "context": "",
+      "property": "font-size",
+      "token": "--type-body",
+      "value": "14px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
+    },
+    {
+      "id": "UX7-STYLE-003",
+      "file": "app/design-system/overlays.css",
+      "selector": ".action-row",
+      "context": "",
+      "property": "gap",
+      "token": "--space-12",
+      "value": "12px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
+    },
+    {
+      "id": "UX7-STYLE-004",
+      "file": "app/design-system/layout.css",
+      "selector": ".mobile-header :is(.mobile-section-title,.mobile-header-title,.mobile-header-brand)",
+      "context": "@media (max-width:760px)",
+      "property": "line-height",
+      "token": "--app-title-line-height",
+      "value": "24px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
+    },
+    {
+      "id": "UX7-STYLE-005",
+      "file": "app/design-system/layout.css",
+      "selector": ".app-root[data-ux=\"master-v3\"] .section-title h2",
+      "context": "",
+      "property": "line-height",
+      "token": "--section-title-line-height",
+      "value": "20px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
+    },
+    {
+      "id": "UX7-STYLE-006",
+      "file": "app/design-system/layout.css",
+      "selector": ".app-root[data-ux=\"master-v3\"] .page-head .bo-page-heading h1",
+      "context": "",
+      "property": "line-height",
+      "token": "--app-title-line-height",
+      "value": "24px",
+      "source": "docs/architecture/ux-navigation-v7/source-v7-1.md#2-exakter-visueller-vertrag-für-app-oberflächen"
     }
   ],
   "reference": "docs/audit/v24/reference/IMPLEMENTIERUNG.md",

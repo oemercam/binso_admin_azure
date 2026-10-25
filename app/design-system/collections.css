@@ -117,15 +117,12 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 }
 .contact-list b{font-size:var(--type-label)}
 .contact-list small{display:block;margin-top:3px;color:var(--color-muted);font-size:var(--type-secondary)}
-.payment-detail-summary + .detail-card{border-top:0}
 .detail-card{max-width:780px}
 .header-search-controls .searchbox{min-width:0;flex:1;margin:0}
 .record-controls{display:flex;align-items:center;justify-content:space-between;gap:var(--field-group-gap);padding-bottom:var(--field-label-gap)}
 .record-controls>label{display:flex;align-items:center;gap:var(--field-label-gap);font-size:var(--control-help-font)}
 .contact-sheet{width:min(100%,560px)}
 .detail-grid:has(>.surface:only-child){grid-template-columns:minmax(0,1fr)}
-.desktop-detail-main>.tabs + .detail-grid>.surface:first-child{border-top:0}
-.toolbar + .desktop-record-table{border-top:0}
 .contact-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .contact-actions .button{min-width:var(--touch);width:var(--touch);min-height:var(--touch);padding:0}
 .contact-main{min-width:0;min-height:var(--touch);overflow-wrap:anywhere;border:0;padding:0;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
@@ -179,19 +176,6 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 @media (min-width:761px){
 .desktop-record-table{display:block}
 .desktop-record-head,.desktop-record-row{display:grid}
-.detail-grid>.surface,
-  .detail-card{
-    padding:var(--desktop-section-y) 0;
-    border-left:0;
-    border-right:0;
-    border-radius:0;
-    box-shadow:none;
-    background:transparent;
-  }
-.detail-card{
-    border-top:1px solid var(--color-line);
-    border-bottom:1px solid var(--color-line);
-  }
 }
 @media (min-width:761px) and (max-width:1100px){
 .detail-grid{grid-template-columns:1fr}
@@ -300,12 +284,9 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .detail-card{margin:0}
 .detail-list{margin-top:8px}
 .detail-list>div:last-child{border-bottom:0}
-.tabs + .surface,
-  .tabs + .detail-grid>.surface:first-child{border-top:0}
 .customer-tab-panel .contact-list>div:last-child,
   .employee-tab-panel .detail-list>div:last-child{border-bottom:0}
 .tabs + .detail-grid{margin-top:0}
-.tabs + .detail-grid>.surface:first-child{border-top:0}
 .time-filter-toolbar .searchbox{flex:1;min-width:0;width:auto}
 .time-layout>.timer-card>.tabs{margin-bottom:10px}
 .time-filter-toolbar + .chips{flex-wrap:nowrap;overflow-x:auto}
@@ -325,7 +306,8 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .bo-detail-heading-main .status{flex-shrink:0}
 .bo-detail-heading-main{flex-wrap:wrap}
 .bo-detail-heading-main .status{margin-left:auto}
-.desktop-record-table,.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
+.desktop-record-table{min-width:0;max-width:100%}
+.desktop-record-head,.desktop-record-row{min-width:0;max-width:100%}
 .desktop-record-row>[role="cell"]{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .desktop-record-row>.table-status-cell{overflow:visible;white-space:normal}
 .desktop-record-row>[role="cell"].align-right{white-space:normal;overflow:visible;overflow-wrap:anywhere}

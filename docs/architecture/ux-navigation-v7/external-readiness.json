@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-25T09:28:26.530Z",
+  "mode": "public GET only",
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "ms": 220,
+      "state": "ok",
+      "sha": "8f25f5d59efcc346b37eb5bcf00b14f37bca0d1a",
+      "profile": "development-20261012"
+    },
+    {
+      "path": "/api/health/ready",
+      "status": 200,
+      "ms": 213,
+      "state": "ready",
+      "sha": null,
+      "profile": null
+    }
+  ]
+}

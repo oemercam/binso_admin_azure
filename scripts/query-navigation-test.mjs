@@ -56,5 +56,13 @@ try{
  const readsBefore=requests.length;assert.deepEqual(render('/api/customers').data,{name:'Refreshed customer'});await settle('/api/customers');
  assert.equal(requests.length,readsBefore,'A refresh on the previous visit cannot disable fresh return snapshots');
  render('/api/customers').refresh();render('/api/customers');assert.equal(requests.length,readsBefore+1,'A new explicit refresh still bypasses the fresh snapshot');
- console.log('Actual query hook: immediate fresh/stale returns, background refresh, mutation/session fences, stale responses and access-denial eviction passed.');
+ // Intent preloading must obey the same revision/identity boundaries as hooks.
+ const preload=exports.prefetchApiQuery('/api/dashboard');requests.at(-1).resolve({metric:1});await preload;
+ assert.deepEqual(cache.readQuerySnapshot('/api/dashboard',session+':'+revision,session,clock),{metric:1});
+ const warmRequests=requests.length;await exports.prefetchApiQuery('/api/dashboard');assert.equal(requests.length,warmRequests);
+ const invalidatedPreload=exports.prefetchApiQuery('/api/projects');revision++;requests.at(-1).resolve({private:'obsolete'});await invalidatedPreload;
+ assert.equal(cache.readQuerySnapshot('/api/projects',session+':'+revision,session,clock),undefined,'A preload cannot install data from before a mutation');
+ const oldSessionPreload=exports.prefetchApiQuery('/api/employees');session='new-identity';requests.at(-1).resolve({private:'other person'});await oldSessionPreload;
+ assert.equal(cache.readQuerySnapshot('/api/employees',session+':'+revision,session,clock),undefined,'A preloaded response cannot cross an identity boundary');
+ console.log('Actual query hook: immediate returns, refresh, mutation/session fences, intent preloading and access-denial eviction passed.');
 }finally{for(const effect of effects)effect.cleanup?.();globalThis.window=previousWindow;}

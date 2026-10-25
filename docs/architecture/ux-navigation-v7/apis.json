@@ -1,0 +1,2984 @@
+[
+  {
+    "file": "app/api/absences/[id]/route.ts",
+    "route": "/api/absences/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/absences/context/route.ts",
+    "route": "/api/absences/context",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/absences/route.ts",
+    "route": "/api/absences",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/invitation/route.ts",
+    "route": "/api/auth/invitation",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 24
+      },
+      {
+        "method": "POST",
+        "line": 29
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/login/route.ts",
+    "route": "/api/auth/login",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 17
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/logout/route.ts",
+    "route": "/api/auth/logout",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/mfa/confirm/route.ts",
+    "route": "/api/auth/mfa/confirm",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "getSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/mfa/route.ts",
+    "route": "/api/auth/mfa",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "DELETE",
+        "line": 20
+      }
+    ],
+    "indicators": [
+      "getSession",
+      "authorize",
+      "assertSameOrigin",
+      "withTenant",
+      "enforceRateLimit",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/mfa/setup/route.ts",
+    "route": "/api/auth/mfa/setup",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "getSession",
+      "authorize",
+      "assertSameOrigin",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/passkeys/options/route.ts",
+    "route": "/api/auth/passkeys/options",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/passkeys/route.ts",
+    "route": "/api/auth/passkeys",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "DELETE",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/passkeys/verify/route.ts",
+    "route": "/api/auth/passkeys/verify",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/password/route.ts",
+    "route": "/api/auth/password",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/reauthenticate/route.ts",
+    "route": "/api/auth/reauthenticate",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 15
+      }
+    ],
+    "indicators": [
+      "getSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/recover/route.ts",
+    "route": "/api/auth/recover",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/register/route.ts",
+    "route": "/api/auth/register",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 15
+      },
+      {
+        "method": "POST",
+        "line": 24
+      }
+    ],
+    "indicators": [
+      "getSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/resend-verification/route.ts",
+    "route": "/api/auth/resend-verification",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/sensitive-access/route.ts",
+    "route": "/api/auth/sensitive-access",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 4
+      }
+    ],
+    "indicators": [
+      "requireSession"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/session/route.ts",
+    "route": "/api/auth/session",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 4
+      }
+    ],
+    "indicators": [
+      "getSession"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/sessions/[id]/route.ts",
+    "route": "/api/auth/sessions/[id]",
+    "methods": [
+      {
+        "method": "DELETE",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/sessions/route.ts",
+    "route": "/api/auth/sessions",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "DELETE",
+        "line": 41
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/auth/verify-email/route.ts",
+    "route": "/api/auth/verify-email",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/billing/catalog/route.ts",
+    "route": "/api/billing/catalog",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/billing/checkout/route.ts",
+    "route": "/api/billing/checkout",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 15
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/billing/portal/route.ts",
+    "route": "/api/billing/portal",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 2
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/billing/webhook/route.ts",
+    "route": "/api/billing/webhook",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/[id]/conditions/[conditionId]/review/route.ts",
+    "route": "/api/contracts/[id]/conditions/[conditionId]/review",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/[id]/conditions/[conditionId]/route.ts",
+    "route": "/api/contracts/[id]/conditions/[conditionId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/[id]/conditions/route.ts",
+    "route": "/api/contracts/[id]/conditions",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/[id]/route.ts",
+    "route": "/api/contracts/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "PATCH",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/[id]/status/route.ts",
+    "route": "/api/contracts/[id]/status",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/contracts/route.ts",
+    "route": "/api/contracts",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/[id]/activity/route.ts",
+    "route": "/api/customers/[id]/activity",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/[id]/contacts/[contactId]/route.ts",
+    "route": "/api/customers/[id]/contacts/[contactId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 7
+      },
+      {
+        "method": "DELETE",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "authorize",
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/[id]/contacts/route.ts",
+    "route": "/api/customers/[id]/contacts",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      },
+      {
+        "method": "POST",
+        "line": 22
+      }
+    ],
+    "indicators": [
+      "authorize",
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/[id]/documents/route.ts",
+    "route": "/api/customers/[id]/documents",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 4
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/[id]/route.ts",
+    "route": "/api/customers/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 13
+      },
+      {
+        "method": "PATCH",
+        "line": 16
+      },
+      {
+        "method": "DELETE",
+        "line": 24
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/archive/route.ts",
+    "route": "/api/customers/archive",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/duplicates/route.ts",
+    "route": "/api/customers/duplicates",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/import/route.ts",
+    "route": "/api/customers/import",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/merge/route.ts",
+    "route": "/api/customers/merge",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/customers/route.ts",
+    "route": "/api/customers",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "POST",
+        "line": 22
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/dashboard/route.ts",
+    "route": "/api/dashboard",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/demo/dashboard/route.ts",
+    "route": "/api/demo/dashboard",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/demo/data/route.ts",
+    "route": "/api/demo/data",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/demo/finance/route.ts",
+    "route": "/api/demo/finance",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/demo/platform-finance/route.ts",
+    "route": "/api/demo/platform-finance",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/demo/session/route.ts",
+    "route": "/api/demo/session",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/documents/[number]/credits/route.ts",
+    "route": "/api/documents/[number]/credits",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/followups/route.ts",
+    "route": "/api/documents/[number]/followups",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/pdf/route.ts",
+    "route": "/api/documents/[number]/pdf",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/refunds/route.ts",
+    "route": "/api/documents/[number]/refunds",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/revision/route.ts",
+    "route": "/api/documents/[number]/revision",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/route.ts",
+    "route": "/api/documents/[number]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 14
+      },
+      {
+        "method": "PATCH",
+        "line": 28
+      },
+      {
+        "method": "DELETE",
+        "line": 84
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/send/route.ts",
+    "route": "/api/documents/[number]/send",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 20
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/status/route.ts",
+    "route": "/api/documents/[number]/status",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/[number]/versions/route.ts",
+    "route": "/api/documents/[number]/versions",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 13
+      },
+      {
+        "method": "POST",
+        "line": 35
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/preview/route.ts",
+    "route": "/api/documents/preview",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/documents/route.ts",
+    "route": "/api/documents",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 14
+      },
+      {
+        "method": "POST",
+        "line": 21
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/allowances/[claimId]/route.ts",
+    "route": "/api/employees/[id]/allowances/[claimId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/allowances/route.ts",
+    "route": "/api/employees/[id]/allowances",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/employment/[periodId]/route.ts",
+    "route": "/api/employees/[id]/employment/[periodId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/employment/route.ts",
+    "route": "/api/employees/[id]/employment",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/family/[childId]/route.ts",
+    "route": "/api/employees/[id]/family/[childId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/family/route.ts",
+    "route": "/api/employees/[id]/family",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/route.ts",
+    "route": "/api/employees/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 18
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/wages/[definitionId]/route.ts",
+    "route": "/api/employees/[id]/wages/[definitionId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/[id]/wages/route.ts",
+    "route": "/api/employees/[id]/wages",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/employees/route.ts",
+    "route": "/api/employees",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 14
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/[id]/reimbursement/route.ts",
+    "route": "/api/expenses/[id]/reimbursement",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/[id]/route.ts",
+    "route": "/api/expenses/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 18
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/billing/route.ts",
+    "route": "/api/expenses/billing",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/options/route.ts",
+    "route": "/api/expenses/options",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/route.ts",
+    "route": "/api/expenses",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 14
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/expenses/scan-receipt/route.ts",
+    "route": "/api/expenses/scan-receipt",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/files/[id]/download/route.ts",
+    "route": "/api/files/[id]/download",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/files/[id]/route.ts",
+    "route": "/api/files/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 14
+      },
+      {
+        "method": "DELETE",
+        "line": 36
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/files/route.ts",
+    "route": "/api/files",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 24
+      },
+      {
+        "method": "POST",
+        "line": 45
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/finance/overview/route.ts",
+    "route": "/api/finance/overview",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/finance/route.ts",
+    "route": "/api/finance",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/health/ready/route.ts",
+    "route": "/api/health/ready",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 23
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/health/route.ts",
+    "route": "/api/health",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/integrations/status/route.ts",
+    "route": "/api/integrations/status",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      }
+    ],
+    "indicators": [
+      "requireUser"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/notifications/[id]/route.ts",
+    "route": "/api/notifications/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/notifications/followups/route.ts",
+    "route": "/api/notifications/followups",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "withTenant",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/notifications/push/route.ts",
+    "route": "/api/notifications/push",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 13
+      },
+      {
+        "method": "POST",
+        "line": 22
+      },
+      {
+        "method": "DELETE",
+        "line": 50
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/notifications/route.ts",
+    "route": "/api/notifications",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/accounts/[id]/route.ts",
+    "route": "/api/operator/accounts/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/accounts/route.ts",
+    "route": "/api/operator/accounts",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/announcements/route.ts",
+    "route": "/api/operator/announcements",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 2
+      },
+      {
+        "method": "POST",
+        "line": 3
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/audit/route.ts",
+    "route": "/api/operator/audit",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 2
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/customers/[id]/route.ts",
+    "route": "/api/operator/customers/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/customers/route.ts",
+    "route": "/api/operator/customers",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/dashboard/route.ts",
+    "route": "/api/operator/dashboard",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/demo-session/route.ts",
+    "route": "/api/operator/demo-session",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      },
+      {
+        "method": "POST",
+        "line": 6
+      },
+      {
+        "method": "DELETE",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests. Explicit retired constant-export handlers identified; HTTP 410 contract retained."
+  },
+  {
+    "file": "app/api/operator/finance/route.ts",
+    "route": "/api/operator/finance",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/integrations/email-test/route.ts",
+    "route": "/api/operator/integrations/email-test",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/logout/route.ts",
+    "route": "/api/operator/logout",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 7
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/maintenance/route.ts",
+    "route": "/api/operator/maintenance",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/monitoring/route.ts",
+    "route": "/api/operator/monitoring",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 5
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/notifications/push/route.ts",
+    "route": "/api/operator/notifications/push",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      },
+      {
+        "method": "POST",
+        "line": 21
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "enforceRateLimit",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/payments/route.ts",
+    "route": "/api/operator/payments",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/preferences/route.ts",
+    "route": "/api/operator/preferences",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "PATCH",
+        "line": 15
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/restrictions/[id]/route.ts",
+    "route": "/api/operator/restrictions/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/restrictions/route.ts",
+    "route": "/api/operator/restrictions",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "POST",
+        "line": 15
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/sso/callback/route.ts",
+    "route": "/api/operator/sso/callback",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/tickets/[id]/messages/route.ts",
+    "route": "/api/operator/tickets/[id]/messages",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/tickets/[id]/route.ts",
+    "route": "/api/operator/tickets/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 13
+      },
+      {
+        "method": "PATCH",
+        "line": 31
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/tickets/route.ts",
+    "route": "/api/operator/tickets",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/operator/users/route.ts",
+    "route": "/api/operator/users",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 23
+      }
+    ],
+    "indicators": [
+      "requireOperator",
+      "authorize"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/payments/[id]/route.ts",
+    "route": "/api/payments/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 4
+      }
+    ],
+    "indicators": [],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/payments/route.ts",
+    "route": "/api/payments",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/products/[id]/route.ts",
+    "route": "/api/products/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "PATCH",
+        "line": 16
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/products/route.ts",
+    "route": "/api/products",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/projects/[id]/route.ts",
+    "route": "/api/projects/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "PATCH",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/projects/route.ts",
+    "route": "/api/projects",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/public/offer/route.ts",
+    "route": "/api/public/offer",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/public/report/route.ts",
+    "route": "/api/public/report",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/reports/exports/[id]/route.ts",
+    "route": "/api/reports/exports/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/reports/exports/[id]/send/route.ts",
+    "route": "/api/reports/exports/[id]/send",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/reports/exports/[id]/share/route.ts",
+    "route": "/api/reports/exports/[id]/share",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/reports/exports/route.ts",
+    "route": "/api/reports/exports",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "enforceRateLimit",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/reports/route.ts",
+    "route": "/api/reports",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 14
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/search/route.ts",
+    "route": "/api/search",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/company/route.ts",
+    "route": "/api/settings/company",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "PATCH",
+        "line": 19
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/documents/route.ts",
+    "route": "/api/settings/documents",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      },
+      {
+        "method": "PATCH",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/notifications/route.ts",
+    "route": "/api/settings/notifications",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/profile/route.ts",
+    "route": "/api/settings/profile",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 15
+      }
+    ],
+    "indicators": [
+      "requireUser",
+      "assertSameOrigin",
+      "readJson"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/readiness/route.ts",
+    "route": "/api/settings/readiness",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "PATCH",
+        "line": 10
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/security/route.ts",
+    "route": "/api/settings/security",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/subscription/route.ts",
+    "route": "/api/settings/subscription",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/team/invitations/[id]/route.ts",
+    "route": "/api/settings/team/invitations/[id]",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 9
+      },
+      {
+        "method": "DELETE",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/team/invitations/route.ts",
+    "route": "/api/settings/team/invitations",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/team/members/[userId]/route.ts",
+    "route": "/api/settings/team/members/[userId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/settings/team/members/[userId]/sensitive-access/route.ts",
+    "route": "/api/settings/team/members/[userId]/sensitive-access",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "PATCH",
+        "line": 18
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/bank/route.ts",
+    "route": "/api/suppliers/[id]/bank",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 12
+      },
+      {
+        "method": "PATCH",
+        "line": 20
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/invoices/[invoiceId]/match/route.ts",
+    "route": "/api/suppliers/[id]/invoices/[invoiceId]/match",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 9
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/invoices/[invoiceId]/review/route.ts",
+    "route": "/api/suppliers/[id]/invoices/[invoiceId]/review",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 3
+      },
+      {
+        "method": "POST",
+        "line": 4
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/invoices/route.ts",
+    "route": "/api/suppliers/[id]/invoices",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/resources/[resourceId]/assignments/route.ts",
+    "route": "/api/suppliers/[id]/resources/[resourceId]/assignments",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 11
+      },
+      {
+        "method": "PATCH",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/resources/[resourceId]/route.ts",
+    "route": "/api/suppliers/[id]/resources/[resourceId]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 7
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/resources/route.ts",
+    "route": "/api/suppliers/[id]/resources",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/[id]/route.ts",
+    "route": "/api/suppliers/[id]",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "PATCH",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/approval-policy/route.ts",
+    "route": "/api/suppliers/approval-policy",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 7
+      },
+      {
+        "method": "POST",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/suppliers/route.ts",
+    "route": "/api/suppliers",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/support/tickets/[id]/messages/route.ts",
+    "route": "/api/support/tickets/[id]/messages",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      },
+      {
+        "method": "POST",
+        "line": 12
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/support/tickets/[id]/route.ts",
+    "route": "/api/support/tickets/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/support/tickets/route.ts",
+    "route": "/api/support/tickets",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 10
+      },
+      {
+        "method": "POST",
+        "line": 13
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/telemetry/web-vitals/route.ts",
+    "route": "/api/telemetry/web-vitals",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "readJson",
+      "enforceRateLimit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/[id]/pricing/route.ts",
+    "route": "/api/time-entries/[id]/pricing",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "POST",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/[id]/route.ts",
+    "route": "/api/time-entries/[id]",
+    "methods": [
+      {
+        "method": "PATCH",
+        "line": 6
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/billing/route.ts",
+    "route": "/api/time-entries/billing",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/options/route.ts",
+    "route": "/api/time-entries/options",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 8
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/policy/route.ts",
+    "route": "/api/time-entries/policy",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 6
+      },
+      {
+        "method": "PATCH",
+        "line": 11
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/review/route.ts",
+    "route": "/api/time-entries/review",
+    "methods": [
+      {
+        "method": "POST",
+        "line": 9
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-entries/route.ts",
+    "route": "/api/time-entries",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 14
+      },
+      {
+        "method": "POST",
+        "line": 20
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/time-tracker/route.ts",
+    "route": "/api/time-tracker",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "POST",
+        "line": 20
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  },
+  {
+    "file": "app/api/workforce-assignments/route.ts",
+    "route": "/api/workforce-assignments",
+    "methods": [
+      {
+        "method": "GET",
+        "line": 11
+      },
+      {
+        "method": "POST",
+        "line": 20
+      },
+      {
+        "method": "PATCH",
+        "line": 42
+      }
+    ],
+    "indicators": [
+      "requireSession",
+      "authorize",
+      "assertSameOrigin",
+      "readJson",
+      "withTenant",
+      "idempotency",
+      "audit"
+    ],
+    "qualification": "Static call indicators only; delegated guards and runtime cases require owner tests."
+  }
+]

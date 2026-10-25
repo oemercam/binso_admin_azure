@@ -12,5 +12,5 @@ export function setupStepIssues(company:Record<string,unknown>,step:SetupStep){
 }
 /** Same canonical payment requirements on the server, dashboard and setup form. */
 export function requiredSetupTasks(company:Record<string,unknown>,returnTo='/dashboard'):SetupTask[]{
- return setupSteps.map((id,index)=>({id,title:['Firmenname','Firmenadresse','Bankverbindung'][index],importance:'required',complete:setupStepIssues(company,id).length===0,href:setupProcessDestination(id,returnTo)}));
+ return setupSteps.map((id,index)=>({id,title:['Unternehmen','Adresse','Zahlungskonto'][index],importance:'required',complete:setupStepIssues(company,id).length===0,href:setupProcessDestination(id,returnTo)}));
 }

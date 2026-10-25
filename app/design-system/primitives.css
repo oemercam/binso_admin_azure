@@ -114,7 +114,7 @@ input[type="file"]:disabled::file-selector-button{opacity:var(--control-disabled
 .form-link{text-align:right;font-size:var(--type-label)}
 .form-link a{font-weight:700}
 .quick-grid .button{width:100%;min-width:0;white-space:normal;text-align:left;justify-content:flex-start}
-.form-page{width:100%;max-width:900px;border-top:1px solid var(--color-line)}
+.form-page{width:100%;max-width:900px}
 .form-page.narrow{max-width:700px}
 .form-section{padding:20px 0;border-bottom:1px solid var(--color-line);background:transparent}
 .form-section:first-child{padding-top:0}
@@ -233,8 +233,8 @@ html[data-theme] .form-field select{appearance:none;-webkit-appearance:none;padd
   }
 .button{min-height:44px;height:44px;padding-inline:14px}
 .quick-grid .button{min-height:44px;height:44px;padding-inline:12px}
-.form-page,
-  .form-page.narrow{width:100%;max-width:none}
+.form-page{width:100%;max-width:none}
+.form-page.narrow{width:100%;max-width:none}
 .customer-tab-panel .section-title .button,
   .employee-tab-panel .section-title .button{min-height:var(--touch);height:var(--touch);padding-inline:11px}
 .form-section{padding:18px 0}
@@ -306,6 +306,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:var(--shape-group-small)}
 .loading-state{display:block;min-height:0;padding:0}
+.loading-state[data-loading-layout="page"]{min-block-size:min(360px,50svh);inline-size:100%}
+.loading-state[data-loading-layout="records"]{min-block-size:min(288px,45svh);inline-size:100%}
 
 @keyframes content-progress{0%,100%{opacity:.35;transform:scaleX(.5)}50%{opacity:1;transform:scaleX(1)}}
 

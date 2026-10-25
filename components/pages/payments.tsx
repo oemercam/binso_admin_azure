@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "../app-shell";
 import { RecordsView, RecordsControls, useRecordsController } from "../records";
+import {useCustomerScope} from "@/lib/client/customer-scope";
 import {useApiQuery} from "@/lib/client/use-api-query";
 import { apiPost, ClientApiError, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
 import { AccessLink, Button, Checkbox, EmptyState, ErrorState, LoadingState, Field, Icon, Status, Toast, Select, Input } from "../ui";
@@ -19,12 +20,13 @@ import {allowDraftNavigation} from '../use-browser-back-guard';
 import { useRecordList, swissDate, paymentMethodLabel } from "./shared";
 
 export function PaymentsPage() {
-  const customerId=useSearchParams().get("customerId");
+  const customerScope=useCustomerScope();
+  const customerId=customerScope.customerId;
   const columns:NonNullable<Parameters<typeof useRecordsController>[0]["columns"]>=[{label:"Datum",index:1},{label:"Kunde",index:2},{label:"Referenz",index:3},{label:"Betrag",index:4,align:"right"},{label:"Status",index:5,status:true}];
   const chips=["Alle","Verbucht","Ausstehend"];
   const {rows:paymentRows,total,controller,pagination,loading,error}=useRecordList("payments",{placeholder:"Zahlungen suchen...",chips,columns,sortFields:{1:"paid_on",2:"customer_name",3:"invoice_number",4:"amount",5:"status"},defaultOrder:"paid_on.desc",scope:{customerId},filterValues:{Verbucht:{field:"status",value:"booked"},Ausstehend:{field:"status",value:"pending"}}});
-  return <AppShell title="Zahlungen" subtitle={loading?undefined:`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
-    <FinanceTabs/><RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} rowHref={row=>`/zahlungen/${row[0]}`}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={`/zahlungen/${id}`} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
+  return <AppShell title="Zahlungen" backHref={customerScope.returnTo} subtitle={loading?undefined:`${total} Zahlungen`} active="zahlungen" actions={<RecordsControls scope={customerScope.scope} controller={controller} placeholder="Zahlungen suchen..." chips={chips} columns={columns}><CreateAction href="/zahlungen/neu" label="Zahlung erfassen"/></RecordsControls>}>
+    <RecordsView controller={controller} toolbarActions={false} showCount={false} remote pagination={pagination} countLabel="Zahlungen" loading={loading} error={error} items={paymentRows} placeholder="Zahlungen suchen..." chips={chips} columns={columns} rowHref={row=>customerScope.detailHref(`/zahlungen/${row[0]}`)}>{([id,date,name,meta,amount,status])=><FinancialSummaryRow href={customerScope.detailHref(`/zahlungen/${id}`)} title={`${name} · ${date}`} meta={meta} amount={amount} status={status} tone={status==="Verbucht"?"success":"neutral"}/>}</RecordsView>
   </AppShell>;
 }
 

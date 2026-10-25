@@ -5,7 +5,8 @@ import {compareRecordValues} from "@/lib/record-sort";
 import {matchesRecordChip,listStatusOverride} from "@/lib/list-filter";
 
 import Link from "next/link";
-import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useId, useRef, type ReactNode, type CSSProperties } from "react";
+import {usePathname,useSearchParams} from 'next/navigation';
+import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, useSyncExternalStore, useId, useRef, type ReactNode, type CSSProperties, type SetStateAction } from "react";
 import {EmptyState, Icon, Status, LoadingState, ErrorState, Button, Field, Select, Input} from "./ui";
 import { ListRow, FilterSheet, ListSearch, DetailTabs, FormSheet } from "./binso-ux";
 import {SelectControl} from './select-control';
@@ -54,30 +55,58 @@ function tone(status: string): "success" | "danger" | "warning" | "neutral" | "i
 
 type RecordsColumns=Array<{label:string;index:number;align?:"left"|"right";status?:boolean;render?:(item:string[])=>React.ReactNode}>;
 export type RecordsController=ReturnType<typeof useRecordsController>;
+const subscribeReadiness=()=>()=>{};
+const clientReady=()=>true,serverReady=()=>false;
+type ListSelection={query:string;activeChip:string;sort:"default"|"asc"|"desc";sortIndex:number;page:number};
 
 /** One committed search/filter/sort state, reusable in a page header or list toolbar. */
 export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,enabled=true}:{placeholder:string;chips?:string[];columns?:RecordsColumns;enabled?:boolean}){
-  const [query,setQuery]=useState("");
-  const [activeChip,setActiveChip]=useState(chips[0] ?? "Alle");
-  const [sort,setSort]=useState<"default"|"asc"|"desc">("default");
+  const pathname=usePathname(),search=useSearchParams().toString();
   const firstSortIndex=columns?.[0]?.index??0;
   const statusIndex=columns?.find(column=>column.status)?.index;
-  const [sortIndex,setSortIndex]=useState(firstSortIndex);
-
   const chipsKey=JSON.stringify(chips);
   const columnIndexes=JSON.stringify(columns?.map(column=>column.index)??[]);
-  const [restored,setRestored]=useState(false);
-  const [page,setPage]=useState(0);
+  const ready=useSyncExternalStore(subscribeReadiness,clientReady,serverReady);
+  const key=enabled&&ready?"binso.list:"+pathname+":"+placeholder:"";
+  // Like the central period owner, SSR stays unresolved. A client navigation
+  // restores synchronously, before any consumer starts its query or paints.
+  const restoredSelection=useMemo<ListSelection>(()=>{
+    const storedChips:string[]=JSON.parse(chipsKey),indexes:number[]=JSON.parse(columnIndexes);
+    const defaults:ListSelection={query:"",activeChip:storedChips[0]??"Alle",sort:"default",sortIndex:firstSortIndex,page:0};
+    if(!key)return defaults;
+    const requested=listStatusOverride(search,storedChips);
+    try{
+      const saved=JSON.parse(listStateStore.get(key)??"null");
+      if(saved)return {query:typeof saved.query==="string"?saved.query:"",activeChip:requested??(storedChips.includes(saved.activeChip)?saved.activeChip:defaults.activeChip),sort:["default","asc","desc"].includes(saved.sort)?saved.sort:"default",sortIndex:Number.isInteger(saved.sortIndex)&&(!indexes.length||indexes.includes(saved.sortIndex))?saved.sortIndex:firstSortIndex,page:requested?0:Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0};
+    }catch{/* Invalid page-memory state falls back to the current list contract. */}
+    return {...defaults,activeChip:requested??defaults.activeChip};
+  },[key,search,chipsKey,columnIndexes,firstSortIndex]);
+  const [selection,setSelection]=useState<{key:string;value:ListSelection}|null>(null);
+  const current=selection?.key===key?selection.value:restoredSelection;
+  const {query,sort,sortIndex,page}=current;
+  // A permission-driven chip change cannot retain an inaccessible financial filter.
+  const activeChip=chips.includes(current.activeChip)?current.activeChip:chips[0]??"Alle";
+  const update=<K extends keyof ListSelection>(field:K,value:SetStateAction<ListSelection[K]>)=>setSelection(previous=>{
+    const base=previous?.key===key?previous.value:restoredSelection;
+    return {key,value:{...base,[field]:typeof value==="function"?(value as (old:ListSelection[K])=>ListSelection[K])(base[field]):value}};
+  });
+  const setQuery=(value:SetStateAction<string>)=>update("query",value);
+  const setActiveChip=(value:SetStateAction<string>)=>update("activeChip",value);
+  const setSort=(value:SetStateAction<ListSelection["sort"]>)=>update("sort",value);
+  const setSortIndex=(value:SetStateAction<number>)=>update("sortIndex",value);
+  const setPage=(value:SetStateAction<number>)=>update("page",value);
+  const restored=enabled&&ready;
   const scrollSnapshot=useRef<{y:number;context:string}|null>(null);
   const listContext=JSON.stringify({query,activeChip,sort,sortIndex,page});
   useEffect(()=>{
     if(!enabled)return;
-    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    const key="binso.list:scroll:"+pathname+":"+placeholder;
+    scrollSnapshot.current=null;
     try{const saved=JSON.parse(listStateStore.get(key)??"null");if(saved&&Number.isFinite(saved.y)&&saved.y>=0&&typeof saved.context==="string")scrollSnapshot.current=saved;}catch{}
-  },[enabled,placeholder]);
+  },[enabled,pathname,placeholder]);
   useEffect(()=>{
     if(!enabled||!restored)return;
-    const key="binso.list:scroll:"+window.location.pathname+":"+placeholder;
+    const key="binso.list:scroll:"+pathname+":"+placeholder;
     const remember=(event:MouseEvent)=>{
       const link=event.target instanceof Element?event.target.closest<HTMLAnchorElement>(".mobile-record-list a,.desktop-record-row[href]"):null;
       if(!link||link.closest("[data-records-owner]")?.getAttribute("data-records-owner")!==placeholder||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.target==="_blank")return;
@@ -85,9 +114,10 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
     };
     document.addEventListener("click",remember,true);
     return()=>document.removeEventListener("click",remember,true);
-  },[enabled,restored,placeholder,listContext]);
-  useEffect(()=>{if(!enabled)return;const storedChips:string[]=JSON.parse(chipsKey);const requested=listStatusOverride(window.location.search,storedChips);try{const saved=JSON.parse(listStateStore.get("binso.list:"+window.location.pathname+":"+placeholder)??"null");if(saved){queueMicrotask(()=>{setQuery(typeof saved.query==="string"?saved.query:"");setActiveChip(requested??(storedChips.includes(saved.activeChip)?saved.activeChip:storedChips[0]??"Alle"));setSort(["default","asc","desc"].includes(saved.sort)?saved.sort:"default");setSortIndex(Number.isInteger(saved.sortIndex)&&(!JSON.parse(columnIndexes).length||JSON.parse(columnIndexes).includes(saved.sortIndex))?saved.sortIndex:firstSortIndex);setPage(requested?0:Number.isSafeInteger(saved.page)&&saved.page>=0?saved.page:0);setRestored(true);});return;}}catch{}queueMicrotask(()=>{if(requested){setActiveChip(requested);setPage(0)}setRestored(true)});},[chipsKey,placeholder,firstSortIndex,columnIndexes,enabled]);
-  useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set("binso.list:"+window.location.pathname+":"+placeholder,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[restored,query,activeChip,sort,sortIndex,page,placeholder,enabled]);
+  },[enabled,restored,pathname,placeholder,listContext]);
+  // Next renders a destination before committing window.location. Read and write
+  // the same router-owned key, never the previous page's browser URL.
+  useEffect(()=>{if(!enabled||!restored)return;try{listStateStore.set(key,JSON.stringify({query,activeChip,sort,sortIndex,page}));}catch{}},[key,restored,query,activeChip,sort,sortIndex,page,enabled]);
 
 
   const [searchOpen,setSearchOpen]=useState(false),[filterOpen,setFilterOpen]=useState(false);
@@ -99,14 +129,14 @@ export function useRecordsController({placeholder,chips=["Alle","Aktiv","Inaktiv
 }
 
 /** Search and filters use the existing sheet, fields and action footer. */
-export function RecordsControls({controller:s,placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,children,inline=true,appearance="line",filterChips=chips,tools}:{tools?:()=>ReactNode;controller:RecordsController;placeholder:string;chips?:string[];filterChips?:string[];columns?:RecordsColumns;children?:ReactNode;inline?:boolean;appearance?:"pill"|"line"}){
+export function RecordsControls({controller:s,placeholder,chips=["Alle","Aktiv","Inaktiv"],columns,children,inline=true,appearance="line",filterChips=chips,tools,scope}:{scope?:{label:string;value:string;error?:string|null;onClear:()=>void};tools?:()=>ReactNode;controller:RecordsController;placeholder:string;chips?:string[];filterChips?:string[];columns?:RecordsColumns;children?:ReactNode;inline?:boolean;appearance?:"pill"|"line"}){
  const id=useId(),searchId=id+'-search';
  const choices=columns?.length?columns:[{label:"Name",index:s.firstSortIndex}];
  const selectedColumn=choices.find(column=>column.index===s.sortIndex);
  const order=(column:{label:string;align?:string},direction:string)=>column.align==='right'||/Betrag|Umsatz|Stunden|Dauer|Datum|Aktualisiert/.test(column.label)?direction==='asc'?'Aufsteigend':'Absteigend':direction==='asc'?'A–Z':'Z–A';
  const filterButton=<SelectControl className="records-filter-action" aria-label="Filter" popupTitle="Filtern nach" toolIcon={<Icon name="filter" size={18}/>} value={s.activeChip} onChange={event=>s.setActiveChip(event.target.value)}>{filterChips.map(chip=><option key={chip} value={chip}><LocalizedText>{chip}</LocalizedText></option>)}</SelectControl>;
  const sortButton=<SelectControl data-record-sort="true" aria-label="Sortieren" popupTitle="Sortieren nach" toolIcon={<Icon name="sort" size={18}/>} value={s.sort==='default'?'default':s.sortIndex+':'+s.sort} onChange={event=>{if(event.target.value==='default'){s.setSort('default');s.setSortIndex(s.firstSortIndex)}else{const [index,direction]=event.target.value.split(':');s.setSortIndex(Number(index));s.setSort(direction as 'asc'|'desc')}}}><option value="default"><LocalizedText>{"Standard"}</LocalizedText></option>{choices.flatMap(column=>['asc','desc'].map(direction=><option key={column.index+':'+direction} value={column.index+':'+direction}><LocalizedText>{column.label}</LocalizedText>{' '}<LocalizedText>{order(column,direction)}</LocalizedText></option>))}</SelectControl>;
- const activeFilters=<div className="records-active-filters" aria-live="polite">{s.activeChip!==(chips[0]??'Alle')&&<div className="records-active-line"><span><LocalizedText>{"Filter"}</LocalizedText>{': '}<LocalizedText>{s.activeChip}</LocalizedText></span><LocalizedElement as="button" type="button" className="records-reset" aria-label="Filter zurücksetzen" onClick={()=>s.setActiveChip(chips[0]??'Alle')}><LocalizedText>{"Zurücksetzen"}</LocalizedText></LocalizedElement></div>}{s.sort!=='default'&&<div className="records-active-line"><span><LocalizedText>{"Sortierung"}</LocalizedText>{': '}<LocalizedText>{selectedColumn?.label??'Name'}</LocalizedText>{' '}<LocalizedText>{order(selectedColumn??{label:'Name'},s.sort)}</LocalizedText></span><LocalizedElement as="button" type="button" className="records-reset" aria-label="Sortierung zurücksetzen" onClick={()=>{s.setSort('default');s.setSortIndex(s.firstSortIndex)}}><LocalizedText>{"Zurücksetzen"}</LocalizedText></LocalizedElement></div>}</div>;
+ const activeFilters=<div className="records-active-filters" aria-live="polite">{scope&&<div className="records-active-line"><span><LocalizedText>{scope.label}</LocalizedText>{": "}<span translate="no">{scope.value}</span></span><LocalizedElement as="button" type="button" className="records-reset" aria-label="Kundenfilter zurücksetzen" onClick={()=>{s.setPage(0);scope.onClear()}}><LocalizedText>{"Zurücksetzen"}</LocalizedText></LocalizedElement></div>}{scope?.error&&<ErrorState>{scope.error}</ErrorState>}{s.activeChip!==(chips[0]??'Alle')&&<div className="records-active-line"><span><LocalizedText>{"Filter"}</LocalizedText>{': '}<LocalizedText>{s.activeChip}</LocalizedText></span><LocalizedElement as="button" type="button" className="records-reset" aria-label="Filter zurücksetzen" onClick={()=>s.setActiveChip(chips[0]??'Alle')}><LocalizedText>{"Zurücksetzen"}</LocalizedText></LocalizedElement></div>}{s.sort!=='default'&&<div className="records-active-line"><span><LocalizedText>{"Sortierung"}</LocalizedText>{': '}<LocalizedText>{selectedColumn?.label??'Name'}</LocalizedText>{' '}<LocalizedText>{order(selectedColumn??{label:'Name'},s.sort)}</LocalizedText></span><LocalizedElement as="button" type="button" className="records-reset" aria-label="Sortierung zurücksetzen" onClick={()=>{s.setSort('default');s.setSortIndex(s.firstSortIndex)}}><LocalizedText>{"Zurücksetzen"}</LocalizedText></LocalizedElement></div>}</div>;
  return <>{inline?<div className="records-inline-controls" data-appearance={appearance}><div className="records-search-row"><ListSearch value={s.query} onChange={s.setQuery} placeholder={placeholder}/>{filterButton}{sortButton}{tools?.()}{children}</div>{activeFilters}</div>:<><LocalizedElement as="button" type="button" className="icon-button records-search-action" aria-label={placeholder} onClick={()=>s.setSearchOpen(true)}><Icon name="search" size={20}/></LocalizedElement>{filterButton}{sortButton}{tools?.()}{children}{activeFilters}</>}
  <FilterSheet label={placeholder.replace(/\.\.\.$/,'')} open={s.searchOpen} onClose={()=>s.setSearchOpen(false)} actions={<Button type="submit" form={searchId}><LocalizedText>{"Anwenden"}</LocalizedText></Button>}><form id={searchId} onSubmit={event=>{event.preventDefault();s.setSearchOpen(false)}}><Field label="Suchtext" allowReadOnlyInput><Input type="search" maxLength={200} value={s.query} onChange={event=>s.setQuery(event.target.value)} placeholder={placeholder}/></Field></form></FilterSheet>
  </>;
@@ -191,7 +221,7 @@ export function RecordsView({
       {showCount&&!loading&&(visible.length>0||hasFilters)&&<span className="records-count" aria-live="polite"><LocalizedText>{`${pagination?.total??visible.length} ${(pagination?.total??visible.length)===1?singularCountLabel:countLabel}`}</LocalizedText></span>}
     </div>}
 
-    {loading?<LoadingState><LocalizedText>{"Einträge werden geladen …"}</LocalizedText></LoadingState>:error?<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" columns={columns.length}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}><LocalizedText>{col.label}</LocalizedText>{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true"><LocalizedText>{sort==="asc"?" ↑":" ↓"}</LocalizedText></span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status appearance="pill" tone={tone(item[col.index]??item.at(-1)??"")}><LocalizedText>{item[col.index]??item.at(-1)??"—"}</LocalizedText></Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
+    {loading?<LoadingState layout="records"><LocalizedText>{"Einträge werden geladen …"}</LocalizedText></LoadingState>:error?<ErrorState><LocalizedText>{error}</LocalizedText></ErrorState>:visible.length ? <><DataTable owner={placeholder} label={placeholder.replace(/ suchen.*$/,"")}>{columns&&<DataTableHead className="desktop-record-head" columns={columns.length}>{columns.map(col=><span role="columnheader" aria-sort={sortIndex===col.index&&sort!=="default"?(sort==="asc"?"ascending":"descending"):"none"} className={col.align==="right"?"align-right":""} key={col.label}><LocalizedText>{col.label}</LocalizedText>{sortIndex===col.index&&sort!=="default"?<span aria-hidden="true"><LocalizedText>{sort==="asc"?" ↑":" ↓"}</LocalizedText></span>:null}</span>)}<span aria-hidden="true"/></DataTableHead>}{visible.map((item,index)=>{const cells=<>{columns?.map(col=><span role="cell" key={col.label} className={`${col.align==="right"?"align-right ":""}${col.status?"table-status-cell":""}`}>{col.render?col.render(item):col.status?<Status appearance="pill" tone={tone(item[col.index]??item.at(-1)??"")}><LocalizedText>{item[col.index]??item.at(-1)??"—"}</LocalizedText></Status>:(item[col.index]||"—")}</span>)}<Icon name="arrow" size={16}/></>;const href=rowHref?.(item);return href?<DataTableRow href={href} className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>:<DataTableRow className="desktop-record-row" columns={columns?.length??1} key={item.join("-")+index}>{cells}</DataTableRow>})}</DataTable><div className="records mobile-record-list" data-records-owner={placeholder}>{visible.map((item,index)=><span className="record-wrapper" key={item.join("-")+index}>{children(item)}</span>)}</div></> :
       <EmptyState   title={query.trim()?"Keine Treffer für diese Suche":emptyLabel?.(activeChip)??(activeChip==="Inaktiv"?"Keine inaktiven "+countLabel:activeChip==="Aktiv"?"Keine aktiven "+countLabel:"Keine "+countLabel+" erfasst")}/>}
     {pagination&&<RecordsPagination {...pagination} loading={loading}/>}
   </>;
@@ -242,7 +272,7 @@ function recordGrid(columns?:number):CSSProperties|undefined{
  if(columns==null)return undefined;
  const count=Math.max(1,Math.trunc(columns));
  return {"--record-grid":count===1?'minmax(0,1fr) 25px':
-  'minmax(180px,1fr) repeat('+(count-1)+',minmax(80px,110px)) 25px'} as CSSProperties;
+  'minmax(0,1fr) repeat('+(count-1)+',minmax(80px,110px)) 25px'} as CSSProperties;
 }
 
 /** Same identity and secondary line for customer, employee and other directories. */
