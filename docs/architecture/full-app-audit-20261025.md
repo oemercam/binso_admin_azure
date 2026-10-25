@@ -85,6 +85,11 @@ gewertet. Die gezielte A15-Fünfsprachenprüfung bleibt bis zum vollständigen
 Ergebnis ebenfalls offen; ein erster Lauf wurde korrekt durch den noch offenen
 Datenschutzdialog der frischen Prüfsitzung blockiert und nach regulärer
 Consent-Vorbereitung neu gestartet, ohne die Assertion zu ändern.
+Der korrigierte A15-Lauf bestand auf dem finalen Produktionsbuild für Deutsch
+einschließlich verzögerter Antwort, Fehlerschutz, Tastatur und Reload-Persistenz;
+die übrigen vier Sprachen waren beim Abbruch noch nicht abgeschlossen.
+Unvollständige Browserprozesse und der eigene Linux-QA-Container wurden zum
+Ende des Zeitfensters gestoppt; die tatsächliche Vorschau bleibt geöffnet.
 
 Unter Windows-WebKit übersprang Tab auch in einer unabhängigen minimalen
 Vergleichsseite Links; der gleiche native Fokus-Vertrag blieb deshalb rot.
