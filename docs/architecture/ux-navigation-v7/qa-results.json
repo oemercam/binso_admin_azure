@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "date": "2026-10-25",
+  "implementationCommit": "e1ffb6e2efa3a2e6780958817d927c9c60dd0235",
+  "acceptance": "partial-awaiting-owner-review",
+  "externalMutations": false,
+  "productionMigrations": false,
+  "checks": [
+    {"command":"pnpm install --frozen-lockfile --offline","exit":0},
+    {"command":"pnpm lint","exit":0},
+    {"command":"pnpm css:check","exit":0},
+    {"command":"pnpm typecheck","exit":0},
+    {"command":"pnpm release:check","exit":0},
+    {"command":"pnpm security:scan:all","exit":0},
+    {"command":"pnpm build","exit":0},
+    {"command":"pnpm test","platform":"isolated-linux","groups":82,"exit":0},
+    {"command":"package test commands individually","platform":"windows","passed":81,"total":82,"remaining":"POSIX getuid/file permissions; passed unchanged under Linux"},
+    {"command":"native PostgreSQL concurrency/auth/registration/passkey gates","exit":0},
+    {"command":"native HTTP and PostgreSQL tenant/role/session gates","exit":0},
+    {"command":"node scripts/loading-browser-test.mjs","engine":"webkit","activeServiceWorker":true,"cases":20,"widths":[390,1440],"themes":["light","dark"],"exit":0,"physicalPwa":false},
+    {"command":"node scripts/ux-browser-test.mjs","interactions":["header"],"themes":["light","dark"],"exit":0},
+    {"command":"node scripts/foundation-integration-test.mjs","exit":0},
+    {"command":"node scripts/ux-style-contract-test.mjs","exit":0},
+    {"command":"node scripts/ux-contract-check.mjs","owners":40,"sourcePages":88,"exit":0}
+  ],
+  "linux": {
+    "explicitOwnerRuntimeException": true,
+    "image": "node:24.20.0-bookworm-slim",
+    "digest": "sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e",
+    "pnpm": "10.17.1",
+    "source": "exact Git bundle; no host credentials or production data",
+    "scannerQualification": "real Unix socket protocol peer; no antivirus engine qualification"
+  },
+  "browserFinal": {"status":"running","engine":"chromium","widths":[390],"themes":["light","dark"],"interactions":"all default domains"},
+  "manualBrowser": {
+    "data":"isolated synthetic tenant; actual application and backend",
+    "customerHubWidths":[320,390,430,768,1024,1440],
+    "rowHeight":48,
+    "rowFontSize":14,
+    "visibleTitle":{"fontSize":18,"lineHeight":24},
+    "horizontalOverflow":false,
+    "verified":["customer hub to scoped invoices to invoice and exact return chain","More to unscoped invoice list with both synthetic customers","eight customer hub destinations","personal avatar in DE/FR/IT/EN/TR","support list to detail to explicit conversation","light and dark reference views"],
+    "screenshots":"local V7-Vorschau-20261025 folder; private raw QA evidence excluded from Git"
+  },
+  "open": [
+    "Two earlier WebKit reopen navigations exceeded the unchanged 30-second load deadline. A complete subsequent run with request diagnostics passed; intermittent cause remains unproven.",
+    "3443 of 3616 catalogue entries lack Turkish translations; reference navigation is translated, global five-language acceptance is incomplete.",
+    "Real iPhone/iPad installed-PWA, native keyboard/safe-area and physical authenticator tests.",
+    "Every role/state/route/theme/zoom/accessibility combination is not visually accepted.",
+    "Full GitHub Linux browser/shard/axe/CodeQL/scanner-engine and package qualification has not been executed for this unpublished branch.",
+    "Production Azure configuration/schema, provider delivery and legal translation approval remain unqualified."
+  ]
+}

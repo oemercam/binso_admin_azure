@@ -22,7 +22,7 @@ API-Inventar nennt Methoden, Quellorte und statische Guard-Indikatoren. Das ist 
 
 ## Browsernachweise
 
-Echte lokale Anwendung, synthetische Firma: Kunden-Zentrale bei 320/390/430/768/1024/1440 px, alle acht Zeilen 48 px/14 px, gleiche Zählwert-/Chevron-Ausrichtung, kein horizontaler Überlauf. Kunden-Zentrale → kundenbezogene Rechnungen → Rechnung → exakt dieselbe Liste → Kunden-Zentrale tatsächlich geprüft. Mehr → Rechnungen zeigt beide synthetischen Kunden ohne versteckten Kundenfilter. Avatar DE/FR/TR geprüft; weitere Nachweise im finalen QA-Protokoll. Bilder im Workspace-Ordner V7-Vorschau-20261025; keine Produktionsbilder oder private Release-Nachweise im Git.
+Echte lokale Anwendung, synthetische Firma: Kunden-Zentrale bei 320/390/430/768/1024/1440 px, alle acht Zeilen 48 px/14 px, gleiche Zählwert-/Chevron-Ausrichtung, kein horizontaler Überlauf. Kunden-Zentrale → kundenbezogene Rechnungen → Rechnung → exakt dieselbe Liste → Kunden-Zentrale tatsächlich geprüft, im optimierten finalen Build erneut bestätigt. Sichtbarer Titel 18 px/24 px nachgemessen. Mehr → Rechnungen zeigt beide synthetischen Kunden ohne versteckten Kundenfilter. Avatar DE/FR/IT/EN/TR geprüft. Bilder im Workspace-Ordner V7-Vorschau-20261025; keine Produktionsbilder oder private Release-Nachweise im Git.
 
 ## Verbleibende Abweichungen und Risiken
 
@@ -35,4 +35,14 @@ Echte lokale Anwendung, synthetische Firma: Kunden-Zentrale bei 320/390/430/768/
 
 ## Finaler Prüfstand
 
-Befehle, Exitcodes und Identität werden nach den finalen lokalen Gates in qa-results.json ergänzt. Bis dahin keine abschliessende Abnahme oder Deploymentfähigkeit behauptet.
+Anwendungsstand: e1ffb6e2efa3a2e6780958817d927c9c60dd0235. Danach ausschliesslich QA-Synchronisation/Diagnostik und Dokumentation; keine weitere Anwendungs-, API-, CSS-, Berechtigungs- oder Migrationsänderung.
+
+- Frozen-Lockfile-Installation, Lint, CSS, Typecheck, release:check, security:scan:all und optimierter Produktionsbuild: Exit 0.
+- Vollständiger unveränderter pnpm-test-Befehl: alle 82 Gruppen unter Linux erfolgreich, Exit 0. Offizielles node:24.20.0-bookworm-slim, Digest sha256:ba849c60be29959425b8734d57b8b4b7d56f98edd9504c9af091d5281095a71e, pnpm 10.17.1. Eigentümerfreigabe zur isolierten Laufzeitausnahme liegt vor. Git-Bundle des exakten Stands, keine Host-Zugangsdaten, keine Produktionsdaten. Unix-Socket-/Manifestprüfungen unverändert bestanden.
+- Windows: dieselben 82 Gruppen einzeln protokolliert, 81 erfolgreich; POSIX-getuid-Gruppe dort nicht ausführbar, anschliessend unter Linux bestanden. Windows-Scannertransport war ein In-Memory-Protokollgegenpart; Linux verwendet den echten Unix-Socket, ebenfalls keine Antivirus-Engine.
+- Native PostgreSQL-16-Gegenprüfungen für Parallelität, Registrierung, Auth/Passkey sowie reale HTTP-/Mandanten-/Rollenprüfungen: Exit 0, ausschliesslich isolierte synthetische Datenbanken.
+- WebKit mit aktivem Service Worker: 20 Start-/Refresh-/Wiederöffnungs-/Navigationsfälle, beide Themes bei 390/1440 px, Exit 0. Oberfläche und Navigation bleiben bei Warmnavigation erhalten; null zusätzliche Sitzungsabfragen. Lokale synthetische Navigationszeiten 917–1545 ms sind keine Aussage über die Produktiv-PWA oder echte Apple-Geräte.
+- Zwei vorherige WebKit-Wiederöffnungen erreichten das unveränderte 30-s-Load-Limit. Der vollständige anschliessende Lauf mit zusätzlicher Request-Diagnostik bestand ohne Änderung der Timeouts, Bereitschaftsbedingungen oder Anwendung. Ursache der intermittierenden Load-Verzögerung nicht abschliessend bewiesen; als QA-/Performance-Risiko offen.
+- Such-/Header-Browserprüfung nach Warten auf das tatsächlich geladene Eingabefeld: beide Themes erfolgreich; Geometrie, Fokus, Abbrechen/Schliessen und verspätete Suchantworten bleiben streng geprüft.
+
+Der vollständige Chromium-Abschlusslauf und dessen Ergebnis werden im gesonderten QA-Protokoll ergänzt. Keine vollständige visuelle, sprachliche, Geräte- oder Produktionsabnahme behauptet; keine externe Schreibaktion durchgeführt.

@@ -1132,6 +1132,9 @@ try{
     await page.evaluate(()=>window.scrollTo(0,180));const scroll=await page.evaluate(()=>scrollY);
     const searchTrigger=await header.getByRole('button',{name:'Suche',exact:true}).boundingBox();await page.mouse.click(searchTrigger.x+searchTrigger.width/2,searchTrigger.y+searchTrigger.height/2);
     const panel=page.getByRole('dialog',{name:'Suche',exact:true});await panel.waitFor();
+    // The persistent panel chrome mounts before its deferred search content.
+    // Measure the real controls only after their actual input is visible.
+    await panel.getByLabel('Suchen',{exact:true}).waitFor({state:'visible'});
     assert.equal(await page.locator('.bottom-sheet').count(),0,'Header search is not a bottom sheet');
     assert.equal(await panel.getByRole('button',{name:'Abbrechen',exact:true}).filter({visible:true}).count(),width<=760?1:0,'Mobile search cancels beside the input; desktop uses the anchored close control');
     assert.equal(await panel.getByLabel('Suchen',{exact:true}).evaluate(el=>el===document.activeElement),true,'Search focuses its input');
