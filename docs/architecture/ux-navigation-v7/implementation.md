@@ -45,4 +45,19 @@ Erster vollständig geprüfter Anwendungsstand: e1ffb6e2efa3a2e6780958817d927c9c
 - Zwei vorherige WebKit-Wiederöffnungen erreichten das unveränderte 30-s-Load-Limit. Der vollständige anschliessende Lauf mit zusätzlicher Request-Diagnostik bestand ohne Änderung der Timeouts, Bereitschaftsbedingungen oder Anwendung. Ursache der intermittierenden Load-Verzögerung nicht abschliessend bewiesen; als QA-/Performance-Risiko offen.
 - Such-/Header-Browserprüfung nach Warten auf das tatsächlich geladene Eingabefeld: beide Themes erfolgreich; Geometrie, Fokus, Abbrechen/Schliessen und verspätete Suchantworten bleiben streng geprüft.
 
-Der vollständige Chromium-Abschlusslauf und dessen Ergebnis werden im gesonderten QA-Protokoll ergänzt. Keine vollständige visuelle, sprachliche, Geräte- oder Produktionsabnahme behauptet; keine externe Schreibaktion durchgeführt.
+## Abschliessende Ergebnisse
+
+Finaler Anwendungs-Build: a193225bb87295cd3ce62beaa7349ef9d2d47132. Danach nur der korrigierte Zahlungs-Testaufbau und QA-Dokumentation; Anwendungs-, CSS-, API-, Datenbank- und Paketdateien unverändert. Skript-Hashes und genaue Nachweise stehen in qa-results.json. Native HTTP-/Parallelitätsnachweise stammen aus dem ersten vollständigen Stand; ihre Backend-Owner sind bytegleich zum finalen Anwendungsstand.
+
+- Alle 82 Linux-Testgruppen auch auf a193225b: Exit 0. Build, Lint, Typen, CSS, Releaseverträge, vollständiger Abhängigkeitsaudit und Frozen-Lockfile-Installation erfolgreich.
+- Vollständiger korrigierter Chromium-Gesamtlauf: 102 Routen-/Viewportfälle je Theme, insgesamt 204, alle 14 Fachablaufgruppen, null erfasste Browser-Laufzeitfehler, beide Läufe Exit 0. Die vorher gesicherten echten Referenzbilder wurden erhalten; beim letzten funktionalen Lauf nur die doppelte Bild-/DOM-Ausgabe abgeschaltet, keine Geometrie-/Funktionsassertion.
+- Gezielter vollständiger Zahlungsablauf zusätzlich in beiden Themes erfolgreich: acht geöffnete Verbraucher, kein Reload, keine fiktive Bestätigung, verlorene Antwort, idempotente Wiederholung und explizite Überzahlungszustimmung.
+- WebKit abschliessend ohne parallele Browser-/Datenbanktests über den bekannten finalen Vorschau-Server: alle 20 Fälle mit aktivem Service Worker erfolgreich, unveränderte 30-s-Grenze. Warmnavigation lokal synthetisch 404–432 ms, gemeinsame Oberfläche/Navigation erhalten, keine weitere Auth-Abfrage. Frühere parallele Wiederöffnungs-Timeouts bleiben als nicht abschliessend erklärte QA-/PWA-Risiken sichtbar. Das ist kein Geräte- oder Produktionsgeschwindigkeitsnachweis.
+- Infrastruktur: offizielle Azure-CLI/Bicep-Vorlage lokal in leerem separatem QA-Konfigurationsverzeichnis kompiliert, Exit 0. Keine Cloud-Ressource angelegt oder geändert. Die eigentliche Scanner-Engine-/Image-Qualifikation bleibt offen.
+- Echte lokale Referenz erneut bei 320/390/430/768/1024/1440 px: acht Zeilen je 48 px, 14/20 px Schrift, Gewicht 400, Abstand 12 px, Icons 18 px, Chevron 16 px, sichtbarer Titel 18/24 px, kein horizontaler Überlauf. Vollständige JPEG-Browserbilder für Mobile und Desktop sowie Admin-Filter-Rückweg im lokalen Vorschauordner.
+
+Die für diesen Auftrag neu angelegten abgeschlossenen PostgreSQL- und Linux-QA-Container wurden beendet. Gemeinsame Testdatenbanken und die lokale Live-Vorschau bleiben für die Abnahme bestehen. Zwei bestehende synthetische Referenz-Sitzungen wurden ausschliesslich in binso_ui_test verlängert; keine Produktivsitzung oder Sicherheitsregel verändert.
+
+Der private lokale Ordner .qa-phase1 ist ausdrücklich per Gitignore ausgeschlossen: synthetische Fixtures, Rohprotokolle, Browserbeweise und Git-Quellbundles werden nicht versehentlich mit veröffentlicht. Die eingecheckten QA-Zusammenfassungen enthalten nur bereinigte Metadaten; echte Referenzbilder bleiben im lokalen Vorschauordner.
+
+Keine vollständige visuelle, sprachliche, Geräte- oder Produktionsabnahme behauptet. Alle 88 Routenzeilen bleiben Teilweise; die Ausführung einer synthetischen Regression ersetzt keine menschliche Abnahme jeder Rolle/jedes Zustands. Keine GitHub-Schreibaktion, kein Merge, kein Azure-Deployment und keine produktive Migration.

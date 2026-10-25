@@ -3939,7 +3939,7 @@
       "components/ui.tsx#Toast"
     ],
     "status": "Teilweise",
-    "evidence": "Real isolated-browser customer hub/list/detail/back flow; six hub widths 320/390/430/768/1024/1440. Full role/language/device acceptance pending."
+    "evidence": "Actual synthetic tenant/customer hub at 320/390/430/768/1024/1440, 8 rows at 48px/14px, title 18/24, scoped invoices/detail/exact return; all roles/locales/states not accepted."
   },
   {
     "route": "/kunden/neu",
@@ -5279,7 +5279,7 @@
       "components/statistics.tsx#Series"
     ],
     "status": "Teilweise",
-    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed."
+    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed. Actual operator customer filter/ticket return defect reproduced and corrected centrally; full operator role/device/localization acceptance remains open."
   },
   {
     "route": "/operator/login",
@@ -5294,7 +5294,7 @@
       "components/ui.tsx#ErrorState"
     ],
     "status": "Teilweise",
-    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed."
+    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed. Actual operator customer filter/ticket return defect reproduced and corrected centrally; full operator role/device/localization acceptance remains open."
   },
   {
     "route": "/operator",
@@ -5442,7 +5442,7 @@
       "components/statistics.tsx#Series"
     ],
     "status": "Teilweise",
-    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed."
+    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed. Actual operator customer filter/ticket return defect reproduced and corrected centrally; full operator role/device/localization acceptance remains open."
   },
   {
     "route": "/operator/wallboard",
@@ -5509,7 +5509,7 @@
       "components/monitoring.tsx#MetricReading"
     ],
     "status": "Teilweise",
-    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed."
+    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed. Actual operator customer filter/ticket return defect reproduced and corrected centrally; full operator role/device/localization acceptance remains open."
   },
   {
     "route": "/",
@@ -7486,7 +7486,7 @@
       "components/ui.tsx#Toast"
     ],
     "status": "Teilweise",
-    "evidence": "AST route/owner inventory and shared foundation contracts; no per-route functional/visual acceptance claimed."
+    "evidence": "Actual local synthetic ticket detail before explicit conversation, files and metadata, dock present in detail and hidden in chat; full role/device/provider acceptance open."
   },
   {
     "route": "/support/neu",

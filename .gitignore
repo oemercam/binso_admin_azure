@@ -3,6 +3,8 @@ node_modules
 out
 deploy/
 /evidence/
+# Private local QA fixtures, browser evidence and source bundles.
+/.qa-phase1/
 .env
 .env.*
 !.env.example
