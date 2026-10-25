@@ -11,8 +11,8 @@ export async function verifyPhase1Navigation(){
  assert.deepEqual(mainNavigation.map(({href,label,icon})=>[href,label,icon]),[
   ['/dashboard','Übersicht','house'],['/kunden','Kunden','navigation-users'],['/projekte','Aufträge','briefcase-business'],['/zeit','Zeit','clock3']]);
  assert.deepEqual(moreNavigation.map(group=>[group.title,group.items.map(item=>item.href)]),[
-  ['Geschäft',['/angebote','/rechnungen','/zahlungen','/spesen','/finanzen']],['Auswertung',['/berichte']],['Verwaltung',['/einstellungen/firma','/einstellungen/team','/einstellungen']],['Hilfe',['/support','/hilfe']]]);
- for(const [route,expected]of [['/kunden/real-id','kunden'],['/projekte/real-id','projekte'],['/zeit','zeit'],['/finanzen/analyse','more'],['/einstellungen/konto','more']])assert.equal(primaryNavigationSection(route),expected);
+  ['Geschäft',['/angebote','/rechnungen','/zahlungen','/spesen','/finanzen','/produkte','/lieferanten','/vertraege']],['Auswertung',['/berichte']],['Verwaltung',['/einstellungen/firma','/einstellungen/team','/mitarbeiter','/abwesenheiten','/einstellungen']],['Hilfe',['/support','/hilfe']]]);
+ for(const [route,expected]of [['/kunden/real-id','kunden'],['/projekte/real-id','projekte'],['/zeit','zeit'],['/finanzen/analyse','more'],['/einstellungen/konto','more'],['/produkte/real-id','more'],['/lieferanten/real-id','more'],['/vertraege/real-id','more'],['/mitarbeiter/real-id','more'],['/abwesenheiten','more']])assert.equal(primaryNavigationSection(route),expected);
  const old=execFileSync('git',['show',base+':app/design-system/navigation.css'],{encoding:'utf8'});
  const normalize=css=>css.replace(/font-size:[^;}]+;?/g,'').replace(/font-weight:[^;}]+;?/g,'').replace(/\r\n/g,'\n');
  const current=read('app/design-system/navigation.css');
@@ -29,6 +29,6 @@ export async function verifyPhase1Navigation(){
  const originalIcons=execFileSync('git',['show',base+':components/ui.tsx'],{encoding:'utf8'});
  assert.equal(paths(icon),paths(originalIcons),'All existing non-V2 icon paths remain unchanged');
  assert.notEqual(paths(icon.replace('M3 11.5 12 4l9 7.5','M3 11.5 12 5l9 7.5')),paths(originalIcons),'Existing protected icon mutation is detected');
- assert.deepEqual(moreNavigation[0].items.map(item=>item.label),['Angebote','Rechnungen','Zahlungen','Ausgaben & Spesen','Finanzübersicht'],'V7 approved business destinations and order');
+ assert.deepEqual(moreNavigation[0].items.map(item=>item.label),['Angebote','Rechnungen','Zahlungen','Ausgaben & Spesen','Finanzübersicht','Produkte','Lieferanten','Verträge'],'V7 destinations retain order; existing business modules have their approved primary location under More');
  console.log('Phase 1 navigation: exact V2 catalogue, owning routes, permission filtering and unchanged dock/FAB geometry/material with negative probes passed. Visual acceptance remains separate.');
 }
