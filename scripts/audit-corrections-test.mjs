@@ -191,7 +191,11 @@ console.log('Guided setup: canonical area readiness, partial/complete saves, saf
 // Optional setup content starts collapsed even on desktop and remains operable.
 {
  let current=false;const effects=[];
- const {DetailDisclosure}=compile('components/binso-ux.tsx',{react:{...react,useState:initial=>[current??initial,next=>{current=next}],useLayoutEffect:effect=>effects.push(effect)}});
+ const {DetailDisclosure}=compile('components/binso-ux.tsx',{
+  '@/config/workspace-navigation':compile('config/workspace-navigation.ts'),
+  '@/config/create-actions':compile('config/create-actions.ts'),
+  react:{...react,useState:initial=>[current??initial,next=>{current=next}],useLayoutEffect:effect=>effects.push(effect)}
+ });
  let disclosure=DetailDisclosure({label:'Optional ergänzen',defaultOpen:false,children:'Fields'});
  effects.forEach(effect=>effect());assert.equal(disclosure.props.open,false);
  disclosure.props.onToggle({currentTarget:{open:true}});

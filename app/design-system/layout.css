@@ -116,14 +116,7 @@
 }
 .page-head p{margin:7px 0 0;color:var(--color-muted);font-size:var(--body-font-size);line-height:var(--body-line-height)}
 .page-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
-.surface{
-  border:0;
-  border-radius:0;
-  background:var(--color-bg);
-  box-shadow:none;
-}
-.surface{padding:20px}
-.bo-workspace-section{min-width:0;margin-block:20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.bo-workspace-section{min-width:0;margin-block:var(--space-16)}
 .bo-workspace-section>h2{margin:0 0 16px}
 .page-container{--page-x:var(--workspace-page-inset);--mobile-page-x:22px}
 .section-title{
@@ -184,7 +177,6 @@
 }
 .sidebar-nav-group{display:grid;gap:2px;margin-top:12px}
 .sidebar-nav-label{padding:0 14px 5px;color:var(--color-muted);font-size:var(--type-secondary);font-weight:600}
-.desktop-detail-main>.surface{border-radius:0;box-shadow:none;border-inline:0}
 .mobile-header,.mobile-header *{filter:none;-webkit-filter:none;mix-blend-mode:normal}
 .mobile-header .logo,.mobile-header svg,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
 .app-main:has(.support-detail-workspace){position:fixed;top:var(--workspace-viewport-top);left:0;right:0;height:var(--workspace-viewport-height);overflow:hidden;padding-bottom:0}
@@ -331,12 +323,9 @@
 .page-head h1{font-size:var(--workspace-title-size);line-height:1.5}
 .page-head p{margin-top:5px;font-size:var(--type-control);line-height:1.4}
 .page-head .mobile-page-actions{display:none}
-.page-container>section:not([aria-modal="true"]),
-.page-container>.surface,
-.page-container>.finance-analysis,
-.page-container>.finance-breakdown{margin-top:var(--desktop-section-gap)}
+.page-container>.surface{margin-top:var(--desktop-section-gap)}
+.page-container>section:not([aria-modal="true"]),.page-container>.finance-analysis,.page-container>.finance-breakdown{margin-top:var(--desktop-section-gap)}
 .page-container>.toolbar{margin-top:0}
-.surface{padding:18px}
 .section-title{min-height:28px}
 .section-title h2{font-size:var(--section-title-font)}
 }
@@ -360,7 +349,6 @@
   .page-head-detail:not([data-heading-placement="content"])>div>p,
   .page-head-detail .page-actions{display:none}
 .page-actions{position:static}
-.surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}
 .customer-tab-panel>.section-title,
   .employee-tab-panel>.section-title{margin-bottom:12px}
 .surface>.compact-list:last-child>a:last-child,
@@ -662,7 +650,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .app-root[data-ux="master-v3"] .page-container[data-section="dashboard"] .bo-page-heading>p{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:var(--type-label)}
 .app-root[data-ux="master-v3"] .bo-dashboard-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .app-root[data-ux="master-v3"] .bo-overview-task-grid,.app-root[data-ux="master-v3"] .bo-overview-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-block:16px;min-width:0}
-.app-root[data-ux="master-v3"] :is(.bo-overview-task-grid,.bo-overview-secondary)>.bo-workspace-section{margin:0;padding:var(--ux-card-inset);border:1px solid var(--color-line);border-radius:var(--shape-panel);min-width:0}
+.app-root[data-ux="master-v3"] :is(.bo-overview-task-grid,.bo-overview-secondary)>.bo-workspace-section{margin:0;min-width:0}
 .app-root[data-ux="master-v3"] .bo-overview-task-grid:empty,.app-root[data-ux="master-v3"] .bo-overview-secondary:empty{display:none}
 .app-root[data-ux="master-v3"] .bo-overview-task-grid>.bo-workspace-section:only-child,.app-root[data-ux="master-v3"] .bo-overview-secondary>.bo-workspace-section:only-child{grid-column:1/-1}
 @media(max-width:760px){
@@ -683,3 +671,17 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 /* Shared V7 context below centered record headers; never a second title. */
 .detail-context-line{display:none}
 @media(max-width:760px){.detail-context-line{display:flex;align-items:center;gap:var(--space-12);min-height:24px;margin-bottom:var(--space-16);font-size:var(--type-secondary);color:var(--color-muted)}.detail-context-line>span:not(.status){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail-context-line>.status{margin-left:auto;flex:none}}
+
+/* The public/auth surface retains its independent material. */
+.surface{border:0;border-radius:0;background:var(--color-bg);box-shadow:none;padding:20px}
+
+@media(min-width:761px){.surface{padding:18px}}
+@media(max-width:760px){.surface{padding:18px 0;border-left:0;border-right:0;border-radius:0}}
+
+/* Owner-approved customer-detail material, shared by app content families.
+   Public marketing, overlays, document output and navigation chrome are separate owners. */
+:is(.app-root,.operator-root) :is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block),.navigation-group{min-width:0;border:1px solid var(--color-line);border-radius:var(--shape-group);padding:var(--space-16);background:var(--color-bg);box-shadow:none}
+:is(.app-root,.operator-root) :is(.navigation-group,.bo-settings-group-body),.navigation-group{padding-block:0}
+/* A content group owns one perimeter; nested charts/lists/sections retain only their inner rows. */
+:is(.app-root,.operator-root) :is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block) :is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block){border:0;border-radius:0;padding:0;box-shadow:none;background:transparent}
+:is(.app-root,.operator-root) :is(.desktop-record-table,.mobile-record-list):empty{display:none}

@@ -31,11 +31,12 @@
     {
       "id": "UX24-SURFACE",
       "scope": "Cards/Listen/Settings",
-      "requirement": "Offene Abschnitte und Listen gemäss ZIP. Trennlinien nur zwischen Einträgen. Keine frei erfundenen Kartenraster.",
+      "requirement": "Owner-Freigabe 25.10.2026: Darstellung der Kundendetailseite zentral auf Inhaltsgruppen aller Kunden- und Admin-Seiten und Unterseiten übertragen: eine dünne Umrandung, 16 px Rundung/Innenabstand, bestehende dezente Bereichs-Icons und Trennlinien ausschliesslich zwischen Zeilen. Eingebettete Listen/Diagramme erhalten keine zweite Kartenumrandung. Öffentliche Website, Ausgabedokumente, Overlay- und Navigationsgeometrie bleiben eigenständige Owner.",
       "owner": "app/design-system/layout.css",
-      "acceptance": "Einzelner, letzter und mehrzeiliger Eintrag ohne Schlusslinie",
+      "acceptance": "Browser: äusserer Rahmen 1 px, Rundung 16 px, Innenabstand 16 px; Navigation ohne vertikalen Zusatzabstand; verschachtelte Inhaltsgruppen ohne eigenen Rahmen/Radius/Inset. Letzte Zeile ohne Schlusslinie. Gegenproben für falsche Rahmen, Rundung und Insets müssen fehlschlagen.",
       "status": "offen",
-      "evidence": []
+      "evidence": [],
+      "decision": "Neueste ausdrückliche Owner-Anweisung ersetzt den historischen Vertrag rahmenloser Inhaltsabschnitte. Visuelle Abnahme aller abgeleiteten Seiten bleibt offen."
     },
     {
       "id": "UX24-CONTROL",

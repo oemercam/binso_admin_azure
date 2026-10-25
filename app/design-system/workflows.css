@@ -118,7 +118,7 @@
 .line-head span:nth-child(n+2){text-align:right}
 .optional-row{padding-top:10px;border-top:1px solid var(--color-line)}
 .time-layout{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:32px;container-type:inline-size}
-.time-section{min-width:0;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
+.time-section{min-width:0}
 .timer-card{text-align:left}
 .time-overview-section{padding-left:32px;border-left:1px solid var(--color-line)}
 .timer-project{width:100%;max-width:none;margin:0;display:grid;gap:18px;text-align:left}
@@ -347,10 +347,8 @@
   border-top:1px solid var(--color-line);
   background:var(--color-bg);
 }
-.account-sheet,
-.global-search,
-.customer-tab-panel,
-.employee-tab-panel{min-width:0}
+.customer-tab-panel,.employee-tab-panel{min-width:0}
+.account-sheet,.global-search{min-width:0}
 .manual-time-sheet,
 .project-sheet{width:min(100%,560px)}
 @keyframes sheet-enter{
@@ -407,20 +405,6 @@
 @media (min-width:761px){
 .mobile-record-list{display:none}
 .quick-create-sheet{width:320px}
-.customer-tab-panel,
-  .employee-tab-panel{
-    padding:var(--desktop-section-y) 0;
-    border-left:0;
-    border-right:0;
-    border-radius:0;
-    box-shadow:none;
-    background:transparent;
-  }
-.customer-tab-panel,
-  .employee-tab-panel{
-    border-top:1px solid var(--color-line);
-    border-bottom:1px solid var(--color-line);
-  }
 }
 @media (min-width:761px) and (max-width:1100px){
 .product-modules{grid-template-columns:repeat(2,1fr)}
@@ -511,7 +495,6 @@
   }
 .desktop-detail-main,
   .entity-edit-main{min-width:0}
-.employee-tab-panel{padding:0}
 .expense-detail-workspace{
     grid-template-columns:minmax(0,1fr) 320px;
     align-items:start;
@@ -571,10 +554,6 @@ html,body{width:100%;max-width:100%;min-width:0;overflow-x:clip}
   .employee-tab-panel{width:100%;max-width:none}
 .customer-tab-panel,
   .employee-tab-panel{margin:0}
-.customer-tab-panel,
-  .employee-tab-panel{border-top:0}
-.customer-tab-panel,
-  .employee-tab-panel{border-bottom:0}
 .customer-tab-panel .compact-list>a:last-child,
   .customer-tab-panel .timeline>div:last-child{border-bottom:0}
 .danger-zone{padding:18px 0;border-left:0;border-right:0;border-radius:0}
@@ -680,8 +659,7 @@ a{-webkit-tap-highlight-color:transparent}
 .finance-breakdown{grid-template-columns:1fr;gap:24px;padding:22px 0}
 .responsive-create-action>span{display:none}
 .responsive-create-action>svg{display:block;grid-area:1 / 1;align-self:center;justify-self:center}
-.time-layout>.time-section{border-top:0}
-.time-layout>.time-section+.time-section{margin-top:20px}
+.time-layout>.time-section+.time-section{margin-top:0}
 .time-overview-section{padding-left:0;border-left:0}
 .time-layout:has([role="tab"][aria-selected="true"]:last-child){grid-template-columns:minmax(0,1fr)}
 }
@@ -742,7 +720,6 @@ a{-webkit-tap-highlight-color:transparent}
  .page-container[data-section="zeit"] .timer-actions>.button{min-height:44px}
  .page-container[data-section="zeit"] .timer-project{gap:12px}
  .page-container[data-section="zeit"] .time-layout{gap:16px}
- .page-container[data-section="zeit"] .time-section{padding:14px;border:1px solid var(--color-line);border-radius:var(--shape-panel)}
  .page-container[data-section="zeit"] .time-group-head{min-height:46px;padding-block:8px}
 }
 

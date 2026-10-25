@@ -125,6 +125,16 @@ no production migration, external mutation, GitHub push/merge or Azure deploymen
 without separate explicit authorization. Local commits for the final QA identity
 are allowed. Historical migration files must not be rewritten.
 
+## Customer-detail card material (25 October 2026)
+
+The owner's subsequent explicit request extends the existing customer-detail
+card, icon and separator pattern to content groups across customer and Admin
+pages and subpages. `docs/architecture/ux-navigation-v7/content-cards.md` records
+this addition. It supersedes older flat/open-section appearance contracts;
+reuse the existing central components, tokens and CSS owners. Keep one perimeter
+per group, no nested card chrome, and preserve navigation/FAB, data and security.
+Derived views still require visual approval; this authorizes no external writes.
+
 ## Master Implementation Phase 1 (24 October 2026)
 
 The user supplied the complete `docs/architecture/master-phase1/source.md` after

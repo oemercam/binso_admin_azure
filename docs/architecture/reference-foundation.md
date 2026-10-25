@@ -1,5 +1,20 @@
 # Verbindliche UI-Foundation
 
+## Freigegebene Inhaltskarten vom 25. Oktober 2026
+
+Die jüngste Owner-Anweisung überträgt das bestehende Kundendetail-Muster auf
+die Inhaltsgruppen aller Kunden- und Admin-Seiten und Unterseiten. Der gemeinsame
+Owner in `app/design-system/layout.css` verwendet vorhandene Tokens: einen dünnen
+Rahmen, 16 px Rundung und 16 px Innenabstand. Navigationsgruppen behalten 48-px-Zeilen
+mit 18-px-Icons und eingerückten Trennlinien. Ihre Überschrift steht ausserhalb der
+Karte. Verschachtelte Listen, Diagramme und Abschnitte erhalten keinen zweiten
+Rahmen. Die bisherigen rahmenlosen Inhaltsverträge werden dadurch ersetzt.
+
+Bereichs-Icons stammen weiterhin aus der bestehenden Navigation. Datenzeilen,
+Formulare und Tabellen behalten ihre Semantik und Abläufe. Öffentliche Website,
+Dokumentausgabe, Dialoge sowie Bottom-Navigation und blauer Plus-Button behalten
+ihre jeweiligen Owner. Abgeleitete Seiten benötigen weiterhin visuelle Abnahme.
+
 ## Quelle und Rangfolge
 
 Die unveränderten Dateien in `docs/audit/v24/reference/` und die Ergänzungen in

@@ -23,7 +23,8 @@
 .bo-monitor-alarms>div{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0}
 .bo-monitor-alarms small{flex-basis:100%;color:var(--color-muted);overflow-wrap:anywhere}
 .bo-monitoring-wallboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
-.bo-monitoring-wallboard>.bo-monitor-toolbar,.bo-monitoring-wallboard>.bo-metric-tiles,.bo-monitoring-wallboard>.bo-workspace-section:last-of-type,.bo-monitoring-wallboard>footer{grid-column:1/-1}
+.bo-monitoring-wallboard>.bo-workspace-section:last-of-type{grid-column:1/-1}
+.bo-monitoring-wallboard>.bo-monitor-toolbar,.bo-monitoring-wallboard>.bo-metric-tiles,.bo-monitoring-wallboard>footer{grid-column:1/-1}
 .bo-monitoring-wallboard .bo-monitor-toolbar{margin-bottom:0}
 .bo-monitoring-wallboard .bo-monitor-toolbar h2{font-size:clamp(24px,2vw,48px)}
 .bo-monitoring-wallboard .metric>strong{font-size:clamp(28px,3vw,64px)}
@@ -171,20 +172,14 @@
 .operator-detail-list>div{display:grid;grid-template-columns:130px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--color-line);font-size:var(--type-secondary)}
 .operator-detail-list dt{color:var(--color-muted)}
 .operator-detail-list dd{margin:0}
-.customer-context,
-.operator-thread,
-.monitoring-panel,
-.announcement-card,
-.operator-root .security-card{border:0;border-radius:0;background:var(--color-bg);padding:0;box-shadow:none;min-width:0}
+.monitoring-panel,.operator-root .security-card{min-width:0}
+.announcement-card{min-width:0}
+.customer-context,.operator-thread{border:0;border-radius:0;background:var(--color-bg);padding:0;box-shadow:none;min-width:0}
 .operator-ticket-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px}
 .operator-reply{margin-top:14px;padding-top:12px;border-top:1px solid var(--color-line)}
-.context-block{display:grid;gap:5px;padding:14px 0;border-top:1px solid var(--color-line)}
+.context-block{display:grid;gap:5px}
 .context-block small,.context-block span:not(.status){color:var(--color-muted);font-size:var(--type-secondary)}
 .monitoring-panel{
-  padding:0;
-  border:0;
-  border-radius:0;
-  background:var(--color-bg);
   color:var(--color-fg);
 }
 .monitoring-list>div{
@@ -205,7 +200,7 @@
 .monitoring-list>div>div:first-child>i{width:7px;height:7px;border-radius:50%;background:var(--palette-35c778)}
 .monitoring-list b,.monitoring-list small{display:block}
 .monitoring-list small{margin-top:4px;color:var(--color-muted);font-size:var(--type-secondary)}
-.announcement-card{display:grid;gap:8px;margin-top:12px;padding:16px 0;border-width:1px 0 0;border-radius:0}
+.announcement-card{display:grid;gap:8px;margin-top:12px}
 .announcement-card b{font-size:var(--type-body)}
 .announcement-card p,.announcement-card small{margin:0;color:var(--color-muted);font-size:var(--type-secondary)}
 .audit-list{display:grid;margin-top:10px}
@@ -237,7 +232,7 @@
 .operator-header-brand{min-width:0}
 .operator-home-link{display:none}
 .operator-payment-insights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.operator-payment-insight{min-width:0;min-height:104px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 0}
+.operator-payment-insight{min-width:0;min-height:104px;display:flex;align-items:center;justify-content:space-between;gap:18px}
 .operator-payment-insight>div:first-child{min-width:0;display:grid;gap:6px;overflow-wrap:anywhere}
 
 
@@ -246,7 +241,6 @@
 .operator-payment-insights{
   align-items:stretch;
 }
-.operator-payment-insight{border:0;border-radius:0;background:transparent;box-shadow:none}
 .operator-sidebar-groups{display:grid;gap:18px}
 .operator-sidebar-group{display:grid;gap:3px}
 .operator-nav-label{
@@ -311,8 +305,7 @@
   font-size:var(--type-control);
   line-height:1.45;
 }
-.operator-table-card,
-.operator-root .surface{border-radius:var(--shape-group)}
+.operator-table-card{border-radius:var(--shape-group)}
 .operator-table-head{
   min-height:42px;
   padding-inline:10px;
@@ -371,14 +364,13 @@
 .operator-home-link{display:inline-flex}
 .operator-table-card{margin-top:16px}
 .operator-insight-grid{grid-template-columns:1fr;gap:12px}
-.monitoring-panel{margin-inline:0;padding:0;border-radius:0}
+.monitoring-panel{margin-inline:0}
 .monitoring-list>div{grid-template-columns:minmax(0,1fr) minmax(0,.65fr)}
 .operator-main{padding-bottom:calc(var(--mobile-nav-h) + var(--safe-bottom) + 38px)}
 .operator-table-card .operator-table{border-top:0}
 .operator-detail-list>div:last-child,.monitoring-list>div:last-child{border-bottom:0}
 .operator-payment-insights{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.operator-payment-insight{min-height:104px;display:grid;align-content:space-between;gap:8px;padding:12px 0}
-.operator-payment-insight{border:0;border-radius:0;background:transparent;box-shadow:none}
+.operator-payment-insight{min-height:104px;display:grid;align-content:space-between;gap:8px}
 .operator-main{
     padding-top:0;
   }
