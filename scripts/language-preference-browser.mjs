@@ -50,16 +50,21 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
  * The isolated HTTP adapter never dispatches notifications or changes a real user. */
 async function verifyNotificationPreference(page,{base,locale,text}){
  let enabled=true,phase='fail',updates=0,release,started;
+ let releaseRead,readStarted,holdRead=true;
+ const pendingRead=new Promise(resolve=>releaseRead=resolve),receivedRead=new Promise(resolve=>readStarted=resolve);
  const pending=new Promise(resolve=>release=resolve),received=new Promise(resolve=>started=resolve);
  const handler=async route=>{
-  if(route.request().method()==='GET')return route.fulfill({json:{channels:{email:true,push:false},items:[{kind:'Rechnungen',email:enabled,push:false}]}});
+  if(route.request().method()==='GET'){if(holdRead){readStarted();await pendingRead;}return route.fulfill({json:{channels:{email:true,push:false},items:[{kind:'Rechnungen',email:enabled,push:false}]}});}
   assert.equal(route.request().method(),'PATCH');updates++;assert.deepEqual(route.request().postDataJSON(),{kind:'Rechnungen',channel:'email',enabled:false});
   if(phase==='fail')return route.fulfill({status:503,json:{message:'Synthetic preference failure'}});
   started();await pending;enabled=false;return route.fulfill({json:{ok:true}});
  };
  await page.route('**/api/settings/notifications',handler);
  try{
-  await page.goto(base+'/einstellungen/benachrichtigungen?lang='+locale,{waitUntil:'networkidle'});
+  await page.goto(base+'/einstellungen/benachrichtigungen?lang='+locale,{waitUntil:'domcontentloaded'});
+  await receivedRead;
+  assert.equal(await page.getByRole('switch').count(),0,'Unconfirmed notification defaults must never appear as saved settings');
+  holdRead=false;releaseRead();await page.waitForLoadState('networkidle');
   const control=page.getByRole('switch',{name:text('Rechnungen',locale)+' · '+text('E-Mail',locale),exact:true});
   await control.waitFor();assert.equal(await control.isEnabled(),true);assert.equal(await control.getAttribute('aria-checked'),'true');
   await control.click();await page.getByRole('alert').getByText(text('Einstellung konnte nicht gespeichert werden.',locale),{exact:true}).waitFor();
@@ -68,6 +73,6 @@ async function verifyNotificationPreference(page,{base,locale,text}){
   assert.equal(await control.getAttribute('aria-busy'),'true');assert.equal(await control.isEnabled(),false);assert.equal(await control.getAttribute('aria-checked'),'true');
   await page.keyboard.press('Space');assert.equal(updates,2,'Native busy state prevents repeated keyboard mutations');
   release();await page.waitForFunction(()=>document.querySelector('[role="switch"]')?.getAttribute('aria-checked')==='false');
-  await page.reload({waitUntil:'networkidle'});assert.equal(await control.getAttribute('aria-checked'),'false');assert.equal(updates,2,'Reload reads persistence without repeating a mutation');
- }finally{release();await page.unroute('**/api/settings/notifications',handler);}
+  await page.reload({waitUntil:'networkidle'});await control.waitFor({state:'visible'});assert.equal(await control.getAttribute('aria-checked'),'false');assert.equal(updates,2,'Reload reads persistence without repeating a mutation');
+ }finally{releaseRead();release();await page.unroute('**/api/settings/notifications',handler);}
 }

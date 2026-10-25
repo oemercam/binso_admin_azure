@@ -31,6 +31,7 @@ Die Inventur ist kein Nachweis, dass jeder dynamische Zustand ausgeführt wurde.
 | A14 | Ein kurzer Feldtitel wie Verkaufspreis bricht mobil wegen der alten festen .4fr-Spalte unnötig um. | Vorhandenes Datenzeilen-Raster verwendet bis zu 50 % natürlich breite Bezeichnungen und den verbleibenden Platz für rechtsbündige Werte. Lange Inhalte bleiben umbrechbar. |
 | A13 | Desktop-Detailaktionen belegen eine eigene 68-px-Zeile samt zusätzlicher Trennlinie. | Vorhandene `DetailHeading` bringt Aktionen direkt in die Titelzeile; mobile Header und fachliche Formular-Footer bleiben erhalten. |
 | A12 | Türkisch ist in großen Teilen des Hauptkatalogs nicht vorhanden. | 174 fehlende Kerntexte ergänzt. Übrige fehlende Texte werden im Inventar vollständig aufgeführt; keine vollständige türkische oder rechtliche Abnahme behauptet. |
+| A15 | Benachrichtigungseinstellungen zeigen vor ihrer GET-Antwort voreingestellte Schalter. Ein Reload kann dadurch kurz einen falschen gespeicherten Zustand darstellen. | Zustellungs- und Gerätegruppe erscheinen erst nach bestätigtem Laden. Der tatsächliche Browsertest hält die erste Antwort an und verlangt null sichtbare Schalter; Fehler-, Wartestatus-, Tastatur- und Persistenzprüfungen bleiben erhalten. |
 
 ## Prüfung und tatsächliche Grenzen
 
@@ -46,6 +47,13 @@ Anfragen 433 ms im ersten Durchgang und 175/163 ms in den Folgedurchgängen,
 jeweils HTTP 200. Einzelne warme Antworten lagen bei 66–174 ms. Das ist ein
 isolierter leerer Testmandant auf lokalem PostgreSQL, kein Azure-, Last- oder
 iPhone-PWA-Nachweis. Daraus folgt keine Zusage zu produktiven Ladezeiten.
+
+Zusätzlich antworteten acht tatsächliche angemeldete HTML-Seiten im lokalen
+Produktionsbuild mit HTTP 200 in 42–156 ms inklusive vollständigem Empfang.
+Die Datenbank hatte während der Browserprobleme keine blockierten Verbindungen.
+Das grenzt die lokale Diagnose ein, beweist aber keine Ursache der produktiven
+PWA-Probleme. Einzelne Browser-Dokumentnavigationen überschritten weiterhin
+30 Sekunden; der ausstehende Dokumentpfad wird unverändert als Fehler erfasst.
 
 Die nativen PostgreSQL-Parallel-, Authentifizierungs-, Registrierungs- und Passkey-Prüfungen bestanden. Der vollständige HTTP-Lauf bestand auf einer separaten frischen Datenbank: alle inventarisierten privaten GET-Routen über acht Rollen, 80 gültige Schreibfälle, Mandantentrennung, Finanz-/Rabatt-/Freigabegrenzen und tatsächlicher Sitzungsablauf. Ein erster HTTP-Start gegen die bereits befüllte Paralleltest-Datenbank wurde korrekt abgewiesen; nichts wurde zurückgesetzt.
 
