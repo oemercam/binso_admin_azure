@@ -836,7 +836,7 @@ try{
   if(hasInteraction('time')){
   await page.waitForLoadState("networkidle");await navigate(base+'/zeit');await page.waitForLoadState('networkidle');await page.getByRole('tab',{name:'Einträge',exact:true}).click();
   const group=page.locator('details.time-group').first();await group.waitFor();
-  assert.equal(await group.locator('summary strong').textContent(),'2:15','Grouped duration uses exact minutes');
+  assert.equal(await group.locator('summary strong').textContent(),'2:15 h','Grouped duration uses exact minutes and the approved explicit hour unit');
   assert.equal(await group.getAttribute('open'),null,'Entry groups start collapsed');
   await group.locator('summary').click();await group.locator('.time-record-list').waitFor();
   assert.equal(await group.locator('.time-record-list>div').count(),2,'Expansion shows both entries');
