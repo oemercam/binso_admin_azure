@@ -28,6 +28,7 @@ Die Inventur ist kein Nachweis, dass jeder dynamische Zustand ausgeführt wurde.
 | A09 | Unbenutzter Modulkatalog in `lib/modules.ts` enthält veraltete, nicht vorhandene Navigationsziele; Listen enthalten alte Demo-ID-Fallbacks. | Nach Importprüfung unbenutzten Katalog entfernt, benötigten `ModuleKey` erhalten. Produkt-/Mitarbeiterlisten verwenden reale IDs. |
 | A10 | Berichte rendern bei fehlenden Zahlungs-/Spesenrechten eine leere Informationskarte. | Ganze Karte bedingt rendern; fachliche Erklärungen bleiben bei zugehörigen Daten erreichbar. |
 | A11 | Mobiler Zurück-Test misst Existenz und Sichtbarkeit in verschiedenen DOM-Zuständen. | Wartet auf sichtbaren Button und misst Sichtbarkeit, 44-px-Zielfläche sowie nicht abgeschnittenes Icon atomar. Keine Fehlerunterdrückung oder Zeitlimit-Erhöhung. |
+| A14 | Ein kurzer Feldtitel wie Verkaufspreis bricht mobil wegen der alten festen .4fr-Spalte unnötig um. | Vorhandenes Datenzeilen-Raster verwendet bis zu 50 % natürlich breite Bezeichnungen und den verbleibenden Platz für rechtsbündige Werte. Lange Inhalte bleiben umbrechbar. |
 | A13 | Desktop-Detailaktionen belegen eine eigene 68-px-Zeile samt zusätzlicher Trennlinie. | Vorhandene `DetailHeading` bringt Aktionen direkt in die Titelzeile; mobile Header und fachliche Formular-Footer bleiben erhalten. |
 | A12 | Türkisch ist in großen Teilen des Hauptkatalogs nicht vorhanden. | 174 fehlende Kerntexte ergänzt. Übrige fehlende Texte werden im Inventar vollständig aufgeführt; keine vollständige türkische oder rechtliche Abnahme behauptet. |
 
@@ -46,7 +47,11 @@ jeweils HTTP 200. Einzelne warme Antworten lagen bei 66–174 ms. Das ist ein
 isolierter leerer Testmandant auf lokalem PostgreSQL, kein Azure-, Last- oder
 iPhone-PWA-Nachweis. Daraus folgt keine Zusage zu produktiven Ladezeiten.
 
-Abschließende vollständige Code-/Browser-/HTTP-Prüfungen: noch in Arbeit.
+Die nativen PostgreSQL-Parallel-, Authentifizierungs-, Registrierungs- und Passkey-Prüfungen bestanden. Der vollständige HTTP-Lauf bestand auf einer separaten frischen Datenbank: alle inventarisierten privaten GET-Routen über acht Rollen, 80 gültige Schreibfälle, Mandantentrennung, Finanz-/Rabatt-/Freigabegrenzen und tatsächlicher Sitzungsablauf. Ein erster HTTP-Start gegen die bereits befüllte Paralleltest-Datenbank wurde korrekt abgewiesen; nichts wurde zurückgesetzt.
+
+Die Browsermatrix scheiterte unter paralleler lokaler Last einmal beim Seitenaufbau und einmal beim Warten auf Netzwerkruhe. Zwölf anschließende isolierte öffentliche/Startansichten mit unveränderten Wartebedingungen bestanden. Die Ursache ist nicht abschließend belegt. Zusätzliche Diagnose protokolliert bei einem Fehler ausstehende Ressourcen ohne Parameter oder Zugangsdaten; keine Wiederholung oder Zeitlimit-Erhöhung im Test. Die breit angelegte Prüfung wird ressourcenschonend aufgeteilt, ohne Routen, Themes oder Assertions zu entfernen.
+
+Abschließende vollständige Code-/Browserprüfungen: noch in Arbeit.
 Die bisherigen Ergebnisse sind keine pauschale Abnahme jeder Rolle und jedes
 bedingten Formular-/Fehlerzustands. Echte iPhone/iPad-PWA, externe Zustellung,
 Providerkonfiguration, vollständige fünfsprachige Sichtprüfung und juristisch

@@ -293,7 +293,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .time-filter-toolbar + .chips{flex-wrap:nowrap;overflow-x:auto}
 .time-filter-toolbar + .chips>button{flex-shrink:0}
 .time-layout>.timer-card>.tabs{border-top:0}
-.detail-list>div{grid-template-columns:minmax(0,.4fr) minmax(0,1fr);gap:12px}
+.detail-list>div{grid-template-columns:fit-content(50%) minmax(0,1fr);gap:12px}
 .detail-list dd{min-width:0;overflow-wrap:anywhere;line-height:1.5}
 }
 @media (max-width:640px){

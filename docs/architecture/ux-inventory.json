@@ -304240,7 +304240,7 @@
       "declarations": [
         {
           "property": "grid-template-columns",
-          "value": "minmax(0,.4fr) minmax(0,1fr)",
+          "value": "fit-content(50%) minmax(0,1fr)",
           "important": false
         },
         {
