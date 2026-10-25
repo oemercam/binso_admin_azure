@@ -94,10 +94,11 @@
 .page-container{
   background:var(--app-canvas);
   width:100%;
+  min-block-size:calc(100svh - var(--workspace-header-height));
   max-width:var(--content-max);
   margin:0 auto;
   padding:34px var(--page-x) 90px;
-  animation:page-enter var(--motion-fast) var(--motion-ease-standard) backwards;
+  /* The persistent frame must not fade or translate again on route changes. */
 }
 .page-head{
   min-height:0;
@@ -187,7 +188,7 @@
 .mobile-header,.mobile-header *{filter:none;-webkit-filter:none;mix-blend-mode:normal}
 .mobile-header .logo,.mobile-header svg,.mobile-header .mobile-back,.mobile-header .mobile-notification-button,.mobile-header .avatar-button{opacity:1}
 .app-main:has(.support-detail-workspace){position:fixed;top:var(--workspace-viewport-top);left:0;right:0;height:var(--workspace-viewport-height);overflow:hidden;padding-bottom:0}
-.app-main:has(.support-detail-workspace) .page-container{height:calc(var(--workspace-viewport-height) - var(--workspace-header-height));display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--desktop-section-gap)}
+.app-main:has(.support-detail-workspace) .page-container{min-block-size:0;height:calc(var(--workspace-viewport-height) - var(--workspace-header-height));display:flex;flex-direction:column;overflow:hidden;padding-bottom:var(--desktop-section-gap)}
 .app-header{background:var(--app-canvas);color:var(--app-text);backdrop-filter:none;-webkit-backdrop-filter:none}
 .app-header-leading{display:flex;align-items:center;min-width:0;gap:8px;flex:1}
 .app-header-actions{display:flex;align-items:center;gap:4px;flex:none;padding:2px}
@@ -678,3 +679,7 @@ html[data-theme="dark"] .app-start-icon{filter:invert(1)}
 .app-root .page-head-detail h1{font-size:var(--type-mobile-detail);line-height:1.3}
 .app-root[data-ux="master-v3"] .page-head-detail .bo-page-heading h1{font-size:var(--type-mobile-detail)}
 .bo-workspace-section>h2{font-size:var(--type-section);font-weight:600;line-height:1.3}
+
+/* Shared V7 context below centered record headers; never a second title. */
+.detail-context-line{display:none}
+@media(max-width:760px){.detail-context-line{display:flex;align-items:center;gap:var(--space-12);min-height:24px;margin-bottom:var(--space-16);font-size:var(--type-secondary);color:var(--color-muted)}.detail-context-line>span:not(.status){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.detail-context-line>.status{margin-left:auto;flex:none}}

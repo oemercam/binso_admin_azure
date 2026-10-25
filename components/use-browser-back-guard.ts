@@ -4,6 +4,8 @@ import {useLayoutEffect,useRef} from "react";
 
 type DraftGuard={blocked:()=>void;protectUnload:()=>boolean;navigate?:(url:string)=>void};
 const guards=new Set<DraftGuard>();
+/** Also protects explicit application updates, including drafts rendered in portals. */
+export function hasProtectedDraft(){return [...guards].some(guard=>guard.protectUnload());}
 let boundary:{release:()=>void;allow:()=>void;cleanup:()=>void}|null=null;
 
 /** One same-URL boundary protects all active drafts before Next can unmount them on Safari back. */

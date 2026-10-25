@@ -306,6 +306,8 @@ input:not([type="checkbox"]):not([type="radio"]),
 .bo-row-actions:disabled{opacity:.4;cursor:not-allowed}
 .bo-row-actions:hover:not(:disabled){background:var(--color-subtle);border-radius:var(--shape-group-small)}
 .loading-state{display:block;min-height:0;padding:0}
+.loading-state[data-loading-layout="page"]{min-block-size:min(360px,50svh);inline-size:100%}
+.loading-state[data-loading-layout="records"]{min-block-size:min(288px,45svh);inline-size:100%}
 
 @keyframes content-progress{0%,100%{opacity:.35;transform:scaleX(.5)}50%{opacity:1;transform:scaleX(1)}}
 

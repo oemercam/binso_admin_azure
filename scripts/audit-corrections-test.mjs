@@ -178,7 +178,7 @@ try{
   assert.equal(calls.length,1);
   if(scenario==='partial'){assert.equal(routes.length,0,'Partial address remains in its area');assert.ok(walk(tree).some(node=>Array.isArray(node.props.children)&&node.props.children.some(child=>child?.props?.children==='Teilstand gespeichert. Für Rechnungen fehlen noch gültige Pflichtangaben.')))}
   if(scenario==='address')assert.ok(routes[0].includes('setupStep=bank'));
-  if(scenario==='bank-read-error'){assert.equal(routes.length,0);assert.equal(tree.props.title,'Bankverbindung');assert.ok(walk(tree).some(node=>node.props.children==='Reload failed'));}
+  if(scenario==='bank-read-error'){assert.equal(routes.length,0);assert.equal(tree.props.title,'Zahlungskonto');assert.ok(walk(tree).some(node=>node.props.children==='Reload failed'));}
   if(scenario==='bank-stale-address'){assert.ok(routes[0].includes('setupStep=address'));assert.notEqual(tree.props.title,'Rechnungsangaben vollständig');}
   if(scenario==='bank'){
    assert.equal(calls[0].path,'/api/settings/documents');assert.equal(calls[0].payload.vatRate,0);assert.equal(calls[0].payload.paymentTermsDays,0);assert.equal(calls[0].payload.invoiceIntroText,'Keep authored text');

@@ -2,8 +2,8 @@
 
 import { useEffect } from "react";
 
-/** Updates the offline shell silently. Documents stay network-first and hashed
- * build assets are never cached by the worker, so no forced reload is needed. */
+/** Updates only the offline worker. The separate version notice offers a safe,
+ * explicit replacement of already running application code after a deployment. */
 export function PwaRegister() {
   useEffect(() => {
     if (!("serviceWorker" in navigator) || process.env.NODE_ENV !== "production") return;

@@ -139,6 +139,13 @@
   --mobile-row-h:64px;
   --mobile-sheet-row-h:56px;
   --touch:44px;
+  --navigation-row-height:48px;
+  --space-4:4px;
+  --space-8:8px;
+  --space-12:12px;
+  --space-16:16px;
+  --space-24:24px;
+  --space-32:32px;
 
   --header-avatar-size:34px;
   --kpi-value-font:20px;
@@ -366,7 +373,7 @@ html{scroll-behavior:auto}
  --body-font-size:var(--type-body);
  --body-line-height:1.45;
  --page-heading-size:var(--ux-page-title);
- --page-heading-line-height:1.2;
+ --page-heading-line-height:24px;
  --section-title-font:var(--type-section);
  --control-h:48px;
 }

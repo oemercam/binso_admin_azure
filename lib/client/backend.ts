@@ -29,6 +29,10 @@ export function clearClientSession(){
   }catch{/* Browser storage can be unavailable; server revocation and the memory fence still apply. */}
 }
 
+let pendingClientMutations=0;
+/** Includes response validation and fresh-authentication waits, not only fetch. */
+export function hasPendingClientMutation(){return pendingClientMutations>0;}
+
 let logoutPending:Promise<void>|null=null;
 export function logoutClientSession():Promise<void>{
   if(logoutPending)return logoutPending;
@@ -129,6 +133,8 @@ async function mutationResult<T>(response:Response,path:string,fallback:string,r
 }
 
 export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKey?:string;validate?:(value:unknown)=>void}={}):Promise<T>{
+  pendingClientMutations++;
+  try{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"POST",
@@ -138,7 +144,9 @@ export async function apiPost<T>(path:string,body:unknown,options:{idempotencyKe
     },
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision,"POST",options.validate);
+  return await mutationResult<T>(response,path,"Die Anfrage konnte nicht verarbeitet werden.",revision,"POST",options.validate);
+
+  }finally{pendingClientMutations--;}
 }
 
 const pendingGets=new Map<string,Promise<unknown>>();
@@ -179,23 +187,33 @@ export async function apiReadPost<T>(path:string,body:unknown):Promise<T>{
 }
 
 export async function apiPatch<T>(path:string,body:unknown,validate?:(value:unknown)=>void,options:{idempotencyKey?:string}={}):Promise<T>{
+  pendingClientMutations++;
+  try{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{
     method:"PATCH",
     headers:{"Content-Type":"application/json",...(options.idempotencyKey?{"Idempotency-Key":options.idempotencyKey}:{})},
     body:JSON.stringify(body),
   });
-  return mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);
+  return await mutationResult<T>(response,path,"Änderung konnte nicht gespeichert werden.",revision,"PATCH",validate);
+
+  }finally{pendingClientMutations--;}
 }
 
 export async function apiDelete<T>(path:string,body?:unknown,options:{idempotencyKey?:string}={}):Promise<T>{
+  pendingClientMutations++;
+  try{
   const revision=dataRevision([]);
   const response=await fetchApi(path,{method:"DELETE",headers:{...(body===undefined?{}:{'Content-Type':'application/json'}),...(options.idempotencyKey?{'Idempotency-Key':options.idempotencyKey}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});
-  return mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
+  return await mutationResult<T>(response,path,"Löschen konnte nicht ausgeführt werden.",revision,"DELETE");
+
+  }finally{pendingClientMutations--;}
 }
 
 const uploadReplayKeys=new WeakMap<File,Map<string,string>>();
 export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
+  pendingClientMutations++;
+  try{
   const revision=dataRevision([]);
   const file=form.get("file");
   const headers:Record<string,string>={};
@@ -206,9 +224,11 @@ export async function apiUpload<T>(path:string,form:FormData):Promise<T>{
     headers["Idempotency-Key"]=key;
   }
   const response=await fetchApi(path,{method:"POST",body:form,headers});
-  return mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST",value=>{
+  return await mutationResult<T>(response,path,"Datei konnte nicht hochgeladen werden.",revision,"POST",value=>{
     if(!['profile_avatar','company_logo'].includes(String(form.get('purpose'))))return;
     const item=(value as {item?:{id?:unknown;available?:unknown;scanStatus?:unknown}}|null)?.item;
     if(typeof item?.id!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id)||typeof item.available!=='boolean'||!['clean','pending','rejected'].includes(String(item.scanStatus)))throw new ClientApiError('Die Speicherung konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.','invalid_response',502);
   });
+
+  }finally{pendingClientMutations--;}
 }

@@ -26,7 +26,7 @@ for(const file of ['lib/commercial-contract.ts','lib/server/repositories/commerc
 }
 for(const route of ['/lieferanten','/lieferanten/neu','/lieferanten/supplier-one'])assert.ok(fullRoutes.includes(route),'Required coverage retains '+route);
 assert.ok(planChanges(['components/pages/suppliers.tsx'],{level:'fast'}).routes.includes('/lieferanten/supplier-one'),'Supplier detail uses its own existing QA fixture, never an offer ID');
-for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[id\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}
+for(const entry of catalog.routes){const expression=new RegExp('^'+entry.route.replace(/\[\.\.\.section\]/g,'.+').replace(/\[[a-zA-Z][a-zA-Z0-9_]*\]/g,'[^/]+')+'$');assert.ok(fullRoutes.some(route=>expression.test(route)),'Full QA omits page '+entry.route);}
 assert(planChanges(['components/unmapped.tsx'],{level:'fast'}).routes.includes('/kunden/neu'),'Unknown FAST dependencies must retain representative browser coverage');
 assert.throws(()=>planChanges([],{level:'skip'}));
 console.log('QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.');

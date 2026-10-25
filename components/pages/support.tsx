@@ -5,6 +5,7 @@ import {safeAppPath} from "@/lib/navigation";
 
 import {allowDraftNavigation} from "../use-browser-back-guard";
 import {FileUpload} from '../file-upload';
+import {EntityFiles} from '../entity-files';
 import {fileSelectionError} from '@/lib/file-selection';
 import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
@@ -19,7 +20,7 @@ import { useWorkspaceViewport } from "../use-workspace-viewport";
 import { AppShell } from "../app-shell";
 import { RecordRow, RecordsView, RecordsControls, useRecordsController } from "../records";
 import { apiGet, apiPost, apiPatch, apiUpload, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {Button, EmptyState, Field, Icon, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble, Status} from "../ui";
+import {Button, EmptyState, Field, Icon, SectionTitle, Toast, Input, Select, Textarea, FormActions, LoadingState, ErrorState, MessageBubble, Status} from "../ui";
 import { ActionRow, ActionsMenu, CreateAction, FormSheet } from "../binso-ux";
 
 
@@ -210,7 +211,7 @@ export function SupportChat({ticketId}:{ticketId:string}) {
     }
   };
 
-  return <AppShell headingPlacement="header" title="Support" active="support" backHref="/support" backLabel="Support" mobileActions={closed?<ActionsMenu header label="Ticketaktionen" busy={sending}><ActionRow title="Wieder öffnen" icon="back" onClick={()=>void reopen()}/></ActionsMenu>:undefined}>
+  return <AppShell conversation headingPlacement="header" title="Support" active="support" unsavedChanges={Boolean(draft.trim())||sending||uploading} backHref={'/support/'+encodeURIComponent(ticketId)} backLabel="Support" mobileActions={closed?<ActionsMenu header label="Ticketaktionen" busy={sending}><ActionRow title="Wieder öffnen" icon="back" onClick={()=>void reopen()}/></ActionsMenu>:undefined}>
     <div className="entity-detail-workspace support-detail-workspace">
 
       <div className="desktop-detail-main"><div className="support-thread"><div className="thread-context"><span title={ticketReference}>{ticketSubject}</span>{ticket&&<Status tone={ticketStatus==="resolved"||ticketStatus==="closed"?"success":"info"}>{ticketStatusLabel[ticketStatus]??ticketStatus}</Status>}</div><LocalizedElement as="div" className="thread-messages" tabIndex={0} role="log" ref={messagesRef} aria-label="Nachrichtenverlauf">
@@ -223,4 +224,26 @@ export function SupportChat({ticketId}:{ticketId:string}) {
     </div>
     {toast&&<Toast title={toast} tone={toast==="Datei angehängt."?"success":toast==="Datei im Demo-Modus nicht dauerhaft gespeichert."?"info":"danger"}/>}
   </AppShell>;
+}
+
+/** List -> ticket detail -> conversation. The existing ticket/messages APIs and
+ * attachment owner remain authoritative; this creates no second ticket model. */
+export function SupportTicketPage({ticketId}:{ticketId:string}){
+ const view=useSearchParams().get('view');
+ return view==='conversation'?<SupportChat ticketId={ticketId}/>:<SupportTicketDetail ticketId={ticketId}/>;
+}
+
+function SupportTicketDetail({ticketId}:{ticketId:string}){
+ const query=useApiQuery<{items:Array<{id:string;case_number?:string;subject:string;description?:string;status:string;created_at:string;updated_at:string}>}>('/api/support/tickets?id='+encodeURIComponent(ticketId));
+ const item=query.data?.items.find(item=>item.id===ticketId);
+ const labels:Record<string,string>={new:'Neu',open:'Offen',in_progress:'In Bearbeitung',waiting_customer:'Warten auf Kunde',resolved:'Gelöst',closed:'Geschlossen'};
+ const title=item?.subject??'Support-Anfrage';
+ return <AppShell title={title} titleIsUserContent headingPlacement="header" active="support" backHref="/support" backLabel="Support" recordLabel={item?supportReference(item.id,item.case_number):undefined} status={item?<Status>{labels[item.status]??item.status}</Status>:undefined}>
+  {query.loading?<LoadingState layout="page"/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:!item?<EmptyState title="Ticket wurde nicht gefunden."/>:<>
+   <section className="bo-workspace-section"><SectionTitle title="Beschreibung"/><p translate="no">{item.description||'—'}</p></section>
+   <div className="action-list navigation-group"><ActionRow title="Unterhaltung" icon="support" href={'/support/'+encodeURIComponent(ticketId)+'?view=conversation'}/></div>
+   <EntityFiles readOnly={["resolved","closed"].includes(item.status)} purpose="support_attachment" entityId={ticketId}/>
+   <section className="bo-workspace-section"><SectionTitle title="Verlauf"/><dl className="detail-list"><div><dt><LocalizedText>Erstellt</LocalizedText></dt><dd>{formatDateTime(item.created_at)}</dd></div><div><dt><LocalizedText>Aktualisiert</LocalizedText></dt><dd>{formatDateTime(item.updated_at)}</dd></div></dl></section>
+  </>}
+ </AppShell>;
 }

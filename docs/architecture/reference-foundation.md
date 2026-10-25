@@ -25,6 +25,10 @@ Backdrop-Unschärfe und keine Schattenkapsel um Header-Aktionen. Normale
 Dialog-Abdunklung und fachlich nötige Buttonformen bleiben davon getrennt.
 `LoadingState` kündigt Wartezeiten ausschliesslich barrierefrei an; kein blauer
 Fortschrittsbalken und keine sichtbaren Ladesätze beim internen Seitenwechsel. Seine Beschreibung bleibt ausschliesslich für Screenreader vorhanden.
+Seine zentralen Varianten `layout="page"` und `layout="records"` reservieren
+ruhige Inhaltsgeometrie; eingebettete Zustände bleiben standardmässig kompakt.
+Bekannte Listensteuerungen dürfen bei der Rückkehr ausschliesslich als inerte,
+sitzungsgebundene Platzhalter bleiben, bis die aktuelle Route registriert ist.
 Seitenuntertitel und Ergebniszähler zeigen während des Abrufs keine Ersatztexte.
 Ein Startbildschirm gehört nur zum initialen Sessionaufbau, nie zum internen
 Seitenwechsel oder Zurück. Fehler und Wiederholungsaktionen bleiben sichtbar.

@@ -56,7 +56,7 @@ export function SetupProcess(){
   finally{pending.current=false;setBusy(false)}
  };
  const field=(key:string,label:string,id?:string,options?:{autoComplete?:string;maxLength?:number;type?:string})=><Field key={key} label={label} error={notice&&activeIssues.some(issue=>setupFieldIds[issue.field]===id)?'Für Rechnungen erforderlich':undefined}><Input id={id} value={value(key)} onChange={event=>change(key,event.target.value)} disabled={busy} {...options}/></Field>;
- return <AppShell title={finished?'Rechnungsangaben vollständig':['Firma','Firmenadresse','Bankverbindung'][setupSteps.indexOf(step)]} active="einstellungen" orientationText={null} loading={query.loading} backHref={returnTo} backLabel="Übersicht">
+ return <AppShell title={finished?'Rechnungsangaben vollständig':['Unternehmen','Adresse','Zahlungskonto'][setupSteps.indexOf(step)]} active="einstellungen" orientationText={null} loading={query.loading} backHref={returnTo} backLabel="Übersicht">
   {query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<div className="setup-process">
    {finished?<section className="surface" role="status"><h2><LocalizedText>Deine Rechnungsangaben sind vollständig</LocalizedText></h2><Button onClick={()=>{allowDraftNavigation();router.push(returnTo)}}>Zur Übersicht</Button></section>:<>
     <SetupProgress tasks={tasks} active={step}/>

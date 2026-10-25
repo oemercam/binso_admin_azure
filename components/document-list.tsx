@@ -19,7 +19,7 @@ export function DocumentList({items,kind,loading=false,error=null,outstanding=fa
 }
 export function FinanceTabs(){
  const path=usePathname(),access=usePageAccess();
- const items=[{href:"/finanzen",label:"Übersicht"},{href:"/finanzen/analyse",label:"Analyse"},{href:"/angebote",label:"Angebote"},{href:"/rechnungen",label:"Rechnungen"},{href:"/zahlungen",label:"Zahlungen"}];
+ const items=[{href:"/finanzen",label:"Übersicht"},{href:"/finanzen/analyse",label:"Analyse"}];
  return <DetailTabs label="Finanzen">{items.filter(item=>access.canOpen(item.href)).map(item=><Link key={item.href} href={item.href} className={path===item.href?"active":""} aria-current={path===item.href?"page":undefined}><LocalizedText>{item.label}</LocalizedText></Link>)}</DetailTabs>;
 }
 

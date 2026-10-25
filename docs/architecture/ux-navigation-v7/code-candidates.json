@@ -1,0 +1,1246 @@
+[
+  {
+    "file": ".github/workflows/azure-architecture-audit.yml",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 1
+    }
+  },
+  {
+    "file": ".github/workflows/deploy-azure.yml",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 4
+    }
+  },
+  {
+    "file": ".github/workflows/graph-mail-readiness.yml",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "app/api/expenses/billing/route.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "app/api/expenses/scan-receipt/route.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "app/api/files/route.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "app/api/time-entries/billing/route.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "app/design-system/primitives.css",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "app/impressum/page.tsx",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "app/layout.tsx",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "app/page.tsx",
+    "matches": {
+      "urls": 8
+    }
+  },
+  {
+    "file": "components/cash-statistics.tsx",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "components/document-settings.tsx",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "components/documents.tsx",
+    "matches": {
+      "localeLiteral": 2
+    }
+  },
+  {
+    "file": "components/header-panel-content.tsx",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "components/marketing.tsx",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "components/monitoring-chart.tsx",
+    "matches": {
+      "localeLiteral": 5
+    }
+  },
+  {
+    "file": "components/monitoring.tsx",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "components/operator.tsx",
+    "matches": {
+      "localeLiteral": 16
+    }
+  },
+  {
+    "file": "components/pages/customers.tsx",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "components/pages/finance.tsx",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "components/pages/products.tsx",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "components/records.tsx",
+    "matches": {
+      "explicitAny": 1,
+      "emptyCatch": 3
+    }
+  },
+  {
+    "file": "config/create-actions.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "config/domain.ts",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "database/migrations/0001_baseline.sql",
+    "matches": {
+      "uuidLiteral": 17
+    }
+  },
+  {
+    "file": "database/migrations/0023_finance_and_demo_fixture.sql",
+    "matches": {
+      "uuidLiteral": 88
+    }
+  },
+  {
+    "file": "database/migrations/0024_finance_integrity.sql",
+    "matches": {
+      "uuidLiteral": 12
+    }
+  },
+  {
+    "file": "database/migrations/0026_demo_business_fixture.sql",
+    "matches": {
+      "uuidLiteral": 31
+    }
+  },
+  {
+    "file": "database/migrations/0032_demo_invoice_payment_setup.sql",
+    "matches": {
+      "uuidLiteral": 2
+    }
+  },
+  {
+    "file": "database/migrations/0034_stripe_checkout_integrity.sql",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "database/migrations/0042_demo_business_process.sql",
+    "matches": {
+      "uuidLiteral": 35
+    }
+  },
+  {
+    "file": "database/migrations/0043_demo_customer_profiles.sql",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "database/migrations/0049_canonical_demo_template_read.sql",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "database/migrations/0055_workforce_assignments_and_reports.sql",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "database/migrations/0057_v254_plan_entitlements.sql",
+    "matches": {
+      "explicitAny": 2
+    }
+  },
+  {
+    "file": "database/migrations/0093_sensitive_membership_grants.sql",
+    "matches": {
+      "explicitAny": 6
+    }
+  },
+  {
+    "file": "database/migrations/0102_supplier_invoice_matches.sql",
+    "matches": {
+      "explicitAny": 3
+    }
+  },
+  {
+    "file": "database/migrations/0104_supplier_invoice_reviews.sql",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "database/operations/ownerless-company-diagnostic.sql",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "lib/client/backend.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "lib/client/data-events.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/client/process-draft.ts",
+    "matches": {
+      "emptyCatch": 4
+    }
+  },
+  {
+    "file": "lib/client/statistic-period.ts",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "lib/config.ts",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "lib/dashboard-greeting.ts",
+    "matches": {
+      "localeLiteral": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "lib/directory-query.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/display-format.ts",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "lib/navigation.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/observability/model.ts",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "lib/search.ts",
+    "matches": {
+      "localeLiteral": 1
+    }
+  },
+  {
+    "file": "lib/server/document-logo.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "lib/server/email.ts",
+    "matches": {
+      "urls": 3,
+      "important": 6
+    }
+  },
+  {
+    "file": "lib/server/env.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/server/http.ts",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "lib/server/integrations.ts",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "lib/server/operator/entra-proof.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/server/operator/entra.ts",
+    "matches": {
+      "urls": 5
+    }
+  },
+  {
+    "file": "lib/server/repositories/business-api.ts",
+    "matches": {
+      "explicitAny": 3
+    }
+  },
+  {
+    "file": "lib/server/repositories/customer-merge.ts",
+    "matches": {
+      "explicitAny": 2
+    }
+  },
+  {
+    "file": "lib/server/repositories/reports.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "lib/server/repositories/stripe-billing.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/server/repositories/time-review.ts",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "lib/server/storage.ts",
+    "matches": {
+      "urls": 4
+    }
+  },
+  {
+    "file": "lib/server/stripe.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "lib/site-manifest.ts",
+    "matches": {
+      "explicitAny": 3
+    }
+  },
+  {
+    "file": "next-env.d.ts",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "pnpm-lock.yaml",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "public/sw.js",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/absence-contract.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/api-auth-surface-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 3,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/api-tenant-postgres-test.mjs",
+    "matches": {
+      "explicitAny": 3,
+      "urls": 2,
+      "uuidLiteral": 3,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/app-workspace-browser.mjs",
+    "matches": {
+      "important": 5
+    }
+  },
+  {
+    "file": "scripts/audit-corrections-test.mjs",
+    "matches": {
+      "urls": 6
+    }
+  },
+  {
+    "file": "scripts/auth-integrity-test.mjs",
+    "matches": {
+      "urls": 24,
+      "uuidLiteral": 7
+    }
+  },
+  {
+    "file": "scripts/auth-request-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/auth-ux-browser.mjs",
+    "matches": {
+      "important": 3
+    }
+  },
+  {
+    "file": "scripts/avatar-browser.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/azure-auth-check.mjs",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/azure-readiness-check-test.mjs",
+    "matches": {
+      "uuidLiteral": 4
+    }
+  },
+  {
+    "file": "scripts/business-readiness-contract.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/business-readiness-test.mjs",
+    "matches": {
+      "uuidLiteral": 2
+    }
+  },
+  {
+    "file": "scripts/check-css-architecture.mjs",
+    "matches": {
+      "important": 1
+    }
+  },
+  {
+    "file": "scripts/check-db.mjs",
+    "matches": {
+      "explicitAny": 4
+    }
+  },
+  {
+    "file": "scripts/check-deployed-assets.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/check-deployed-auth.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/check-route-css.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/check-theme.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/client-session-test.mjs",
+    "matches": {
+      "uuidLiteral": 4
+    }
+  },
+  {
+    "file": "scripts/commercial-contract-test.mjs",
+    "matches": {
+      "urls": 5
+    }
+  },
+  {
+    "file": "scripts/compliance/measure-browser-test.mjs",
+    "matches": {
+      "urls": 5,
+      "important": 2
+    }
+  },
+  {
+    "file": "scripts/contract-document-test.mjs",
+    "matches": {
+      "urls": 7
+    }
+  },
+  {
+    "file": "scripts/creation-chrome-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/customer-financial-projection-test.mjs",
+    "matches": {
+      "uuidLiteral": 5
+    }
+  },
+  {
+    "file": "scripts/customer-import-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/customer-merge-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 3,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/data-foundation-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/demo-session-test.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/deployed-auth-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/discount-contract.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/discount-test.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/document-controls-browser.mjs",
+    "matches": {
+      "important": 6
+    }
+  },
+  {
+    "file": "scripts/document-presentation-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/employee-dossier-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 5
+    }
+  },
+  {
+    "file": "scripts/employee-family-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/expense-payment-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/external-resource-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/external-time-contract.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/file-rescan-test.mjs",
+    "matches": {
+      "uuidLiteral": 2
+    }
+  },
+  {
+    "file": "scripts/fixtures/business-data.ts",
+    "matches": {
+      "explicitAny": 1,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/fixtures/template-access.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/font-delivery-browser.mjs",
+    "matches": {
+      "important": 1
+    }
+  },
+  {
+    "file": "scripts/form-choice-browser.mjs",
+    "matches": {
+      "important": 3
+    }
+  },
+  {
+    "file": "scripts/global-ux-startup-test.mjs",
+    "matches": {
+      "explicitAny": 2
+    }
+  },
+  {
+    "file": "scripts/import-table-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/invitation-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/invoice-overpayment-contract.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/invoice-tax-report-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/loading-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/localization-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/localization-test.mjs",
+    "matches": {
+      "urls": 6,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/mail-message-test.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/maintenance-test.mjs",
+    "matches": {
+      "urls": 3,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/migration-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 27,
+      "uuidLiteral": 16
+    }
+  },
+  {
+    "file": "scripts/navigation-return-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/next-glob-security-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/notification-read-test.mjs",
+    "matches": {
+      "uuidLiteral": 5
+    }
+  },
+  {
+    "file": "scripts/observability-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/observability-test.mjs",
+    "matches": {
+      "uuidLiteral": 2
+    }
+  },
+  {
+    "file": "scripts/offer-followup-contract.mjs",
+    "matches": {
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/offer-report-contract.mjs",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "scripts/offer-response-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 3
+    }
+  },
+  {
+    "file": "scripts/operator-announcement-test.mjs",
+    "matches": {
+      "urls": 6,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/operator-contract-test.mjs",
+    "matches": {
+      "urls": 8,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/organization-data-lifecycle.mjs",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "scripts/package-patches-test.mjs",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "scripts/package-patches.mjs",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "scripts/passkey-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 12
+    }
+  },
+  {
+    "file": "scripts/permission-selfcheck.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/phase1-identity-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/phase1-policy-cases.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/phase1-push-cases.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 7
+    }
+  },
+  {
+    "file": "scripts/phase1-time-review-cases.mjs",
+    "matches": {
+      "explicitAny": 3,
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/postgres-parallel-test.mjs",
+    "matches": {
+      "explicitAny": 2,
+      "urls": 1,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/presentation-consistency-test.mjs",
+    "matches": {
+      "important": 2
+    }
+  },
+  {
+    "file": "scripts/public-demo-flow-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/pwa-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/pwa-lifecycle-test.mjs",
+    "matches": {
+      "urls": 4
+    }
+  },
+  {
+    "file": "scripts/pwa-navigation-timeout-test.mjs",
+    "matches": {
+      "urls": 4
+    }
+  },
+  {
+    "file": "scripts/pwa-transition-test.mjs",
+    "matches": {
+      "explicitAny": 2
+    }
+  },
+  {
+    "file": "scripts/qa-local-http.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/qa-plan.mjs",
+    "matches": {
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/quality-browser-plan-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/readiness-integrity-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/readiness-oidc-probe-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/readiness-oidc-probe.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "uuidLiteral": 3
+    }
+  },
+  {
+    "file": "scripts/registration-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/registration-test.mjs",
+    "matches": {
+      "urls": 29,
+      "uuidLiteral": 2
+    }
+  },
+  {
+    "file": "scripts/report-retention-contract.mjs",
+    "matches": {
+      "explicitAny": 1
+    }
+  },
+  {
+    "file": "scripts/report-share-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/report-summary-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 4,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/runtime-integrity-test.mjs",
+    "matches": {
+      "urls": 14
+    }
+  },
+  {
+    "file": "scripts/sensitive-access-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/session-expiry-native-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/single-company-preflight-test.mjs",
+    "matches": {
+      "uuidLiteral": 7
+    }
+  },
+  {
+    "file": "scripts/startup-navigation-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/statistics-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/stripe-configuration-audit.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/supplier-approval-policy-contract.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/supplier-bank-contract.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/supplier-contract.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/supplier-invoice-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/supplier-invoice-match-contract.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/supplier-invoice-review-contract.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/supplier-receipt-contract.mjs",
+    "matches": {
+      "urls": 5
+    }
+  },
+  {
+    "file": "scripts/supplier-review-concurrency-contract.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/system-state-browser-test.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/task-controls-render-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/task-focused-ux-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/test-data-reset-inventory-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 8
+    }
+  },
+  {
+    "file": "scripts/test-data-reset-test.mjs",
+    "matches": {
+      "uuidLiteral": 3
+    }
+  },
+  {
+    "file": "scripts/time-minute-allocation-contract.mjs",
+    "matches": {
+      "urls": 4
+    }
+  },
+  {
+    "file": "scripts/time-price-source-contract.mjs",
+    "matches": {
+      "urls": 3
+    }
+  },
+  {
+    "file": "scripts/ux-browser-test.mjs",
+    "matches": {
+      "explicitAny": 1,
+      "localeLiteral": 1,
+      "urls": 3,
+      "uuidLiteral": 2,
+      "emptyCatch": 2
+    }
+  },
+  {
+    "file": "scripts/ux-dom-evidence.mjs",
+    "matches": {
+      "emptyCatch": 2
+    }
+  },
+  {
+    "file": "scripts/ux-master-v5-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/ux-regression-test.mjs",
+    "matches": {
+      "urls": 6
+    }
+  },
+  {
+    "file": "scripts/v23-2-ux-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 1
+    }
+  },
+  {
+    "file": "scripts/v26-minute-native-browser.mjs",
+    "matches": {
+      "urls": 1,
+      "emptyCatch": 1
+    }
+  },
+  {
+    "file": "scripts/v26-native-policy-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/v26-native-readiness-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/v26-native-review-concurrency-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/v26-native-review-test.mjs",
+    "matches": {
+      "urls": 2
+    }
+  },
+  {
+    "file": "scripts/v7-audit-inventory.mjs",
+    "matches": {
+      "important": 1
+    }
+  },
+  {
+    "file": "scripts/wage-definition-contract.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/web-vitals-consent-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/workflow-safety-test.mjs",
+    "matches": {
+      "urls": 1
+    }
+  },
+  {
+    "file": "scripts/workforce-regression-test.mjs",
+    "matches": {
+      "urls": 1,
+      "uuidLiteral": 1
+    }
+  }
+]

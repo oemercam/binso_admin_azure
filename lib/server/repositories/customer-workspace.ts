@@ -8,7 +8,7 @@ import {financialSummary} from "./financial-summary";
 import {customerActivity} from "./customer-activity";
 
 /** Caller provides a tenant-scoped repeatable-read transaction. */
-export async function customerWorkspace(c:PoolClient,s:SessionUser,id:string){
+export async function customerWorkspace(c:PoolClient,s:SessionUser,id:string,view:'workspace'|'hub'='workspace'){
  const item=(await listApiBusiness(c,s,'customers','id=eq.'+encodeURIComponent(id)))[0];
  if(!item){
   const merged=(await c.query<{merged_into_customer_id:string}>('select merged_into_customer_id from customers where organization_id=$1 and id::text=$2 and merged_into_customer_id is not null',[s.organizationId,id])).rows[0];
@@ -19,6 +19,23 @@ export async function customerWorkspace(c:PoolClient,s:SessionUser,id:string){
   throw new ApiError(404,'not_found','Kunde wurde nicht gefunden.');
  }
  const filter='customer_id=eq.'+encodeURIComponent(String(item.id));
+ if(view==='hub'){
+  const count=async(table:string,extra='')=>{
+   const rows=await listApiBusiness(c,s,table,filter+extra+'&limit=1');
+   const total=rows.length?Number(rows[0].total_count):0;
+   return Number.isSafeInteger(total)&&total>=0?total:null;
+  };
+  const canFiles=tenantCan(s.role,'documents:read');
+  const counts={
+   projects:tenantCan(s.role,'projects:read')?await count('projects'):null,
+   offers:tenantCan(s.role,'sales:read')?await count('documents','&kind=offer'):null,
+   invoices:tenantCan(s.role,'invoices:read')?await count('documents','&kind=invoice'):null,
+   payments:tenantCan(s.role,'payments:read')?await count('payments'):null,
+   contacts:await count('customer_contacts'),
+   files:canFiles?Number((await c.query<{count:string}>("select count(*) from file_objects where organization_id=$1 and customer_id=$2 and purpose='customer_document' and archived_at is null",[s.organizationId,String(item.id)])).rows[0].count):null,
+  };
+  return {item,counts,capabilities:{invoices:tenantCan(s.role,'invoices:read'),offers:tenantCan(s.role,'sales:read'),files:canFiles}};
+ }
  const contacts=await listApiBusiness(c,s,'customer_contacts',filter+'&order=is_primary.desc,created_at.asc');
  const documents=tenantCan(s.role,'invoices:read')||tenantCan(s.role,'sales:read')?await listApiBusiness(c,s,'documents',filter):[];
  const openInvoices=tenantCan(s.role,'invoices:read')?await listApiBusiness(c,s,'documents',filter+'&kind=invoice&display_status=eq.open&order=due_date.asc&limit=4'):[];

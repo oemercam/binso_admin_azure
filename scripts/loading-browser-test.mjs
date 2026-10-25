@@ -14,7 +14,7 @@ if(!process.env.BINSO_BASE_URL){server=spawn(process.execPath,process.env.BINSO_
 const browser=await engines[process.env.BINSO_UX_BROWSER??'webkit'].launch({headless:true});const results=[];
 try{
  for(const viewport of [{width:390,height:844},{width:1440,height:1000}])for(const theme of ['light','dark']){
-  const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:'block'});
+  const context=await browser.newContext({viewport,colorScheme:theme,reducedMotion:theme==='dark'?'reduce':'no-preference',serviceWorkers:baseline?'block':'allow'});
   await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));let authCalls=0,delay=350,authMode='valid',showCustomer=false,profileGate=null,dashboardGate=null;const calls={};
   await context.route('**/api/**',async route=>{const p=new URL(route.request().url()).pathname;calls[p]=(calls[p]||0)+1;
    if(p==='/api/auth/session'){authCalls++;await new Promise(r=>setTimeout(r,delay));return route.fulfill({status:authMode==='error'?503:200,json:authMode==='error'?{message:'Initialisierung fehlgeschlagen'}:authMode==='expired'?{authenticated:false}:{authenticated:true,demo:false,tenant:{id:'fixture',role:'owner',plan:'pro'}}});}
@@ -42,6 +42,8 @@ try{
   }
   await measure('cold',()=>page.goto(base+'/kunden'));
   if(!baseline){
+   await page.waitForFunction(()=>navigator.serviceWorker?.controller?.scriptURL.endsWith('/sw.js'),undefined,{timeout:20000});
+   assert.equal(await page.evaluate(()=>Boolean(navigator.serviceWorker.controller)),true,'The current loading regression must actually run under its active service worker');
    // Separate real readiness events, not fixed sleeps: the profile may arrive
    // well before the ledger. Neither may reveal an empty first dashboard.
    let releaseProfile,releaseDashboard;
@@ -92,5 +94,5 @@ try{
   authMode='error';await page.reload();await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   await context.close();
  }
- await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
+ await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',activeServiceWorker:!baseline,syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));
 }finally{await browser.close();server?.kill();await uiAuth.close();}

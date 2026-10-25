@@ -1,0 +1,291 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-10-25T08:58:50.964Z",
+  "baseSha": "d35df2c5b0a4f118b5e49a8d8481204d232e4f89",
+  "branch": "feat/ux-navigation-v7-1-audit-20261025",
+  "toolchain": {
+    "git": "git version 2.55.0.windows.5",
+    "node": "v24.20.0",
+    "pnpm": "10.17.1 (runtime validated)"
+  },
+  "localChanges": [
+    "M app/api/dashboard/route.ts",
+    " M app/design-system/layout.css",
+    " M app/design-system/primitives.css",
+    " M app/layout.tsx",
+    " M components/app-shell.tsx",
+    " M components/pages/time.tsx",
+    " M components/pwa-register.tsx",
+    " M components/records.tsx",
+    " M components/ui.tsx",
+    " M components/use-browser-back-guard.ts",
+    " M docs/architecture/reference-foundation.md",
+    " M docs/architecture/routes.md",
+    " M docs/architecture/ux-inventory.json",
+    " M docs/architecture/v21-5-integration-inventory.json",
+    " M docs/architecture/v21-5-routes.md",
+    " M docs/architecture/v26-route-additions.json",
+    " M docs/audit/v24/page-matrix.json",
+    " M lib/client/backend.ts",
+    " M lib/client/locale.tsx",
+    " M lib/client/use-api-query.ts",
+    " M lib/locales/messages.json",
+    " M package.json",
+    " M scripts/loading-browser-test.mjs",
+    " M scripts/migration-test.mjs",
+    " M scripts/qa-plan.mjs",
+    " M scripts/query-navigation-test.mjs",
+    "?? components/pwa-version-notice.tsx",
+    "?? docs/architecture/pwa-transition-corrections-20261025.md",
+    "?? docs/architecture/ux-navigation-v7/",
+    "?? scripts/pwa-transition-test.mjs",
+    "?? scripts/v7-audit-inventory.mjs"
+  ],
+  "files": 2273,
+  "extensions": {
+    ".example": 1,
+    ".yml": 16,
+    ".json": 225,
+    "[extensionless]": 4,
+    ".md": 199,
+    ".tsx": 223,
+    ".ts": 359,
+    ".css": 15,
+    ".sql": 112,
+    ".csv": 15,
+    ".gz": 1,
+    ".png": 683,
+    ".zip": 2,
+    ".log": 15,
+    ".txt": 85,
+    ".html": 11,
+    ".mjs": 277,
+    ".conf": 2,
+    ".sh": 6,
+    ".bicep": 1,
+    ".mts": 2,
+    ".patch": 1,
+    ".yaml": 2,
+    ".svg": 5,
+    ".woff2": 1,
+    ".ttf": 2,
+    ".webmanifest": 3,
+    ".js": 1,
+    ".py": 2,
+    ".ps1": 2
+  },
+  "routes": 88,
+  "apiRoutes": 158,
+  "components": 291,
+  "cssOwners": [
+    {
+      "id": "theme",
+      "path": "app/design-system/theme.css"
+    },
+    {
+      "id": "foundation",
+      "path": "app/design-system/foundation.css"
+    },
+    {
+      "id": "primitives",
+      "path": "app/design-system/primitives.css"
+    },
+    {
+      "id": "layout",
+      "path": "app/design-system/layout.css"
+    },
+    {
+      "id": "collections",
+      "path": "app/design-system/collections.css"
+    },
+    {
+      "id": "overlays",
+      "path": "app/design-system/overlays.css"
+    },
+    {
+      "id": "analytics",
+      "path": "app/design-system/analytics.css"
+    },
+    {
+      "id": "documents",
+      "path": "app/design-system/documents.css"
+    },
+    {
+      "id": "workflows",
+      "path": "app/design-system/workflows.css"
+    },
+    {
+      "id": "settings",
+      "path": "app/design-system/settings.css"
+    },
+    {
+      "id": "auth",
+      "path": "app/design-system/auth.css"
+    },
+    {
+      "id": "marketing",
+      "path": "app/design-system/marketing.css"
+    },
+    {
+      "id": "operator",
+      "path": "app/design-system/operator.css"
+    },
+    {
+      "id": "navigation",
+      "path": "app/design-system/navigation.css"
+    }
+  ],
+  "migrations": [
+    "database/migrations/0001_baseline.sql",
+    "database/migrations/0002_auth_memberships.sql",
+    "database/migrations/0003_registration_onboarding.sql",
+    "database/migrations/0004_subscription_billing.sql",
+    "database/migrations/0005_stripe_payment_provider.sql",
+    "database/migrations/0006_production_saas.sql",
+    "database/migrations/0007_subscription_lifecycle.sql",
+    "database/migrations/0008_production_completion.sql",
+    "database/migrations/0009_multitenant_rbac_business_model.sql",
+    "database/migrations/0010_product_simplicity_devsecops.sql",
+    "database/migrations/0011_saas_platform_foundation.sql",
+    "database/migrations/0012_v74_production_hardening.sql",
+    "database/migrations/0013_v75_complete_product_foundation.sql",
+    "database/migrations/0014_v79_demo_access.sql",
+    "database/migrations/0015_v82_normalized_business_core.sql",
+    "database/migrations/0016_self_service_signup.sql",
+    "database/migrations/0017_v150_code_schema_alignment.sql",
+    "database/migrations/0018_v151_organization_profile_alignment.sql",
+    "database/migrations/0019_v163_productivity_ux.sql",
+    "database/migrations/0020_customer_sales_lifecycle.sql",
+    "database/migrations/0021_tenant_branding_documents_payments.sql",
+    "database/migrations/0022_receipt_recognition.sql",
+    "database/migrations/0023_finance_and_demo_fixture.sql",
+    "database/migrations/0024_finance_integrity.sql",
+    "database/migrations/0025_business_api_integrity.sql",
+    "database/migrations/0026_demo_business_fixture.sql",
+    "database/migrations/0027_support_operator_integrity.sql",
+    "database/migrations/0028_user_profile_persistence.sql",
+    "database/migrations/0029_operator_persistence.sql",
+    "database/migrations/0030_notification_preference_isolation.sql",
+    "database/migrations/0031_business_field_persistence.sql",
+    "database/migrations/0032_demo_invoice_payment_setup.sql",
+    "database/migrations/0033_invoice_qr_reference.sql",
+    "database/migrations/0034_stripe_checkout_integrity.sql",
+    "database/migrations/0035_email_otp_and_mfa_enrollment.sql",
+    "database/migrations/0036_entra_operator_identity.sql",
+    "database/migrations/0037_demo_document_presentation.sql",
+    "database/migrations/0038_timer_customer_context.sql",
+    "database/migrations/0039_process_completion.sql",
+    "database/migrations/0040_customer_contact_names.sql",
+    "database/migrations/0041_business_process.sql",
+    "database/migrations/0042_demo_business_process.sql",
+    "database/migrations/0043_demo_customer_profiles.sql",
+    "database/migrations/0044_time_entry_precision.sql",
+    "database/migrations/0045_document_snapshots.sql",
+    "database/migrations/0046_file_business_relations.sql",
+    "database/migrations/0047_runtime_auth_bootstrap.sql",
+    "database/migrations/0048_file_scan_evidence.sql",
+    "database/migrations/0049_canonical_demo_template_read.sql",
+    "database/migrations/0050_platform_maintenance.sql",
+    "database/migrations/0051_document_reminders.sql",
+    "database/migrations/0051_runtime_maintenance_permissions.sql",
+    "database/migrations/0052_invoice_refunds.sql",
+    "database/migrations/0053_offer_revisions.sql",
+    "database/migrations/0054_document_language_snapshot.sql",
+    "database/migrations/0055_workforce_assignments_and_reports.sql",
+    "database/migrations/0056_customer_type.sql",
+    "database/migrations/0057_v254_plan_entitlements.sql",
+    "database/migrations/0058_member_module_profiles.sql",
+    "database/migrations/0059_solo_owner_time.sql",
+    "database/migrations/0060_single_company_identity.sql",
+    "database/migrations/0061_submitted_time_review.sql",
+    "database/migrations/0062_passkey_credentials.sql",
+    "database/migrations/0063_invitation_metadata_boundary.sql",
+    "database/migrations/0064_retire_demo_bootstrap.sql",
+    "database/migrations/0065_notification_read_receipts.sql",
+    "database/migrations/0066_retire_template_workforce_role.sql",
+    "database/migrations/0067_scoped_fresh_authentication.sql",
+    "database/migrations/0068_offer_versions_and_public_responses.sql",
+    "database/migrations/0069_attachment_archival.sql",
+    "database/migrations/0070_issued_invoice_pdf.sql",
+    "database/migrations/0071_operator_language_preference.sql",
+    "database/migrations/0072_report_export_snapshots.sql",
+    "database/migrations/0073_report_mail_outbox.sql",
+    "database/migrations/0074_report_recipient_shares.sql",
+    "database/migrations/0075_controlled_customer_duplicates.sql",
+    "database/migrations/0076_report_snapshot_expiry_index.sql",
+    "database/migrations/0077_personal_offer_followups.sql",
+    "database/migrations/0078_document_delivery_outcomes.sql",
+    "database/migrations/0079_document_delivery_lookup.sql",
+    "database/migrations/0080_personal_setup_preferences.sql",
+    "database/migrations/0081_offer_response_mail_outbox.sql",
+    "database/migrations/0082_document_discount_calculation.sql",
+    "database/migrations/0083_document_delivery_monitoring.sql",
+    "database/migrations/0084_employee_basic_dossier.sql",
+    "database/migrations/0085_employee_employment_periods.sql",
+    "database/migrations/0086_supplier_numbering.sql",
+    "database/migrations/0087_expense_payment_source.sql",
+    "database/migrations/0088_expense_reimbursement_evidence.sql",
+    "database/migrations/0089_supplier_bank_guard.sql",
+    "database/migrations/0090_supplier_invoice_drafts.sql",
+    "database/migrations/0091_supplier_invoice_receipts.sql",
+    "database/migrations/0092_external_resources.sql",
+    "database/migrations/0093_sensitive_membership_grants.sql",
+    "database/migrations/0094_employee_wage_definitions.sql",
+    "database/migrations/0095_employee_family_claims.sql",
+    "database/migrations/0096_absence_requests.sql",
+    "database/migrations/0097_commercial_contract_conditions.sql",
+    "database/migrations/0098_contract_document_reviews.sql",
+    "database/migrations/0099_external_time_classification.sql",
+    "database/migrations/0100_time_price_sources.sql",
+    "database/migrations/0101_time_minute_allocations.sql",
+    "database/migrations/0102_supplier_invoice_matches.sql",
+    "database/migrations/0103_supplier_approval_policy.sql",
+    "database/migrations/0104_supplier_invoice_reviews.sql",
+    "database/migrations/0105_organization_mfa_policy.sql",
+    "database/migrations/0106_web_push.sql",
+    "database/migrations/0107_push_dispatch_lifecycle.sql"
+  ],
+  "workflows": [
+    ".github/workflows/avatar-profile.yml",
+    ".github/workflows/azure-architecture-audit.yml",
+    ".github/workflows/codeql.yml",
+    ".github/workflows/deploy-azure.yml",
+    ".github/workflows/document-discounts.yml",
+    ".github/workflows/graph-mail-readiness.yml",
+    ".github/workflows/invoice-readiness.yml",
+    ".github/workflows/lifecycle-preflight-diagnostic.yml",
+    ".github/workflows/postgresql-backup-readiness.yml",
+    ".github/workflows/production-monitoring-readiness.yml",
+    ".github/workflows/quality.yml",
+    ".github/workflows/readiness-oidc-verification.yml",
+    ".github/workflows/retention-maintenance.yml",
+    ".github/workflows/stripe-configuration-audit.yml",
+    ".github/workflows/v25-final-sample.yml"
+  ],
+  "duplicateAssetGroups": [
+    [
+      "public/brand/pwa-icon-512.png",
+      "public/brand/pwa-icon-maskable-512.png"
+    ]
+  ],
+  "caseCollisions": [],
+  "generatedDirectories": [
+    {
+      "directory": ".next",
+      "review": "Generated/private tree inventoried by owner; no credentials or tenant data exported."
+    },
+    {
+      "directory": ".qa-phase1",
+      "review": "Generated/private tree inventoried by owner; no credentials or tenant data exported."
+    },
+    {
+      "directory": "node_modules",
+      "review": "Generated/private tree inventoried by owner; no credentials or tenant data exported."
+    }
+  ],
+  "limitations": [
+    "Pattern occurrences are review candidates, not confirmed defects.",
+    "No production database contents, secrets, user uploads or private release evidence exported.",
+    "Visual/role/device/provider qualification is recorded separately."
+  ]
+}

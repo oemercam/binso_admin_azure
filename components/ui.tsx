@@ -203,8 +203,8 @@ export function Toast({ title, text, tone = "success",inline=false,actionLabel,o
 }
 
 /** Quiet navigation has no decorative progress bar. Status remains available to assistive technology. */
-export function LoadingState({children="Daten werden geladen …",className}:{children?:React.ReactNode;className?:string}){
-  return <span role="status" aria-live="polite" className={`loading-state ${className??""}`.trim()}><span className="sr-only"><LocalizedText>{children}</LocalizedText></span></span>;
+export function LoadingState({children="Daten werden geladen …",className,layout="inline"}:{children?:React.ReactNode;className?:string;layout?:"inline"|"records"|"page"}){
+  return <span role="status" aria-live="polite" aria-busy="true" data-loading-layout={layout} className={`loading-state ${className??""}`.trim()}><span className="sr-only"><LocalizedText>{children}</LocalizedText></span></span>;
 }
 
 /** Retry remains local to the owning data source; callers retain their error text. */

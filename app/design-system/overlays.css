@@ -60,9 +60,9 @@
 .sheet-header h2{margin:0;font-size:var(--sheet-title-font);font-weight:600;letter-spacing:-.025em;line-height:1.3}
 .sheet-header p{margin:4px 0 0;color:var(--color-muted);font-size:var(--type-label);line-height:1.45}
 .action-list{display:grid;min-width:0}
-.action-row{position:relative;display:grid;grid-template-columns:24px minmax(0,1fr) 16px;align-items:center;gap:12px;width:100%;min-width:0;min-height:var(--action-row-height);padding:var(--field-label-gap) 0;border:0;border-radius:0;background:transparent;color:var(--color-fg);text-align:left;font-size:var(--control-label-font);font-weight:var(--control-label-weight);line-height:1.4;transition:background-color var(--motion-fast) var(--motion-ease)}
+.action-row{position:relative;display:grid;grid-template-columns:18px minmax(0,1fr) auto 16px;align-items:center;gap:12px;width:100%;min-width:0;min-height:var(--navigation-row-height);padding:var(--space-8) 0;border:0;border-radius:0;background:transparent;color:var(--color-fg);text-align:left;font-size:var(--type-body);font-weight:400;line-height:20px;transition:background-color var(--motion-fast) var(--motion-ease)}
 .action-row:not(:disabled):active{background:var(--color-subtle)}
-.action-row:not(:last-child)::after{content:"";position:absolute;left:36px;right:0;bottom:0;height:1px;background:var(--color-line)}
+.action-row:not(:last-child)::after{content:"";position:absolute;left:30px;right:0;bottom:0;height:1px;background:var(--color-line)}
 .action-row>span{min-width:0;overflow-wrap:anywhere}
 .action-row-description{display:block;margin-top:3px;color:var(--color-muted);font-size:var(--control-help-font);font-weight:400}
 .action-row>.unread-dot{justify-self:end}
@@ -377,3 +377,11 @@
  .bo-period-sheet{align-items:flex-end;padding:0}
  .bo-period-sheet .bottom-sheet{margin:0;border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;border-bottom:0;max-height:calc(var(--dialog-available-height) - var(--dialog-edge-gap))}
 }
+
+/* V7: shared navigation/action row columns, including optional counts. */
+.action-row>.action-row-label{grid-column:2;min-width:0}
+.action-row>.action-row-value{grid-column:3;text-align:end;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--color-muted)}
+.action-row>svg:last-child:not(:first-child),.action-row>.action-row-selection,.action-row>.unread-dot{grid-column:4}
+.action-row>svg:first-child{width:18px;height:18px}
+
+.navigation-group{border:1px solid var(--color-line);border-radius:var(--shape-group);padding-inline:var(--space-16);background:var(--color-bg)}
