@@ -132,3 +132,77 @@ const {OfferHistory}=compile('components/offer-history.tsx',{
 const historyView=OfferHistory({number:'AN-1',canWrite:false});
 assert.ok(Array.isArray(historyView.props.children),'Historical preview is outside the collapsed disclosure');
 assert.equal(historyView.props.children[1].props.fileUrl,'/api/documents/AN-1/versions?version=1');
+
+// Guided setup uses the actual canonical validator and real component handlers.
+const qr=compile('lib/qr-bill.ts',{'swissqrbill/utils':require('swissqrbill/utils')});
+const readiness=compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':{safeAppPath}});
+const original={name:'Fixture Company',street:'',building_number:'',postal_code:'',city:'',country_code:'CH',iban:'',qr_iban:'',vat_rate:0,payment_terms_days:0,invoice_intro_text:'Keep authored text'};
+assert.equal(readiness.requiredSetupTasks(original).filter(task=>task.complete).length,1);
+assert.equal(readiness.setupStepIssues({...original,street:'Testweg'},'address')[0].field,'postalCode');
+assert.equal(readiness.requiredSetupTasks({...original,street:'Testweg',postal_code:'8000',city:'Zürich'}).filter(task=>task.complete).length,2);
+assert.ok(readiness.setupProcessDestination('bank','https://evil.invalid').includes('returnTo=%2Fdashboard'));
+const walk=node=>Array.isArray(node)?node.flatMap(walk):node&&typeof node==='object'&&node.props?[node,...walk(node.props.children)]:[];
+const oldDocument=globalThis.document;globalThis.document={getElementById:()=>({focus(){}})};
+try{
+ for(const scenario of ['partial','address','invalid-bank','bank','bank-read-error','bank-stale-address','logo-return','clean-exit','dirty-exit']){
+  let cursor=0;const cells=[],calls=[],routes=[];
+  const hooks={useState:initial=>{const i=cursor++;if(!(i in cells))cells[i]=typeof initial==='function'?initial():initial;return [cells[i],next=>{cells[i]=typeof next==='function'?next(cells[i]):next}]},useRef:value=>{const i=cursor++;return cells[i]??=({current:value})},useEffect:()=>{}};
+  const bank=scenario.includes('bank'),base={...original,...(bank?{street:'Testweg',postal_code:'8000',city:'Zürich'}:{})};
+  const params=new URLSearchParams('setupStep='+(bank?'bank':'address'));if(scenario==='logo-return')params.set('returnTo','/rechnungen/neu?customerId=c1');
+  const {SetupProcess}=compile('components/setup-process.tsx',{
+   react:hooks,'next/navigation':{useSearchParams:()=>params,useRouter:()=>({push:path=>routes.push(path),replace:path=>routes.push(path)})},
+   '@/lib/client/use-api-query':{useApiQuery:()=>({loading:false,data:{item:base},refresh(){}})},
+   '@/lib/client/page-access':{usePageAccess:()=>({write:true})},'@/lib/client/locale':{useTranslation:()=>value=>value},
+   '@/lib/navigation':{safeAppPath},'@/lib/setup-readiness':readiness,'@/lib/action-readiness':compile('lib/action-readiness.ts',{'./navigation':{safeAppPath}}),
+   '@/config/domain':{domainConfig:{vatRates:[0,8.1]}},'./use-browser-back-guard':{allowDraftNavigation(){},useBrowserBackGuard:()=>()=>{}},
+   '@/lib/client/backend':{apiGet:async()=>{if(scenario==='bank-read-error')throw Error('Reload failed');return {item:{...base,iban:'CH9300762011623852957',...(scenario==='bank-stale-address'?{street:''}:{})}}},apiPatch:async(path,payload)=>{calls.push({path,payload});return {item:{...base,...(bank?{iban:payload.iban}:{name:payload.name,street:payload.street,postal_code:payload.postalCode,city:payload.city})}}}},
+  });
+  const render=()=>{cursor=0;return SetupProcess()};
+  let tree=render();assert.equal(tree.props.orientationText,null,'Guided steps omit the unrelated generic settings description');
+  if(scenario==='logo-return'){const href=walk(tree).find(node=>node.props.title==='Firmenlogo').props.href;const back=new URL(href,'https://fixture.invalid').searchParams.get('returnTo');assert.equal(new URL(back,'https://fixture.invalid').searchParams.get('returnTo'),'/rechnungen/neu?customerId=c1');continue;}
+  const input=(id,value)=>{const node=walk(tree).find(node=>node.props.id===id);assert.ok(node,id);node.props.onChange({target:{value}});tree=render()};
+  if(scenario==='clean-exit'||scenario==='dirty-exit'){
+   if(scenario==='dirty-exit')input('setup-street','Changed');
+   walk(tree).find(node=>node.props.children==='Später fortsetzen').props.onClick();tree=render();
+   assert.equal(routes.length,scenario==='clean-exit'?1:0);
+   if(scenario==='dirty-exit')assert.ok(walk(tree).some(node=>node.props.open===true&&node.props.title==='Änderungen verwerfen?'));
+   continue;
+  }
+  if(bank)input('setup-iban',scenario==='invalid-bank'?'CH123':'CH9300762011623852957');
+  else{input('setup-street','Testweg');if(scenario==='address'){input('setup-postal-code','8000');input('setup-city','Zürich')}}
+  const submit=walk(tree).find(node=>node.type==='form').props.onSubmit;await Promise.all([submit({preventDefault(){}}),submit({preventDefault(){}})]);tree=render();
+  if(scenario==='invalid-bank'){assert.equal(calls.length,0,'Invalid IBAN never opens fresh authentication');assert.equal(routes.length,0);continue;}
+  assert.equal(calls.length,1);
+  if(scenario==='partial'){assert.equal(routes.length,0,'Partial address remains in its area');assert.ok(walk(tree).some(node=>Array.isArray(node.props.children)&&node.props.children.some(child=>child?.props?.children==='Teilstand gespeichert. Für Rechnungen fehlen noch gültige Pflichtangaben.')))}
+  if(scenario==='address')assert.ok(routes[0].includes('setupStep=bank'));
+  if(scenario==='bank-read-error'){assert.equal(routes.length,0);assert.equal(tree.props.title,'Bankverbindung');assert.ok(walk(tree).some(node=>node.props.children==='Reload failed'));}
+  if(scenario==='bank-stale-address'){assert.ok(routes[0].includes('setupStep=address'));assert.notEqual(tree.props.title,'Rechnungsangaben vollständig');}
+  if(scenario==='bank'){
+   assert.equal(calls[0].path,'/api/settings/documents');assert.equal(calls[0].payload.vatRate,0);assert.equal(calls[0].payload.paymentTermsDays,0);assert.equal(calls[0].payload.invoiceIntroText,'Keep authored text');
+   assert.equal(tree.props.title,'Rechnungsangaben vollständig','Completion is shown only after confirmed persistence');
+  }
+ }
+}finally{globalThis.document=oldDocument;}
+console.log('Guided setup: canonical area readiness, partial/complete saves, safe return, actual clean/dirty exit, invalid-bank preflight and confirmed completion passed; no security bypass.');
+
+// Optional setup content starts collapsed even on desktop and remains operable.
+{
+ let current=false;const effects=[];
+ const {DetailDisclosure}=compile('components/binso-ux.tsx',{react:{...react,useState:initial=>[current??initial,next=>{current=next}],useLayoutEffect:effect=>effects.push(effect)}});
+ let disclosure=DetailDisclosure({label:'Optional ergänzen',defaultOpen:false,children:'Fields'});
+ effects.forEach(effect=>effect());assert.equal(disclosure.props.open,false);
+ disclosure.props.onToggle({currentTarget:{open:true}});
+ disclosure=DetailDisclosure({label:'Optional ergänzen',defaultOpen:false,children:'Fields'});assert.equal(disclosure.props.open,true);
+ disclosure.props.onToggle({currentTarget:{open:false}});assert.equal(current,false);
+}
+
+// The persistent layout must receive route-level orientation overrides.
+{
+ const file='components/app-shell.tsx',ast=ts.createSourceFile(file,fs.readFileSync(file,'utf8'),99,true,4);
+ const node=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='AppShell');
+ const exported={};let registered;
+ const code=ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+ Function('require','exports','useContext','usePathname','useLayoutEffect','ShellRegistration',code)(require,exported,()=>configuration=>{registered=configuration},()=>'/einstellungen/firma',effect=>effect(),{});
+ exported.AppShell({title:'Firma',active:'einstellungen',orientationText:null,children:'Body'});
+ assert.equal(registered.orientationText,null,'The mounted shared shell respects the guided step description');
+}

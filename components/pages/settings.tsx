@@ -2,6 +2,7 @@
 import {useSetupField} from "../use-setup-field";
 import {setupFieldIds} from "@/lib/action-readiness";
 import {SetupGuidePreference} from "../setup-guide";
+import {SetupProcess} from '../setup-process';
 import {PushDeviceSettings} from "../push-device-settings";
 import {SettingsNavigation} from "../settings-navigation";
 import {FileUpload} from "../file-upload";
@@ -131,7 +132,11 @@ export function AccountSettingsPage() {
   </AppShell>;
 }
 
-export function CompanySettingsPage() {
+export function CompanySettingsPage(){
+ const search=useSearchParams();
+ return search.get('onboarding')==='1'||['name','address','bank'].includes(search.get('setupStep')??'')?<SetupProcess/>:<CompanySettingsDetail/>;
+}
+function CompanySettingsDetail() {
 
   const router=useRouter(),search=useSearchParams();
   const onboarding=search.get("onboarding")==="1";
@@ -150,7 +155,8 @@ export function CompanySettingsPage() {
   const [toast,setToast]=useState<string|null>(null);
   const [editing,setEditing]=useState(false);
   const query=useApiQuery<{item:Record<string,unknown>}>("/api/settings/company");
-  const loading=query.loading,loadError=query.error;
+  const [hydratedItem,setHydratedItem]=useState<Record<string,unknown>|null>(null);
+  const loading=query.loading||Boolean(query.data&&query.data.item!==hydratedItem&&!editing),loadError=query.error;
   const [saving,setSaving]=useState(false);
   const saveBusy=useRef(false);
   const [baseline,setBaseline]=useState("");
@@ -171,7 +177,7 @@ export function CompanySettingsPage() {
     const item=query.data.item;let active=true;
     queueMicrotask(()=>{if(!active)return;
       setName(String(item.name??""));setLegalName(String(item.legal_name??""));setCountryCode(String(item.country_code??"CH"));setUid(String(item.uid??""));setLogoUrl(String(item.logo_url??""));setStreet(String(item.street??""));setBuildingNumber(String(item.building_number??""));
-      setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));
+      setPostalCode(String(item.postal_code??""));setCity(String(item.city??""));setEmail(String(item.email??""));setPhone(String(item.phone??""));setHydratedItem(item);
       if(onboarding&&!onboardingOpened.current){onboardingOpened.current=true;setBaseline(JSON.stringify([String(item.name??""),String(item.uid??""),String(item.street??""),String(item.building_number??""),String(item.postal_code??""),String(item.city??""),String(item.email??""),String(item.phone??""),String(item.legal_name??""),String(item.country_code??"CH")]));setEditing(true);}
     });
     return()=>{active=false};
@@ -212,10 +218,10 @@ export function CompanySettingsPage() {
         </div>
         </form><FormActions sheet>{onboarding&&<Button variant="secondary" disabled={saving} onClick={()=>{setSetupDestination(null);setSetupBack(false);if(setupDirty)setSetupDiscard(true);else router.replace("/dashboard")}}><LocalizedText>{"Später fortsetzen"}</LocalizedText></Button>}<Button requiresWrite disabled={loading||!!loadError||saving} type="submit" form="company-settings-form"><LocalizedText>{saving?"Wird gespeichert…":onboarding?"Einrichtung abschliessen":"Speichern"}</LocalizedText></Button></FormActions>
  </>;
-  return <AppShell title={onboarding?"Unternehmen einrichten":"Firma"} active="einstellungen" editing={false} unsavedChanges={false} backHref="/einstellungen" backLabel="Einstellungen" mobileActions={!editing&&!onboarding?<ActionsMenu header label="Weitere Aktionen"><ActionRow requiresWrite disabled={loading||!!loadError} icon="edit" title="Bearbeiten" onClick={beginEdit}/></ActionsMenu>:undefined} actions={!editing&&!onboarding?<ActionsMenu header label="Weitere Aktionen"><ActionRow requiresWrite disabled={loading||!!loadError} icon="edit" title="Bearbeiten" onClick={beginEdit}/></ActionsMenu>:undefined}>
+  return <AppShell title={onboarding?"Unternehmen einrichten":"Firma"} active="einstellungen" editing={false} unsavedChanges={false} backHref={fieldRecovery.returnTo??"/einstellungen"} backLabel={fieldRecovery.returnTo?"Zurück":"Einstellungen"} mobileActions={!editing&&!onboarding?<ActionsMenu header label="Weitere Aktionen"><ActionRow requiresWrite disabled={loading||!!loadError} icon="edit" title="Bearbeiten" onClick={beginEdit}/></ActionsMenu>:undefined} actions={!editing&&!onboarding?<ActionsMenu header label="Weitere Aktionen"><ActionRow requiresWrite disabled={loading||!!loadError} icon="edit" title="Bearbeiten" onClick={beginEdit}/></ActionsMenu>:undefined}>
     {loading?<LoadingState><LocalizedText>{"Einstellungen werden geladen …"}</LocalizedText></LoadingState>:loadError?<ErrorState onRetry={query.refresh} retryLabel="Erneut versuchen"><LocalizedText>{loadError}</LocalizedText></ErrorState>:<div className="settings-detail-grid">
       {!editing&&<section className="surface company-logo-card">{companyLogoSource(logoPreview||logoUrl)?<LocalizedElement as="img" src={companyLogoSource(logoPreview||logoUrl)} alt="Firmenlogo"/>:<LocalizedElement as="span" className="company-logo-placeholder" role="img" aria-label="Kein Firmenlogo"><Icon name="users"/></LocalizedElement>}<div><b><LocalizedText verbatim={!!name}>{name||"Firma"}</LocalizedText></b><small><LocalizedText>{"Firmenlogo für Angebote, Rechnungen und Dokumente"}</LocalizedText></small></div></section>}
-      {editing?(onboarding?<section className="company-setup-page">{companyForm}</section>:<FormSheet open={editing} label="Firmendaten bearbeiten" onClose={()=>{setEditing(false);setPendingLogo(null);setLogoPreview("");setRemoveLogo(false);}} busy={saving} dirty={currentValues!==baseline||pendingLogo!==null||removeLogo}>{companyForm}
+      {editing?(onboarding?<section className="company-setup-page">{companyForm}</section>:<FormSheet open={editing} label="Firmendaten bearbeiten" onClose={()=>{setEditing(false);setPendingLogo(null);setLogoPreview("");setRemoveLogo(false);if(fieldRecovery.returnTo){allowDraftNavigation();router.push(fieldRecovery.returnTo)}}} busy={saving} dirty={currentValues!==baseline||pendingLogo!==null||removeLogo}>{companyForm}
       </FormSheet>):<section className="settings-readonly"><dl className="detail-list settings-master-data"><div><dt><LocalizedText>{"Firmenname"}</LocalizedText></dt><dd><LocalizedText verbatim={true}>{name||"Nicht hinterlegt"}</LocalizedText></dd></div><div><dt><LocalizedText>{"UID"}</LocalizedText></dt><dd><LocalizedText>{uid||"Nicht hinterlegt"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Adresse"}</LocalizedText></dt><dd><LocalizedText>{[street,buildingNumber].filter(Boolean).join(" ")||"Nicht hinterlegt"}</LocalizedText><br/><LocalizedText>{[postalCode,city].filter(Boolean).join(" ")||"Nicht hinterlegt"}</LocalizedText></dd></div><div><dt><LocalizedText>{"E-Mail"}</LocalizedText></dt><dd><LocalizedText>{email||"Nicht hinterlegt"}</LocalizedText></dd></div><div><dt><LocalizedText>{"Telefon"}</LocalizedText></dt><dd><LocalizedText>{phone||"Nicht hinterlegt"}</LocalizedText></dd></div></dl></section>}
     </div>}
     <ConfirmDialog open={setupDiscard} busy={saving} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." onCancel={()=>{setSetupDiscard(false);setSetupDestination(null);setSetupBack(false)}} confirmLabel="Änderungen verwerfen" onConfirm={()=>{allowDraftNavigation();setSetupDiscard(false);if(setupDestination)window.location.assign(setupDestination);else if(setupBack)leaveSetup();else router.replace("/dashboard")}}/>

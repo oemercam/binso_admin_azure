@@ -10,6 +10,7 @@ import {tenantCan} from '@/lib/permissions';
 import {canonicalPlanId,effectiveUserLimit,capacityReached} from '@/config/plans';
 import {invoicePaymentRequirements,createQrBillData} from '@/lib/qr-bill';
 import {setupDestination,type SetupGuide,type SetupTask,type InvoiceReadiness,type SetupField} from '@/lib/action-readiness';
+import {requiredSetupTasks} from '@/lib/setup-readiness';
 
 export function canConfigureSetup(s:SessionUser){return tenantCan(s.role,'organization:write',s.moduleProfile);}
 async function company(c:PoolClient,s:SessionUser){
@@ -21,12 +22,10 @@ async function company(c:PoolClient,s:SessionUser){
 export async function readSetupGuide(c:PoolClient,s:SessionUser):Promise<SetupGuide>{
  authorize(s,'organization:read');
  if(!canConfigureSetup(s))throw new ApiError(403,'forbidden','Keine Berechtigung.');
- const item=await company(c,s),issues=invoicePaymentRequirements(item);
+ const item=await company(c,s);
  const pref=(await c.query('select dismissed from user_setup_preferences where organization_id=$1 and user_id=$2',[s.organizationId,s.userId])).rows[0];
  const tasks:SetupTask[]=[
-  {id:'name',title:'Firmenname',importance:'required',complete:!issues.some(i=>['name','legalName'].includes(i.field)),href:setupDestination(item.legal_name?'legalName':'name')},
-  {id:'address',title:'Firmenadresse',importance:'required',complete:!issues.some(i=>['street','postalCode','city','countryCode'].includes(i.field)),href:setupDestination('street')},
-  {id:'bank',title:'Bankverbindung',importance:'required',complete:!issues.some(i=>['iban','qrIban'].includes(i.field)),href:setupDestination(item.qr_iban?'qrIban':'iban')},
+  ...requiredSetupTasks(item),
   {id:'terms',title:'Zahlungsfrist',importance:'recommended',complete:Number.isInteger(Number(item.payment_terms_days))&&item.payment_terms_days!==null&&Number(item.payment_terms_days)>=0&&Number(item.payment_terms_days)<=365,href:setupDestination('paymentTerms')},
   {id:'numbering',title:'Automatische Nummerierung',importance:'optional',complete:true,href:'/einstellungen/dokumente'},
   {id:'texts',title:'Dokumenttexte',importance:'optional',complete:!!(item.invoice_intro_text||item.quote_intro_text),href:setupDestination('documentTexts')},

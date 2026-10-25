@@ -84,9 +84,9 @@ export function DetailSections({summary,facts,records,extra}:{summary:ReactNode;
 }
 
 /** Supplementary facts stay accessible without crowding a mobile dossier. */
-export function DetailDisclosure({label,children,open:controlledOpen,onOpenChange,summaryValue}:{label:string;children:ReactNode;open?:boolean;onOpenChange?:(open:boolean)=>void;summaryValue?:ReactNode}){
- const [localOpen,setOpen]=useState(false),touched=useRef(false),open=controlledOpen??localOpen;
- useLayoutEffect(()=>{if(controlledOpen!==undefined)return;const media=window.matchMedia('(min-width:761px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[controlledOpen]);
+export function DetailDisclosure({label,children,open:controlledOpen,defaultOpen,onOpenChange,summaryValue}:{label:string;children:ReactNode;open?:boolean;defaultOpen?:boolean;onOpenChange?:(open:boolean)=>void;summaryValue?:ReactNode}){
+ const [localOpen,setOpen]=useState(defaultOpen??false),touched=useRef(false),open=controlledOpen??localOpen;
+ useLayoutEffect(()=>{if(controlledOpen!==undefined||defaultOpen!==undefined)return;const media=window.matchMedia('(min-width:761px)'),update=()=>{if(!touched.current)setOpen(media.matches)};update();media.addEventListener('change',update);return()=>media.removeEventListener('change',update)},[controlledOpen,defaultOpen]);
  return <details className="bo-data-disclosure" data-controlled={controlledOpen!==undefined||undefined} open={open} onToggle={event=>{const next=event.currentTarget.open;if(next!==open){touched.current=true;if(controlledOpen===undefined)setOpen(next);onOpenChange?.(next)}}}><summary><LocalizedText>{label}</LocalizedText>{summaryValue!==undefined&&<span className="bo-disclosure-value">{summaryValue}</span>}</summary><div>{children}</div></details>;
 }
 

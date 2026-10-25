@@ -71,6 +71,7 @@ function AppShellFrame({
   headingPlacement="content",
   recordLabel,
   subtitle,
+  orientationText,
   active,
   children,
   actions,
@@ -93,6 +94,7 @@ function AppShellFrame({
   statusTone?: "neutral"|"success"|"warning"|"danger"|"info";
   loading?:boolean;
   subtitle?: string;
+  orientationText?:string|null;
   active: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
@@ -156,7 +158,7 @@ function AppShellFrame({
   const bodyControls=listControls?cloneElement(listControls,{children:undefined}):inlineControls;
   const pageChildren=inlineControls?childNodes.filter(child=>child!==inlineControls):children;
   const mobileHeading=pathname==='/dashboard'?'Übersicht':title;
-  const orientation=preview||pathname==='/dashboard'&&loading?undefined:pageOrientation(pathname,editing,access?.role);
+  const orientation=preview||orientationText===null||pathname==='/dashboard'&&loading?undefined:orientationText??pageOrientation(pathname,editing,access?.role);
   const headingSubtitle=orientation&&!(subtitle&&/^\d+\s/.test(subtitle))?undefined:subtitle;
   const headingCreate=contentCreate&&pathname==="/dashboard";
   const headingActions=contentCreate&&!headingCreate?undefined:visibleActions;
@@ -394,10 +396,10 @@ const ShellRegistration=createContext<((configuration:ShellConfiguration)=>void)
  * the mounted frame, navigation, session and timer across route transitions. */
 export function AppShell(props:ShellProps){
  const register=useContext(ShellRegistration),pathname=usePathname();
- const {title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading}=props;
+ const {title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading}=props;
  useLayoutEffect(()=>{
-  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading});
- },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading]);
+  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading});
+ },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading]);
  return register?props.children:<AppShellFrame {...props}/>;
 }
 const appSections:Record<string,string>={hilfe:"Hilfe & Informationen",vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};

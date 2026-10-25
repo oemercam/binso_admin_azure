@@ -993,8 +993,9 @@ try{
  const customerMergeService=await import(dataModule(customerMergeSource));
  const setupNavigationModule=dataModule(await fs.readFile('lib/navigation.ts','utf8'));
  const setupActionModule=dataModule((await fs.readFile('lib/action-readiness.ts','utf8')).replace("'./navigation'",JSON.stringify(setupNavigationModule)));
+ const setupReadinessModule=dataModule((await fs.readFile('lib/setup-readiness.ts','utf8')).replace("'./qr-bill'",JSON.stringify(qrModule)).replace("'./navigation'",JSON.stringify(setupNavigationModule)));
  let readinessSource=(await fs.readFile('lib/server/business-readiness.ts','utf8')).replace("import 'server-only';",'');
- for(const [name,value] of Object.entries({'./http':processHttp,'./rbac':processRbac,'./audit':audit,'./plan-access':actualPlanModule,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/lib/qr-bill':qrModule,'@/lib/action-readiness':setupActionModule,'@/config/plan-access':planAccessModuleUrl}))readinessSource=readinessSource.replaceAll("'"+name+"'",JSON.stringify(value));
+ for(const [name,value] of Object.entries({'./http':processHttp,'./rbac':processRbac,'./audit':audit,'./plan-access':actualPlanModule,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/lib/qr-bill':qrModule,'@/lib/action-readiness':setupActionModule,'@/lib/setup-readiness':setupReadinessModule,'@/config/plan-access':planAccessModuleUrl}))readinessSource=readinessSource.replaceAll("'"+name+"'",JSON.stringify(value));
  const readinessModule=dataModule(readinessSource);
  const pushConfigModule=dataModule((await fs.readFile('lib/server/push-config.ts','utf8')).replace("import 'server-only';",'').replace("'./env'",JSON.stringify(publicEnv)));
  let timeReviewSource=await fs.readFile('lib/server/repositories/time-review.ts','utf8');

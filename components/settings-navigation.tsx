@@ -32,6 +32,7 @@ export function SettingsNavigation({context=false}:{context?:boolean}){
 
 /** Shared workspace composition; pages keep their existing data and form handlers. */
 export function SettingsWorkspace({children}:{children:ReactNode}){
- const pathname=usePathname();
+ const pathname=usePathname(),search=useSearchParams();
+ if(pathname==='/einstellungen/firma'&&(search.get('onboarding')==='1'||['name','address','bank'].includes(search.get('setupStep')??'')))return <>{children}</>;
  return pathname.startsWith("/einstellungen/")?<div className="settings-workspace"><SettingsNavigation context/><div className="settings-page-content">{children}</div></div>:<>{children}</>;
 }
