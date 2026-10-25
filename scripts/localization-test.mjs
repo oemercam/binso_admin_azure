@@ -1,10 +1,13 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {matchesLocalizedRoute} from './localized-route-contract.mjs';
-for(const locale of ['de','fr','it','en']){
+import {translationCoverage} from './full-app-audit-report.mjs';
+assert.equal(translationCoverage({messages:{Beispiel:['English','Français','Italiano']}}).tr.complete,false,'Three existing translations never qualify Turkish');
+assert.equal(translationCoverage({messages:{Beispiel:['English','Français','Italiano','Türkçe']},plurals:{Zeilen:{tr:{one:'satır',other:'satır'}}}}).tr.complete,true,'Actual Turkish text and plural forms qualify catalogue availability only');
+for(const locale of ['de','fr','it','en','tr']){
  const target='https://fixture.invalid/kunden?page=2';
  for(const actual of [target,target+'&lang='+locale])assert.equal(matchesLocalizedRoute(actual,target,locale),true);
- for(const actual of ['https://foreign.invalid/kunden?page=2','https://fixture.invalid/kunden/other?page=2',target+'&extra=1',target+'&lang='+(locale==='en'?'fr':'en'),target+'&lang=tr',target+'&lang='+locale+'&lang='+locale,target+'#other','https://fixture.invalid/kunden?page=1'])assert.equal(matchesLocalizedRoute(actual,target,locale),false,'Language reflection must not hide a different route/query: '+actual);
+ for(const actual of ['https://foreign.invalid/kunden?page=2','https://fixture.invalid/kunden/other?page=2',target+'&extra=1',target+'&lang='+(locale==='en'?'fr':'en'),target+'&lang=ja',target+'&lang='+locale+'&lang='+locale,target+'#other','https://fixture.invalid/kunden?page=1'])assert.equal(matchesLocalizedRoute(actual,target,locale),false,'Language reflection must not hide a different route/query: '+actual);
 }
 import {createRequire} from 'node:module';
 import ts from 'typescript';
@@ -43,6 +46,10 @@ for(const [language,unit] of [['de','Std.'],['en','hr'],['fr','h'],['it','ore']]
  const tag=config.localeTags[language],translate=value=>locale.translateMessage(value,language),options={locale:tag,translateUnit:translate};
  const row=sharedRows.mapRemoteRows('products',[productFixture],options)[0];
  assert.equal(row[0],'Stück','Actual product names remain verbatim even when matching a catalogue key');
+ assert.equal(row[1],translate('Produkt'),'Data-driven product types use the selected language');
+ const payment=sharedRows.mapRemoteRows('payments',[{id:'payment',paid_on:'2026-01-02',customer:{name:'Kunde'},method:'bank',amount:1,status:'booked'}],options)[0];
+ assert.equal(payment[2],'Kunde','Actual customer name is preserved even when it matches a UI label');assert.equal(payment[3],translate('Banküberweisung'),'Payment method is translated before joining user-authored references');
+ assert.equal(sharedRows.swissDate('2026-01-02',tag),financialDates.formatDate('2026-01-02',tag));
  assert.equal(row[2],'CHF '+Number(productFixture.unit_price).toLocaleString(tag,{minimumFractionDigits:2,maximumFractionDigits:2})+' / '+unit,'Actual remote rows use locale numbers and translated standard units');
  assert.equal(sharedRows.mapRemoteRows('employees',[{id:'fixture-employee',first_name:'Tag',last_name:'Jahr',workload_percent:'83.75'}],options)[0][2],Number('83.75').toLocaleString(tag)+' %');
  assert.equal(timestampDates.withPriceUnit('CHF 10','Stück',translate),'CHF 10 / Stück','Custom units remain user content even when they collide with a translated label');

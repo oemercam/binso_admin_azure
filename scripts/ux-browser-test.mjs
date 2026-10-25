@@ -501,7 +501,12 @@ try{
      const titleBox=await title.evaluate(el=>{const r=el.getBoundingClientRect();return {visible:el.checkVisibility(),x:r.x,width:r.width,height:r.height}});
      assert.ok(titleBox.visible&&titleBox.width>0&&titleBox.height>0&&Math.abs(titleBox.x+titleBox.width/2-width/2)<=1.5,`${route} ${width}px: visible detail title is geometrically centered ${JSON.stringify(titleBox)}`);
     }
-    if(width<=760&&await page.locator('.mobile-back').count()){const back=page.locator('.mobile-back');assert.ok(await back.isVisible(),`${route}: detail back control is visible`);const icon=await back.locator('svg').boundingBox();assert.ok(icon&&icon.width>=18&&icon.height>=18&&icon.x>=0,`${route}: back icon is not clipped`);}
+    if(width<=760&&await page.locator('.mobile-back').count()){
+     const back=page.locator('.mobile-back');await back.waitFor({state:'visible'});
+     const measured=await back.evaluate(el=>{const r=el.getBoundingClientRect(),icon=el.querySelector('svg')?.getBoundingClientRect();return {visible:el.checkVisibility(),width:r.width,height:r.height,icon:icon?{x:icon.x,width:icon.width,height:icon.height}:null}});
+     assert.ok(measured.visible&&measured.width>=44&&measured.height>=44,`${route} ${width}px: detail back control is visible and touchable ${JSON.stringify(measured)}`);
+     assert.ok(measured.icon&&measured.icon.width>=18&&measured.icon.height>=18&&measured.icon.x>=0,`${route}: back icon is not clipped`);
+    }
     if(!process.env.BINSO_UX_BASELINE&&['/dashboard','/finanzen'].includes(route)){
       const ready=await page.waitForFunction(({dashboard})=>{const metrics=document.querySelectorAll('.bo-cash-overview .bo-metric-tiles>.metric').length,actions=[...document.querySelectorAll('.app-section-dashboard .page-actions .bo-create-action')].filter(el=>el.checkVisibility()).length,legacyActions=document.querySelectorAll('.bo-quick-create-links>a').length,bars=document.querySelectorAll('.bo-overview-bars>button').length;return metrics===4&&(dashboard?actions===1:!!document.querySelector('.bo-cash-overview .bo-comparison-card,.bo-cash-overview .empty-state'))?{metrics,actions,legacyActions,bars,analysis:document.querySelectorAll('.bo-ring-chart,.bo-statistics').length}:null},{dashboard:route==='/dashboard'});
       const overview=await ready.jsonValue();await ready.dispose();

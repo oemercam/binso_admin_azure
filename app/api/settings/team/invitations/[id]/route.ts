@@ -1,3 +1,4 @@
+import {asLocale,localeCookie} from '@/lib/locales/config';
 import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
 import {NextRequest} from "next/server";
 import {apiError,assertSameOrigin,json} from "@/lib/server/http";
@@ -8,7 +9,7 @@ import {audit} from "@/lib/server/audit";
 import {resendInvitation} from '@/lib/server/invitations';
 export async function POST(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{
  assertSameOrigin(request);const s=await requireSession();authorize(s,'users:manage');await requireFreshAuthentication(s);const {id}=await params;
- return json(await resendInvitation(s,id,request.headers.get('idempotency-key')??''),201);
+ return json(await resendInvitation(s,id,request.headers.get('idempotency-key')??'',asLocale(request.cookies?.get(localeCookie)?.value)),201);
 }catch(error){return apiError(error);}}
 export async function DELETE(request:NextRequest,{params}:{params:Promise<{id:string}>}){try{
  assertSameOrigin(request);const s=await requireSession();authorize(s,'users:manage');await requireFreshAuthentication(s);const {id}=await params;

@@ -13,11 +13,16 @@ export const moreNavigation = [
   {href:'/zahlungen',label:'Zahlungen',icon:'wallet'},
   {href:'/spesen',label:'Ausgaben & Spesen',icon:'card'},
   {href:'/finanzen',label:'Finanzübersicht',icon:'chart'},
+  {href:'/produkte',label:'Produkte',icon:'box'},
+  {href:'/lieferanten',label:'Lieferanten',icon:'building'},
+  {href:'/vertraege',label:'Verträge',icon:'file'},
  ]},
  {title:'Auswertung',items:[{href:'/berichte',label:'Berichte',icon:'chart'}]},
  {title:'Verwaltung',items:[
   {href:'/einstellungen/firma',label:'Unternehmen',icon:'building'},
   {href:'/einstellungen/team',label:'Mitarbeiter & Berechtigungen',icon:'users'},
+  {href:'/mitarbeiter',label:'Mitarbeiter',icon:'users'},
+  {href:'/abwesenheiten',label:'Abwesenheiten',icon:'calendar'},
   {href:'/einstellungen',label:'Unternehmenseinstellungen',icon:'settings'},
  ]},
  {title:'Hilfe',items:[

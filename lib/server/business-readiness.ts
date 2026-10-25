@@ -13,8 +13,14 @@ import {setupDestination,type SetupGuide,type SetupTask,type InvoiceReadiness,ty
 import {requiredSetupTasks} from '@/lib/setup-readiness';
 
 export function canConfigureSetup(s:SessionUser){return tenantCan(s.role,'organization:write',s.moduleProfile);}
-async function company(c:PoolClient,s:SessionUser){
- const row=(await c.query('select name,legal_name,street,building_number,postal_code,city,country_code,iban,qr_iban,payment_terms_days,logo_url,invoice_intro_text,quote_intro_text from organizations where id=$1',[s.organizationId])).rows[0];
+async function company(c:PoolClient,s:SessionUser,setup=false){
+ const setupFields=setup?`,
+  (select dismissed from user_setup_preferences where organization_id=o.id and user_id=$2) setup_dismissed,
+  (select json_build_object('max_users',e.max_users,'plan',s.plan,
+   'active',(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active'),
+   'pending',(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()))
+   from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=o.id) setup_capacity`:'';
+ const row=(await c.query('select name,legal_name,street,building_number,postal_code,city,country_code,iban,qr_iban,payment_terms_days,logo_url,invoice_intro_text,quote_intro_text'+setupFields+' from organizations o where id=$1',setup?[s.organizationId,s.userId]:[s.organizationId])).rows[0];
  if(!row)throw new ApiError(404,'organization_not_found','Unternehmen wurde nicht gefunden.');
  return row;
 }
@@ -22,8 +28,8 @@ async function company(c:PoolClient,s:SessionUser){
 export async function readSetupGuide(c:PoolClient,s:SessionUser):Promise<SetupGuide>{
  authorize(s,'organization:read');
  if(!canConfigureSetup(s))throw new ApiError(403,'forbidden','Keine Berechtigung.');
- const item=await company(c,s);
- const pref=(await c.query('select dismissed from user_setup_preferences where organization_id=$1 and user_id=$2',[s.organizationId,s.userId])).rows[0];
+ // One tenant-scoped round trip; preference, capacity and company share the same snapshot.
+ const item=await company(c,s,true);
  const tasks:SetupTask[]=[
   ...requiredSetupTasks(item),
   {id:'terms',title:'Zahlungsfrist',importance:'recommended',complete:Number.isInteger(Number(item.payment_terms_days))&&item.payment_terms_days!==null&&Number(item.payment_terms_days)>=0&&Number(item.payment_terms_days)<=365,href:setupDestination('paymentTerms')},
@@ -31,11 +37,11 @@ export async function readSetupGuide(c:PoolClient,s:SessionUser):Promise<SetupGu
   {id:'texts',title:'Dokumenttexte',importance:'optional',complete:!!(item.invoice_intro_text||item.quote_intro_text),href:setupDestination('documentTexts')},
   {id:'logo',title:'Firmenlogo',importance:'optional',complete:!!item.logo_url,href:setupDestination('logo')},
  ];
- const capacity=(await c.query("select e.max_users,s.plan,(select count(*) from organization_memberships m where m.organization_id=e.organization_id and m.status='active') active,(select count(*) from organization_invitations i where i.organization_id=e.organization_id and i.status='pending' and i.expires_at>now()) pending from organization_entitlements e join organization_subscriptions s on s.organization_id=e.organization_id where e.organization_id=$1",[s.organizationId])).rows[0];
+ const capacity=item.setup_capacity;
  const plan=canonicalPlanId(capacity?.plan);
  if(plan&&tenantCan(s.role,'users:manage',s.moduleProfile)&&!capacityReached(Number(capacity.active)+Number(capacity.pending),effectiveUserLimit(plan,capacity.max_users)))tasks.push({id:'team',title:'Mitarbeiter einladen',importance:'optional',complete:Number(capacity.active)+Number(capacity.pending)>1,href:'/einstellungen/team'});
  const required=tasks.filter(task=>task.importance==='required');
- return {dismissed:pref?.dismissed===true,editable:s.organizationStatus!=='read_only'&&!s.isDemo,requiredComplete:required.filter(task=>task.complete).length,requiredTotal:required.length,tasks};
+ return {dismissed:item.setup_dismissed===true,editable:s.organizationStatus!=='read_only'&&!s.isDemo,requiredComplete:required.filter(task=>task.complete).length,requiredTotal:required.length,tasks};
 }
 export async function setSetupGuideDismissed(c:PoolClient,s:SessionUser,dismissed:unknown){
  authorize(s,'organization:write');

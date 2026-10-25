@@ -10,10 +10,11 @@ import {authorize} from "./rbac";
 import {audit} from "./audit";
 import {idempotentBusiness} from "./business-idempotency";
 import type {SessionUser} from "./session";
+import {mailText,type MailLocale} from './mail-i18n';
 
 /** Cross-tenant identity lookup is required for existing accounts. Every business
  * write still carries the authenticated tenant; no platform identity is exposed. */
-export async function inviteUser(s:SessionUser,email:string,role:string,key:string,moduleProfile:import("@/lib/permissions").ModuleProfile="standard",replaceInvitationId:string|null=null){
+export async function inviteUser(s:SessionUser,email:string,role:string,key:string,moduleProfile:import("@/lib/permissions").ModuleProfile="standard",replaceInvitationId:string|null=null,locale:MailLocale='de'){
  authorize(s,'users:manage');
  if(!['standard','time_only'].includes(moduleProfile)||moduleProfile==='time_only'&&role!=='member')throw new ApiError(400,'profile_invalid','Ungültiges Modulprofil.');
  if(s.isDemo)throw new ApiError(403,'demo_read_only','Einladungen sind in der Demo deaktiviert.');
@@ -48,9 +49,10 @@ export async function inviteUser(s:SessionUser,email:string,role:string,key:stri
    await c.query("insert into organization_invitations(id,organization_id,email,role,status,expires_at,created_by_user_id,module_profile) values($1,$2,$3,$4,'pending',now()+interval '7 days',$5,$6)",[id,s.organizationId,email,role,s.userId,moduleProfile]);
    await c.query("insert into organization_memberships(organization_id,user_id,role,status,email,module_profile) values($1,$2,$3,'invited',$4,$5) on conflict(organization_id,user_id) do update set role=excluded.role,module_profile=excluded.module_profile,status='invited'",[s.organizationId,userId,role,email,moduleProfile]);
    await c.query("insert into auth_tokens(user_id,organization_id,email,token_hash,token_type,metadata,expires_at) values($1,$2,$3,$4,'invitation',$5::jsonb,now()+interval '7 days')",[userId,s.organizationId,email,createHash('sha256').update(token).digest('hex'),JSON.stringify({invitation_id:id})]);
-   const url=env.appUrl+'/einladung?token='+encodeURIComponent(token);
-   const html=mailLayout('Einladung zu Binso One','<p>Du wurdest zu einem Binso One Firmenkonto eingeladen.</p>',{label:'Einladung annehmen',url});
-   const outbox=(await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,'invitation',$3,$4,'Einladung zu Binso One',$5,$6,$7) returning id",[s.organizationId,'invitation:'+id,id,email,'Einladung annehmen: '+url,html,s.userId])).rows[0];
+   const url=env.appUrl+'/einladung?token='+encodeURIComponent(token)+'&lang='+locale;
+   const subject=mailText('Einladung zu Binso One',locale),label=mailText('Einladung annehmen',locale);
+   const html=mailLayout(subject,'<p>'+mailText('Du wurdest zu einem Binso One Firmenkonto eingeladen.',locale)+'</p>',{label,url},locale);
+   const outbox=(await c.query("insert into mail_outbox(organization_id,deduplication_key,kind,entity_id,recipient,subject,body,attachment_html,created_by) values($1,$2,'invitation',$3,$4,$5,$6,$7,$8) returning id",[s.organizationId,'invitation:'+id,id,email,subject,label+': '+url,html,s.userId])).rows[0];
    await audit(c,{organizationId:s.organizationId,userId:s.userId,userName:s.name,action:'Einladung erstellt',entityType:'invitation',entityId:id,metadata:{role,moduleProfile,delivery:'queued'}});
    if(replaceInvitationId)await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'invitation.resent',entityType:'invitation',entityId:id,metadata:{previousInvitationId:replaceInvitationId}});
    return {id,outboxId:String(outbox.id)};
@@ -78,9 +80,9 @@ export async function inviteUser(s:SessionUser,email:string,role:string,key:stri
  return {ok:true,id:prepared.id};
 }
 
-export async function resendInvitation(s:SessionUser,id:string,key:string){
+export async function resendInvitation(s:SessionUser,id:string,key:string,locale:MailLocale='de'){
  authorize(s,'users:manage');
  const previous=await withTenant(s.organizationId,s.userId,async c=>(await c.query('select email,role,module_profile from organization_invitations where organization_id=$1 and id::text=$2',[s.organizationId,id])).rows[0]);
  if(!previous)throw new ApiError(404,'not_found','Einladung wurde nicht gefunden.');
- return inviteUser(s,previous.email,previous.role,key,previous.module_profile??'standard',id);
+ return inviteUser(s,previous.email,previous.role,key,previous.module_profile??'standard',id,locale);
 }

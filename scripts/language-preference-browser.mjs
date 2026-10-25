@@ -16,20 +16,20 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
  await page.goto(base+'/einstellungen/sprache?lang='+locale,{waitUntil:'networkidle'});
  const control=page.locator('.form-field .app-select-trigger'),next=locale==='en'?'fr':'en';
  await selectAppOption(control,next);await page.getByRole('alert').getByText(text('Sprache konnte nicht gespeichert werden.',locale),{exact:true}).waitFor();
- assert.equal(await appControlValue(control),locale,'A failed write retains the last confirmed selection');assert.equal(await page.locator('html').getAttribute('lang'),locale+'-CH');assert.equal(updates,1);
+ assert.equal(await appControlValue(control),locale,'A failed write retains the last confirmed selection');assert.equal(await page.locator('html').getAttribute('lang'),(locale==='tr'?'tr-TR':locale+'-CH'));assert.equal(updates,1);
  phase='hold';await selectAppOption(control,next);await received;
  assert.equal(await control.isEnabled(),false,'Slow writes cannot race another selection');assert.equal(await control.getAttribute('aria-busy'),'true');assert.equal(await appControlValue(control),locale);
- release();await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',next);
+ release();await page.waitForFunction(locale=>document.documentElement.lang===(locale==='tr'?'tr-TR':locale+'-CH'),next);
  assert.equal(await appControlValue(control),next);assert.equal(updates,2);
  // Next's separate route announcer deliberately has role=alert. Assert the
  // actual preference error has cleared in every language, not all live regions.
- for(const language of ['de','fr','it','en'])await page.getByRole('alert').filter({hasText:text('Sprache konnte nicht gespeichert werden.',language)}).waitFor({state:'hidden'});
+ for(const language of ['de','fr','it','en','tr'])await page.getByRole('alert').filter({hasText:text('Sprache konnte nicht gespeichert werden.',language)}).waitFor({state:'hidden'});
  await page.reload({waitUntil:'networkidle'});assert.equal(await appControlValue(control),next,'Confirmed server preference survives reload');assert.equal(updates,2,'Reload never repeats the write');
  // A mobile settings detail intentionally has a Back header, not a duplicate
  // account action. Open the account panel from the actual workspace header.
  phase='ready';await page.goto(base+'/dashboard?lang='+next,{waitUntil:'networkidle'});await page.locator('button.avatar-button:visible').first().click();
  const account=page.locator('.account-sheet .locale-switcher .app-select-trigger');await selectAppOption(account,locale);
- await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',locale);assert.equal(updates,3,'The account menu uses the same persisted preference path');
+ await page.waitForFunction(locale=>document.documentElement.lang===(locale==='tr'?'tr-TR':locale+'-CH'),locale);assert.equal(updates,3,'The account menu uses the same persisted preference path');
  await page.keyboard.press('Escape');await page.goto(base+'/einstellungen/sprache?lang='+locale,{waitUntil:'networkidle'});assert.equal(await appControlValue(control),locale);assert.equal(updates,3);
  await verifyNotificationPreference(page,{base,locale,text});
  let operatorLocale=null,operatorUpdates=0;
@@ -40,10 +40,10 @@ export async function verifyLanguagePreference(page,{base,locale,text}){
  });
  await page.goto(base+'/operator?lang='+locale,{waitUntil:'networkidle'});await page.locator('.operator-app-header button.avatar-button:visible').click();
  await selectAppOption(page.locator('.account-sheet .locale-switcher .app-select-trigger'),next);
- await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',next);assert.equal(operatorUpdates,1);assert.equal(updates,3,'Operator storage must never use the tenant profile endpoint');
+ await page.waitForFunction(locale=>document.documentElement.lang===(locale==='tr'?'tr-TR':locale+'-CH'),next);assert.equal(operatorUpdates,1);assert.equal(updates,3,'Operator storage must never use the tenant profile endpoint');
  await page.keyboard.press('Escape');
  await page.evaluate(locale=>{document.cookie='binso_locale='+locale+'; Path=/; SameSite=Lax';const url=new URL(location.href);url.searchParams.set('lang',locale);history.replaceState(history.state,'',url)},locale);
- await page.reload({waitUntil:'networkidle'});await page.waitForFunction(locale=>document.documentElement.lang===locale+'-CH',next);assert.equal(operatorUpdates,1,'Reading a stored preference does not replay its mutation');
+ await page.reload({waitUntil:'networkidle'});await page.waitForFunction(locale=>document.documentElement.lang===(locale==='tr'?'tr-TR':locale+'-CH'),next);assert.equal(operatorUpdates,1,'Reading a stored preference does not replay its mutation');
 }
 
 /** Actual switches retain confirmed state, localized names and keyboard semantics.

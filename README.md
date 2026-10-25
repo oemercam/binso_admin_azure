@@ -3,6 +3,8 @@
 Aktueller Einstieg: [Lieferstand, Konzeptablage und GitHub-Abhängigkeiten](docs/architecture/delivery-status.md).
 Dieser Bericht bewahrt datierte Nachweise; den aktuellen Head und CI im verlinkten PR prüfen.
 
+Lokaler Folgeauftrag vom 25. Oktober: [Gesamtaudit, Korrekturen und offene Nachweise](docs/architecture/full-app-audit-20261025.md).
+
 Binso One ist die app-first Business-Plattform der Binso GmbH für Schweizer KMU.
 
 ## Projektorientierung für Entwicklungsaufträge

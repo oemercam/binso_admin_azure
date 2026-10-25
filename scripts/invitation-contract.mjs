@@ -54,5 +54,17 @@ export async function verifyInvitationContract({load,mock,db,org,other,act,reque
  assert.equal((await db.query('select password_hash from app_users where id=$1',[existingId])).rows[0].password_hash,hash,'Existing account password stays unchanged');
  result=await create('synthetic-expired@example.invalid');assert.equal(result.status,201);const expired=(await result.json()).id,expiredToken=token();
  await db.query("update auth_tokens set expires_at=now()-interval '1 second' where metadata->>'invitation_id'=$1",[expired]);assert.equal((await preview(expiredToken)).status,400,'Expired token cannot preview');
+ const {mailText}=load('lib/i18n.ts');let localizedId;
+ for(const locale of ['de','fr','it','en','tr']){
+  const key=randomUUID(),body=localizedId?{}:{email:'synthetic-localized@example.invalid',role:'member',moduleProfile:'time_only'};
+  const localizedRequest=()=>{const next=request(body,key);next.cookies.set('binso_locale',locale);return next;};
+  result=localizedId?await resend.POST(localizedRequest(),{params:Promise.resolve({id:localizedId})}):await invite.POST(localizedRequest());
+  assert.equal(result.status,201,await result.clone().text());localizedId=(await result.json()).id;
+  const mail=mails.at(-1),subject=mailText('Einladung zu Binso One',locale),label=mailText('Einladung annehmen',locale);
+  assert.equal(mail.subject,subject);assert.ok(mail.text.startsWith(label+': '));assert.ok(mail.html.includes('lang="'+locale+'"'));
+  const link=new URL(mail.text.match(/https?:\/\/\S+/)[0]);assert.equal(link.searchParams.get('lang'),locale);assert.equal((await preview(link.searchParams.get('token'))).status,200);
+  const stored=(await db.query("select subject,body,attachment_html from mail_outbox where organization_id=$1 and entity_id=$2 and kind='invitation'",[org,localizedId])).rows[0];
+  assert.equal(stored.subject,subject);assert.equal(stored.body,mail.text);assert.equal(stored.attachment_html,mail.html,'Persisted outbox and sent locale match');
+ }
  console.log('Invitations: real runtime auth routes/SQL, GET non-consumption, seven-day token rotation, full-seat replacement, role/profile preservation, single-use activation, retry/outbox deduplication, revoke, tenant/roles and atomic rollback passed. External delivery is synthetic and remains unqualified.');
 }

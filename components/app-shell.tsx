@@ -5,7 +5,7 @@ import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/cli
 import {asLocale} from '@/lib/locales';
 import {PageAccessContext} from "@/lib/client/page-access";
 import {tenantCanOpenPath,tenantCan,tenantCanCreateAt,permissionForModule,type ModuleProfile} from "@/lib/permissions";
-import {moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
+import {isPlanId,moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {loadTheme,saveTheme} from "@/lib/client/theme";
@@ -68,7 +68,10 @@ const desktopNavGroups = [
 
 type NotificationItem=PanelNotification;
 
-function accessFromSession(session:ClientSession|null){return session?.authenticated?{role:session.tenant?.role??"reader",plan:session.tenant?.plan??"pro" as PlanId,readOnly:session.tenant?.readOnly===true,moduleProfile:session.tenant?.moduleProfile??"standard",enrollmentRequired:session.security?.enrollmentRequired===true}:null;}
+function accessFromSession(session:ClientSession|null){
+ if(!session?.authenticated||!session.tenant?.role||!isPlanId(session.tenant.plan))return null;
+ return {role:session.tenant.role,plan:session.tenant.plan,readOnly:session.tenant.readOnly===true,moduleProfile:session.tenant.moduleProfile??"standard",enrollmentRequired:session.security?.enrollmentRequired===true};
+}
 
 function AppShellFrame({
   title,
@@ -135,9 +138,10 @@ function AppShellFrame({
     let active=true;let refreshRevision=0;
     const refresh=()=>{const requestedRevision=++refreshRevision;return apiGet<ClientSession>('/api/auth/session').then(session=>{
       if(!active||requestedRevision!==refreshRevision)return;
-      if(session.authenticated)void prefetchApiQuery('/api/settings/profile');
-      setAccess(accessFromSession(session));
-      setAccessError(session.authenticated?null:'Deine Sitzung ist beendet. Bitte melde dich erneut an.');
+      const nextAccess=accessFromSession(session);
+      if(nextAccess)void prefetchApiQuery('/api/settings/profile');
+      setAccess(nextAccess);
+      setAccessError(!session.authenticated?'Deine Sitzung ist beendet. Bitte melde dich erneut an.':nextAccess?null:'Zugang konnte nicht geprüft werden.');
     }).catch(error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}});};
     const resume=(event:PageTransitionEvent)=>{if(event.persisted){invalidateClientSession();setAccess(null);void refresh();}};
     const visibility=()=>{if(document.visibilityState==="visible")void refresh();};

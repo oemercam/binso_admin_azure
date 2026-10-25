@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 
 // Owner-approved customer-detail material applies to these existing content owners.
 // Menus, forms, navigation chrome and public output keep their own geometry.
-export const contentGroupSelector=':is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block)';
+export const contentGroupSelector=':is(.surface,.bo-workspace-section,.detail-card,.settings-readonly,.security-card,.monitoring-panel,.operator-payment-insight,.bo-statistics,.time-section,.desktop-record-table,.mobile-record-list,.customer-tab-panel,.employee-tab-panel,.project-tab-panel,.navigation-group,.bo-settings-group-body,.settings-form,.invoice-form,.bo-cash-trend,.document-detail-view,.form-page,.announcement-card,.context-block,.detail-list,.action-list,.plan-hero)';
 
 export async function assertContentGroups(page){
  const groups=await page.evaluate(selector=>[...document.querySelectorAll(':is(.app-root,.operator-root) '+selector)].filter(el=>el.checkVisibility()).map(el=>{
