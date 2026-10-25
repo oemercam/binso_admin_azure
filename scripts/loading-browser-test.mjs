@@ -52,9 +52,12 @@ try{
     await page.goto(base+'/dashboard');await Promise.all([profileRequested,dashboardRequested]);
     assert.equal(await page.locator('.app-root').isVisible(),false,'Identity alone cannot reveal placeholder identity or an empty dashboard');
     assert.equal(await page.locator('.app-launch-screen').isVisible(),true,'Existing launch surface covers first-page readiness');
-    releaseProfile();
-    await page.waitForFunction(()=>document.querySelector('.bo-page-heading h1')?.textContent.includes('Fixture'));
-    assert.equal(await page.locator('.app-root').isVisible(),false,'A ready greeting cannot expose an unfinished ledger');
+    const profileReceived=page.waitForResponse(response=>new URL(response.url()).pathname==='/api/settings/profile');
+    releaseProfile();await (await profileReceived).finished();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    assert.equal(await page.locator('.app-root').isVisible(),false,'A completed profile cannot expose an unfinished ledger');
+    assert.equal(await page.locator('.app-launch-screen').isVisible(),true,'The existing launch surface still covers the held ledger');
+    assert.equal(await page.locator('.bo-page-heading h1').filter({hasText:'Fixture'}).count(),0,'The personal heading is withheld until both profile and ledger are ready');
     releaseDashboard();await page.locator('.bo-cash-overview').waitFor({state:'visible'});
     await page.waitForFunction(()=>!document.querySelector('.app-launch-screen'));
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));

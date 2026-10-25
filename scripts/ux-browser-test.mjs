@@ -1211,7 +1211,8 @@ try{
    await navigate(base+route);await page.waitForLoadState('networkidle');const field=page.locator('input').first();await field.fill(route.startsWith('/einladung')?'Einladung Entwurf':'SyntheticPassword!123');await page.waitForFunction(()=>typeof history.state?.binsoDraftBoundary==='string',{},{timeout:3000});await page.goBack();const discard=page.getByRole('alertdialog');await discard.waitFor();await discard.getByRole('button',{name:'Weiter bearbeiten',exact:true}).click();assert.ok((await appControlValue(field)).length>0,'Auth creation drafts survive canceled browser back');await field.fill('');await page.waitForFunction(()=>!history.state?.binsoDraftBoundary,{},{timeout:3000});assert.equal(await page.getByRole('alertdialog').count(),0,'Reverting a draft removes the warning');
   }
   for(const scenario of [
-   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Kundenname *',back:'/kunden'},
+   {group:'customers',route:'/kunden/customer-one/bearbeiten',field:'Kundenname *',back:'/kunden/customer-one'},
+   {group:'customers',route:'/kunden/customer-one/bearbeiten?returnTo='+encodeURIComponent('/kunden/customer-one?tab=activity'),field:'Kundenname *',back:'/kunden/customer-one?tab=activity'},
    {group:'products',route:'/produkte/product-one',menu:'Produktaktionen',field:'Name',back:'/produkte'},
    {group:'employees',route:'/mitarbeiter/employee-one',menu:'Mitarbeiteraktionen',field:'Vorname',back:'/mitarbeiter'},
   ]){
