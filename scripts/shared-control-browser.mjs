@@ -166,10 +166,12 @@ async function verifyAnimationStabilityRegression(page){
 
 export async function assertMobileHeaderTargets(page){
  await waitForFiniteAnimations(page);
- const targets=page.locator('.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back').filter({visible:true});
- // Hydration may replace the header between awaited nth-locator operations.
- // Snapshot the same visible targets and all their dimensions in one DOM task.
- const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
+ const selector='.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back';
+ const targets=page.locator(selector).filter({visible:true});
+ // Playwright resolves evaluateAll's array before its separate evaluation task.
+ // Query, visibility and dimensions must share one task: hydration can replace
+ // an otherwise valid header and leave a previously resolved element detached.
+ const measured=await page.evaluate(selector=>[...document.querySelectorAll(selector)].filter(el=>el.checkVisibility()).map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}),selector);
  for(const box of measured){
   assert.ok(box.width>=44&&box.height>=44,'Mobile header actions retain at least 44px touch targets: '+JSON.stringify(box));
  }
@@ -226,6 +228,29 @@ export async function verifyHeaderTargetRegression(page){
  try{await assert.rejects(()=>assertMobileHeaderTargets(page),/44px touch targets/);}
  finally{await target.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),style);}
  await assertMobileHeaderTargets(page);
+}
+
+/** Isolated adversary: replace the header between locator resolution and use. */
+export async function verifyHeaderMeasurementHydrationRegression(page){
+ await page.setContent('<header class="mobile-header"><a class="mobile-back" aria-label="Aufträge" href="#">Zurück</a></header><style>.mobile-back{display:inline-flex;min-width:44px;width:44px;height:44px}</style>');
+ const wrap=target=>new Proxy(target,{get(object,key){
+  if(key==='filter')return options=>wrap(object.filter(options));
+  if(key==='evaluateAll')return async measure=>{
+   const elements=await object.elementHandles();
+   try{
+    await page.evaluate(()=>{const header=document.querySelector('.mobile-header');header.replaceWith(header.cloneNode(true));});
+    return await page.evaluate(measure,elements);
+   }finally{await Promise.all(elements.map(element=>element.dispose()));}
+  };
+  const value=Reflect.get(object,key);return typeof value==='function'?value.bind(object):value;
+ }});
+ const racingPage=new Proxy(page,{get(object,key){
+  if(key==='locator')return (...args)=>wrap(object.locator(...args));
+  const value=Reflect.get(object,key);return typeof value==='function'?value.bind(object):value;
+ }});
+ assert.deepEqual(await racingPage.locator('.mobile-back').filter({visible:true}).evaluateAll(elements=>elements.map(el=>({connected:el.isConnected,width:el.getBoundingClientRect().width}))),[{connected:false,width:0}],'Hydration invalidates an element resolved before the measurement task');
+ await assertMobileHeaderTargets(racingPage);
+ await verifyHeaderTargetRegression(page);
 }
 
 /** Development Lab has a persistent HMR connection; await actual hydration and fonts. */

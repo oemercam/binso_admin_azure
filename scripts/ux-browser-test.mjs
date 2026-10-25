@@ -34,7 +34,7 @@ import {assertCustomerHub,verifyCustomerStates} from './customer-ux-browser.mjs'
 import {assertNavigationToggle,verifyNavigationPersistence,assertFlatMobileNavigation,verifyFlatNavigationAdversaries} from './navigation-ux-browser.mjs';
 import {verifyPreviewControls} from './document-controls-browser.mjs';
 import {verifyTimeWorkspace} from './time-workspace-browser.mjs';
-import {openSettingsEditor,assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,waitForFiniteAnimations,assertPresentationControls,verifyPresentationControlRegression,assertCanonicalClosedFields} from './shared-control-browser.mjs';
+import {openSettingsEditor,assertMobileHeaderTargets,assertChatTargets,assertOpaqueChrome,verifyHeaderTargetRegression,verifyHeaderMeasurementHydrationRegression,waitForFiniteAnimations,assertPresentationControls,verifyPresentationControlRegression,assertCanonicalClosedFields} from './shared-control-browser.mjs';
 
 // Synthetic UI fixtures: real business/RLS integration is covered by migration-test.mjs.
 // No request reaches a production system; unhandled fixture APIs fail closed.
@@ -382,7 +382,7 @@ try{
    return route.fulfill({status:data?200:503,json:data??{message:'UI fixture unavailable'}});
   });
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{if(process.env.BINSO_UX_DEBUG)console.log('PAGE ERROR',error.stack);errors.push(next.url()+': '+error.message)});if(process.env.BINSO_UX_DEBUG)next.on('requestfailed',req=>console.log('FAILED REQUEST',req.url(),req.failure()));return next};
-  const listFrameProbe=await context.newPage();try{await verifyListFrameMeasurement(listFrameProbe);}finally{await listFrameProbe.close();}
+  const listFrameProbe=await context.newPage();try{await verifyListFrameMeasurement(listFrameProbe);await verifyHeaderMeasurementHydrationRegression(listFrameProbe);}finally{await listFrameProbe.close();}
   let page=await trackedPage();
   // Hard fixture resets use a new document; real Link navigation stays on the same page.
   // WebKit cannot carry Next's old-document RSC prefetch scheduler across page.goto resets.
