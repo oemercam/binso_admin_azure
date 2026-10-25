@@ -50,8 +50,10 @@ try{
   const popup=page.locator('.app-select-popup');await popup.getByText(text('Die Anfrage konnte nicht verarbeitet werden.'),{exact:true}).waitFor();
   directoryPhase='hold';await popup.getByRole('button',{name:text('Erneut versuchen'),exact:true}).click();await directoryReceived;
   const loading=popup.getByRole('status');await loading.waitFor({state:'attached'});assert.equal((await loading.innerText()).trim(),text('Daten werden geladen …'));
-  for(const label of ['Zurück','Weiter'])assert.equal(await popup.getByRole('button',{name:text(label),exact:true}).isDisabled(),true,'Pending directory controls remain locked and translated');
-  directoryPhase='success';releaseDirectory();await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).click();
+  for(const label of ['Zurück','Weiter'])assert.equal(await popup.getByRole('button',{name:text(label),exact:true}).count(),0,'An initially empty first directory page has no meaningless paging controls while pending');
+  directoryPhase='success';releaseDirectory();await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).waitFor();
+  for(const label of ['Zurück','Weiter'])assert.equal(await popup.getByRole('button',{name:text(label),exact:true}).count(),0,'A complete two-customer directory needs no pagination');
+  await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).click();
   await dialog.getByRole('combobox',{name:text('Zielkunde'),exact:true}).click();await page.getByRole('option',{name:'Synthetic retained',exact:true}).click();
   await dialog.getByRole('button',{name:text('Vorschau prüfen'),exact:true}).click();await dialog.getByText(text('Keine geschützten Verknüpfungen gefunden'),{exact:true}).waitFor();assert.equal(writes,0);
   assert.equal(await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).isDisabled(),true);

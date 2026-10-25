@@ -92,6 +92,9 @@ const {SelectSearchPagination}=compile('components/select-control.tsx',{react});
 assert.equal(SelectSearchPagination({search:{page:0,hasNext:false},onPage:()=>{}}),null,'A single/empty page has no paging controls');
 assert.ok(SelectSearchPagination({search:{page:0,hasNext:true},onPage:()=>{}}));
 assert.ok(SelectSearchPagination({search:{page:1,hasNext:false},onPage:()=>{}}),'The last page still permits returning');
+const pendingPages=SelectSearchPagination({search:{page:1,hasNext:true,loading:true},onPage:()=>{throw Error('Unexpected page mutation')}});
+assert.equal(pendingPages.props.children.length,2);
+assert.ok(pendingPages.props.children.every(button=>button.props.disabled===true),'Actual previous/next controls remain locked while a populated directory loads');
 
 const display=compile('lib/display-format.ts');
 for(const [minutes,expected] of [[0,'0:00 h'],[0.01,'< 1 Min.'],[0.99,'< 1 Min.'],[1,'0:01 h'],[60,'1:00 h'],[1500,'25:00 h'],[-1,'—'],[NaN,'—']])assert.equal(display.formatTimeDuration(minutes),expected);
@@ -202,7 +205,18 @@ console.log('Guided setup: canonical area readiness, partial/complete saves, saf
  const node=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='AppShell');
  const exported={};let registered;
  const code=ts.transpileModule(node.getText(ast),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
- Function('require','exports','useContext','usePathname','useLayoutEffect','ShellRegistration',code)(require,exported,()=>configuration=>{registered=configuration},()=>'/einstellungen/firma',effect=>effect(),{});
+ const actualReact=require('react'),recordsControls=()=>null;
+ Function('require','exports','useContext','usePathname','useLayoutEffect','ShellRegistration','Children','isValidElement','RecordsControls',code)(require,exported,()=>configuration=>{registered=configuration},()=>'/einstellungen/firma',effect=>effect(),{},actualReact.Children,actualReact.isValidElement,recordsControls);
  exported.AppShell({title:'Firma',active:'einstellungen',orientationText:null,children:'Body'});
  assert.equal(registered.orientationText,null,'The mounted shared shell respects the guided step description');
+ const controls=actualReact.createElement(recordsControls,{controller:'Actual controller'},actualReact.createElement('a',{href:'/kunden/neu'},'Neuer Kunde'));
+ const body=actualReact.createElement('section',null,'Customer rows');
+ const rendered=exported.AppShell({title:'Kunden',active:'kunden',children:[controls,body]});
+ assert.equal(registered.actions,controls,'Inline list controls reach the persistent command bar with their creation action');
+ assert.equal(walk(rendered).filter(node=>node.type===recordsControls).length,0,'Transferred controls do not render twice in page content');
+ assert.equal(walk(rendered).filter(node=>node.type==='section').length,1,'The actual list body remains in the route');
+ const explicit=actualReact.createElement('button',null,'Explicit action');
+ const explicitBody=exported.AppShell({title:'Details',active:'kunden',actions:explicit,children:[controls,body]});
+ assert.equal(registered.actions,explicit,'Explicit detail actions retain ownership');
+ assert.equal(walk(explicitBody).filter(node=>node.type===recordsControls).length,1,'Nested controls stay in detail content when the header already has actions');
 }

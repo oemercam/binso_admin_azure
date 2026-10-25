@@ -397,10 +397,13 @@ const ShellRegistration=createContext<((configuration:ShellConfiguration)=>void)
 export function AppShell(props:ShellProps){
  const register=useContext(ShellRegistration),pathname=usePathname();
  const {title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading}=props;
+ let inlineControls:React.ReactNode;
+ if(!actions)Children.forEach(props.children,child=>{if(!inlineControls&&isValidElement(child)&&child.type===RecordsControls)inlineControls=child;});
+ const shellActions=actions??inlineControls;
  useLayoutEffect(()=>{
-  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading});
- },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading]);
- return register?props.children:<AppShellFrame {...props}/>;
+  register?.({pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,actions:shellActions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading});
+ },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,shellActions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading]);
+ return register?(inlineControls?Children.map(props.children,child=>child===inlineControls?null:child):props.children):<AppShellFrame {...props}/>;
 }
 const appSections:Record<string,string>={hilfe:"Hilfe & Informationen",vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
