@@ -7,7 +7,7 @@ export const contentGroupSelector=':is(.surface,.bo-workspace-section,.detail-ca
 export async function assertContentGroups(page){
  const groups=await page.evaluate(selector=>[...document.querySelectorAll(':is(.app-root,.operator-root) '+selector)].filter(el=>el.checkVisibility()).map(el=>{
   const css=getComputedStyle(el),nested=!!el.parentElement?.closest(selector);
-  return {name:el.className,nested,borders:[css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth],radius:css.borderRadius,padding:[css.paddingTop,css.paddingRight,css.paddingBottom,css.paddingLeft],navigation:el.matches('.navigation-group,.bo-settings-group-body'),shadow:css.boxShadow};
+  return {name:el.className,nested,borders:[css.borderTopWidth,css.borderRightWidth,css.borderBottomWidth,css.borderLeftWidth],radius:css.borderRadius,padding:[css.paddingTop,css.paddingRight,css.paddingBottom,css.paddingLeft],navigation:el.matches('.navigation-group,.bo-settings-group-body,.action-list'),shadow:css.boxShadow};
  }),contentGroupSelector);
  for(const group of groups){
   assert.ok(group.borders.every(value=>value===(group.nested?'0px':'1px')),'One card perimeter, no nested or doubled borders: '+JSON.stringify(group));
