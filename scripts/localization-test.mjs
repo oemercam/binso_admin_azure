@@ -125,14 +125,26 @@ const uiAst=ts.createSourceFile('ui.tsx',fs.readFileSync('components/ui.tsx','ut
 const toggleSource=uiAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='Toggle').getText(uiAst);
 Function('require','exports','LocalizedElement',ts.transpileModule(toggleSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,toggleExports,client.LocalizedElement);
 const settingsAst=ts.createSourceFile('settings.tsx',fs.readFileSync('components/pages/settings.tsx','utf8'),99,true,4),notificationExports={};
-const notificationSource=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage').getText(settingsAst);
+const notificationNode=settingsAst.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='NotificationSettingsPage');
+const notificationSource=notificationNode.getText(settingsAst);
+const notificationStateDeclarations=notificationNode.body.statements.filter(ts.isVariableStatement).flatMap(statement=>[...statement.declarationList.declarations]).filter(declaration=>ts.isCallExpression(declaration.initializer)&&declaration.initializer.expression.getText(settingsAst)==='useState');
+const readyStateIndex=notificationStateDeclarations.findIndex(declaration=>ts.isArrayBindingPattern(declaration.name)&&declaration.name.elements[0].name.getText(settingsAst)==='ready');
+assert.ok(readyStateIndex>=0,'The actual notification owner declares its loading boundary');
+assert.equal(notificationStateDeclarations[readyStateIndex].initializer.arguments[0].kind,ts.SyntaxKind.FalseKeyword,'Notifications start unconfirmed');
+let notificationStateIndex=0,confirmedNotificationRender=false;
+const useNotificationState=initial=>React.useState(notificationStateIndex++===readyStateIndex?confirmedNotificationRender:initial);
 const wrapper=({children})=>React.createElement('div',null,children);
 const rowSource=ts.createSourceFile('binso-ux.tsx',fs.readFileSync('components/binso-ux.tsx','utf8'),99,true,4).statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='ListRow').getText();
 const rowExports={};Function('require','exports','LocalizedText','Status','Icon','Link',ts.transpileModule(rowSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,rowExports,client.LocalizedText,()=>null,()=>null,wrapper);
 const pushDevice=compile('components/push-device-settings.tsx',{'react':React,'@/lib/client/locale':client,'@/lib/client/backend':{},'./ui':{Button:wrapper,ErrorState:wrapper,LoadingState:wrapper}});
 const preferenceCount=compile('config/notification-channels.ts').notificationPreferenceKinds.length;
-Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','PushDeviceSettings',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,React.useState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,pushDevice.PushDeviceSettings);
+Function('require','exports','Fragment','ListRow','useId','useRef','useState','useEffect','AppShell','ErrorState','LoadingState','SettingsGroup','LocalizedText','Toggle','PushDeviceSettings',ts.transpileModule(notificationSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,notificationExports,React.Fragment,rowExports.ListRow,React.useId,React.useRef,useNotificationState,React.useEffect,wrapper,wrapper,wrapper,wrapper,client.LocalizedText,toggleExports.Toggle,pushDevice.PushDeviceSettings);
 for(const language of config.locales){
+ notificationStateIndex=0;confirmedNotificationRender=false;
+ const pending=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
+ assert.doesNotMatch(pending,/role="switch"/,'Unconfirmed defaults never appear as saved notification settings');
+ assert.ok(pending.includes(locale.translateMessage('Einstellungen werden geladen …',language)),'The pending state retains its localized announcement');
+ notificationStateIndex=0;confirmedNotificationRender=true;
  const markup=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(notificationExports.NotificationSettingsPage)));
  const labels=new Map([...markup.matchAll(/<(?:b|span) id="([^"]+)">([^<]+)<\/(?:b|span)>/g)].map(match=>[match[1],match[2]]));
  const switches=[...markup.matchAll(/<button[^>]*role="switch"[^>]*>/g)];assert.equal(switches.length,preferenceCount);
