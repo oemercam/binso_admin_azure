@@ -12,7 +12,7 @@ import {writeTestOutput} from './test-output.mjs';
 const outputIndex=process.argv.indexOf('--output');
 const output=outputIndex<0?undefined:process.argv[outputIndex+1];
 assert.ok(output,'Use --output <report.json>');
-await fs.access('.next/BUILD_ID');
+const buildId=(await fs.readFile('.next/BUILD_ID','utf8')).trim();
 const probe=net.createServer();await new Promise(resolve=>probe.listen(0,'127.0.0.1',resolve));
 const port=probe.address().port;await new Promise(resolve=>probe.close(resolve));
 const base='http://127.0.0.1:'+port;
@@ -45,10 +45,12 @@ try{
   if(path.startsWith('/login?lang=')){
    const locale=new URL(path,base).searchParams.get('lang'),translations=JSON.parse(await fs.readFile('lib/locales/messages.json','utf8'));
    const expected=translations['Willkommen zurück'][{en:0,fr:1,it:2,tr:3}[locale]]+'.';
-   const heading=html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1].replace(/<[^>]*>/g,'').replaceAll('&#x27;',"'").replaceAll('&amp;','&');
-   assert.equal(heading,expected,'The first HTML heading is already in the selected language');
+   // Compare the generated text markup exactly; this is not an HTML sanitizer.
+   const heading=html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1].replaceAll('<!-- -->','');
+   const escaped=expected.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('\"','&quot;').replaceAll("'",'&#x27;');
+   assert.equal(heading,escaped,'The first HTML heading is already in the selected language');
   }
-  for(const tag of html.matchAll(/<(?:script|link)\b[^>]*>/g)){
+  for(const tag of html.matchAll(/<(?:script|link)\b[^>]*>/gi)){
    // Modern Safari/Chrome ignore legacy-only scripts; do not count them as
    // part of a module-capable browser's initial transfer estimate.
    if(/\bnomodule(?:\s|=|>)/i.test(tag[0]))continue;
@@ -72,7 +74,7 @@ try{
   const response=await request(path);assert.equal(response.status,307,path);assert.equal(new URL(response.location,base).pathname,'/login');
   protectedRedirects.push({path,status:response.status,firstByteMs:round(response.firstByteMs),target:new URL(response.location,base).pathname});
  }
- const report={measuredAt:new Date().toISOString(),commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),buildId:(await fs.readFile('.next/BUILD_ID','utf8')).trim(),node:process.version,mode:'Local production build, loopback, one sequential client, gzip, 20 warm requests per public route; declared resources for a module-capable browser',limits:['No browser rendering, JavaScript execution, FCP, LCP, CLS or INP measurements.','No real mobile connection, production Azure latency, database or authenticated app API measurements.','Declared HTML assets only: nomodule scripts, dynamic imports, images, later browser requests and protocol header overhead are excluded.','First request means route-first in this running process, not an Azure cold start.'],routes,protectedRedirects,assets:[...assets.values()].sort((a,b)=>b.transferredBytes-a.transferredBytes)};
+ const report={measuredAt:new Date().toISOString(),commit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),buildId,node:process.version,mode:'Local production build, loopback, one sequential client, gzip, 20 warm requests per public route; declared resources for a module-capable browser',limits:['No browser rendering, JavaScript execution, FCP, LCP, CLS or INP measurements.','No real mobile connection, production Azure latency, database or authenticated app API measurements.','Declared HTML assets only: nomodule scripts, dynamic imports, images, later browser requests and protocol header overhead are excluded.','First request means route-first in this running process, not an Azure cold start.'],routes,protectedRedirects,assets:[...assets.values()].sort((a,b)=>b.transferredBytes-a.transferredBytes)};
  await fs.mkdir(path.dirname(output),{recursive:true});
  await writeTestOutput(output,JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify({report:output,routes:routes.map(({path,warmFirstByteMs,initialJsTransferBytes,htmlAndDeclaredResourcesTransferBytes})=>({path,warmFirstByteMs,initialJsTransferBytes,htmlAndDeclaredResourcesTransferBytes})),largestAssets:report.assets.slice(0,4)},null,2));
