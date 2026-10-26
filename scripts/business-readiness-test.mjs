@@ -64,7 +64,7 @@ try{
  const navigation=await compile('lib/navigation.ts'),actions=await compile('lib/action-readiness.ts',{'./navigation':navigation});
  const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation});
  const readiness=await import(await compile('lib/server/business-readiness.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
- const pdf=await compile('lib/server/document-pdf.ts',{'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
+ const pdf=await compile('lib/server/document-pdf.ts',{'@/lib/document-lines':moduleUrl(await fs.readFile('lib/document-lines.ts','utf8')),'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
  const logo=moduleUrl('export async function documentLogo(){return undefined}'); // Synthetic fixture has no company logo; rendering and issuance remain real.
  const versions=await compile('lib/server/offer-versions.ts',{'./http':http,'./repositories/business-api':business,'./document-pdf':pdf,'./document-logo':logo});
  const process=await import(await compile('lib/server/document-process.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./offer-versions':versions,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':plans}));
