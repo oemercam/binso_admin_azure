@@ -57,7 +57,7 @@ try{
     const features=page.locator('#funktionen');
     await features.getByRole('tab',{name:text('Finanzen',locale),exact:true}).click();
     await page.waitForFunction(()=>{const image=document.querySelector('#reference-feature-panel img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('invoices-desktop-')});
-    await features.getByRole('tab',{name:text('Kunden & Verkauf',locale),exact:true}).click();
+    await features.getByRole('tab',{name:text('Kunden',locale),exact:true}).click();
     await page.waitForFunction(()=>{const image=document.querySelector('#reference-feature-panel img');return image?.complete&&image.naturalWidth>0&&image.getAttribute('src').includes('customers-desktop-')});
     await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
    }
