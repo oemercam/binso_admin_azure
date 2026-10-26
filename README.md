@@ -1,7 +1,7 @@
 # Binso One
 
-Aktueller Einstieg: [Lieferstand, Konzeptablage und GitHub-Abhängigkeiten](docs/architecture/delivery-status.md).
-Dieser Bericht bewahrt datierte Nachweise; den aktuellen Head und CI im verlinkten PR prüfen.
+Aktueller Einstieg: [Release, Regelrangfolge und offene Abnahmen](docs/current-state.md).
+Historische Lieferberichte sind datierte Nachweise; aktuellen Main und Live-SHA getrennt prüfen.
 
 Lokaler Folgeauftrag vom 25. Oktober: [Gesamtaudit, Korrekturen und offene Nachweise](docs/architecture/full-app-audit-20261025.md).
 

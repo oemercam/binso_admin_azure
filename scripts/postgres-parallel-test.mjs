@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';
 import pg from 'pg';
+import {acquireMigrationLock} from './migration-lock.mjs';
 import {moduleUrl,financialModuleUrl,localeTestModuleUrl,documentAmountSqlModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
 // fallback, production credentials, schema reset or destructive cleanup is used.
@@ -13,6 +14,14 @@ const url=new URL(address);
 assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/binso_v213_test'&&url.username==='binso_test','Concurrency test refuses any other database');
 const pool=new pg.Pool({connectionString:address,max:16});
 try{
+ const unlock=await acquireMigrationLock(pool);
+ const contender=await pool.connect();
+ try{
+  assert.equal((await contender.query("select pg_try_advisory_lock(hashtextextended($1,0)) as acquired",['binso:canonical:migrations'])).rows[0].acquired,false,'Concurrent migration process cannot enter while another runner owns the session lock');
+  await unlock();
+  assert.equal((await contender.query("select pg_try_advisory_lock(hashtextextended($1,0)) as acquired",['binso:canonical:migrations'])).rows[0].acquired,true,'Completion releases the lock for the next migration process');
+  await contender.query("select pg_advisory_unlock(hashtextextended($1,0))",['binso:canonical:migrations']);
+ }finally{contender.release();}
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Requires an empty disposable test database; never resets an existing schema');
  await pool.query('create table schema_migrations(version text primary key,checksum text not null,applied_at timestamptz not null default now())');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort()){

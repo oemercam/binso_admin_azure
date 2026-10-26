@@ -33,7 +33,7 @@ for(const gate of ['pnpm lint','pnpm typecheck','pnpm build','pnpm security:scan
 const require=createRequire(import.meta.url);
 const yaml=createRequire(require.resolve('eslint'))('js-yaml');
 const config=yaml.load(workflow);
-assert.equal(config.jobs.browser.services.postgres.image,'postgres:16','Every UI lane authenticates real isolated operator sessions; no demo-cookie bypass');
+assert.equal(config.jobs.browser.services.postgres.image,'postgres:18','Every UI lane authenticates real isolated operator sessions; no demo-cookie bypass');
 const originalUiUrl=process.env.BINSO_UI_TEST_URL;
 try{
  for(const address of ['postgres://binso_test:test@production.invalid:5432/binso_ui_test','postgres://binso_test:test@127.0.0.1:5432/production','postgres://owner:test@127.0.0.1:5432/binso_ui_test','postgres://binso_test:test@127.0.0.1:5432/binso_ui_test?host=production.invalid','https://binso_test:test@127.0.0.1/binso_ui_test']){

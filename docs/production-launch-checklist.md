@@ -1,6 +1,6 @@
 # Binso One – Production Launch Checklist
 
-Stand: 5. Oktober 2026
+Orientierung aktualisiert am 26. Oktober 2026. Historische Häkchen sind Implementierungsangaben, keine aktuelle Releaseabnahme. Maßgeblich: [aktueller Index](current-state.md) und [Produktions-Abnahmeregister](operations/production-acceptance.json).
 
 ## Release Gate
 - [ ] main Quality grün für den finalen Go-live-Commit
@@ -51,7 +51,7 @@ Stand: 5. Oktober 2026
 - [x] kein produktiver Session-Zugriff vor Verifikation
 - [x] zweiter Login-Faktor
 - [x] TOTP + Recovery Codes
-- [x] Authenticator-Pflicht für Owner/Admin/Finance
+- [x] Tenant-MFA gemäß aktueller freiwilliger bzw. ausdrücklich aktivierter Unternehmenspolicy; eingeschaltete Faktoren bleiben verbindlich, kritische Änderungen verlangen Fresh Auth.
 - [x] serverseitige aktive Sitzungsübersicht und Fernabmeldung anderer Sitzungen implementiert
 - [ ] Sitzungswiderruf mit zwei echten Browsern/Geräten praktisch getestet
 - [ ] Microsoft-Graph-Selbsttest in GitHub Actions grün

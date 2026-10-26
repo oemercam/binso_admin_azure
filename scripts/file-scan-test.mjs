@@ -8,15 +8,19 @@ import {moduleUrl} from './data-test-modules.mjs';
 
 // A controlled clamd protocol peer, not an antivirus engine or a malware-detection claim.
 const http=moduleUrl(`export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}`);
-const memory=process.env.BINSO_FILE_SCAN_PROTOCOL_TEST_TRANSPORT==='memory';
+const memory=process.env.BINSO_FILE_SCAN_PROTOCOL_TEST_TRANSPORT==='memory'||process.platform==='win32';
+globalThis.__scanTestEnv={};
 let source=await fs.readFile('lib/server/file-scan.ts','utf8');
 let protocol=await fs.readFile('lib/server/clamav-protocol.mjs','utf8');
 if(memory)protocol=protocol.replace("'node:net'",JSON.stringify(moduleUrl('export const createConnection=(...args)=>globalThis.__scanConnectionFactory(...args)')));
 source=source.replace('"./clamav-protocol.mjs"',JSON.stringify(moduleUrl(protocol)));
-source=source.replace('import "server-only";','').replace('"@/config/limits"',JSON.stringify(moduleUrl('export const limitsConfig={maxFileUploadBytes:10*1024*1024}'))).replace('"./env"',JSON.stringify(moduleUrl('export const env={}'))).replace('"./http"',JSON.stringify(http));
+source=source.replace('import "server-only";','').replace('"@/config/limits"',JSON.stringify(moduleUrl('export const limitsConfig={maxFileUploadBytes:10*1024*1024}'))).replace('"./env"',JSON.stringify(moduleUrl('export const env=globalThis.__scanTestEnv'))).replace('"./http"',JSON.stringify(http));
 if(memory)source=source.replace('"node:net"',JSON.stringify(moduleUrl('export const createConnection=(...args)=>globalThis.__scanConnectionFactory(...args)')));
 const {scanFile}=await import(moduleUrl(source));
 assert.equal(await scanFile(Buffer.from('synthetic')), 'pending');
+globalThis.__scanTestEnv.fileAccessMode='clean-only';
+await assert.rejects(scanFile(Buffer.from('synthetic')),e=>e.status===503&&e.code==='file_scan_unavailable','Clean-only uploads must fail before persisting unusable files when no scanner exists');
+delete globalThis.__scanTestEnv.fileAccessMode;
 await assert.rejects(scanFile(Buffer.alloc(10*1024*1024+1)),e=>e.status===413);
 await assert.rejects(scanFile(Buffer.from('synthetic'),{socketPath:'relative.sock'}),e=>e.status===503);
 await assert.rejects(scanFile(Buffer.from('synthetic'),{socketPath:'C:\\synthetic\\scanner.sock'}),e=>e.status===503,'A Windows path must not be accepted as a production Unix socket');

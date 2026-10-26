@@ -1,0 +1,13 @@
+name: Scoped PostgreSQL runner access
+description: One runner IPv4 rule; explicit cleanup remains required even after failure
+inputs:
+  operation:
+    required: true
+    description: open or close
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        ACCESS_OPERATION: ${{ inputs.operation }}
+      run: bash scripts/postgres-runner-access.sh "$ACCESS_OPERATION"

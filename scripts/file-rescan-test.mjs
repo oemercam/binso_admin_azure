@@ -12,6 +12,9 @@ const privateDirectory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-private-man
 try{
  const filename=path.join(privateDirectory,'manifest.json');
  await fs.writeFile(filename,JSON.stringify({selected:'original'}),{mode:0o600});
+ if(process.platform==='win32'){
+  await assert.rejects(readPrivateManifest(filename),/POSIX ownership checks/,'Unsupported permission semantics must fail closed, never trust Windows mode bits');
+ }else{
  assert.deepEqual(await readPrivateManifest(filename),{selected:'original'});
  const symlink=path.join(privateDirectory,'link.json');await fs.symlink(filename,symlink);
  await assert.rejects(readPrivateManifest(symlink),'A final-component symlink must never be followed');
@@ -21,6 +24,7 @@ try{
  const originalOpen=fs.open;
  fs.open=async(...args)=>{const file=await originalOpen(...args);if(args[0]===filename){await fs.rename(filename,filename+'.old');await fs.writeFile(filename,JSON.stringify({selected:'replacement'}),{mode:0o600});}return file;};
  try{assert.deepEqual(await readPrivateManifest(filename),{selected:'original'},'Replacing the checked pathname cannot replace the opened manifest');}finally{fs.open=originalOpen;}
+ }
 }finally{await fs.rm(privateDirectory,{recursive:true,force:true});}
 const db=new PGlite();
 const organization='00000000-0000-4000-8000-000000000001',foreign='00000000-0000-4000-8000-000000000002';

@@ -4,6 +4,7 @@ import pg from 'pg';
 import {scanBytes} from '../lib/server/clamav-protocol.mjs';
 import {rescanPendingFile} from '../lib/server/file-rescan.mjs';
 import {readPrivateManifest} from './private-manifest.mjs';
+if(typeof process.getuid!=='function')throw Error('Controlled rescan requires Linux/POSIX file ownership; no Windows permission fallback is allowed.');
 
 // Operator-run only. Dry run creates a bounded, hash-bound manifest; apply never selects new files.
 const option=name=>{const at=process.argv.indexOf(name);return at<0?undefined:process.argv[at+1];};

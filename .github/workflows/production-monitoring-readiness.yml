@@ -35,4 +35,4 @@ jobs:
       - name: Verify production monitoring resources
         shell: bash
         run: |
-          bash scripts/production-monitoring-check.sh
+          node scripts/production-monitoring-check.mjs

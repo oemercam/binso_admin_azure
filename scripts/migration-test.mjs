@@ -4,6 +4,7 @@ import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import {displayModuleUrl,localeTestModuleUrl} from "./data-test-modules.mjs";
 import {randomUUID,createHmac,createHash as hashIssuedPdf} from "node:crypto";
 import {PGlite} from '@electric-sql/pglite';
+import {checkSchema} from './schema-contract.mjs';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
@@ -42,6 +43,7 @@ try{
   }catch(e){await db.exec('rollback');throw new Error(file+': '+e.message)}
  }
  await db.exec('reset role');
+ await checkSchema(db,JSON.parse(await fs.readFile('database/schema-contract.json','utf8')));
  await prepareHistoricalFixtureOwner(db);
  await db.query("select set_config('app.user_id','demo-readonly',false)");
  const demoProfiles=(await db.query("select c.id,c.city,c.address,c.email,(select count(*)::int from customer_contacts cc where cc.organization_id=c.organization_id and cc.customer_id=c.id and cc.is_primary and cc.archived_at is null) primary_contacts from customers c where c.organization_id=$1 and c.external_id in ('demo-customer-acme','demo-customer-alpin','demo-customer-nova')",[demo])).rows;

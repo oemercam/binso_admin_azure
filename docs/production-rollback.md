@@ -14,7 +14,7 @@ Ein fehlerhaftes Release wird auf den letzten nachweislich grünen Commit zurüc
 6. Nach Deploy zwingend prüfen:
    - /api/health
    - /api/health/ready
-   - Demo-Session und Persistence Smoke Test
+   - ausschließlich lesender Deployed-Auth-Test einschließlich Ablehnung ausgemusterter Demo-Zugänge; isolierter Persistence-Test ohne produktive Kundendaten
    - Kundenlogin
    - Microsoft Graph Mail
    - Stripe Checkout/Webhook nur soweit der Incident Billing betrifft

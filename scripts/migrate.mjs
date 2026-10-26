@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import pg from "pg";
+import {acquireMigrationLock} from './migration-lock.mjs';
 
 const url=process.env.DATABASE_URL;
 if(!url)throw new Error("DATABASE_URL is required");
@@ -12,7 +13,9 @@ const divergent=new Set([
  "005_production_readiness.sql","006_organization_settings.sql","007_support_attachments.sql","008_locale_turkish.sql","009_platform_foundation.sql"
 ]);
 
+let releaseMigrationLock;
 try{
+ releaseMigrationLock=await acquireMigrationLock(pool);
  await pool.query(`create table if not exists schema_migrations(
    version text primary key,
    checksum text not null,
@@ -56,4 +59,4 @@ try{
    }finally{client.release()}
  }
  console.log("Canonical migrations complete");
-}finally{await pool.end()}
+}finally{try{await releaseMigrationLock?.();}finally{await pool.end()}}
