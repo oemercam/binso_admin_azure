@@ -4,9 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
 import {PGlite} from '@electric-sql/pglite';
+import {verifyMonitoringContract} from './monitoring-contract-test.mjs';
 const temp=await fs.mkdtemp(path.join(os.tmpdir(),'binso-readiness-'));
 const db=new PGlite();
 try {
+ await verifyMonitoringContract();
  await db.exec('create role schema_owner; create role runtime_probe; create role dangerous bypassrls; create table isolation_probe(id integer); alter table isolation_probe owner to schema_owner;');
  const sql=await fs.readFile('scripts/sql/runtime-role-check.sql','utf8');
  await db.exec('set role runtime_probe');await db.exec(sql);await db.exec('reset role');

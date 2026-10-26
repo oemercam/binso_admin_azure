@@ -117,4 +117,11 @@ try{
   if(error?.code!=="ENOENT")throw error;
 }
 
-console.log("Documentation and public-flow consistency passed: runtime, authentication, billing, privacy and legal content are aligned.");
+assert.ok(readme.includes('(docs/current-state.md)'),"README must lead to the current release/rule index");
+const currentIndex=await read('docs/current-state.md');
+for(const target of ['operations/production-acceptance.json','operations/system-hardening-20261026.md','architecture/master-phase1/source.md']){
+ assert.ok(currentIndex.includes(target),'Current index must retain '+target);await fs.access('docs/'+target);
+}
+assert.ok(!launch.includes('Authenticator-Pflicht für Owner/Admin/Finance'),'Launch checklist must not restore the retired unconditional role-based MFA requirement');
+assert.ok(launch.includes('operations/production-acceptance.json'),'Historical launch ticks cannot be the only release evidence');
+console.log("Documentation and public-flow consistency passed: runtime, authentication, billing, privacy, current orientation and legal version bindings are aligned; substantive legal approval remains separate.");

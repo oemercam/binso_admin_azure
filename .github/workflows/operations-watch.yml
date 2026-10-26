@@ -1,0 +1,32 @@
+name: Operations Watch
+on:
+  schedule:
+    - cron: '41 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: operations-watch
+  cancel-in-progress: false
+jobs:
+  readiness-and-maintenance:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check public liveness and database readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL=https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
+          curl --fail --silent --show-error --retry 2 --max-time 20 "$URL/api/health" | jq -e '.status == "ok"' > /dev/null
+          curl --fail --silent --show-error --retry 2 --max-time 20 "$URL/api/health/ready" | jq -e '.status == "ready"' > /dev/null
+      - name: Detect overdue scheduled retention without bypassing production approval
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const {data}=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'retention-maintenance.yml',branch:'main',event:'schedule',per_page:100});
+            const latest=data.workflow_runs.find(run=>run.status==='completed'&&run.conclusion==='success');
+            if(!latest||Date.now()-Date.parse(latest.updated_at)>36*3600000)core.setFailed('Scheduled retention has no successful execution within 36 hours. Check production approvals and the maintenance workflow; no safety gate was bypassed.');
+            else core.summary.addRaw('Live readiness and scheduled retention freshness passed. This is not a restore, delivery or physical-device acceptance proof.').write();

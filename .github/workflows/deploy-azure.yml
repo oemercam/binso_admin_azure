@@ -17,6 +17,14 @@ on:
         required: true
         default: false
         type: boolean
+      activate_scanner:
+        description: 'Explicit approval for the qualified scanner using already approved capacity and registry'
+        type: boolean
+        default: false
+      production_evidence_run_id:
+        description: Reviewed exact-SHA evidence run used by production qualification
+        type: string
+        default: ''
 
 concurrency:
   group: production-deploy
@@ -29,6 +37,7 @@ permissions:
 env:
   BINSO_DEPLOY_SHA: ${{ inputs.commit_sha }}
   BINSO_RELEASE_PROFILE: ${{ inputs.release_profile || 'production' }}
+  BINSO_APPROVE_SCANNER: ${{ inputs.activate_scanner }}
   AZURE_WEBAPP_NAME: binso-admin-prod
   AZURE_RESOURCE_GROUP: rg-binso-admin-prod
   PRODUCTION_URL: https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net
@@ -85,6 +94,26 @@ jobs:
           run-id: ${{ steps.verified.outputs.run_id }}
 
       - uses: ./.github/actions/setup-node
+      - name: Verify production evidence origin
+        if: inputs.release_profile == 'production' && inputs.production_evidence_run_id != ''
+        uses: ./.github/actions/verify-production-evidence
+        with:
+          run_id: ${{ inputs.production_evidence_run_id }}
+          source_sha: ${{ env.BINSO_DEPLOY_SHA }}
+      - name: Download source-bound production approval evidence
+        if: inputs.release_profile == 'production' && inputs.production_evidence_run_id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binso-production-evidence-${{ env.BINSO_DEPLOY_SHA }}
+          run-id: ${{ inputs.production_evidence_run_id }}
+          github-token: ${{ github.token }}
+          path: .production-evidence
+      - name: Verify production acceptance before any productive operation
+        if: inputs.release_profile == 'production'
+        env:
+          BINSO_PRODUCTION_ACCEPTANCE_REGISTER: ${{ inputs.production_evidence_run_id != '' && '.production-evidence/register.json' || 'docs/operations/production-acceptance.json' }}
+          BINSO_PRODUCTION_EVIDENCE_ROOT: ${{ inputs.production_evidence_run_id != '' && '.production-evidence' || '.' }}
+        run: pnpm ops:readiness --production
 
       - name: Validate deploy artifact
         shell: bash
@@ -101,6 +130,18 @@ jobs:
           grep -q "$DEPLOY_SHA" /tmp/binso-artifact/public/deployment.json
           node --input-type=module -e 'import fs from "node:fs";import {createHash} from "node:crypto";import {validateScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const raw=fs.readFileSync("/tmp/binso-artifact/ux-compliance/release-scope.v1.json");const scope=validateScope(JSON.parse(raw));const meta=JSON.parse(fs.readFileSync("/tmp/binso-artifact/public/deployment.json"));const hash=createHash("sha256").update(raw).digest("hex");if(meta.sha!==process.env.BINSO_DEPLOY_SHA||meta.releaseProfile!==scope.id||meta.productionAcceptance!==false||meta.releaseScopeSha256!==hash||hash!==scopeDigest())throw Error("Release scope/artifact binding mismatch");'
 
+      - name: Azure login (OIDC)
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Allow only this runner to reach PostgreSQL
+        uses: ./.github/actions/postgres-runner-access
+        with:
+          operation: open
+
       - name: Validate and migrate Azure PostgreSQL
         shell: bash
         env:
@@ -113,17 +154,11 @@ jobs:
             echo "::error::DATABASE_URL for Azure Database for PostgreSQL is required."
             exit 1
           fi
+          node scripts/wait-postgres.mjs
           node scripts/single-company-preflight.mjs
           pnpm db:migrate
           pnpm db:check
           RETENTION_DRY_RUN=true pnpm retention:cleanup
-
-      - name: Azure login (OIDC)
-        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Verify actual HTTPS and EasyAuth configuration without changing it
         shell: bash
@@ -176,7 +211,7 @@ jobs:
 
           has_setting() {
             local result
-            if jq -e --arg name "$1" 'if type == "array" then any(.[]; .name == $name) else error("Invalid settings collection") end' <<<"$SETTINGS_JSON" > /dev/null; then
+            if node scripts/deployment-setting.mjs "$1" <<<"$SETTINGS_JSON" > /dev/null; then
               return 0
             else
               result=$?
@@ -276,7 +311,7 @@ jobs:
         run: |
           set -euo pipefail
           ENABLED="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
-          if [ "$ENABLED" = true ]; then echo '::error::Permanent scanner activation is outside the approved no-extra-cost development scope.'; exit 1; fi
+          if [ "$ENABLED" = true ] && [ "$BINSO_APPROVE_SCANNER" != true ]; then echo '::error::Scanner activation requires explicit approval for this release and existing approved capacity.'; exit 1; fi
           if [ "$ENABLED" != true ]; then
             echo 'enabled=false' >> "$GITHUB_OUTPUT"
             exit 0
@@ -338,9 +373,9 @@ jobs:
           echo "::add-mask::$RUNTIME_URL"
           DATABASE_URL="$RUNTIME_URL" DATABASE_SSL=true DATABASE_SSL_REJECT_UNAUTHORIZED=true BINSO_EXPECTED_DB_ROLE=binso_runtime node scripts/check-runtime-db.mjs
           SIDECAR="$(az webapp config appsettings list -g "$AZURE_RESOURCE_GROUP" -n "$AZURE_WEBAPP_NAME" --query "[?name=='BINSO_SCANNER_SIDECAR'].value | [0]" -o tsv)"
-          if [ "$SIDECAR" = true ]; then echo '::error::The approved development scope does not authorize a permanent scanner sidecar.'; exit 1; fi
+          if [ "$SIDECAR" = true ] && [ "$BINSO_APPROVE_SCANNER" != true ]; then echo '::error::Scanner activation requires current-release approval.'; exit 1; fi
           SETTINGS_FILE="$(mktemp)"
-          BINSO_RUNTIME_URL="$RUNTIME_URL" BINSO_SETTINGS_FILE="$SETTINGS_FILE" node --input-type=module -e 'import fs from "node:fs";import {readScope} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync(process.env.BINSO_SETTINGS_FILE,JSON.stringify({DATABASE_URL:process.env.BINSO_RUNTIME_URL,BINSO_RELEASE_PROFILE:scope.id,BINSO_FILE_ACCESS_MODE:"clean-only",BINSO_SCANNER_SIDECAR:"false",FILE_SCAN_SOCKET:""}),{mode:0o600});'
+          BINSO_RUNTIME_URL="$RUNTIME_URL" BINSO_SETTINGS_FILE="$SETTINGS_FILE" BINSO_QUALIFIED_SCANNER="${{ steps.scanner.outputs.enabled }}" node scripts/prepare-runtime-settings.mjs
           echo "BINSO_DEV_SETTINGS_FILE=$SETTINGS_FILE" >> "$GITHUB_ENV"
           unset RUNTIME_URL
 
@@ -464,3 +499,9 @@ jobs:
         shell: bash
         run: |
           if [ -n "${BINSO_DEV_SETTINGS_FILE:-}" ]; then rm -f "$BINSO_DEV_SETTINGS_FILE"; fi
+
+      - name: Remove temporary PostgreSQL runner access
+        if: always()
+        uses: ./.github/actions/postgres-runner-access
+        with:
+          operation: close

@@ -299,3 +299,13 @@ financial/security/tenant/consent boundary. Reuse existing legal clauses and
 version IDs; missing translation approval is not permission to invent legal
 text. The implementation-status records the partial 15-minute result and open
 Admin/route/legal approval gaps. No GitHub or production actions authorized.
+
+## Systemaudit corrections (26 October 2026)
+
+The user authorized implementing all system-audit corrections. docs/current-state.md
+is the current orientation and documents the Phase1/V7 precedence over historical
+latest-V5 claims. Earlier dated branch/status statements are historical context.
+Keep security, tenant and financial boundaries, existing mandatory gates, original
+source archives and exact-SHA production approval. Never treat prepared scanner,
+network, restore, legal, device or delivery work as executed acceptance.
+See docs/operations/system-hardening-20261026.md and the evidence register.

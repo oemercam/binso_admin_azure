@@ -1,0 +1,22 @@
+name: Verify production evidence origin
+description: Only a successful completed exact-SHA main run may supply approval data
+inputs:
+  run_id:
+    description: Reviewed run ID
+    required: true
+  source_sha:
+    description: Immutable source commit
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      env:
+        EVIDENCE_RUN_ID: ${{ inputs.run_id }}
+        EVIDENCE_SOURCE_SHA: ${{ inputs.source_sha }}
+      with:
+        script: |
+          if(!/^[1-9][0-9]{0,14}$/.test(process.env.EVIDENCE_RUN_ID))throw Error('A numeric reviewed evidence run ID is required');
+          const {data}=await github.rest.actions.getWorkflowRun({...context.repo,run_id:Number(process.env.EVIDENCE_RUN_ID)});
+          const {validateEvidenceRun}=await import(process.env.GITHUB_WORKSPACE+'/scripts/evidence-run.mjs');
+          validateEvidenceRun(data,process.env.EVIDENCE_SOURCE_SHA);

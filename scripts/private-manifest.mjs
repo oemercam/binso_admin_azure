@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 
 /** Check and read one no-follow descriptor, never reopen the checked pathname. */
 export async function readPrivateManifest(filename){
+ if(typeof process.getuid!=='function')throw Error('Private-manifest operations require POSIX ownership checks; run controlled rescan on Linux.');
  const file=await fs.open(filename,constants.O_RDONLY|constants.O_NOFOLLOW);
  try{
   const info=await file.stat();

@@ -8,13 +8,15 @@ const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 try{
  await fs.mkdir(path.join(root,'scripts'));await fs.mkdir(path.join(root,'lib/server'),{recursive:true});
  for(const file of ['scripts/start-scanner-production.mjs','scripts/scanner-bridge.mjs','lib/server/clamav-protocol.mjs'])await fs.copyFile(file,path.join(root,file));
- for(const test of [
+ const posixTests=[
   {name:'exit status',body:'setTimeout(()=>process.exit(7),30)',expected:7},
   {name:'unexpected worker signal',body:'setTimeout(()=>process.kill(process.pid,"SIGKILL"),30)',expected:137},
   {name:'graceful termination',body:'process.on("SIGTERM",()=>setTimeout(()=>process.exit(0),30));setInterval(()=>{},1000)',signal:'SIGTERM',expected:0},
   {name:'interrupt forwarding',body:'setInterval(()=>{},1000)',signal:'SIGINT',expected:130},
   {name:'bounded stuck worker',body:'process.on("SIGTERM",()=>{});setInterval(()=>{},1000)',signal:'SIGTERM',expected:137,timeout:true},
- ]){
+ ];
+ const windowsTests=[posixTests[0],{...posixTests[1],expected:1}];
+ for(const test of process.platform==='win32'?windowsTests:posixTests){
   await fs.writeFile(path.join(root,'server.js'),'console.log("WORKER:"+process.pid);'+test.body);
   const launcher=spawn(process.execPath,[path.join(root,'scripts/start-scanner-production.mjs')],{env:{...process.env,BINSO_SCANNER_SIDECAR:'false'},stdio:['ignore','pipe','pipe']});
   let logs='',workerPid,timeout;
@@ -34,5 +36,5 @@ try{
    assert.equal(workerPid,undefined,test.name+' cannot leave an orphan worker');
   }finally{clearTimeout(timeout);if(launcher.exitCode===null&&launcher.signalCode===null)launcher.kill('SIGKILL');if(workerPid)try{process.kill(workerPid,'SIGKILL')}catch{}}
  }
- console.log('Actual runtime launcher: normal exit, unexpected signal, graceful SIGTERM, SIGINT and bounded stubborn-worker shutdown without orphans passed.');
+ console.log(process.platform==='win32'?'Windows launcher: normal exit and forced worker termination without orphans passed. POSIX graceful shutdown remains mandatory in Linux CI.':'Actual runtime launcher: normal exit, unexpected signal, graceful SIGTERM, SIGINT and bounded stubborn-worker shutdown without orphans passed.');
 }finally{await fs.rm(root,{recursive:true,force:true})}

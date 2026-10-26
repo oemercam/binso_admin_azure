@@ -18,6 +18,10 @@ on:
         type: choice
         options: [production, development]
         default: production
+      production_evidence_run_id:
+        description: Successful main run containing reviewed exact-SHA production evidence
+        type: string
+        default: ''
   schedule:
     - cron: '23 1 * * *'
   release:
@@ -29,6 +33,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
+  actions: read
 env:
   BINSO_BUILD_SHA: ${{ github.sha }}
 jobs:
@@ -81,7 +86,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       postgres:
-        image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
+        image: postgres:18 # Docker Official Image; ECR mirror exceeded its data quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -98,6 +103,27 @@ jobs:
           fetch-depth: 0 # Immutable navigation comparisons need historical source objects.
       - uses: ./.github/actions/setup-node
       - run: pnpm release:check
+      - run: pnpm db:contract
+      - name: Verify reviewed production evidence origin
+        if: github.event_name == 'workflow_dispatch' && inputs.release_profile == 'production' && inputs.production_evidence_run_id != ''
+        uses: ./.github/actions/verify-production-evidence
+        with:
+          run_id: ${{ inputs.production_evidence_run_id }}
+          source_sha: ${{ github.sha }}
+      - name: Download reviewed evidence without changing source commits
+        if: github.event_name == 'workflow_dispatch' && inputs.release_profile == 'production' && inputs.production_evidence_run_id != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binso-production-evidence-${{ github.sha }}
+          run-id: ${{ inputs.production_evidence_run_id }}
+          github-token: ${{ github.token }}
+          path: .production-evidence
+      - name: Require real source-bound production acceptance
+        if: github.event_name == 'workflow_dispatch' && inputs.release_profile == 'production'
+        env:
+          BINSO_PRODUCTION_ACCEPTANCE_REGISTER: ${{ inputs.production_evidence_run_id != '' && '.production-evidence/register.json' || 'docs/operations/production-acceptance.json' }}
+          BINSO_PRODUCTION_EVIDENCE_ROOT: ${{ inputs.production_evidence_run_id != '' && '.production-evidence' || '.' }}
+        run: pnpm ops:readiness --production
       - run: pnpm test
       - name: Fast UX compliance contracts
         # Runtime/rate-limit/demo/navigation contracts already ran in pnpm test.
@@ -136,7 +162,7 @@ jobs:
     runs-on: ubuntu-24.04
     services:
       postgres:
-        image: postgres:16 # Docker Official Image; ECR mirror exceeded its data quota
+        image: postgres:18 # Docker Official Image; ECR mirror exceeded its data quota
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test
@@ -187,7 +213,7 @@ jobs:
     services:
       postgres:
         # Every UI lane uses real operator sessions in a disposable loopback database.
-        image: postgres:16
+        image: postgres:18
         env:
           POSTGRES_USER: binso_test
           POSTGRES_PASSWORD: binso_test

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "productionAcceptance": false,
+  "requirements": [
+    {"id":"scanner-live","description":"Qualified live scanner, clean/rejected/outage and controlled existing-file rescan","evidence":null},
+    {"id":"network-live","description":"Scoped app/CI access, removed Azure-wide rule, fresh-worker database readiness and rollback","evidence":null},
+    {"id":"full-production-qa","description":"Exact-release full production-profile Quality including PostgreSQL 18 and all existing gates","evidence":null},
+    {"id":"restore-live","description":"Isolated real restore, schema/data verification, measured RPO/RTO and cleanup","evidence":null},
+    {"id":"alarm-delivery","description":"Controlled actual alarm reception and escalation acknowledgement","evidence":null},
+    {"id":"retention-live","description":"Successful recent scheduled retention, restricted credentials and verified supervision","evidence":null},
+    {"id":"legal-approval","description":"Qualified review of current terms, privacy, DPA, translations and commercial/payroll scope","evidence":null},
+    {"id":"physical-devices","description":"Named physical iPhone/PWA/Android/tablet and accessibility acceptance","evidence":null},
+    {"id":"identity-ingress","description":"Real Entra role/MFA/offboarding and spoofed ingress rejection","evidence":null},
+    {"id":"mail-delivery","description":"Real Graph delivery, mailbox scope and SPF/DKIM/DMARC evidence","evidence":null},
+    {"id":"commercial-domain","description":"Historical finance/contracts, permitted Stripe lifecycle and validated payroll boundaries","evidence":null}
+  ]
+}

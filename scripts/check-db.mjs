@@ -1,4 +1,6 @@
 import pg from "pg";
+import fs from 'node:fs/promises';
+import {checkSchema,checkMigrationVersions} from './schema-contract.mjs';
 if(!process.env.DATABASE_URL)throw new Error("DATABASE_URL is required");
 const pool=new pg.Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL==="false"?undefined:{rejectUnauthorized:process.env.DATABASE_SSL_REJECT_UNAUTHORIZED!=="false"}});
 
@@ -58,7 +60,10 @@ const tenantTables=["invoice_refunds","credit_notes","organization_invitations",
 const forceTables=["notification_reads","invoice_refunds","credit_notes","document_deliveries","billing_checkout_sessions","customers","projects","quotes","quote_lines","orders","products_services","time_entries","expenses","invoices","invoice_lines","payments","suppliers","supplier_invoices","employees","tasks","absences","contracts","accounting_entries","bank_transactions","vat_periods","payroll_runs","business_documents","operating_costs","active_time_trackers"];
 try{
  const meta=await pool.query("select current_database() db,current_user db_user,current_schema() schema,now() now");
- const migrations=await pool.query(restricted?"select public.runtime_schema_versions() as version":"select version from schema_migrations order by version");
+ const migrations=await pool.query(restricted?"select public.runtime_schema_versions() as version":"select version,checksum from schema_migrations order by version");
+ await checkMigrationVersions(migrations.rows,{checksums:!restricted});
+ const contract=JSON.parse(await fs.readFile('database/schema-contract.json','utf8'));
+ await checkSchema(pool,contract);
  const versions=migrations.rows.map(r=>r.version);
  if(!versions.includes("0016_self_service_signup.sql"))throw new Error("Canonical database lineage incomplete: 0016_self_service_signup.sql is not applied.");
  if(!versions.includes("0017_v150_code_schema_alignment.sql"))throw new Error("Database migration 0017_v150_code_schema_alignment.sql is not applied.");
@@ -80,5 +85,5 @@ try{
  const policyMap=new Map(policies.rows.map(r=>[r.tablename,Number(r.count)]));
  const policyMissing=tenantTables.filter(t=>(policyMap.get(t)||0)<1);
  if(policyMissing.length)throw new Error(`Tenant RLS policy missing on: ${policyMissing.join(", ")}`);
- console.log({...meta.rows[0],lineage:"canonical-0001..0054",schema:"ok",checkedTables:Object.keys(required).length,rlsTables:tenantTables.length,migrations:versions.length});
+ console.log({...meta.rows[0],lineage:contract.migrations.at(-1),schema:"ok",checkedTables:contract.tables.length,rlsTables:contract.tables.filter(t=>t.rls).length,migrations:versions.length});
 }finally{await pool.end()}
