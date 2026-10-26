@@ -14,7 +14,7 @@ assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/bin
 const pool=new pg.Pool({connectionString:address,max:8});
 let server;
 try{
- const pgVersion=Number((await pool.query("select current_setting('server_version_num') version")).rows[0].version);assert.ok(pgVersion>=160000&&pgVersion<170000,'Gate requires PostgreSQL 16');
+ const pgVersion=Number((await pool.query("select current_setting('server_version_num') version")).rows[0].version);assert.ok(pgVersion>=180000&&pgVersion<190000,'Gate requires PostgreSQL 18');
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Never resets an existing database');
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort())await pool.query(await fs.readFile('database/migrations/'+name,'utf8'));
  await pool.query(await fs.readFile('database/operations/provision-runtime-role.sql','utf8'));
