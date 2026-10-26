@@ -8,7 +8,7 @@ import {DocumentModal} from './pdf-preview';
 import {Button,ErrorState,Field,FormActions,SectionTitle,Textarea} from './ui';
 import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {formatDateTime} from '@/lib/display-format';
-import {localeTags} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
 type Event={id:string;link_id:string;kind:string;body:string;actor:string;created_at:string;version:number;recipient:string;revoked_at:string|null};
 type History={versions:Array<{version:number;created_at:string}>;events:Event[];deliveries:Array<{id:string;recipient:string;status:string;created_at:string;version:number|null}>};
 import {offerActivityLabel,deliveryLabel} from "@/lib/offer-activity";

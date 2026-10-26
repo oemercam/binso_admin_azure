@@ -29,6 +29,6 @@ export async function verifyPhase1Navigation(){
  const originalIcons=execFileSync('git',['show',base+':components/ui.tsx'],{encoding:'utf8'});
  assert.equal(paths(icon),paths(originalIcons),'All existing non-V2 icon paths remain unchanged');
  assert.notEqual(paths(icon.replace('M3 11.5 12 4l9 7.5','M3 11.5 12 5l9 7.5')),paths(originalIcons),'Existing protected icon mutation is detected');
- assert.deepEqual(moreNavigation[0].items.map(item=>item.label),['Angebote','Rechnungen','Zahlungen','Ausgaben & Spesen','Finanzübersicht','Produkte','Lieferanten','Verträge'],'V7 destinations retain order; existing business modules have their approved primary location under More');
+ assert.deepEqual(moreNavigation[0].items.map(item=>item.label),['Angebote','Rechnungen','Zahlungen','Spesen','Finanzübersicht','Produkte','Lieferanten','Verträge'],'V7 destinations retain order; existing business modules have their approved primary location under More');
  console.log('Phase 1 navigation: exact V2 catalogue, owning routes, permission filtering and unchanged dock/FAB geometry/material with negative probes passed. Visual acceptance remains separate.');
 }

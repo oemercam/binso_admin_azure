@@ -12,7 +12,7 @@ const qrTextAllowed=/^[\u0020-\u007e\u00a0-\u017f\u0218-\u021b\u20ac]*$/u;
 /** Same canonical rules for setup/preflight, form feedback and final issuance. */
 export function invoicePaymentRequirements(company:Record<string,unknown>):InvoicePaymentRequirement[]{
  const issues:InvoicePaymentRequirement[]=[],account=normalizeIban(company.qr_iban||company.iban),bankField=company.qr_iban?'qrIban':'iban';
- if(!account)issues.push({field:bankField,message:"Bitte zuerst die IBAN deiner Firma unter Einstellungen → Rechnungen und Dokumente erfassen."});
+ if(!account)issues.push({field:bankField,message:"Bitte zuerst die IBAN deiner Firma unter Einstellungen → Dokumente erfassen."});
  else if(!validSwissIban(account))issues.push({field:bankField,message:"Bitte eine gültige Schweizer oder Liechtensteiner IBAN für die QR-Rechnung erfassen."});
  const name=company.legal_name||company.name,nameField=company.legal_name?'legalName':'name';
  for(const [value,field] of [[name,nameField],[company.street,'street'],[company.postal_code,'postalCode'],[company.city,'city']] as Array<[unknown,InvoicePaymentRequirement['field']]>)if(!String(value??'').trim())issues.push({field,message:"Bitte die vollständige Firmenadresse unter Einstellungen → Firma erfassen."});

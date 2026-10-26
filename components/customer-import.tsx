@@ -7,15 +7,14 @@ import {tenantCanCreateAt} from '@/lib/permissions';
 import {customerImportFields,contactImportFields,importLimits} from '@/lib/import-table';
 import {reportCsv} from '@/lib/report-export';
 import {LocalizedText} from '@/lib/client/locale';
-import {useLocale} from '@/lib/client/locale';
-import {translateMessage} from '@/lib/locales';
+import {useTranslation} from '@/lib/client/locale';
 import {FileUpload} from './file-upload';
 import {ActionsMenu,ActionRow,FormSheet,ListRow} from './binso-ux';
 import {Button,Field,Select,FormActions,ErrorState,Status} from './ui';
 type Table={headers:string[];rows:string[][];sheets:string[];sheet:string;rowNumbers:number[]};
 type Reviewed={row:number;input:Record<string,unknown>;issues:string[];duplicate:boolean};
 export function CustomerImportControl({customerId,onOpenArchive,onOpenMerge,header=false,tools=false,extraActions,showTrigger=true,openRequested=false,onRequestedClose}:{showTrigger?:boolean;openRequested?:boolean;onRequestedClose?:()=>void;tools?:boolean;extraActions?:ReactNode;header?:boolean;customerId?:string;onOpenArchive?:()=>void;onOpenMerge?:()=>void}){
- const {locale}=useLocale(),revision=useDataRevision([]),scope=useRef(revision);
+ const translate=useTranslation(),revision=useDataRevision([]),scope=useRef(revision);
  const [allowed,setAllowed]=useState(false),[open,setOpen]=useState(false),[file,setFile]=useState<File|null>(null),[table,setTable]=useState<Table|null>(null),[mapping,setMapping]=useState<Record<string,number>>({}),[review,setReview]=useState<Reviewed[]|null>(null),[count,setCount]=useState<number|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const pending=useRef(false),replay=useRef<{body:string;key:string}|null>(null),attempt=useRef(0);
  const fields=customerId?contactImportFields:customerImportFields;
@@ -43,7 +42,7 @@ export function CustomerImportControl({customerId,onOpenArchive,onOpenMerge,head
   catch(error){if(current===attempt.current)setError(error instanceof Error?error.message:'Import konnte nicht bestätigt werden.');}
   finally{pending.current=false;setBusy(false);}
  };
- const report=()=>{if(!review)return;const rows=[['Zeile','Status','Hinweis'],...review.map(row=>[String(row.row),translateMessage(row.issues.length?'Prüfen':'Bereit',locale),row.issues.map(issue=>translateMessage(issue,locale)).join(' ')])];const url=URL.createObjectURL(new Blob([reportCsv(rows)],{type:'text/csv;charset=utf-8'})),anchor=document.createElement('a');anchor.href=url;anchor.download='binso-importbericht.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ const report=()=>{if(!review)return;const rows=[['Zeile','Status','Hinweis'],...review.map(row=>[String(row.row),translate(row.issues.length?'Prüfen':'Bereit'),row.issues.map(issue=>translate(issue)).join(' ')])];const url=URL.createObjectURL(new Blob([reportCsv(rows)],{type:'text/csv;charset=utf-8'})),anchor=document.createElement('a');anchor.href=url;anchor.download='binso-importbericht.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  if(!allowed)return tools&&extraActions?<ActionsMenu tools label="Listenwerkzeuge">{extraActions}</ActionsMenu>:null;
  return <>{showTrigger&&<ActionsMenu header={header} tools={tools} label={tools?"Listenwerkzeuge":customerId?'Kontaktaktionen':'Kundenaktionen'}>{extraActions}<ActionRow title="Importieren" icon="upload" onClick={()=>{reset();setOpen(true)}}/>{onOpenMerge&&<ActionRow title="Dubletten zusammenführen" icon="users" onClick={onOpenMerge}/>}{onOpenArchive&&<ActionRow title="Archiv" icon="file" onClick={onOpenArchive}/>}</ActionsMenu>}<FormSheet label={customerId?'Kontakte importieren':'Kunden importieren'} open={open||openRequested} headerActions={review?<ActionsMenu header label="Importbericht"><ActionRow title="CSV exportieren" icon="file" onClick={report}/></ActionsMenu>:undefined} onClose={()=>{setOpen(false);onRequestedClose?.();reset()}} busy={busy} dirty={!!file&&count===null}>
  {count!==null?<Status tone="success"><LocalizedText>Import abgeschlossen</LocalizedText>: {count}</Status>:<>

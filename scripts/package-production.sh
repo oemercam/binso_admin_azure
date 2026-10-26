@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+: "${GITHUB_SHA:?Exact source SHA is required}"
 test -f .next/standalone/server.js
 rm -rf deploy
 mkdir -p deploy/app/.next
@@ -28,6 +29,7 @@ cp scripts/scanner-bridge.mjs scripts/start-scanner-production.mjs scripts/resca
 cp lib/server/clamav-protocol.mjs lib/server/file-rescan.mjs deploy/app/lib/server/
 if [ -d public ]; then cp -R public/. deploy/app/public/; fi
 node --input-type=module -e 'import fs from "node:fs";import {readScope,scopeDigest} from "./scripts/compliance/release-scope.mjs";const scope=readScope();fs.writeFileSync("deploy/app/public/deployment.json",JSON.stringify({sha:process.env.GITHUB_SHA,releaseProfile:scope.id,releaseScopeSha256:scopeDigest(),productionAcceptance:false})+"\n");'
+node scripts/verify-runtime-package.mjs deploy/app "$GITHUB_SHA"
 cd deploy/app
 zip -qr ../binso-one.zip .
 cd ../..

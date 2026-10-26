@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-26",
+  "sourceSha": "5b6c969225e6dbdd3dcf812ea82c01e1600635fb",
+  "environment": {
+    "node": "v24.22.1",
+    "pnpm": "10.17.1",
+    "next": "16.4.1",
+    "react": "19.3.0",
+    "typescript": "5.9.3"
+  },
+  "productionDependencyAudit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 385,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 385
+  },
+  "fullDependencyAudit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 579,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 579
+  },
+  "artifact": {
+    "schemaVersion": 1,
+    "artifact": "binso-one.zip",
+    "sourceSha": "5b6c969225e6dbdd3dcf812ea82c01e1600635fb",
+    "size": 213136413,
+    "sha256": "02471e28fc0a14a50b14e2786add785c31412108e81b379bbe533fed47041bd9"
+  },
+  "httpRuntimeDiagnostic": {
+    "sourceSha": "5b6c969225e6dbdd3dcf812ea82c01e1600635fb",
+    "measuredAt": "2026-10-26T09:36:41.553Z",
+    "nativePdfSpreadsheetAndSharp": true,
+    "assetIdentityVerified": true,
+    "runtimeShaMatched": true,
+    "unauthenticatedSessionDenied": true,
+    "checks": [
+      {
+        "route": "/",
+        "status": 200
+      },
+      {
+        "route": "/login",
+        "status": 200
+      },
+      {
+        "route": "/registrieren",
+        "status": 200
+      },
+      {
+        "route": "/fonts/inter/inter-latin-wght-normal.woff2",
+        "status": 200
+      },
+      {
+        "route": "/dashboard",
+        "status": 307
+      },
+      {
+        "route": "/kunden",
+        "status": 307
+      },
+      {
+        "route": "/lieferanten",
+        "status": 307
+      },
+      {
+        "route": "/api/integrations/status",
+        "status": 401
+      },
+      {
+        "route": "/api/health/ready",
+        "status": 503
+      }
+    ],
+    "termination": {
+      "code": 143,
+      "signal": null
+    },
+    "scannerBridgeTested": false,
+    "productionAcceptance": false,
+    "limits": [
+      "The mandatory Unix scanner socket test is blocked by EPERM in this environment. This separate HTTP/native diagnostic does not replace it.",
+      "No browser, real PostgreSQL, mail, payment or production mutation used."
+    ]
+  },
+  "checks": {
+    "productionBuild": "passed",
+    "fullLint": "passed",
+    "cssArchitecture": "passed",
+    "typecheck": "passed",
+    "releaseContracts": "passed",
+    "workflowSafety": "passed",
+    "artifactIntegrity": "passed",
+    "packagePatchContracts": "passed",
+    "deployedAssetsContracts": "passed",
+    "deployedAuthContracts": "passed",
+    "runtimeIntegrity": "passed",
+    "runtimeLauncher": "passed",
+    "productionPackageGuard": "passed",
+    "productionAndFullDependencyGates": "passed",
+    "fullTestSuite": "blocked: file-scan-test listen EPERM on Unix socket",
+    "mandatoryArtifactScannerSmoke": "blocked: scanner-bridge listen EPERM on Unix socket"
+  },
+  "productionAcceptance": false
+}

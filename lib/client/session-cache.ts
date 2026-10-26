@@ -13,10 +13,10 @@ function observeSession(){if(listening||typeof window==="undefined")return;liste
 /** Only retain permissions in memory; cookies and API authorization remain authoritative. */
 export function cachedClientSession(){return typeof window!=="undefined"&&Date.now()<validUntil?cached:null;}
 export function invalidateClientSession(notify=true){++revision;cached=null;validUntil=0;pending=null;if(notify)resetClientData();}
-export function readClientSession():Promise<ClientSession>{
+export function readClientSession(force=false):Promise<ClientSession>{
   observeSession();
   const saved=cachedClientSession();
-  if(saved)return Promise.resolve(saved);
+  if(saved&&!force)return Promise.resolve(saved);
   if(pending)return pending;
   const startedRevision=revision;
   const request=(async()=>{

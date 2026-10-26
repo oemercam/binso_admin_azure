@@ -111,8 +111,8 @@ try{
   // PWA-like close/reopen of the same browser context, not physical installation.
   await page.close();page=await context.newPage();await measure('reopen',()=>page.goto(base+'/kunden'));
   delay=1200;await measure('slow-refresh',()=>page.reload());delay=350;
-  authMode='expired';await page.reload();await page.getByText('Deine Sitzung ist beendet. Bitte melde dich erneut an.',{exact:true}).waitFor();assert.equal(await page.locator('.records-inline-controls').count(),0,'Expired session hides business content');
-  authMode='error';await page.reload();await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
+  authMode='expired';await page.reload();await page.waitForURL(url=>url.pathname==='/login'&&url.searchParams.get('next')==='/kunden');assert.equal(await page.locator('.records-inline-controls').count(),0,'Expired session redirects to login and hides business content');
+  authMode='error';await page.goto(base+'/kunden');await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();
   await context.close();
  }
  await writeTestOutput(output+'/measurements.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',activeServiceWorker:!baseline,syntheticAuthDelayMs:350,results,physicalPwa:false},null,2));console.log(JSON.stringify(results,null,2));

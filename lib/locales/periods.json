@@ -389,7 +389,7 @@
   "fr": "État des factures",
   "it": "Situazione fatture",
   "en": "Invoice balance",
-  "tr": "Fatura durumu"
+  "tr": "Fatura bakiyesi"
  },
  "Bezahlt": {
   "de": "Bezahlt",
@@ -459,7 +459,7 @@
   "fr": "Avoir client",
   "it": "Credito cliente",
   "en": "Customer credit",
-  "tr": "Müşteri bakiyesi"
+  "tr": "Müşteri alacağı"
  },
  "Vergleich": {
   "de": "Vergleich",
@@ -487,7 +487,7 @@
   "fr": "Recherche",
   "it": "Ricerca",
   "en": "Search",
-  "tr": "Ara"
+  "tr": "Arama"
  },
  "Benachrichtigungen": {
   "de": "Benachrichtigungen",
@@ -530,5 +530,145 @@
   "it": "Non è disponibile una conferma di approvazione di questa traduzione legale.",
   "en": "No approval record is available for this legal translation.",
   "tr": "Bu hukuki çeviri için onay kaydı bulunmamaktadır."
+ },
+ "Der Auftraglimit deines aktuellen Plans ist erreicht.": {
+  "de": "Das Auftragslimit deines aktuellen Plans ist erreicht.",
+  "en": "You have reached the job limit of your current plan.",
+  "fr": "La limite de mandats de votre offre actuelle est atteinte.",
+  "it": "Hai raggiunto il limite di commesse del piano attuale.",
+  "tr": "Mevcut paketinizin iş sınırına ulaşıldı."
+ },
+ "Bitte die Auftragangaben prüfen.": {
+  "de": "Bitte die Auftragsangaben prüfen.",
+  "en": "Please check the job details.",
+  "fr": "Vérifie les informations du mandat.",
+  "it": "Controlla i dati della commessa.",
+  "tr": "İş bilgilerini kontrol edin."
+ },
+ "Bitte zuerst die laufenden oder pausierten Zeitmessungen diesen Auftrags abschliessen.": {
+  "de": "Bitte zuerst die laufenden oder pausierten Zeitmessungen dieses Auftrags abschliessen.",
+  "en": "Please finish this job’s running or paused timers first.",
+  "fr": "Termine d’abord les chronomètres en cours ou en pause de ce mandat.",
+  "it": "Termina prima i timer in corso o in pausa di questa commessa.",
+  "tr": "Önce bu işin çalışan veya duraklatılmış zaman ölçümlerini tamamlayın."
+ },
+ "Ungültiger Auftragfilter.": {
+  "de": "Ungültiger Auftragsfilter.",
+  "en": "Invalid job filter.",
+  "fr": "Filtre de mandat non valide.",
+  "it": "Filtro della commessa non valido.",
+  "tr": "Geçersiz iş filtresi."
+ },
+ "Auftragfortschritt, Budget, Aufgaben und Leistungen im Blick behalten.": {
+  "de": "Auftragsfortschritt, Budget, Aufgaben und Leistungen im Blick behalten.",
+  "en": "Keep track of job progress, budgets, tasks and services.",
+  "fr": "Suivez l’avancement, le budget, les tâches et prestations des mandats.",
+  "it": "Tieni sotto controllo l’avanzamento della commessa, il budget, le attività e le prestazioni.",
+  "tr": "İşin ilerlemesini, bütçeyi, görevleri ve hizmetleri takip edin."
+ },
+ "Arbeitszeiten, Auftragzeiten und interne Zeiten erfassen und zuordnen.": {
+  "de": "Arbeitszeiten, Auftragszeiten und interne Zeiten erfassen und zuordnen.",
+  "en": "Record and assign working time, job time and internal time.",
+  "fr": "Saisissez et affectez le temps de travail, de mandat et les heures internes.",
+  "it": "Registra e assegna le ore di lavoro, delle commesse e delle attività interne.",
+  "tr": "Çalışma, iş ve kurum içi süreleri kaydedip atayın."
+ },
+ "Password must be at least 12 characters.": {
+  "de": "Das Passwort muss mindestens 12 Zeichen haben.",
+  "en": "Password must be at least 12 characters.",
+  "fr": "Le mot de passe doit comporter au moins 12 caractères.",
+  "it": "La password deve contenere almeno 12 caratteri.",
+  "tr": "Parola en az 12 karakter olmalıdır."
+ },
+ "Home": {
+  "de": "Startseite",
+  "en": "Home",
+  "fr": "Accueil",
+  "it": "Home",
+  "tr": "Ana sayfa"
+ },
+ "Not found": {
+  "de": "Nicht gefunden",
+  "en": "Not found",
+  "fr": "Introuvable",
+  "it": "Non trovato",
+  "tr": "Bulunamadı"
+ },
+ "Notification": {
+  "de": "Benachrichtigung",
+  "en": "Notification",
+  "fr": "Notification",
+  "it": "Notifica",
+  "tr": "Bildirim"
+ },
+ "Organization": {
+  "de": "Organisation",
+  "en": "Organisation",
+  "fr": "Organisation",
+  "it": "Organizzazione",
+  "tr": "Kuruluş"
+ },
+ "Read only": {
+  "de": "Nur lesen",
+  "en": "Read-only",
+  "fr": "Lecture seule",
+  "it": "Sola lettura",
+  "tr": "Salt okunur"
+ },
+ "Sheets": {
+  "de": "Dialoge",
+  "en": "Sheets",
+  "fr": "Panneaux",
+  "it": "Pannelli",
+  "tr": "Paneller"
+ },
+ "Switzerland": {
+  "de": "Schweiz",
+  "en": "Switzerland",
+  "fr": "Suisse",
+  "it": "Svizzera",
+  "tr": "İsviçre"
+ },
+ "Technical": {
+  "de": "Technisch",
+  "en": "Technical",
+  "fr": "Technique",
+  "it": "Tecnico",
+  "tr": "Teknik"
+ },
+ "Overview": {
+  "de": "Übersicht",
+  "en": "Overview",
+  "fr": "Vue d’ensemble",
+  "it": "Panoramica",
+  "tr": "Genel bakış"
+ },
+ "Close": {
+  "de": "Schliessen",
+  "en": "Close",
+  "fr": "Fermer",
+  "it": "Chiudi",
+  "tr": "Kapat"
+ },
+ "Settings": {
+  "de": "Einstellungen",
+  "en": "Settings",
+  "fr": "Paramètres",
+  "it": "Impostazioni",
+  "tr": "Ayarlar"
+ },
+ "PostgreSQL read-only snapshot": {
+  "de": "Schreibgeschützter PostgreSQL-Snapshot",
+  "en": "PostgreSQL read-only snapshot",
+  "fr": "Instantané PostgreSQL en lecture seule",
+  "it": "Istantanea PostgreSQL in sola lettura",
+  "tr": "PostgreSQL salt okunur anlık görüntüsü"
+ },
+ "Combined": {
+  "de": "Kombiniert",
+  "en": "Combined",
+  "fr": "Combiné",
+  "it": "Combinato",
+  "tr": "Birleşik"
  }
 }

@@ -1,5 +1,6 @@
 import "server-only";
 import {asLocale,localeTags,translateMessage} from "@/lib/locales";
+import {documentUnits} from "@/lib/document-lines";
 import PDFDocument from "pdfkit";
 import {readFile} from "node:fs/promises";
 import {join} from "node:path";
@@ -66,10 +67,11 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   // A repeated table header changes PDFKit's shared drawing state.
   pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
   const y=pdf.y,startPage=pdf.page;pdf.text(description,left,y,{width:235,lineGap:2});const after=pdf.y;
-  const quantity=Number(item.quantity||0).toLocaleString(localeTags[locale],{maximumFractionDigits:3})+' '+String(item.unit||'');
+  const storedUnit=String(item.unit||''),standardUnit=({hour:'Std.',piece:'Stück',flat:'Pauschal'} as Record<string,string>)[storedUnit]??(documentUnits.some(unit=>unit===storedUnit)||storedUnit==='Stunde'?storedUnit:null);
+  const quantity=Number(item.quantity||0).toLocaleString(localeTags[locale],{maximumFractionDigits:3})+' '+(standardUnit?t(standardUnit):storedUnit);
   const amount=item.line_total,price=money(item.unit_price);
-  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text('/ 60 min',366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
-  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' / 60 min':''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
+  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text(t('/ 60 min'),366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
+  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' '+t('/ 60 min'):''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
  }
  ensure(98);const summary=(label:string,value:unknown,bold=false)=>{if(record(document.calculation).revision===1)ensure(bold?32:25);const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;
@@ -87,7 +89,8 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  // Validate before adding a page; an invalid setup never creates a phantom page.
  let bill:SwissQRBill|null=null,qrError='';
  let paymentData:ReturnType<typeof createQrBillData>|null=null;
- if(invoice&&!draft&&!cancelled&&balance>0){try{paymentData=createQrBillData(company,{number:String(document.number),reference:String(document.qr_reference??''),total:balance,currency:String(document.currency),debtor:customer});bill=new SwissQRBill(paymentData,{language:locale.toUpperCase() as 'DE'|'FR'|'IT'|'EN',scissors:true,fontName:'Liberation Sans'});}catch(error){qrError=t('QR-Zahlteil nicht verfügbar')+': '+t(error instanceof Error?error.message:'Zahlungsdaten prüfen.');}}
+ // Swiss QR provides DE/FR/IT/EN slips; the surrounding document keeps its saved locale.
+ if(invoice&&!draft&&!cancelled&&balance>0){try{paymentData=createQrBillData(company,{number:String(document.number),reference:String(document.qr_reference??''),total:balance,currency:String(document.currency),debtor:customer});bill=new SwissQRBill(paymentData,{language:(locale==='tr'?'en':locale).toUpperCase() as 'DE'|'FR'|'IT'|'EN',scissors:true,fontName:'Liberation Sans'});}catch(error){qrError=t('QR-Zahlteil nicht verfügbar')+': '+t(error instanceof Error?error.message:'Zahlungsdaten prüfen.');}}
  if(invoice){
   heading(t('ZAHLUNGSINFORMATIONEN'));
   paragraph([companyName,company.bank_name,qrPaymentAccount(company,String(document.currency))?'IBAN: '+qrPaymentAccount(company,String(document.currency)):'',paymentData?.reference?t('Zahlungsreferenz: ')+paymentData.reference:t('Rechnungsreferenz: ')+String(document.number)].filter(Boolean).join('\n'),9);

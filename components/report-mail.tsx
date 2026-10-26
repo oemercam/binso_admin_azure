@@ -2,8 +2,7 @@
 import {useRef,useState} from 'react';
 import {apiPost} from '@/lib/client/backend';
 import {useApiQuery} from '@/lib/client/use-api-query';
-import {LocalizedText,useLocale} from '@/lib/client/locale';
-import {translateMessage} from '@/lib/locales';
+import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {formatDateTime} from '@/lib/display-format';
 import {FormSheet,ListRow} from './binso-ux';
@@ -14,7 +13,7 @@ type Outcome={id:string;status:'sending'|'accepted'|'failed'|'uncertain';provide
 const deliveryLabels:Record<string,string>={sending:'Versand läuft',accepted:'Vom Anbieter angenommen',failed:'Nicht versendet',uncertain:'Versand ungeklärt'};
 const deliveryTone=(status:string)=>status==='failed'?'danger':status==='uncertain'?'warning':'info';
 export function ReportMailSheet({id,blob,onClose}:{id:string;blob:Blob;onClose:()=>void}){
- const {locale}=useLocale(),[recipient,setRecipient]=useState(''),[subject,setSubject]=useState(()=>translateMessage('Berichte',locale)),[message,setMessage]=useState(()=>translateMessage('Im Anhang findest du den angeforderten Bericht.',locale));
+ const {locale}=useLocale(),translate=useTranslation(),[recipient,setRecipient]=useState(''),[subject,setSubject]=useState(()=>translate('Berichte')),[message,setMessage]=useState(()=>translate('Im Anhang findest du den angeforderten Bericht.'));
  const key=useRef(crypto.randomUUID()),pending=useRef(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[outcome,setOutcome]=useState<Outcome|null>(null),[preview,setPreview]=useState(false),[dirty,setDirty]=useState(false);
  const history=useApiQuery<{items:Array<{id:string;recipient:string;subject:string;status:string;created_at:string}>}>('/api/reports/exports/'+id+'/send');
  const frozen=busy||!!outcome&&outcome.status!=='failed';

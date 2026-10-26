@@ -6,7 +6,7 @@ import {fileSelectionError} from '@/lib/file-selection';
 import {limitsConfig} from '@/config/limits';
 import {useProcessDraft} from "../use-process-draft";
 import {LocalizedText,useLocale} from "@/lib/client/locale";
-import {localeTags} from "@/lib/locales";
+import {localeTags} from "@/lib/locales/config";
 import {formatTimestampDate} from "@/lib/display-format";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";

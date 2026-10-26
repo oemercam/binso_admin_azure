@@ -17,7 +17,7 @@ const require=createRequire(import.meta.url);
 const messages=JSON.parse(fs.readFileSync('lib/locales/messages.json','utf8'));
 const templates=JSON.parse(fs.readFileSync('lib/locales/templates.json','utf8'));
 for(const [key,values] of Object.entries({...messages,...templates})){
- assert.ok(values.length===3||values.length===4,'EN/FR/IT required; optional fourth entry is actual Turkish: '+key);
+ assert.ok(values.length===4,'EN/FR/IT/TR are required: '+key);
  for(const value of values)assert.ok(typeof value==='string'&&value.trim(),key);
  const tokens=value=>[...value.matchAll(/\{\d+\}/g)].map(m=>m[0]).sort();
  if(templates[key])for(const value of values)assert.deepEqual(tokens(value),tokens(key),'Template values must survive translation');
@@ -29,11 +29,17 @@ function compile(file,deps={}){
 }
 const config=compile('lib/locales/config.ts');
 const locale=compile('lib/locales/index.ts',{'./config':config,'./periods.json':JSON.parse(fs.readFileSync('lib/locales/periods.json','utf8')),'./messages.json':messages,'./templates.json':templates,'./plurals.json':JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))});
+for(const [key,forms] of Object.entries(JSON.parse(fs.readFileSync('lib/locales/plurals.json','utf8'))))for(const language of config.locales){assert.ok(forms[language]?.one?.trim(),'Singular required: '+language+': '+key);assert.ok(forms[language]?.other?.trim(),'Plural required: '+language+': '+key);}
+assert.equal(locale.translateMessage('2 Kunden','tr'),'2 müşteri','Turkish counted nouns stay singular');
+assert.equal(locale.translateMessage('Seite 2 von 3','tr'),'Sayfa 2 / 3');
+assert.equal(locale.translateMessage('Schritt 2 von 3 · Kunden','tr'),'Adım 2 / 3 · Müşteriler','Dynamic step label translates without changing step numbers');
+assert.equal(locale.translateMessage('Umsatz 2026','tr'),'2026 cirosu');
+assert.equal(locale.translateMessage('Der Auftraglimit deines aktuellen Plans ist erreicht.','de'),'Das Auftragslimit deines aktuellen Plans ist erreicht.','German corrections preserve source lookup keys');
 for(const [language,expected] of [['de','Umsatz 2026'],['en','Revenue 2026'],['fr','Chiffre d’affaires 2026'],['it','Ricavi 2026']])assert.equal(locale.translateMessage('Umsatz 2026',language),expected,'Customer revenue headers translate the label while preserving the actual business year');
 assert.deepEqual(config.locales,['de','fr','it','en','tr']);
 assert.equal(locale.translateMessage('Individueller Zeitraum','tr'),'Özel dönem');
 assert.equal(config.asLocale('tr-TR'),'tr');
-for(const [key,expected]of [['Kunden','Müşteriler'],['Zurückgewiesen','Reddedildi'],['Verwerfen','Sil'],['Authenticator-Pflicht','Doğrulayıcı zorunluluğu']])assert.equal(locale.translateMessage(key,'tr'),expected,'Actual Turkish app translation, never accidental Italian fallback');
+for(const [key,expected]of [['Kunden','Müşteriler'],['Zurückgewiesen','Düzeltme için geri gönderildi'],['Verwerfen','Sil'],['Authenticator-Pflicht','Doğrulayıcı zorunluluğu']])assert.equal(locale.translateMessage(key,'tr'),expected,'Actual Turkish app translation, never accidental Italian fallback');
 assert.equal(locale.translateMessage('Acme AG','tr'),'Acme AG','Unrecognized user content stays verbatim');
 const financialDates=compile('lib/financial-status.ts',{'./money':compile('lib/money.ts')});
 for(const [language,expected] of Object.entries({de:'02.01.2026',fr:'02.01.2026',it:'02.01.2026',en:'02.01.2026'}))assert.equal(financialDates.formatDate('2026-01-02',config.localeTags[language]),expected,'Civil document dates use the chosen Swiss language without timezone day shifts');
@@ -73,7 +79,10 @@ assert.equal(locale.translateMessage('1 Kunden','de'),'1 Kunde');assert.equal(lo
 assert.equal(locale.translateMessage('Seite 2 von 4','fr'),'Page 2 sur 4');
 assert.equal(locale.translateMessage('Schritt 1 von 3 · Prüfen','it'),'Passaggio 1 di 3 · Verifica');
 assert.equal(locale.translateMessage('Die Datei darf höchstens 10 MB gross sein.','en'),'The file must not exceed 10 MB.');
-const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
+const translator=compile('lib/locales/translator.ts',{'./config':config});
+const catalogues=Object.fromEntries(config.locales.map(language=>[language,JSON.parse(fs.readFileSync('lib/locales/generated/'+language+'.json','utf8'))]));
+const actualClient=compile('lib/client/locale.tsx',{'@/lib/locales/config':config,'@/lib/locales/translator':translator,'@/lib/locales/client-catalogue':{rememberLocaleCatalogue(){},loadLocaleCatalogue:async language=>catalogues[language]},'@/lib/locales/generated/de.json':catalogues.de});
+const client={...actualClient,LocaleProvider:({initialLocale,...props})=>React.createElement(actualClient.LocaleProvider,{initialLocale,initialCatalogue:catalogues[initialLocale],...props})};
 // Execute the actual invoice readiness notice, including its real locale context.
 {
  const source=fs.readFileSync('components/documents.tsx','utf8'),ast=ts.createSourceFile('documents.tsx',source,99,true,4),notices=[];
@@ -83,7 +92,7 @@ const client=compile('lib/client/locale.tsx',{'@/lib/locales':locale});
  Function('require','exports','LocalizedText',code)(require,exports,client.LocalizedText);
  const qr=compile('lib/qr-bill.ts',{'swissqrbill/utils':await import('swissqrbill/utils')});
  const company={name:'Synthetic Issuer',street:'Teststrasse',postal_code:'3000',city:'Bern'},before=structuredClone(company),issue=qr.invoicePaymentIssue(company);
- assert.equal(issue,'Bitte zuerst die IBAN deiner Firma unter Einstellungen → Rechnungen und Dokumente erfassen.');
+ assert.equal(issue,'Bitte zuerst die IBAN deiner Firma unter Einstellungen → Dokumente erfassen.');
  for(const language of config.locales){
   const actual=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(exports.ActualReadinessNotice,{paymentIssue:issue})));
   const expected=renderToStaticMarkup(React.createElement('span',null,locale.translateMessage(issue,language)));
@@ -175,12 +184,12 @@ for(const language of config.locales){
  assert.ok(markup.includes(locale.translateMessage('Referenz',language)+': '+id),'Support reference remains exact and separately labeled '+language);
  const userMarkup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(client.LocalizedText,{verbatim:true},message+' · #'+id)));
  assert.equal(userMarkup,message+' · #'+id,'Verbatim user content never gains application-error semantics');
-}console.log('Locale catalogues: complete EN/FR/IT tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.');
+}console.log('Locale catalogues: complete EN/FR/IT/TR tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.');
 // Exercise the real recovery handler with isolated token/mail delivery adapters.
 {
  let user={id:'fixture',language:'de'},sent=null,failMail=false;
  const recovery=compile('app/api/auth/recover/route.ts',{
-  '@/lib/locales':locale,
+  '@/lib/locales':locale,'@/lib/locales/config':config,
   '@/lib/server/http':{apiError:()=>Response.json({error:'internal'},{status:500}),assertSameOrigin:()=>{},cleanText:value=>typeof value==='string'?value.trim():'',json:data=>Response.json(data),readJson:request=>request.json(),validEmail:value=>value.includes('@')},
   '@/lib/server/rate-limit':{enforceRateLimit:async()=>{}},'@/lib/server/db':{query:async()=>({rows:user?[user]:[]})},
   '@/lib/server/auth-tokens':{createAuthToken:async()=> 'synthetic-recovery-token'},
@@ -227,8 +236,10 @@ for(const language of config.locales){
  for(const file of ['impressum','datenschutz','agb','auftragsbearbeitung','unterauftragsbearbeiter']){
   const page=compile('app/'+file+'/page.tsx',{'@/lib/client/locale':client,'@/components/legal-page':legal,'@/config/legal':legalConfig,'next/link':({children,...props})=>element('a',props,children)}).default;
   let baseline;
-  for(const language of ['de','fr','it','en']){
+  for(const language of config.locales){
    const markup=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(page)));
+   const hero=markup.match(/<header class="legal-hero">([\s\S]*?)<\/header>/)?.[1];assert.ok(hero,'Actual legal header exists');
+   for(const text of [page().props.eyebrow,page().props.intro]){const expected=renderToStaticMarkup(element(client.LocaleProvider,{initialLocale:language},element(client.LocalizedText,null,text)));assert.ok(hero.includes(expected),'Actual legal eyebrow and introduction follow the chosen language: '+language);}
    const ids=[...markup.matchAll(/<section[^>]* id="([^"]+)"/g)].map(match=>match[1]);assert.ok(ids.length>=2);assert.equal(new Set(ids).size,ids.length,'No duplicate legal anchors');
    if(baseline)assert.deepEqual(ids,baseline,'Section URLs stay stable across UI languages');else baseline=ids;
    for(const [,id] of markup.matchAll(/href="#([^"]+)"/g))assert.ok(ids.includes(id),'Every table-of-contents link has a real section');
@@ -249,7 +260,7 @@ for(const language of config.locales){
 
 // V5: short closed trigger, full native language names in every option.
 for(const language of config.locales)for(const compact of [false,true]){
- const switcher=compile('components/locale-switcher.tsx',{'./select-control':{SelectControl:({displayValue,children,...props})=>React.createElement('select',{'data-caption':displayValue,value:props.value,onChange(){},'aria-label':props['aria-label']},children)},'@/lib/client/locale':client,'@/lib/client/use-language-preference':{useLanguagePreference:()=>({locale:language,save(){},busy:false,error:null})},'@/lib/locales':locale,'./ui':{ErrorState:()=>null}});
+ const switcher=compile('components/locale-switcher.tsx',{'./select-control':{SelectControl:({displayValue,children,...props})=>React.createElement('select',{'data-caption':displayValue,value:props.value,onChange(){},'aria-label':props['aria-label']},children)},'@/lib/client/locale':client,'@/lib/client/use-language-preference':{useLanguagePreference:()=>({locale:language,save(){},busy:false,error:null})},'@/lib/locales':locale,'@/lib/locales/config':config,'./ui':{ErrorState:()=>null}});
  const html=renderToStaticMarkup(React.createElement(client.LocaleProvider,{initialLocale:language},React.createElement(switcher.LocaleSwitcher,{compact})));
  assert.ok(html.includes('data-caption="'+language.toUpperCase()+'"'),'V5 selected language uses its short code; native options stay complete: '+language);
  for(const code of config.locales)assert.ok(html.includes(config.localeNames[code]),'Existing language option retained: '+code);

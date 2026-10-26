@@ -1,7 +1,8 @@
 "use client";
 import {limitsConfig} from "@/config/limits";
 import {fileSelectionError} from '@/lib/file-selection';
-import {LocalizedText} from "@/lib/client/locale";
+import {LocalizedText,useLocale} from "@/lib/client/locale";
+import {localeTags} from "@/lib/locales/config";
 import {useRef,useState,useImperativeHandle,type Ref} from 'react';
 import {fileRelations} from '@/lib/file-associations';
 import {tenantCan} from '@/lib/permissions';
@@ -17,6 +18,7 @@ export type EntityFilesHandle={chooseFile:()=>void};
 
 /** Entity association is mandatory; every attachment uses the existing file API. */
 export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emptyTitle="Keine Dateien vorhanden",className="",uploadRef}:{purpose:string;entityId:string;readOnly?:boolean;title?:string;emptyTitle?:string;className?:string;uploadRef?:Ref<EntityFilesHandle>}){
+ const {locale}=useLocale();
  const relation=fileRelations[purpose],input=useRef<HTMLInputElement>(null),busy=useRef(false);
  const [uploading,setUploading]=useState(false),[error,setError]=useState<string|null>(null);
  const [search,setSearch]=useState(''),[selected,setSelected]=useState<Attachment|null>(null),[preview,setPreview]=useState<Attachment|null>(null),[removing,setRemoving]=useState<Attachment|null>(null),[deleting,setDeleting]=useState(false);
@@ -39,7 +41,7 @@ export function EntityFiles({purpose,entityId,readOnly=false,title="Dateien",emp
   {files.loading&&<LoadingState><LocalizedText>{"Anhänge werden geladen …"}</LocalizedText></LoadingState>}
   {(error||files.error)&&<ErrorState onRetry={()=>{setError(null);files.refresh()}} retryLabel="Erneut laden"><LocalizedText>{error||files.error}</LocalizedText></ErrorState>}
   {!!files.data?.items.length&&<ListSearch value={search} onChange={setSearch} placeholder="Dateien suchen..."/>}
-  {(files.data?.items??[]).filter(file=>file.fileName.toLocaleLowerCase().includes(search.toLocaleLowerCase().trim())).map(file=><ListRow key={file.id} compact translateTitle={false} onClick={()=>setSelected(file)} title={file.fileName} meta={[file.mimeType?.split('/').at(-1)?.toUpperCase(),file.createdAt?new Date(file.createdAt).toLocaleDateString('de-CH'):null].filter(Boolean).join(' · ')}/>)}
+  {(files.data?.items??[]).filter(file=>file.fileName.toLocaleLowerCase().includes(search.toLocaleLowerCase().trim())).map(file=><ListRow key={file.id} compact translateTitle={false} onClick={()=>setSelected(file)} title={file.fileName} meta={[file.mimeType?.split('/').at(-1)?.toUpperCase(),file.createdAt?new Date(file.createdAt).toLocaleDateString(localeTags[locale]):null].filter(Boolean).join(' · ')}/>)}
   {!!files.data?.items.length&&!files.data.items.some(file=>file.fileName.toLocaleLowerCase().includes(search.toLocaleLowerCase().trim()))&&<EmptyState  title="Keine passenden Dateien" />}
   {!files.loading&&!files.error&&!files.data?.items.length&&<EmptyState  title={emptyTitle} />}
   <ActionSheet label="Dateiaktionen" description={selected?.fileName} open={!!selected} onClose={()=>setSelected(null)}>{selected&&<div className="action-list">{selected.mimeType==='application/pdf'&&<ActionRow icon="file" title="Vorschau" onClick={()=>{setPreview(selected);setSelected(null)}}/>}<ActionRow icon="download" title="Herunterladen" href={'/api/files/'+encodeURIComponent(selected.id)+'/download'} onClick={()=>setSelected(null)}/>{allowed&&(selected.createdBy===session.data?.user?.id||['owner','admin'].includes(session.data?.tenant?.role??''))&&<ActionRow icon="trash" title="Entfernen" onClick={()=>{setRemoving(selected);setSelected(null)}}/>}</div>}</ActionSheet>

@@ -25,7 +25,7 @@ export function overallHealth(states:readonly HealthState[]):HealthState{
 export function evaluateAlarms(metrics:readonly MonitoringMetric[],rules:readonly AlarmRule[],now=Date.now(),staleAfterSeconds=120):MonitoringAlarm[]{
  return rules.map(rule=>{const metric=metrics.find(item=>item.id===rule.metricId);const value=metric?effectiveMetric(metric,now,staleAfterSeconds):null;return {id:rule.id,ruleId:rule.id,state:!value||value.dataState!=='fresh'?'unknown':value.value!>=rule.threshold?rule.severity:'healthy',value:value?.value??null,measuredAt:value?.measuredAt??null};});
 }
-export function formatMonitoringValue(metric:MonitoringMetric){
+export function formatMonitoringValue(metric:MonitoringMetric,locale='de-CH'){
  if(metric.value===null||metric.dataState==='no_permission'||metric.dataState==='unavailable')return '—';
- return metric.value.toLocaleString('de-CH',{maximumFractionDigits:metric.unit==='CHF'?2:metric.unit==='s'?0:2})+(metric.unit==='count'?'':' '+metric.unit);
+ return metric.value.toLocaleString(locale,{maximumFractionDigits:metric.unit==='CHF'?2:metric.unit==='s'?0:2})+(metric.unit==='count'?'':' '+metric.unit);
 }

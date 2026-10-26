@@ -2,7 +2,7 @@
 import {SelectControl} from './select-control';
 import {LocalizedText} from '@/lib/client/locale';
 import {useLanguagePreference} from '@/lib/client/use-language-preference';
-import {localeNames,locales} from '@/lib/locales';
+import {localeNames,locales} from '@/lib/locales/config';
 import {ErrorState} from './ui';
 export function LocaleSwitcher({compact=false,persist=false}:{compact?:boolean;persist?:false|"tenant"|"operator"}){
  const {locale,save,busy,error}=useLanguagePreference(persist);

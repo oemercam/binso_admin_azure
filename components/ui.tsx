@@ -1,7 +1,7 @@
 "use client";
 import type {MetricTrend} from '@/lib/kpi-trend';
 import {useLocale} from '@/lib/client/locale';
-import {localeTags} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {usePageAccess} from "@/lib/client/page-access";
 import {fieldInputHint} from "@/lib/form-input-hints";

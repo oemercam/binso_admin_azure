@@ -28,6 +28,10 @@ try{
  const first=cache.readClientSession(),second=cache.readClientSession();assert.equal(first,second);
  resolveSession(new Response(JSON.stringify({authenticated:true,tenant:{role:'owner',id:'demo-a'}})));
  await first;await cache.readClientSession();assert.equal(reads,1,'Navigation and parallel consumers must share the same validated session');
+ let forcedReads=0;globalThis.fetch=async()=>{forcedReads++;return Response.json({authenticated:true,tenant:{id:'demo-a',role:'owner'}})};
+ await cache.readClientSession();assert.equal(forcedReads,0,'Navigation retains the validated cache');
+ await cache.readClientSession(true);assert.equal(forcedReads,1,'Resume and expiry checks bypass the thirty-second cache');
+ globalThis.fetch=()=>{++reads;return new Promise(resolve=>{resolveSession=resolve})};
  cache.invalidateClientSession();
  const obsolete=cache.readClientSession();cache.invalidateClientSession();resolveSession(new Response(JSON.stringify({authenticated:true,tenant:{id:'old-tenant'}})));
  await assert.rejects(obsolete,/Sitzung wurde geändert/);assert.equal(cache.cachedClientSession(),null);

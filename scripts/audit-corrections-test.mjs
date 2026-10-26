@@ -65,6 +65,8 @@ assert.equal(resetParams.has('projectId'),false);assert.equal(resetParams.get('c
  const settingsHooks={useState:initial=>{const i=cursor++;if(!(i in cells))cells[i]=initial;return [cells[i],value=>{cells[i]=value}]},useRef:value=>{const i=cursor++;return cells[i]??=({current:value})},useEffect:effect=>effects.push(effect)};
  const loadedItem={vat_rate:'8.10',payment_terms_days:30,invoice_intro_text:'Existing company text'};
  const {DocumentSettingsPage}=compile('components/document-settings.tsx',{
+  '@/lib/client/locale':{useLocale:()=>({locale:'de'})},
+  '@/lib/locales/config':compile('lib/locales/config.ts'),
   react:settingsHooks,'next/navigation':{useRouter:()=>({push:()=>{}})},'@/lib/client/page-access':{usePageAccess:()=>({write:true})},
   '@/lib/client/use-api-query':{useApiQuery:()=>({loading:false,error:null,data:{item:loadedItem}})},
   './use-setup-field':{useSetupField:(...args)=>{recoveryArgs=args;return {field:'iban',returnTo:'/rechnungen/neu'}}},

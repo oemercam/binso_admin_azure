@@ -111,15 +111,19 @@ console.log('Actual dashboard handler: one snapshot connection, unchanged plan d
 // Exercise the actual persistent-layout registration, not a copied cache model.
 const ast=ts.createSourceFile('shell.tsx',fs.readFileSync('components/app-shell.tsx','utf8'),99,true,ts.ScriptKind.TSX);
 const layoutSource=ast.statements.find(node=>ts.isFunctionDeclaration(node)&&node.name?.text==='AppShellLayout').getText(ast);
+const sectionSource=ast.statements.find(node=>ts.isVariableStatement(node)&&node.declarationList.declarations.some(item=>item.name.getText(ast)==='appSections')).getText(ast);
+const sectionExports={};Function('exports',ts.transpileModule(sectionSource+';exports.sections=appSections;',{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(sectionExports);
+for(const section of Object.keys(sectionExports.sections)){assert.match(fs.readFileSync('app/'+section+'/layout.tsx','utf8'),/export\s*\{default,metadata\}\s*from\s*['"]@\/components\/customer-app-layout['"]/,'Every customer module shares the same identity boundary: '+section);}
 const shellHooks=hooks(),React=require('react'),result={};let route='/kunden',identity='one';
 const RecordsControls=()=>null,AppShellFrame=()=>null;
-Function('require','exports','usePathname','useDataRevision','useState','useCallback','isValidElement','RecordsControls','appSections','settingsGroups','ShellRegistration','AppShellFrame',ts.transpileModule(layoutSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,result,()=>route,()=>identity,shellHooks.react.useState,shellHooks.react.useCallback,React.isValidElement,RecordsControls,{kunden:'Kunden',produkte:'Produkte'},[],{Provider:()=>null},AppShellFrame);
+Function('require','exports','usePathname','useDataRevision','useState','useCallback','isValidElement','RecordsControls','appSections','settingsGroups','ShellRegistration','AppShellFrame',ts.transpileModule(layoutSource,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(require,result,()=>route,()=>identity,shellHooks.react.useState,shellHooks.react.useCallback,React.isValidElement,RecordsControls,sectionExports.sections,[],{Provider:()=>null},AppShellFrame);
 const renderShell=()=>shellHooks.render(()=>result.AppShellLayout({children:'current route'}));
 let tree=renderShell();const customerTools=React.createElement(RecordsControls,{owner:'customers'});
 tree.props.value({pathname:'/kunden',title:'Kunden',active:'kunden',actions:customerTools});tree=renderShell();assert.equal(tree.props.children.props.loading,undefined);
 route='/produkte';tree=renderShell();assert.equal(tree.props.children.props.actions,undefined,'A new destination cannot borrow the previous toolbar');
 tree.props.value({pathname:'/produkte',title:'Produkte',active:'produkte',actions:React.createElement(RecordsControls,{owner:'products'})});renderShell();
 route='/kunden';tree=renderShell();assert.equal(tree.props.children.props.actions,customerTools);assert.equal(tree.props.children.props.loading,true,'The returning toolbar is only a pending placeholder, made inert by the actual frame');
+route='/lieferanten';tree=renderShell();assert.equal(tree.props.children.type,AppShellFrame,'Suppliers must retain the same persistent frame');assert.equal(tree.props.children.props.title,'Lieferanten');assert.equal(tree.props.children.props.actions,undefined,'Supplier navigation cannot inherit another list toolbar');
 identity='two';tree=renderShell();assert.equal(tree.props.children.props.actions,undefined,'No toolbar or private search can survive the session fence');
 console.log('Actual persistent shell: destination-specific toolbar retention, pending interaction lock and session eviction passed.');
 
