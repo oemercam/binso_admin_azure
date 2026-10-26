@@ -10,7 +10,7 @@ import {useBrowserBackGuard,allowDraftNavigation} from "../use-browser-back-guar
 import ConfirmDialog from "../confirm-dialog";
 import {LocalizedText,LocalizedElement} from "@/lib/client/locale";
 import {useLocale} from "@/lib/client/locale";
-import {asLocale,localeNames,locales,localeTags} from "@/lib/locales";
+import {asLocale,localeNames,locales,localeTags} from "@/lib/locales/config";
 import {useLanguagePreference} from "@/lib/client/use-language-preference";
 import {companyLogoSource} from "@/lib/image-url";
 import {useApiQuery} from "@/lib/client/use-api-query";

@@ -20,7 +20,7 @@ export function LegalPage({eyebrow,title,intro,children,surface="public"}:{eyebr
     return cloneElement(node,{id,tabIndex:-1});
   });
   const body=<main className={surface==="app"?"legal-page app-legal-page":"legal-page"}>
-    <header className="legal-hero"><span className="eyebrow">{eyebrow}</span>{surface==="public"&&<h1><LocalizedText>{title}</LocalizedText></h1>}<p>{intro}</p></header>
+    <header className="legal-hero"><span className="eyebrow"><LocalizedText>{eyebrow}</LocalizedText></span>{surface==="public"&&<h1><LocalizedText>{title}</LocalizedText></h1>}<p><LocalizedText>{intro}</LocalizedText></p></header>
     {anchors.length>=5&&<details className="legal-toc"><summary><LocalizedText>Inhalt</LocalizedText></summary><LocalizedElement as="nav" aria-label="Inhaltsverzeichnis"><ol>{anchors.map(anchor=><li key={anchor.id}><a href={'#'+anchor.id}><LocalizedText>{anchor.title}</LocalizedText></a></li>)}</ol></LocalizedElement></details>}
     <article className="legal-content">{content}</article>
     {surface==="public"&&<LocalizedElement as="nav" className="legal-related" aria-label="Rechtliche Dokumente">

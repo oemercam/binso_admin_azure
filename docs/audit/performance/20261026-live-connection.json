@@ -1,0 +1,129 @@
+{
+  "measuredAt": "2026-10-26T08:58:38.666Z",
+  "base": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net",
+  "mode": "Nine sequential read-only public requests in one curl process; HTTP connection reuse enabled",
+  "limits": [
+    "This environment includes an HTTPS egress/proxy path. TLS timing cannot be attributed to Azure or an end-user device.",
+    "After-connection-ready timing includes request transit, proxy and application; it is not pure server execution time.",
+    "No browser rendering, logged-in data or phone connection measured."
+  ],
+  "samples": [
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/api/health",
+      "status": 200,
+      "dnsSeconds": 0.000088,
+      "connectSeconds": 0.00065,
+      "tlsSeconds": 7.144415,
+      "readySeconds": 7.14455,
+      "firstByteSeconds": 8.013572,
+      "totalSeconds": 8.013639,
+      "newConnections": 1,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 869
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/login",
+      "status": 200,
+      "dnsSeconds": 0.000018,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000082,
+      "firstByteSeconds": 0.242604,
+      "totalSeconds": 0.286525,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 242.5
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/brand/icon-black.svg",
+      "status": 200,
+      "dnsSeconds": 0.00002,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000081,
+      "firstByteSeconds": 0.198444,
+      "totalSeconds": 0.198536,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 198.4
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/api/health",
+      "status": 200,
+      "dnsSeconds": 0.000016,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000073,
+      "firstByteSeconds": 0.201877,
+      "totalSeconds": 0.20193,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 201.8
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/login",
+      "status": 200,
+      "dnsSeconds": 0.000016,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000083,
+      "firstByteSeconds": 0.347582,
+      "totalSeconds": 0.535953,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 347.5
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/brand/icon-black.svg",
+      "status": 200,
+      "dnsSeconds": 0.00002,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000077,
+      "firstByteSeconds": 0.415945,
+      "totalSeconds": 0.416028,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 415.9
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/api/health",
+      "status": 200,
+      "dnsSeconds": 0.000017,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000076,
+      "firstByteSeconds": 0.206751,
+      "totalSeconds": 0.206805,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 206.7
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/login",
+      "status": 200,
+      "dnsSeconds": 0.000017,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000087,
+      "firstByteSeconds": 0.219805,
+      "totalSeconds": 0.263797,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 219.7
+    },
+    {
+      "url": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net/brand/icon-black.svg",
+      "status": 200,
+      "dnsSeconds": 0.000017,
+      "connectSeconds": 0,
+      "tlsSeconds": 0,
+      "readySeconds": 0.000081,
+      "firstByteSeconds": 0.179949,
+      "totalSeconds": 0.223805,
+      "newConnections": 0,
+      "httpVersion": "2",
+      "afterConnectionReadyMs": 179.9
+    }
+  ]
+}

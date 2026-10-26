@@ -1,7 +1,7 @@
 "use client";
 
 import {LocalizedText,LocalizedElement,useLocale} from "@/lib/client/locale";
-import {localeTags} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
 import {formatDateTime} from '@/lib/display-format';
 import Link from "next/link";
 import {ActionRow,DetailTabs,SettingsGroup} from "../binso-ux";

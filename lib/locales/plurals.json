@@ -15,6 +15,10 @@
     "it": {
       "one": "cliente",
       "other": "clienti"
+    },
+    "tr": {
+      "one": "müşteri",
+      "other": "müşteri"
     }
   },
   "Rechnungen": {
@@ -33,6 +37,10 @@
     "it": {
       "one": "fattura",
       "other": "fatture"
+    },
+    "tr": {
+      "one": "fatura",
+      "other": "fatura"
     }
   },
   "Angebote": {
@@ -51,6 +59,10 @@
     "it": {
       "one": "preventivo",
       "other": "preventivi"
+    },
+    "tr": {
+      "one": "teklif",
+      "other": "teklif"
     }
   },
   "Aufträge": {
@@ -69,6 +81,10 @@
     "it": {
       "one": "commessa",
       "other": "commesse"
+    },
+    "tr": {
+      "one": "iş",
+      "other": "iş"
     }
   },
   "Produkte": {
@@ -87,6 +103,10 @@
     "it": {
       "one": "prodotto",
       "other": "prodotti"
+    },
+    "tr": {
+      "one": "ürün",
+      "other": "ürün"
     }
   },
   "Mitarbeiter": {
@@ -105,6 +125,10 @@
     "it": {
       "one": "collaboratore",
       "other": "collaboratori"
+    },
+    "tr": {
+      "one": "çalışan",
+      "other": "çalışan"
     }
   },
   "Spesen": {
@@ -123,6 +147,10 @@
     "it": {
       "one": "spesa",
       "other": "spese"
+    },
+    "tr": {
+      "one": "masraf",
+      "other": "masraf"
     }
   },
   "Einträge": {
@@ -141,6 +169,10 @@
     "it": {
       "one": "voce",
       "other": "voci"
+    },
+    "tr": {
+      "one": "kayıt",
+      "other": "kayıt"
     }
   },
   "Zahlungen": {
@@ -159,6 +191,10 @@
     "it": {
       "one": "pagamento",
       "other": "pagamenti"
+    },
+    "tr": {
+      "one": "ödeme",
+      "other": "ödeme"
     }
   },
   "Projekte": {
@@ -177,6 +213,10 @@
     "it": {
       "one": "progetto",
       "other": "progetti"
+    },
+    "tr": {
+      "one": "proje",
+      "other": "proje"
     }
   },
   "Benachrichtigungen": {
@@ -195,6 +235,10 @@
     "it": {
       "one": "notifica",
       "other": "notifiche"
+    },
+    "tr": {
+      "one": "bildirim",
+      "other": "bildirim"
     }
   },
   "Dateien": {
@@ -213,6 +257,10 @@
     "it": {
       "one": "file",
       "other": "file"
+    },
+    "tr": {
+      "one": "dosya",
+      "other": "dosya"
     }
   },
   "Dokumente": {
@@ -231,6 +279,10 @@
     "it": {
       "one": "documento",
       "other": "documenti"
+    },
+    "tr": {
+      "one": "belge",
+      "other": "belge"
     }
   },
   "Kontakte": {
@@ -249,6 +301,10 @@
     "it": {
       "one": "contatto",
       "other": "contatti"
+    },
+    "tr": {
+      "one": "iletişim kişisi",
+      "other": "iletişim kişisi"
     }
   },
   "Tickets": {
@@ -267,6 +323,10 @@
     "it": {
       "one": "ticket",
       "other": "ticket"
+    },
+    "tr": {
+      "one": "destek talebi",
+      "other": "destek talebi"
     }
   },
   "Berichte": {
@@ -285,6 +345,10 @@
     "it": {
       "one": "rapporto",
       "other": "rapporti"
+    },
+    "tr": {
+      "one": "rapor",
+      "other": "rapor"
     }
   },
   "Tage": {
@@ -303,6 +367,10 @@
     "it": {
       "one": "giorno",
       "other": "giorni"
+    },
+    "tr": {
+      "one": "gün",
+      "other": "gün"
     }
   },
   "Monate": {
@@ -321,6 +389,10 @@
     "it": {
       "one": "mese",
       "other": "mesi"
+    },
+    "tr": {
+      "one": "ay",
+      "other": "ay"
     }
   },
   "Stunden": {
@@ -339,6 +411,10 @@
     "it": {
       "one": "ora",
       "other": "ore"
+    },
+    "tr": {
+      "one": "saat",
+      "other": "saat"
     }
   },
   "Minuten": {
@@ -357,6 +433,10 @@
     "it": {
       "one": "minuto",
       "other": "minuti"
+    },
+    "tr": {
+      "one": "dakika",
+      "other": "dakika"
     }
   },
   "Sekunden": {
@@ -375,6 +455,10 @@
     "it": {
       "one": "secondo",
       "other": "secondi"
+    },
+    "tr": {
+      "one": "saniye",
+      "other": "saniye"
     }
   }
 }

@@ -3,7 +3,7 @@ import {useRef,useState} from 'react';
 import {useApiQuery} from '@/lib/client/use-api-query';
 import {apiPost} from '@/lib/client/backend';
 import {businessDate,formatDate} from '@/lib/financial-status';
-import {localeTags} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
 import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {ActionRow,DetailDisclosure,FormSheet} from './binso-ux';
 import {Button,Checkbox,DateInput,ErrorState,Field,FormActions,LoadingState} from './ui';

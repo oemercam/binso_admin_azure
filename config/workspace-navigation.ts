@@ -1,4 +1,5 @@
 /** Phase 1 navigation V2. Destinations retain the existing server-matched access check. */
+// Each label names one functional area; ampersand pairs are excluded in every locale.
 export const mainNavigation = [
  {href:'/dashboard',label:'Übersicht',icon:'house',section:'dashboard'},
  {href:'/kunden',label:'Kunden',icon:'navigation-users',section:'kunden'},
@@ -11,7 +12,7 @@ export const moreNavigation = [
   {href:'/angebote',label:'Angebote',icon:'file'},
   {href:'/rechnungen',label:'Rechnungen',icon:'receipt'},
   {href:'/zahlungen',label:'Zahlungen',icon:'wallet'},
-  {href:'/spesen',label:'Ausgaben & Spesen',icon:'card'},
+  {href:'/spesen',label:'Spesen',icon:'card'},
   {href:'/finanzen',label:'Finanzübersicht',icon:'chart'},
   {href:'/produkte',label:'Produkte',icon:'box'},
   {href:'/lieferanten',label:'Lieferanten',icon:'building'},
@@ -20,14 +21,14 @@ export const moreNavigation = [
  {title:'Auswertung',items:[{href:'/berichte',label:'Berichte',icon:'chart'}]},
  {title:'Verwaltung',items:[
   {href:'/einstellungen/firma',label:'Unternehmen',icon:'building'},
-  {href:'/einstellungen/team',label:'Mitarbeiter & Berechtigungen',icon:'users'},
+  {href:'/einstellungen/team',label:'Benutzerkonten',icon:'users'},
   {href:'/mitarbeiter',label:'Mitarbeiter',icon:'users'},
   {href:'/abwesenheiten',label:'Abwesenheiten',icon:'calendar'},
-  {href:'/einstellungen',label:'Unternehmenseinstellungen',icon:'settings'},
+  {href:'/einstellungen',label:'Einstellungen',icon:'settings'},
  ]},
  {title:'Hilfe',items:[
   {href:'/support',label:'Support',icon:'support'},
-  {href:'/hilfe',label:'Hilfe & Informationen',icon:'help'},
+  {href:'/hilfe',label:'Hilfe',icon:'help'},
  ]},
 ] as const;
 

@@ -179,17 +179,21 @@ export async function assertMobileHeaderTargets(page){
 }
 
 /** Resolve and measure live detail elements in one task, including after hydration. */
-export async function assertMobileDetailHeaderGeometry(page,width,route){
+export async function assertMobileDetailHeaderGeometry(page,width,route,{timeout=5000}={}){
  const title=page.locator('.mobile-header-detail .mobile-header-title');
  if(await title.count()){
   await title.waitFor({state:'visible'});
-  const box=await page.evaluate(()=>{const el=document.querySelector('.mobile-header-detail .mobile-header-title');if(!el)return null;const r=el.getBoundingClientRect();return {visible:el.checkVisibility(),x:r.x,width:r.width,height:r.height}});
+  const snapshot=await page.waitForFunction(()=>{const el=document.querySelector('.mobile-header-detail .mobile-header-title');if(!el?.checkVisibility())return null;const r=el.getBoundingClientRect();return {visible:true,x:r.x,width:r.width,height:r.height}},null,{timeout});
+  const box=await snapshot.jsonValue();await snapshot.dispose();
   assert.ok(box?.visible&&box.width>0&&box.height>0&&Math.abs(box.x+box.width/2-width/2)<=1.5,`${route} ${width}px: visible detail title is geometrically centered ${JSON.stringify(box)}`);
  }
  const back=page.locator('.mobile-back');
  if(await back.count()){
   await back.waitFor({state:'visible'});
-  const box=await page.evaluate(()=>{const el=document.querySelector('.mobile-back');if(!el)return null;const r=el.getBoundingClientRect(),icon=el.querySelector('svg')?.getBoundingClientRect();return {visible:el.checkVisibility(),width:r.width,height:r.height,icon:icon?{x:icon.x,width:icon.width,height:icon.height}:null}});
+  // A layout registration may briefly remove the live node after waitFor.
+  // Retry absence only; return real dimensions immediately so invalid geometry fails.
+  const snapshot=await page.waitForFunction(()=>{const el=document.querySelector('.mobile-back');if(!el?.checkVisibility())return null;const r=el.getBoundingClientRect(),icon=el.querySelector('svg')?.getBoundingClientRect();return {visible:true,width:r.width,height:r.height,icon:icon?{x:icon.x,width:icon.width,height:icon.height}:null}},null,{timeout});
+  const box=await snapshot.jsonValue();await snapshot.dispose();
   assert.ok(box?.visible&&box.width>=44&&box.height>=44,`${route} ${width}px: detail back control is visible and touchable ${JSON.stringify(box)}`);
   assert.ok(box.icon&&box.icon.width>=18&&box.icon.height>=18&&box.icon.x>=0,`${route}: back icon is not clipped`);
  }
@@ -284,6 +288,18 @@ export async function verifyHeaderMeasurementHydrationRegression(page){
   const value=Reflect.get(object,key);return typeof value==='function'?value.bind(object):value;
  }});
  await assertMobileDetailHeaderGeometry(detailRace,width,'synthetic hydration');
+ // Reproduce the CI race where the visible back node disappears before measurement.
+ const delayedBack=restore=>new Proxy(page,{get(object,key){
+  if(key==='locator')return selector=>{const locator=object.locator(selector);if(selector!=='.mobile-back')return locator;return new Proxy(locator,{get(target,method){
+   if(method==='waitFor')return async options=>{await target.waitFor(options);await page.evaluate(restore=>{const node=document.querySelector('.mobile-back');window.__binsoPendingBack=node;node.remove();if(restore)setTimeout(()=>{document.querySelector('header').prepend(node);delete window.__binsoPendingBack;},50);},restore);};
+   const value=Reflect.get(target,method);return typeof value==='function'?value.bind(target):value;
+  }});};
+  const value=Reflect.get(object,key);return typeof value==='function'?value.bind(object):value;
+ }});
+ await assertMobileDetailHeaderGeometry(delayedBack(true),width,'delayed live-node replacement');
+ try{await assert.rejects(()=>assertMobileDetailHeaderGeometry(delayedBack(false),width,'missing back countercase',{timeout:100}),/Timeout/,'A permanently missing back control must still fail');}
+ finally{await page.evaluate(()=>{const node=window.__binsoPendingBack;if(node)document.querySelector('header').prepend(node);delete window.__binsoPendingBack;});}
+
  await page.locator('.mobile-header-title').evaluate(el=>el.style.transform='translateX(10px)');
  await assert.rejects(()=>assertMobileDetailHeaderGeometry(page,width,'offset countercase'),/geometrically centered/);
  await page.locator('.mobile-header-title').evaluate(el=>el.style.removeProperty('transform'));

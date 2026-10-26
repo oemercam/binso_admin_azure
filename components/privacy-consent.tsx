@@ -95,8 +95,8 @@ export function PrivacySettingsPage(){
     window.setTimeout(()=>setSaved(false),2200);
   };
 
-  return <AppShell title="Datenschutz & Cookies" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
-    <SettingsGroup title="Technisch notwendig"><ListRow information title="Anmeldung & Sicherheit" meta="" value={<LocalizedText>{"Immer aktiv"}</LocalizedText>}/></SettingsGroup>
+  return <AppShell title="Datenschutz" active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen">
+    <SettingsGroup title="Technisch notwendig"><ListRow information title="Sicherheit" meta="" value={<LocalizedText>{"Immer aktiv"}</LocalizedText>}/></SettingsGroup>
     <SettingsGroup title="Optional"><ListRow information title="Performance-Messung" meta="" value={<Toggle label="Performance-Messung" checked={performance} onChange={()=>save(!performance)}/>}/>
       <details className="bo-data-disclosure"><summary><LocalizedText>{"Datenhinweise"}</LocalizedText></summary><p className="settings-note"><LocalizedText>{"Optional werden technische Kennzahlen wie Ladezeit und Darstellungsstabilität sowie eine gekürzte Route erfasst. Keine Werbung und kein Cross-Site-Tracking."}</LocalizedText></p></details>
       {saveError&&<ErrorState><LocalizedText>{saveError}</LocalizedText></ErrorState>}

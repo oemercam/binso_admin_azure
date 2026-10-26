@@ -2,7 +2,7 @@
 import {formControlSnapshot} from '@/lib/client/form-snapshot';
 
 import {LocalizedText,LocalizedElement,useTranslation,useLocale} from "@/lib/client/locale";
-import {asLocale} from '@/lib/locales';
+import {asLocale} from '@/lib/locales/config';
 import {PageAccessContext} from "@/lib/client/page-access";
 import {tenantCanOpenPath,tenantCan,tenantCanCreateAt,permissionForModule,type ModuleProfile} from "@/lib/permissions";
 import {isPlanId,moduleForPath,planAllowsPath,type PlanId} from "@/config/plan-access";
@@ -20,13 +20,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { Children, isValidElement, cloneElement, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {WorkspaceActionContext} from '@/lib/client/workspace-actions';
 import {RecordsControls} from './records';
+import {watchSession} from '@/lib/client/session-watch';
 import {useBrowserBackGuard,allowDraftNavigation} from "./use-browser-back-guard";
 import ConfirmDialog from "./confirm-dialog";
 import { ActionRow, ActionSheet, PageHeading, DetailHeading, CreateAction, QuickCreateAction } from "./binso-ux";
 import {Button, EmptyState, Icon, IconButton, Logo, LoadingState, FormActions, Status} from "./ui";
 import {useApiQuery,useDataRevision,prefetchApiQuery} from "@/lib/client/use-api-query";
-import { apiGet, apiPatch, apiPost, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
-import {invalidateClientSession,type ClientSession} from "@/lib/client/session-cache";
+import { apiGet, apiPatch, apiPost, clearClientSession, logoutClientSession, isProductionBackendEnabled, useBackendMode } from "@/lib/client/backend";
+import {invalidateClientSession,readClientSession,type ClientSession} from "@/lib/client/session-cache";
 import type { SearchItem } from "@/lib/search";
 import type {PanelNotification} from "./header-panel-content";
 import {HeaderPanel} from "./header-panel";
@@ -43,7 +44,7 @@ const NotificationPanel=dynamic(()=>import('./header-panel-content').then(module
 const AccountPanel=dynamic(()=>import('./header-panel-content').then(module=>module.AccountPanel),{loading:()=> <LoadingState/>});
 
 const desktopNav = [
-  ["/dashboard","Start","home"],
+  ["/dashboard","Übersicht","home"],
   ["/kunden","Kunden","users"],
   ["/angebote","Angebote","file"],
   ["/rechnungen","Rechnungen","receipt"],
@@ -62,7 +63,7 @@ const desktopNav = [
 
 const desktopNavGroups = [
   {label:"Verkauf",paths:["/kunden","/angebote","/rechnungen","/produkte"]},
-  {label:"Arbeit & Team",paths:["/projekte","/zeit","/mitarbeiter","/abwesenheiten"]},
+  {label:"Organisation",paths:["/projekte","/zeit","/mitarbeiter","/abwesenheiten"]},
   {label:"Finanzen",paths:["/zahlungen","/spesen","/lieferanten","/vertraege","/finanzen","/berichte"]},
 ];
 
@@ -136,22 +137,23 @@ function AppShellFrame({
   const [accessError,setAccessError]=useState<string|null>(null);
   useEffect(()=>{
     let active=true;let refreshRevision=0;
-    const refresh=()=>{const requestedRevision=++refreshRevision;return apiGet<ClientSession>('/api/auth/session').then(session=>{
-      if(!active||requestedRevision!==refreshRevision)return;
+    const refresh=()=>{const requestedRevision=++refreshRevision;return readClientSession(true).then(session=>{
+      if(!active||requestedRevision!==refreshRevision)return true;
       const nextAccess=accessFromSession(session);
       if(nextAccess)void prefetchApiQuery('/api/settings/profile');
       setAccess(nextAccess);
       setAccessError(!session.authenticated?'Deine Sitzung ist beendet. Bitte melde dich erneut an.':nextAccess?null:'Zugang konnte nicht geprüft werden.');
-    }).catch(error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}});};
-    const resume=(event:PageTransitionEvent)=>{if(event.persisted){invalidateClientSession();setAccess(null);void refresh();}};
-    const visibility=()=>{if(document.visibilityState==="visible")void refresh();};
-    const storage=(event:StorageEvent)=>{if(event.key==='binso.session.changed'){invalidateClientSession();void refresh();}};
-    void refresh();
-    window.addEventListener('focus',refresh);document.addEventListener('visibilitychange',visibility);
-    window.addEventListener('binso-session-invalid',refresh);
-    window.addEventListener('storage',storage);window.addEventListener('pageshow',resume);
-    return()=>{active=false;window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',visibility);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);window.removeEventListener('pageshow',resume)};
-  },[pathname,accessRetry,identityRevision]);
+      return session.authenticated;
+    }).catch(error=>{if(active&&requestedRevision===refreshRevision){setAccess(null);setAccessError(error instanceof Error?error.message:'Zugang konnte nicht geprüft werden.')}throw error;});};
+    const resume=(event:PageTransitionEvent)=>{if(event.persisted){invalidateClientSession();setAccess(null);}};
+    window.addEventListener('pageshow',resume);
+    const stop=watchSession(refresh,()=>{
+      const next=safeAppPath(window.location.pathname+window.location.search);
+      clearClientSession();allowDraftNavigation();
+      window.location.replace('/login?'+new URLSearchParams({next}));
+    });
+    return()=>{active=false;stop();window.removeEventListener('pageshow',resume);};
+  },[accessRetry,identityRevision]);
 
   const canOpen=useCallback((href:string)=>{if(!access)return false;const path=href.split('?')[0].split('#')[0];if(access.enrollmentRequired&&path!=='/einstellungen/sicherheit')return false;const accessModule=moduleForPath(path);return tenantCanOpenPath(access.role,path,access.moduleProfile)&&planAllowsPath(access.plan,path)&&(!path.endsWith('/neu')||tenantCanCreateAt(access.role,path,access.moduleProfile)&&(!access.readOnly||path.startsWith('/support/'))&&(!accessModule||tenantCan(access.role,permissionForModule(accessModule,'write')??'organization:write',access.moduleProfile)));},[access]);
   useEffect(()=>{if(access?.moduleProfile==='time_only'&&pathname==='/dashboard')router.replace('/zeit');},[access?.moduleProfile,pathname,router]);
@@ -343,10 +345,10 @@ function AppShellFrame({
     <ConfirmDialog open={leaveHref!==null} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." cancelLabel="Weiter bearbeiten" confirmLabel="Verwerfen" onCancel={()=>setLeaveHref(null)} onConfirm={()=>{const href=leaveHref;setLeaveHref(null);if(href){window.dispatchEvent(new Event("binso-draft-discard"));allowDraftNavigation();if(href==="browser-back"){leaveBack();return;}const url=new URL(href);if(url.origin===window.location.origin)router.replace(url.pathname+url.search+url.hash);else window.location.assign(href);}}}/>
     {logoutError&&<div className="toast" role="alert"><Icon name="close" size={16}/><span><LocalizedText>{logoutError}</LocalizedText></span><button type="button" className="text-action" disabled={logoutBusy} onClick={()=>void logout()}><LocalizedText>{"Erneut versuchen"}</LocalizedText></button></div>}
     <aside id="customer-desktop-navigation" className="app-sidebar">
-      <Link href={homeHref} className="sidebar-logo" aria-label={translate("Zur Übersicht")}>{(["/dashboard","/kunden","/finanzen","/zeit","/einstellungen"].includes(pathname)||pathname.startsWith("/einstellungen/"))?<><Logo compact/><span hidden={navigationCollapsed}>One</span></>:<><Icon name="home"/><span hidden={navigationCollapsed}><LocalizedText>{"Start"}</LocalizedText></span></>}</Link>
+      <Link href={homeHref} className="sidebar-logo" aria-label={translate("Zur Übersicht")}>{(["/dashboard","/kunden","/finanzen","/zeit","/einstellungen"].includes(pathname)||pathname.startsWith("/einstellungen/"))?<><Logo compact/><span hidden={navigationCollapsed}>One</span></>:<><Icon name="home"/><span hidden={navigationCollapsed}><LocalizedText>{"Übersicht"}</LocalizedText></span></>}</Link>
       {companyQuery.data?.item.name&&canOpen("/einstellungen/firma")&&<Link href="/einstellungen/firma" className="workspace-company" title={companyQuery.data.item.name}><Icon name="home" size={20}/>{!navigationCollapsed&&<span>{companyQuery.data.item.name}<small><LocalizedText>{"Unternehmen"}</LocalizedText></small></span>}</Link>}
       <nav aria-label={translate("Navigation")}>
-        {canOpen("/dashboard")&&<Link href="/dashboard" aria-label={translate("Start")} title={translate("Start")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Start"}</LocalizedText></span></Link>}
+        {canOpen("/dashboard")&&<Link href="/dashboard" aria-label={translate("Übersicht")} title={translate("Übersicht")} className={active==="dashboard"?"active":""} aria-current={active==="dashboard"?"page":undefined}><Icon name="home"/><span><LocalizedText>{"Übersicht"}</LocalizedText></span></Link>}
         {desktopNavGroups.map(group=>desktopNav.some(([href])=>group.paths.includes(href)&&canOpen(href))&&<div className="sidebar-nav-group" key={group.label}><span className="sidebar-nav-label"><LocalizedText>{group.label}</LocalizedText></span>{desktopNav.filter(([href])=>group.paths.includes(href)&&canOpen(href)).map(([href,label,icon])=><Link key={href} href={href} aria-label={translate(label)} title={translate(label)} className={active===href.slice(1)?"active":""} aria-current={active===href.slice(1)?"page":undefined}><Icon name={icon}/><span><LocalizedText>{label}</LocalizedText></span></Link>)}</div>)}
       </nav>
       <div className="sidebar-bottom">
@@ -421,7 +423,7 @@ export function AppShell(props:ShellProps){
  },[register,pathname,title,titleIsUserContent,headingPlacement,recordLabel,subtitle,orientationText,active,shellActions,mobileActions,headerActions,backHref,backLabel,preview,editing,unsavedChanges,status,statusTone,loading,conversation]);
  return register?(inlineControls?Children.map(props.children,child=>child===inlineControls?null:child):props.children):<AppShellFrame {...props}/>;
 }
-const appSections:Record<string,string>={hilfe:"Hilfe & Informationen",vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
+const appSections:Record<string,string>={lieferanten:"Lieferanten",hilfe:"Hilfe",vertraege:"Verträge",abwesenheiten:"Abwesenheiten",berichte:"Berichte",projekte:"Aufträge",dashboard:"Übersicht",kunden:"Kunden",angebote:"Angebote",rechnungen:"Rechnungen",zahlungen:"Zahlungen",produkte:"Produkte",mitarbeiter:"Mitarbeiter",spesen:"Spesen",zeit:"Zeiterfassung",support:"Support",einstellungen:"Einstellungen",belege:"Belege",benachrichtigungen:"Benachrichtigungen",finanzen:"Finanzen"};
 export function AppShellLayout({children}:{children:React.ReactNode}){
  const pathname=usePathname(),section=pathname.split("/")[1];
  const sessionRevision=useDataRevision([]);

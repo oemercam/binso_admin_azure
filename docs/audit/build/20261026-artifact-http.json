@@ -1,0 +1,56 @@
+{
+  "sourceSha": "5b6c969225e6dbdd3dcf812ea82c01e1600635fb",
+  "measuredAt": "2026-10-26T09:36:41.553Z",
+  "nativePdfSpreadsheetAndSharp": true,
+  "assetIdentityVerified": true,
+  "runtimeShaMatched": true,
+  "unauthenticatedSessionDenied": true,
+  "checks": [
+    {
+      "route": "/",
+      "status": 200
+    },
+    {
+      "route": "/login",
+      "status": 200
+    },
+    {
+      "route": "/registrieren",
+      "status": 200
+    },
+    {
+      "route": "/fonts/inter/inter-latin-wght-normal.woff2",
+      "status": 200
+    },
+    {
+      "route": "/dashboard",
+      "status": 307
+    },
+    {
+      "route": "/kunden",
+      "status": 307
+    },
+    {
+      "route": "/lieferanten",
+      "status": 307
+    },
+    {
+      "route": "/api/integrations/status",
+      "status": 401
+    },
+    {
+      "route": "/api/health/ready",
+      "status": 503
+    }
+  ],
+  "termination": {
+    "code": 143,
+    "signal": null
+  },
+  "scannerBridgeTested": false,
+  "productionAcceptance": false,
+  "limits": [
+    "The mandatory Unix scanner socket test is blocked by EPERM in this environment. This separate HTTP/native diagnostic does not replace it.",
+    "No browser, real PostgreSQL, mail, payment or production mutation used."
+  ]
+}

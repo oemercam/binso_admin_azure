@@ -1,3 +1,4 @@
+import {getLocaleCatalogue} from '@/lib/server/locale-catalogue';
 import {FontPreload} from "@/components/font-preload";
 import {localizeMetadata} from "@/lib/server/locale";
 import {cookies} from "next/headers";
@@ -78,7 +79,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={localeTags[locale]} suppressHydrationWarning data-scroll-behavior="smooth">
       <head><FontPreload/><script id="binso-theme-init" dangerouslySetInnerHTML={{__html:`(${initializeTheme.toString()})();`}} /></head>
       <body>
-        <LocaleProvider initialLocale={locale}>
+        <LocaleProvider initialLocale={locale} initialCatalogue={getLocaleCatalogue(locale)}>
         <ThemeRuntime />
         <div id="binso-page-content"><AppShellLayout>{children}</AppShellLayout></div>
         <PrivacyConsent />

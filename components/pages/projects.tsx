@@ -7,9 +7,8 @@ import {useApiQuery} from '@/lib/client/use-api-query';
 import {apiPatch} from '@/lib/client/backend';
 import {useProcessDraft} from '../use-process-draft';
 import {usePageAccess} from '@/lib/client/page-access';
-import {LocalizedText,useLocale} from '@/lib/client/locale';
+import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
-import {translateMessage} from '@/lib/locales';
 import {AppShell} from '../app-shell';
 import {ActionRow,ActionsMenu,CreateAction,FormSheet,MetricTiles,MetricTile,WorkspaceSection} from '../binso-ux';
 import {RecordsView,RecordsControls,RecordRow,TimeEntryRow,useRecordsController} from '../records';
@@ -21,7 +20,7 @@ type Project={id:string;name:string;customer_id:string|null;customer_name:string
 type Workspace={item:Project;totals:{hours:number|string;invoiced_hours:number|string;entries:number|string}|null;time:Array<{id:string;work_date:string;hours:number|string;description:string|null;billable:boolean;approved:boolean}>|null;invoices:Array<DocumentListItem&{number:string;total_amount:number|string}>|null};
 export function ProjectsPage(){
  const customerScope=useCustomerScope(),customerId=customerScope.customerId;
- const {locale}=useLocale();
+ const translate=useTranslation();
  const chips=['Alle','Geplant','Aktiv','Blockiert','Abgeschlossen','Storniert'],columns=[{label:'Auftrag',index:0},{label:'Kunde',index:1},{label:'Arbeitszeit',index:2,align:'right' as const},{label:'Status',index:4,status:true}];
  const controller=useRecordsController({placeholder:'Aufträge suchen...',chips,columns});
  const statuses:Record<string,string>={Geplant:'planned',Aktiv:'active',Blockiert:'blocked',Abgeschlossen:'completed',Storniert:'cancelled'};
@@ -30,7 +29,7 @@ export function ProjectsPage(){
  if(customerId)query.set('customerId',customerId);
  if(controller.query.trim())query.set('q',controller.query.trim());if(statuses[controller.activeChip])query.set('status',statuses[controller.activeChip]);
  const resource=useApiQuery<{items:Project[];total:number}>('/api/projects?'+query.toString());
- const rows=(resource.data?.items??[]).map(item=>[item.name,item.customer_name??translateMessage('Intern',locale),item.hours===null?'—':formatMinutes(Number(item.hours)*60)+' h',item.id,labels[item.status]??item.status]);
+ const rows=(resource.data?.items??[]).map(item=>[item.name,item.customer_name??translate('Intern'),item.hours===null?'—':formatMinutes(Number(item.hours)*60)+' h',item.id,labels[item.status]??item.status]);
  return <AppShell title="Aufträge" backHref={customerScope.returnTo} subtitle={resource.loading?undefined:`${resource.data?.total??0} Aufträge`} active="projekte" actions={<RecordsControls scope={customerScope.scope} controller={controller} placeholder="Aufträge suchen..." chips={chips} columns={columns}><CreateAction href={customerScope.detailHref('/projekte/neu'+(customerId?'?customerId='+encodeURIComponent(customerId):''))} label="Auftrag erstellen"/></RecordsControls>}><RecordsView toolbarActions={false} showCount={false} items={rows} controller={controller} remote loading={resource.loading} error={resource.error} columns={columns} chips={chips} placeholder="Aufträge suchen..." countLabel="Aufträge" pagination={{total:resource.data?.total??0,page:controller.page,pageSize:50,onPage:controller.setPage}} rowHref={row=>customerScope.detailHref('/projekte/'+row[3])}>{row=><RecordRow href={customerScope.detailHref('/projekte/'+row[3])} icon="box" title={row[0]} meta={row[1]} value={row[2]} status={row[4]}/>}</RecordsView></AppShell>;
 }
 export function ProjectDetail({id}:{id:string}){

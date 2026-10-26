@@ -6,7 +6,7 @@ import {FormSheet} from './binso-ux';
 import {DocumentModal} from './pdf-preview';
 import {formatCurrency,formatDate} from '@/lib/financial-status';
 import {useTranslation,useLocale} from '@/lib/client/locale';
-import {localeTags} from '@/lib/locales';
+import {localeTags} from '@/lib/locales/config';
 import {formatDateTime} from '@/lib/display-format';
 import {offerActivityLabel} from '@/lib/offer-activity';
 

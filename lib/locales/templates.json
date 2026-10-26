@@ -2,66 +2,79 @@
   "{0} Monate": [
     "{0} months",
     "{0} mois",
-    "{0} mesi"
+    "{0} mesi",
+    "{0} ay"
   ],
   "Transparente Preise für Binso One. Business-Software für Schweizer KMU ab CHF {0} pro Monat, mit {1} Tagen kostenloser Testphase.": [
     "Clear pricing for Binso One. Business software for Swiss SMEs from CHF {0} per month, with a {1}-day free trial.",
     "Des tarifs clairs pour Binso One. Logiciel de gestion pour les PME suisses dès CHF {0} par mois, avec {1} jours d’essai gratuit.",
-    "Prezzi chiari per Binso One. Software gestionale per PMI svizzere da CHF {0} al mese, con {1} giorni di prova gratuita."
+    "Prezzi chiari per Binso One. Software gestionale per PMI svizzere da CHF {0} al mese, con {1} giorni di prova gratuita.",
+    "Binso One için şeffaf fiyatlar. İsviçre KOBİ’leri için ayda CHF {0}’dan başlayan işletme yazılımı, {1} gün ücretsiz deneme."
   ],
   "Transparente Pläne für Schweizer KMU – {0} Tage kostenlos testen.": [
     "Clear plans for Swiss SMEs – try free for {0} days.",
     "Des offres claires pour les PME suisses – {0} jours d’essai gratuit.",
-    "Piani chiari per PMI svizzere – prova gratis per {0} giorni."
+    "Piani chiari per PMI svizzere – prova gratis per {0} giorni.",
+    "İsviçre KOBİ’leri için açık paketler – {0} gün ücretsiz deneyin."
   ],
   "Schritt {0} von {1} · {2}": [
     "Step {0} of {1} · {2}",
     "Étape {0} sur {1} · {2}",
-    "Passaggio {0} di {1} · {2}"
+    "Passaggio {0} di {1} · {2}",
+    "Adım {0} / {1} · {2}"
   ],
   "Die Datei darf höchstens {0} MB gross sein.": [
     "The file must not exceed {0} MB.",
     "Le fichier ne doit pas dépasser {0} Mo.",
-    "Il file non deve superare {0} MB."
+    "Il file non deve superare {0} MB.",
+    "Dosya en fazla {0} MB olabilir."
   ],
   "Erkannt{0} – Angaben prüfen": [
     "Recognised{0} – check details",
     "Reconnu{0} – vérifier les données",
-    "Riconosciuto{0} – verifica i dati"
+    "Riconosciuto{0} – verifica i dati",
+    "Tanındı{0} – bilgileri kontrol edin"
   ],
   "Seite {0} von {1}": [
     "Page {0} of {1}",
     "Page {0} sur {1}",
-    "Pagina {0} di {1}"
+    "Pagina {0} di {1}",
+    "Sayfa {0} / {1}"
   ],
   "PDF-Seite {0}": [
     "PDF page {0}",
     "Page PDF {0}",
-    "Pagina PDF {0}"
+    "Pagina PDF {0}",
+    "PDF sayfası {0}"
   ],
   "{0} erhält die Rolle {1}. Dadurch ändern sich die Zugriffsrechte.": [
     "{0} will receive the {1} role. This changes their access rights.",
     "{0} recevra le rôle {1}. Cela modifie ses droits d’accès.",
-    "{0} riceverà il ruolo {1}. I suoi diritti di accesso cambieranno."
+    "{0} riceverà il ruolo {1}. I suoi diritti di accesso cambieranno.",
+    "{0} adlı kişiye {1} rolü verilecek. Erişim yetkileri değişir."
   ],
   "Rechnung {0}": [
     "Invoice {0}",
     "Facture {0}",
-    "Fattura {0}"
+    "Fattura {0}",
+    "Fatura {0}"
   ],
   "Angebot {0}": [
     "Quote {0}",
     "Devis {0}",
-    "Preventivo {0}"
+    "Preventivo {0}",
+    "Teklif {0}"
   ],
   "Bestand am {0}": [
     "Balance as of {0}",
     "Solde au {0}",
-    "Saldo al {0}"
+    "Saldo al {0}",
+    "{0} tarihindeki bakiye"
   ],
   "Umsatz {0}": [
     "Revenue {0}",
     "Chiffre d’affaires {0}",
-    "Ricavi {0}"
+    "Ricavi {0}",
+    "{0} cirosu"
   ]
 }

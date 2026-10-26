@@ -1,0 +1,174 @@
+{
+  "measuredAt": "2026-10-26T08:41:06.693558+00:00",
+  "base": "https://binso-admin-prod-asctesfvhnd5b6ay.switzerlandnorth-01.azurewebsites.net",
+  "mode": "Read-only public production HTTPS requests from this execution environment through its network path; sequential curl with gzip; no authentication or load test",
+  "limits": [
+    "Not an iPhone or browser measurement; no LCP, INP, CLS or rendering.",
+    "Production code differs from unpublished local changes.",
+    "Timing includes this environment network/proxy path and Azure; no attribution to database, app or network possible from HTTP alone.",
+    "Five sequential samples are a diagnostic snapshot, not representative field percentiles."
+  ],
+  "routes": [
+    {
+      "path": "/api/health",
+      "samples": [
+        {
+          "status": 200,
+          "firstByteSeconds": 5.7336,
+          "totalSeconds": 5.775718,
+          "transferredBytes": 187
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.396942,
+          "totalSeconds": 7.397013,
+          "transferredBytes": 187
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.679026,
+          "totalSeconds": 7.679097,
+          "transferredBytes": 187
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 6.988824,
+          "totalSeconds": 6.988891,
+          "transferredBytes": 187
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.470127,
+          "totalSeconds": 7.470213,
+          "transferredBytes": 187
+        }
+      ],
+      "successful": 5,
+      "medianFirstByteMs": 7396.9,
+      "minimumFirstByteMs": 5733.6,
+      "maximumFirstByteMs": 7679,
+      "medianTotalMs": 7397
+    },
+    {
+      "path": "/login",
+      "samples": [
+        {
+          "status": 200,
+          "firstByteSeconds": 7.053684,
+          "totalSeconds": 7.097876,
+          "transferredBytes": 6279
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.238611,
+          "totalSeconds": 7.281608,
+          "transferredBytes": 6279
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.316229,
+          "totalSeconds": 7.316418,
+          "transferredBytes": 6279
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.910262,
+          "totalSeconds": 8.108853,
+          "transferredBytes": 6279
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.396683,
+          "totalSeconds": 7.54634,
+          "transferredBytes": 6279
+        }
+      ],
+      "successful": 5,
+      "medianFirstByteMs": 7316.2,
+      "minimumFirstByteMs": 7053.7,
+      "maximumFirstByteMs": 7910.3,
+      "medianTotalMs": 7316.4
+    },
+    {
+      "path": "/registrieren",
+      "samples": [
+        {
+          "status": 200,
+          "firstByteSeconds": 7.748712,
+          "totalSeconds": 7.748901,
+          "transferredBytes": 5817
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.113702,
+          "totalSeconds": 7.155336,
+          "transferredBytes": 5817
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.657406,
+          "totalSeconds": 7.700674,
+          "transferredBytes": 5817
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.25464,
+          "totalSeconds": 7.296689,
+          "transferredBytes": 5817
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.288453,
+          "totalSeconds": 7.33002,
+          "transferredBytes": 5817
+        }
+      ],
+      "successful": 5,
+      "medianFirstByteMs": 7288.5,
+      "minimumFirstByteMs": 7113.7,
+      "maximumFirstByteMs": 7748.7,
+      "medianTotalMs": 7330
+    },
+    {
+      "path": "/",
+      "samples": [
+        {
+          "status": 200,
+          "firstByteSeconds": 7.893706,
+          "totalSeconds": 7.893939,
+          "transferredBytes": 10060
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.059789,
+          "totalSeconds": 7.101063,
+          "transferredBytes": 10060
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.343086,
+          "totalSeconds": 7.385279,
+          "transferredBytes": 10060
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.36974,
+          "totalSeconds": 7.370071,
+          "transferredBytes": 10060
+        },
+        {
+          "status": 200,
+          "firstByteSeconds": 7.022077,
+          "totalSeconds": 7.064063,
+          "transferredBytes": 10060
+        }
+      ],
+      "successful": 5,
+      "medianFirstByteMs": 7343.1,
+      "minimumFirstByteMs": 7022.1,
+      "maximumFirstByteMs": 7893.7,
+      "medianTotalMs": 7370.1
+    }
+  ],
+  "observedReleaseAtFirstHealthProbe": "cddc57f385bb1fd04735e3c47b5f0b115f86a944"
+}
