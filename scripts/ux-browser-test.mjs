@@ -8,6 +8,7 @@ import {matchesLocalizedRoute,waitForLocalizedRoute} from './localized-route-con
 import {waitForLabReady} from './shared-control-browser.mjs';
 import {measureListFrameBorders,verifyListFrameMeasurement,measureMetricDividers,measureOpenSectionShapes,assertContentGroups,verifyContentGroupRegression} from './shared-control-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
+import {zurichBusinessDay,statisticCaption,observedStatisticWindows,matchesReportStatisticRequest} from './browser-calendar.mjs';
 const periodNames={1:'Aktueller Monat',3:'Letzte 3 Monate',6:'Letzte 6 Monate',12:'Letzte 12 Monate'};
 async function chooseStatisticPeriod(page,scope,months){const control=scope.locator('.bo-period-control');await control.waitFor({state:'visible'});if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();const sheet=page.getByRole('dialog',{name:'Zeitraum',exact:true});await sheet.getByRole('radio',{name:periodNames[months],exact:true}).click();await sheet.waitFor({state:'detached'});await page.waitForFunction(()=>!document.documentElement.hasAttribute('data-modal-overlay'));}else await control.getByRole('button',{name:periodNames[months],exact:true}).click();assert.equal(await control.locator('.bo-period-segments button[aria-pressed=true]').getAttribute('aria-label'),periodNames[months],'One active period follows the actual shared control');}
 async function openStatisticCalendar(page,scope){const control=scope.locator('.bo-period-control');await control.waitFor({state:'visible'});if(await control.locator('.bo-period-mobile').isVisible()){await control.locator('.bo-period-mobile').click();await page.getByRole('dialog',{name:'Zeitraum',exact:true}).getByRole('radio',{name:'Individueller Zeitraum',exact:true}).click();}else await control.getByRole('button',{name:'Individueller Zeitraum',exact:true}).click();return page.getByRole('dialog',{name:'Zeitraum',exact:true});}
@@ -47,7 +48,7 @@ const previewState=process.env.BINSO_UX_PREVIEW_STATE;
 if(previewState&&(previewState!=='error'||process.env.BINSO_UX_MATRIX_ONLY!=='1'))throw Error('Preview state requires the isolated matrix-only error case');
 // Keep period assertions valid as the real Swiss calendar advances; never freeze
 // Date.now, which would corrupt timer/recovery interactions in the same suite.
-const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const statisticToday=zurichBusinessDay();
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
@@ -510,10 +511,16 @@ try{
       if(route==='/dashboard'){assert.equal(overview.actions,1,'Dashboard has one page-owned creation trigger');assert.equal(overview.legacyActions,0,'Dashboard has no competing legacy quick links');}
       else{
        const overview=page.locator('.bo-cash-overview'),control=overview.locator('.bo-period-control');await control.waitFor();assert.equal(await control.locator('.bo-period-segments>button').count(),5,'Shared 1/3/6/12-month and custom controls remain available');
-       const expectedFrom=new Date(Date.UTC(statisticYear,statisticMonth-6,1)).toISOString().slice(0,10),format=day=>new Intl.DateTimeFormat('de-CH',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));
        await withNavigationPreferenceLock(async()=>{
         await page.bringToFront();await waitForFiniteAnimations(page);
-        await chooseStatisticPeriod(page,overview,6);assert.equal(await control.getAttribute('title'),format(expectedFrom)+' – '+format(statisticToday),'Compact caption reflects the same inclusive calendar window');assert.equal(await overview.locator('.bo-statistics-dates').count(),0,'No duplicate date line');
+        const before=zurichBusinessDay();
+        await chooseStatisticPeriod(page,overview,6);
+        const caption=await control.getAttribute('title'),after=zurichBusinessDay();
+        // A long full-browser shard may cross Zurich midnight while the state update renders.
+        // Keep the exact inclusive-window assertion for every day actually spanned.
+        const expectedCaptions=observedStatisticWindows(before,after,6).map(window=>statisticCaption(window.to,6));
+        assert.ok(expectedCaptions.includes(caption),'Compact caption reflects the same inclusive calendar window: '+JSON.stringify({caption,before,after,expectedCaptions}));
+        assert.equal(await overview.locator('.bo-statistics-dates').count(),0,'No duplicate date line');
         await chooseStatisticPeriod(page,overview,1);
        });
       }
@@ -732,7 +739,7 @@ try{
   await page.waitForFunction(()=>Object.keys(sessionStorage).some(key=>key.includes('project:edit:project-one')&&JSON.parse(sessionStorage.getItem(key)||'null')?.value?.name==='Rechnungen'));await page.reload();await page.getByRole('button',{name:'Auftragsaktionen',exact:true}).first().click();await page.getByRole('button',{name:'Bearbeiten',exact:true}).click();projectEdit=page.getByRole('dialog',{name:'Auftrag bearbeiten',exact:true});await page.waitForFunction(()=>document.querySelector('[role="dialog"] input')?.value==='Rechnungen');
   await projectEdit.getByRole('button',{name:'Speichern',exact:true}).dblclick();await projectEdit.waitFor({state:'hidden'});await page.getByRole('heading',{name:'Rechnungen',level:1,exact:true}).waitFor();assert.equal(projectFixture.version,2,'Project completion taps create one versioned update');
   processRecoveryMode=false;
-  await navigate(base+'/berichte');await page.getByRole('heading',{name:'Aktueller Bestand',exact:true}).waitFor();const reportFrom=new Date(Date.UTC(statisticYear,statisticMonth-3,1)).toISOString().slice(0,10);const reportChanged=page.waitForRequest(request=>{const url=new URL(request.url());return url.pathname==='/api/reports'&&url.searchParams.get('months')==='custom'&&url.searchParams.get('from')===reportFrom&&url.searchParams.get('to')===statisticToday});await chooseStatisticPeriod(page,page.locator('.app-root'),3);await reportChanged;
+  await navigate(base+'/berichte');await page.getByRole('heading',{name:'Aktueller Bestand',exact:true}).waitFor();const reportBefore=zurichBusinessDay();const reportChanged=page.waitForRequest(request=>{return matchesReportStatisticRequest(new URL(request.url()),reportBefore,zurichBusinessDay(),3)});await chooseStatisticPeriod(page,page.locator('.app-root'),3);await reportChanged;
   reportExports=0;failReportDownload=true;await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();const exportButton=page.getByRole('button',{name:'CSV exportieren',exact:true});await exportButton.click();await page.getByRole('alert').getByText('Synthetic report export unavailable',{exact:true}).waitFor();assert.equal(reportExports,1);failReportDownload=false;
   await page.getByRole('button',{name:'Berichtsaktionen',exact:true}).click();const reportDownload=page.waitForEvent('download');await exportButton.dblclick();const exported=await reportDownload;assert.equal(exported.suggestedFilename(),'binso-reports-fixture.csv');assert.ok((await fs.readFile(await exported.path(),'utf8')).startsWith('"Kennzahl";"Wert";"Einheit"'),'Reports save verified CSV content');assert.equal(reportExports,2,'Failure and one deduplicated retry are the only export requests');assert.equal(new URL(page.url()).pathname,'/berichte');
 
