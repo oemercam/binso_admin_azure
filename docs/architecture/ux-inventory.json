@@ -287,21 +287,6 @@
           "exported": "enforceRateLimit"
         },
         {
-          "local": "decryptSecret",
-          "target": "lib/server/crypto.ts",
-          "exported": "decryptSecret"
-        },
-        {
-          "local": "consumeRecoveryCode",
-          "target": "lib/server/totp.ts",
-          "exported": "consumeRecoveryCode"
-        },
-        {
-          "local": "verifyTotp",
-          "target": "lib/server/totp.ts",
-          "exported": "verifyTotp"
-        },
-        {
           "local": "consumeEmailCode",
           "target": "lib/server/email-otp.ts",
           "exported": "consumeEmailCode"
@@ -7163,19 +7148,9 @@
           "exported": "requireSession"
         },
         {
-          "local": "SessionUser",
-          "target": "lib/server/session.ts",
-          "exported": "SessionUser"
-        },
-        {
           "local": "authorize",
           "target": "lib/server/rbac.ts",
           "exported": "authorize"
-        },
-        {
-          "local": "withTenant",
-          "target": "lib/server/db.ts",
-          "exported": "withTenant"
         },
         {
           "local": "ApiError",
@@ -7196,21 +7171,6 @@
           "local": "json",
           "target": "lib/server/http.ts",
           "exported": "json"
-        },
-        {
-          "local": "readJson",
-          "target": "lib/server/http.ts",
-          "exported": "readJson"
-        },
-        {
-          "local": "requireFreshAuthentication",
-          "target": "lib/server/fresh-authentication.ts",
-          "exported": "requireFreshAuthentication"
-        },
-        {
-          "local": "audit",
-          "target": "lib/server/audit.ts",
-          "exported": "audit"
         }
       ]
     },
@@ -72190,11 +72150,11 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/company-security-policy.tsx#CompanySecurityPolicy",
-        "components/binso-ux.tsx#FormSheet",
         "components/team-settings.tsx#roleLabel",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
         "components/sensitive-access.tsx#SensitiveAccess",
         "components/sensitive-access.tsx#Access",
         "components/ui.tsx#Toggle",
@@ -72442,13 +72402,13 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/company-security-policy.tsx#CompanySecurityPolicy",
-        "components/binso-ux.tsx#FormSheet",
         "lib/plans.ts#plans",
         "lib/plans.ts#PricingPlan",
         "components/team-settings.tsx#roleLabel",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
         "components/sensitive-access.tsx#SensitiveAccess",
         "components/sensitive-access.tsx#Access",
         "lib/sensitive-access.ts#SensitiveCapability",
@@ -72733,11 +72693,11 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/company-security-policy.tsx#CompanySecurityPolicy",
-        "components/binso-ux.tsx#FormSheet",
         "components/team-settings.tsx#roleLabel",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
         "components/sensitive-access.tsx#SensitiveAccess",
         "components/sensitive-access.tsx#Access",
         "components/ui.tsx#Toggle",
@@ -73007,13 +72967,13 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/company-security-policy.tsx#CompanySecurityPolicy",
-        "components/binso-ux.tsx#FormSheet",
         "lib/plans.ts#plans",
         "lib/plans.ts#PricingPlan",
         "components/team-settings.tsx#roleLabel",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
         "components/sensitive-access.tsx#SensitiveAccess",
         "components/sensitive-access.tsx#Access",
         "lib/sensitive-access.ts#SensitiveCapability",
@@ -73984,7 +73944,6 @@
         "/api/notifications/",
         "/api/auth/logout",
         "/api/time-tracker",
-        "/api/settings/security",
         "/api/customers",
         "/api/projects",
         "/api/auth/passkeys/options",
@@ -74111,24 +74070,14 @@
           "component": "components/settings-navigation.tsx#SettingsNavigation"
         },
         {
-          "tag": "FormSheet",
-          "line": 17,
-          "component": "components/company-security-policy.tsx#CompanySecurityPolicy"
-        },
-        {
-          "tag": "Field",
-          "line": 17,
-          "component": "components/company-security-policy.tsx#CompanySecurityPolicy"
+          "tag": "ActionSheet",
+          "line": 227,
+          "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "Sheet",
           "line": 217,
           "component": "components/binso-ux.tsx#FormSheet"
-        },
-        {
-          "tag": "ActionSheet",
-          "line": 227,
-          "component": "components/binso-ux.tsx#ActionsMenu"
         },
         {
           "tag": "FormSheet",
@@ -103747,11 +103696,6 @@
               "specifier": "@/lib/navigation",
               "target": "lib/navigation.ts",
               "clause": "{safeAppPath}"
-            },
-            {
-              "specifier": "@/components/passkey-login",
-              "target": "components/passkey-login.tsx",
-              "clause": "{PasskeyLogin}"
             }
           ]
         },
@@ -103880,7 +103824,6 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/passkey-login.tsx#PasskeyLogin",
         "components/password-input.tsx#PasswordInput"
       ],
       "pageRenderGraph": [
@@ -103978,10 +103921,6 @@
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/passkey-login.tsx#PasskeyLogin",
-        "lib/client/backend.ts#apiReadPost",
-        "lib/client/passkeys.ts#supportsPasskeys",
-        "lib/client/passkeys.ts#passkeyError",
         "components/password-input.tsx#PasswordInput"
       ],
       "layoutRenderGraph": [
@@ -104149,7 +104088,10 @@
         "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "lib/client/passkeys.ts#confirmWithPasskey",
+        "lib/client/backend.ts#apiReadPost",
+        "lib/client/passkeys.ts#passkeyError",
         "components/binso-ux.tsx#FormSheet",
+        "lib/client/passkeys.ts#supportsPasskeys",
         "components/pwa-register.tsx#PwaRegister",
         "components/pwa-version-notice.tsx#PwaVersionNotice",
         "components/ui.tsx#Toast",
@@ -104213,11 +104155,6 @@
               "local": "safeAppPath",
               "target": "lib/navigation.ts",
               "exported": "safeAppPath"
-            },
-            {
-              "local": "PasskeyLogin",
-              "target": "components/passkey-login.tsx",
-              "exported": "PasskeyLogin"
             }
           ]
         },
@@ -104365,7 +104302,6 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/passkey-login.tsx#PasskeyLogin",
         "components/password-input.tsx#PasswordInput",
         "components/font-preload.tsx#FontPreload",
         "components/theme-runtime.tsx#ThemeRuntime",
@@ -104553,10 +104489,6 @@
         "lib/form-input-hints.ts#examples",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/passkey-login.tsx#PasskeyLogin",
-        "lib/client/backend.ts#apiReadPost",
-        "lib/client/passkeys.ts#supportsPasskeys",
-        "lib/client/passkeys.ts#passkeyError",
         "components/password-input.tsx#PasswordInput",
         "app/layout.tsx#RootLayout",
         "lib/locales/config.ts#localeCookie",
@@ -104722,7 +104654,10 @@
         "components/ui.tsx#Toggle",
         "components/fresh-authentication-dialog.tsx#FreshAuthenticationDialog",
         "lib/client/passkeys.ts#confirmWithPasskey",
+        "lib/client/backend.ts#apiReadPost",
+        "lib/client/passkeys.ts#passkeyError",
         "components/binso-ux.tsx#FormSheet",
+        "lib/client/passkeys.ts#supportsPasskeys",
         "components/pwa-register.tsx#PwaRegister",
         "components/pwa-version-notice.tsx#PwaVersionNotice",
         "components/ui.tsx#Toast",
@@ -105619,8 +105554,6 @@
         "/api/settings/readiness",
         "/api/settings/company",
         "/api/settings/documents",
-        "/api/auth/passkeys/options",
-        "/api/auth/passkeys/verify",
         "/api/auth/session",
         "/api/notifications",
         "/api/search?q=",
@@ -105628,6 +105561,8 @@
         "/api/notifications/",
         "/api/auth/logout",
         "/api/time-tracker",
+        "/api/auth/passkeys/options",
+        "/api/auth/passkeys/verify",
         "/api/health"
       ],
       "collections": [],
@@ -105638,27 +105573,27 @@
       "widgets": [
         {
           "tag": "form",
-          "line": 83,
+          "line": 81,
           "component": "app/login/page.tsx#Login"
         },
         {
           "tag": "Field",
-          "line": 84,
+          "line": 82,
           "component": "app/login/page.tsx#Login"
         },
         {
           "tag": "form",
-          "line": 95,
+          "line": 92,
           "component": "app/login/page.tsx#Login"
         },
         {
           "tag": "Field",
-          "line": 96,
+          "line": 93,
           "component": "app/login/page.tsx#Login"
         },
         {
           "tag": "Field",
-          "line": 97,
+          "line": 94,
           "component": "app/login/page.tsx#Login"
         },
         {
@@ -239220,7 +239155,7 @@
       "key": "lib/server/session.ts#requireSession",
       "file": "lib/server/session.ts",
       "name": "requireSession",
-      "line": 113,
+      "line": 112,
       "classes": [],
       "apis": [],
       "collections": [],
@@ -239228,19 +239163,15 @@
       "elements": [],
       "conditions": [
         {
-          "line": 114,
+          "line": 113,
           "expression": "(await maintenanceState()).enabled"
         },
         {
-          "line": 116,
+          "line": 115,
           "expression": "!session"
         },
         {
-          "line": 119,
-          "expression": "session.mfaRequired&&!session.mfaEnabled&&!session.passkeyVerified&&!options.allowMfaEnrollment"
-        },
-        {
-          "line": 120,
+          "line": 116,
           "expression": "options.freshAuthentication"
         }
       ]
@@ -239454,10 +239385,6 @@
         {
           "line": 108,
           "expression": "session"
-        },
-        {
-          "line": 109,
-          "expression": "session?.mfaRequired&&!session.mfaEnabled&&!session.passkeyVerified&&!options.allowMfaEnrollment"
         }
       ]
     },
@@ -240246,7 +240173,7 @@
           "line": 121,
           "props": [
             "icon=\"lock\"",
-            "title=\"Zwei-Faktor-Authentifizierung\"",
+            "title=\"Zusätzliche Sicherheitsbestätigung\"",
             "description={!mfa?(mfaError?\"Anmeldeschutzstatus nicht verfügbar.\":undefined):mfa.demo?\"Demo\":mfa.enabled?\"Aktiv\":mfa.hasPasskey?\"Durch Passkey geschützt\":mfa.required&&!mfa.hasPasskey?\"Verpflichtend\":\"Optional\"}",
             "endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined}",
             "onClick={()=>setPanel(\"mfa\")}"
@@ -240361,7 +240288,7 @@
           "props": [
             "busy={busy}",
             "open={panel===\"mfa\"}",
-            "label=\"Zwei-Faktor-Authentifizierung\"",
+            "label=\"Zusätzliche Sicherheitsbestätigung\"",
             "onClose={()=>setPanel(null)}",
             "dirty={!!(setup||code||recovery.length)}"
           ]
@@ -241130,7 +241057,7 @@
           "tag": "SettingsGroup",
           "line": 38,
           "props": [
-            "title=\"Passkeys\""
+            "title=\"Passkeys für Sicherheitsbestätigungen\""
           ]
         },
         {
@@ -242656,157 +242583,34 @@
       "key": "components/company-security-policy.tsx#CompanySecurityPolicy",
       "file": "components/company-security-policy.tsx",
       "name": "CompanySecurityPolicy",
-      "line": 9,
+      "line": 5,
       "classes": [],
-      "apis": [
-        "/api/settings/security"
-      ],
+      "apis": [],
       "collections": [],
-      "widgets": [
-        {
-          "tag": "FormSheet",
-          "line": 17
-        },
-        {
-          "tag": "Field",
-          "line": 17
-        }
-      ],
+      "widgets": [],
       "elements": [
         {
           "tag": "SettingsGroup",
-          "line": 16,
+          "line": 8,
           "props": [
             "title=\"Unternehmenssicherheit\""
           ]
         },
         {
-          "tag": "ErrorState",
-          "line": 16,
-          "props": [
-            "onRetry={query.refresh}"
-          ]
-        },
-        {
-          "tag": "LoadingState",
-          "line": 16,
-          "props": []
-        },
-        {
-          "tag": "ActionRow",
-          "line": 16,
-          "props": [
-            "icon=\"lock\"",
-            "title=\"Authenticator-Pflicht\"",
-            "metadata={query.data.item.required?'Verpflichtend':'Optional'}",
-            "onClick={()=>{setRequired(query.data!.item.required);setError('');setOpen(true)}}"
-          ]
-        },
-        {
-          "tag": "FormSheet",
-          "line": 17,
-          "props": [
-            "open={open}",
-            "busy={busy}",
-            "label=\"Authenticator-Pflicht\"",
-            "onClose={()=>setOpen(false)}",
-            "dirty={!!query.data&&required!==query.data.item.required}"
-          ]
-        },
-        {
-          "tag": "Field",
-          "line": 17,
-          "props": [
-            "label=\"Für alle Unternehmenskonten verpflichtend\""
-          ]
-        },
-        {
-          "tag": "Input",
-          "line": 17,
-          "props": [
-            "type=\"checkbox\"",
-            "checked={required}",
-            "onChange={event=>setRequired(event.target.checked)}"
-          ]
-        },
-        {
           "tag": "p",
-          "line": 17,
+          "line": 8,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 17,
-          "props": []
-        },
-        {
-          "tag": "ErrorState",
-          "line": 17,
-          "props": []
-        },
-        {
-          "tag": "FormActions",
-          "line": 17,
-          "props": [
-            "sheet"
-          ]
-        },
-        {
-          "tag": "Button",
-          "line": 17,
-          "props": [
-            "variant=\"secondary\"",
-            "disabled={busy}",
-            "onClick={()=>setOpen(false)}"
-          ]
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 17,
-          "props": []
-        },
-        {
-          "tag": "Button",
-          "line": 17,
-          "props": [
-            "disabled={busy||!query.data||required===query.data.item.required}",
-            "onClick={()=>void save()}"
-          ]
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 17,
+          "line": 8,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 11,
-          "expression": "canManage"
-        },
-        {
-          "line": 14,
-          "expression": "pending.current"
-        },
-        {
-          "line": 14,
-          "expression": "error instanceof Error"
-        },
-        {
-          "line": 15,
-          "expression": "!canManage"
-        },
-        {
-          "line": 16,
-          "expression": "query.error"
-        },
-        {
-          "line": 16,
-          "expression": "!query.data"
-        },
-        {
-          "line": 16,
-          "expression": "query.data.item.required"
+          "line": 7,
+          "expression": "access.hasPermission?.('users:manage')!==true"
         }
       ]
     },
@@ -252118,7 +251922,7 @@
       "key": "app/login/page.tsx#Login",
       "file": "app/login/page.tsx",
       "name": "Login",
-      "line": 17,
+      "line": 16,
       "classes": [
         "auth-card",
         "auth-error",
@@ -252136,100 +251940,100 @@
       "widgets": [
         {
           "tag": "form",
-          "line": 83
+          "line": 81
         },
         {
           "tag": "Field",
-          "line": 84
+          "line": 82
         },
         {
           "tag": "form",
-          "line": 95
+          "line": 92
         },
         {
           "tag": "Field",
-          "line": 96
+          "line": 93
         },
         {
           "tag": "Field",
-          "line": 97
+          "line": 94
         }
       ],
       "elements": [
         {
           "tag": "AuthWorkspace",
-          "line": 80,
+          "line": 78,
           "props": []
         },
         {
           "tag": "section",
-          "line": 80,
+          "line": 78,
           "props": [
             "className=\"auth-card\""
           ]
         },
         {
           "tag": "h1",
-          "line": 81,
+          "line": 79,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 81,
+          "line": 79,
           "props": []
         },
         {
           "tag": "p",
-          "line": 82,
+          "line": 80,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 82,
+          "line": 80,
           "props": []
         },
         {
           "tag": "form",
-          "line": 83,
+          "line": 81,
           "props": [
             "onSubmit={submitCode}"
           ]
         },
         {
           "tag": "Field",
-          "line": 84,
+          "line": 82,
           "props": [
-            "label={stage===\"totp\"?\"Authenticator- oder Recovery-Code\":\"6-stelliger Code\"}"
+            "label={\"6-stelliger Code\"}"
           ]
         },
         {
           "tag": "Input",
-          "line": 84,
+          "line": 82,
           "props": [
             "required",
             "autoFocus",
             "value={code}",
-            "onChange={e=>setCode(stage===\"totp\"?e.target.value:e.target.value.replace(/\\D/g,\"\").slice(0,6))}",
-            "inputMode={stage===\"totp\"?\"text\":\"numeric\"}",
+            "onChange={e=>setCode(e.target.value.replace(/\\D/g,\"\").slice(0,6))}",
+            "inputMode={\"numeric\"}",
             "autoComplete=\"one-time-code\"",
-            "placeholder={stage===\"totp\"?\"000000 oder Recovery Code\":\"000000\"}"
+            "placeholder={\"000000\"}"
           ]
         },
         {
           "tag": "ErrorState",
-          "line": 85,
+          "line": 83,
           "props": [
             "className=\"auth-error\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 85,
+          "line": 83,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 86,
+          "line": 84,
           "props": [
             "type=\"submit\"",
             "disabled={loading||!code.trim()}"
@@ -252237,12 +252041,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 86,
+          "line": 84,
           "props": []
         },
         {
           "tag": "button",
-          "line": 88,
+          "line": 86,
           "props": [
             "type=\"button\"",
             "className=\"auth-inline-action\"",
@@ -252252,12 +252056,12 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 88,
+          "line": 86,
           "props": []
         },
         {
           "tag": "button",
-          "line": 89,
+          "line": 87,
           "props": [
             "type=\"button\"",
             "className=\"auth-inline-action\"",
@@ -252266,68 +252070,58 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 89,
+          "line": 87,
           "props": []
         },
         {
           "tag": "AuthWorkspace",
-          "line": 92,
+          "line": 90,
           "props": []
         },
         {
           "tag": "section",
-          "line": 92,
+          "line": 90,
           "props": [
             "className=\"auth-card\""
           ]
         },
         {
           "tag": "h1",
-          "line": 93,
+          "line": 91,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 93,
+          "line": 91,
           "props": []
         },
         {
           "tag": "p",
-          "line": 93,
+          "line": 91,
           "props": []
         },
         {
           "tag": "LocalizedText",
-          "line": 93,
+          "line": 91,
           "props": []
         },
         {
-          "tag": "PasskeyLogin",
-          "line": 94,
-          "props": [
-            "remember={rememberMe}",
-            "onAuthenticated={finish}",
-            "disabled={loading}",
-            "onBusy={value=>{pending.current=value;setLoading(value)}}"
-          ]
-        },
-        {
           "tag": "form",
-          "line": 95,
+          "line": 92,
           "props": [
             "onSubmit={submitCredentials}"
           ]
         },
         {
           "tag": "Field",
-          "line": 96,
+          "line": 93,
           "props": [
             "label=\"E-Mail\""
           ]
         },
         {
           "tag": "Input",
-          "line": 96,
+          "line": 93,
           "props": [
             "name=\"username\"",
             "autoCapitalize=\"none\"",
@@ -252337,20 +252131,20 @@
             "onChange={e=>setEmail(e.target.value)}",
             "type=\"email\"",
             "inputMode=\"email\"",
-            "autoComplete=\"username webauthn\"",
+            "autoComplete=\"username\"",
             "placeholder=\"name@firma.ch\""
           ]
         },
         {
           "tag": "Field",
-          "line": 97,
+          "line": 94,
           "props": [
             "label=\"Passwort\""
           ]
         },
         {
           "tag": "PasswordInput",
-          "line": 97,
+          "line": 94,
           "props": [
             "name=\"password\"",
             "required",
@@ -252362,19 +252156,19 @@
         },
         {
           "tag": "div",
-          "line": 98,
+          "line": 95,
           "props": [
             "className=\"auth-options\""
           ]
         },
         {
           "tag": "label",
-          "line": 98,
+          "line": 95,
           "props": []
         },
         {
           "tag": "Input",
-          "line": 98,
+          "line": 95,
           "props": [
             "type=\"checkbox\"",
             "checked={rememberMe}",
@@ -252383,43 +252177,43 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 98,
+          "line": 95,
           "props": []
         },
         {
           "tag": "div",
-          "line": 98,
+          "line": 95,
           "props": [
             "className=\"form-link\""
           ]
         },
         {
           "tag": "Link",
-          "line": 98,
+          "line": 95,
           "props": [
             "href=\"/passwort-vergessen\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 98,
+          "line": 95,
           "props": []
         },
         {
           "tag": "ErrorState",
-          "line": 99,
+          "line": 96,
           "props": [
             "className=\"auth-error\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 99,
+          "line": 96,
           "props": []
         },
         {
           "tag": "Button",
-          "line": 100,
+          "line": 97,
           "props": [
             "type=\"submit\"",
             "disabled={loading}"
@@ -252427,137 +252221,109 @@
         },
         {
           "tag": "LocalizedText",
-          "line": 100,
+          "line": 97,
           "props": []
         },
         {
           "tag": "p",
-          "line": 102,
+          "line": 99,
           "props": [
             "className=\"auth-bottom\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 102,
+          "line": 99,
           "props": []
         },
         {
           "tag": "Link",
-          "line": 102,
+          "line": 99,
           "props": [
             "href=\"/registrieren\""
           ]
         },
         {
           "tag": "LocalizedText",
-          "line": 102,
+          "line": 99,
           "props": []
         }
       ],
       "conditions": [
         {
-          "line": 31,
+          "line": 30,
           "expression": "explicitNext"
         },
         {
-          "line": 38,
+          "line": 37,
           "expression": "response.status===202"
         },
         {
-          "line": 40,
+          "line": 39,
           "expression": "payload.requiresEmailVerification"
         },
         {
-          "line": 41,
-          "expression": "payload.mfaMethod===\"totp\""
-        },
-        {
-          "line": 45,
+          "line": 43,
           "expression": "!response.ok"
         },
         {
-          "line": 46,
+          "line": 44,
           "expression": "typeof payload?.message===\"string\""
         },
         {
-          "line": 52,
+          "line": 50,
           "expression": "pending.current"
         },
         {
-          "line": 53,
+          "line": 51,
           "expression": "error instanceof Error"
+        },
+        {
+          "line": 56,
+          "expression": "pending.current"
         },
         {
           "line": 58,
-          "expression": "pending.current"
-        },
-        {
-          "line": 60,
           "expression": "stage===\"verify\""
         },
         {
-          "line": 63,
+          "line": 61,
           "expression": "!response.ok"
         },
         {
-          "line": 63,
+          "line": 61,
           "expression": "typeof payload?.message===\"string\""
         },
         {
-          "line": 67,
+          "line": 65,
           "expression": "error instanceof Error"
         },
         {
-          "line": 72,
+          "line": 70,
           "expression": "pending.current"
         },
         {
-          "line": 74,
+          "line": 72,
           "expression": "stage===\"verify\""
         },
         {
-          "line": 74,
+          "line": 72,
           "expression": "!response.ok"
         },
         {
-          "line": 76,
+          "line": 74,
           "expression": "error instanceof Error"
         },
         {
-          "line": 80,
+          "line": 78,
           "expression": "stage!==\"credentials\""
         },
         {
-          "line": 81,
-          "expression": "stage===\"totp\""
-        },
-        {
-          "line": 82,
-          "expression": "stage===\"totp\""
-        },
-        {
           "line": 84,
-          "expression": "stage===\"totp\""
-        },
-        {
-          "line": 84,
-          "expression": "stage===\"totp\""
-        },
-        {
-          "line": 84,
-          "expression": "stage===\"totp\""
-        },
-        {
-          "line": 84,
-          "expression": "stage===\"totp\""
-        },
-        {
-          "line": 86,
           "expression": "loading"
         },
         {
-          "line": 100,
+          "line": 97,
           "expression": "loading"
         }
       ]
@@ -252566,80 +252332,13 @@
       "key": "app/login/page.tsx#Stage",
       "file": "app/login/page.tsx",
       "name": "Stage",
-      "line": 15,
+      "line": 14,
       "classes": [],
       "apis": [],
       "collections": [],
       "widgets": [],
       "elements": [],
       "conditions": []
-    },
-    {
-      "key": "components/passkey-login.tsx#PasskeyLogin",
-      "file": "components/passkey-login.tsx",
-      "name": "PasskeyLogin",
-      "line": 8,
-      "classes": [],
-      "apis": [
-        "/api/auth/passkeys/options",
-        "/api/auth/passkeys/verify"
-      ],
-      "collections": [],
-      "widgets": [],
-      "elements": [
-        {
-          "tag": "ErrorState",
-          "line": 33,
-          "props": []
-        },
-        {
-          "tag": "LocalizedText",
-          "line": 33,
-          "props": []
-        }
-      ],
-      "conditions": [
-        {
-          "line": 12,
-          "expression": "!options.current||Date.now()-issued.current>240_000"
-        },
-        {
-          "line": 15,
-          "expression": "mounted.current"
-        },
-        {
-          "line": 19,
-          "expression": "available"
-        },
-        {
-          "line": 20,
-          "expression": "!await browserSupportsWebAuthnAutofill()||!mounted.current"
-        },
-        {
-          "line": 21,
-          "expression": "!mounted.current||pending.current||latest.current.disabled"
-        },
-        {
-          "line": 23,
-          "expression": "!mounted.current||pending.current||latest.current.disabled"
-        },
-        {
-          "line": 25,
-          "expression": "mounted.current"
-        },
-        {
-          "line": 25,
-          "expression": "mounted.current"
-        },
-        {
-          "line": 30,
-          "expression": "props.disabled&&!pending.current"
-        },
-        {
-          "line": 33,
-          "expression": "error"
-        }
-      ]
     },
     {
       "key": "app/mitarbeiter/[id]/page.tsx#Page",
@@ -281491,7 +281190,7 @@
     {
       "file": "components/company-security-policy.tsx",
       "name": "CompanySecurityPolicy",
-      "line": 9,
+      "line": 5,
       "usedBy": [
         "/einstellungen/team"
       ],
@@ -283463,15 +283162,6 @@
       "line": 41,
       "usedBy": [
         "/zeit"
-      ],
-      "frameworkUsedBy": []
-    },
-    {
-      "file": "components/passkey-login.tsx",
-      "name": "PasskeyLogin",
-      "line": 8,
-      "usedBy": [
-        "/login"
       ],
       "frameworkUsedBy": []
     },

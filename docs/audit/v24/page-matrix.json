@@ -6370,11 +6370,11 @@
         "components/app-shell.tsx#ShellRegistration",
         "components/app-shell.tsx#ShellConfiguration",
         "components/company-security-policy.tsx#CompanySecurityPolicy",
-        "components/binso-ux.tsx#FormSheet",
         "components/team-settings.tsx#roleLabel",
         "components/ui.tsx#SectionTitle",
         "components/binso-ux.tsx#ActionsMenu",
         "components/binso-ux.tsx#RowActions",
+        "components/binso-ux.tsx#FormSheet",
         "components/sensitive-access.tsx#SensitiveAccess",
         "components/sensitive-access.tsx#Access",
         "components/ui.tsx#Toggle",
@@ -8776,7 +8776,6 @@
         "components/ui.tsx#CurrencyInput",
         "components/ui.tsx#FormLabel",
         "components/ui.tsx#FormError",
-        "components/passkey-login.tsx#PasskeyLogin",
         "components/password-input.tsx#PasswordInput"
       ],
       "layouts": [

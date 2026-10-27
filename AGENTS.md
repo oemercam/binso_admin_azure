@@ -322,3 +322,14 @@ authentication. Real Face ID/Touch ID/Windows Hello/Android/iOS-PWA evidence can
 be claimed from virtual authenticators. Exact-SHA merge/migration/deployment gates
 remain mandatory. Implementation and source ZIP preparation are authorized; this
 request does not approve an as-yet-unknown production source SHA.
+
+## Customer password login (27 October 2026, latest owner correction)
+
+The owner explicitly chose registration with email verification, followed by
+customer email/password login only. This supersedes customer TOTP/passkey login
+and tenant mandatory-login-MFA requirements, including existing accounts. Keep
+verified-email checks, password proof, rates, sessions, RBAC, RLS and revocation.
+Do not change Microsoft Entra operator MFA or sensitive-account-change/recovery
+proofs; their existing factors remain stored. No paid push service is authorized.
+See docs/architecture/customer-password-login-20261027.md. Exact-SHA production
+approval and all required QA gates remain mandatory.

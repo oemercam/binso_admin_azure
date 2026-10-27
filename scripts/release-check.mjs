@@ -23,7 +23,14 @@ assert.ok(pricing.includes('domainConfig.trialDays')&&pricing.includes('plans.ma
 assert.ok(register.includes('RegistrationPage'),'Registration must mount the shared full-page entry');
 const registrationSheet=await fs.readFile('components/registration/registration-page.tsx','utf8');
 assert.ok(registrationSheet.includes("search.get(\"plan\")")&&registrationSheet.includes("search.get(\"billing\")")&&registrationSheet.includes('billingCycle:context.billingCycle'),'Registration must preserve selected plan and billing cycle through the server context');
-assert.ok(loginRoute.includes('if(user.mfa_enabled)')&&!loginRoute.includes('purpose:"login"'),'Ordinary verified login must not add mandatory email MFA; opted-in TOTP remains enforced');
+// Latest owner decision: customer email verification then password-only login.
+assert.ok(loginRoute.includes('if(!user.email_verified_at)')&&loginRoute.includes('verifyPassword(password,identity.password_hash)')&&loginRoute.includes('completeRegistrationVerification'),'Customer login retains verified-email and password proof');
+assert.ok(!loginRoute.includes('if(user.mfa_enabled)')&&!loginRoute.includes('purpose:"login"')&&!loginRoute.includes('mfaMethod:'),'Customer login must not add TOTP or email MFA');
+const customerLoginUi=await readPageFile('app/login/page.tsx','utf8');
+assert.ok(customerLoginUi.includes('autoComplete="username"')&&customerLoginUi.includes('autoComplete="current-password"')&&!customerLoginUi.includes('PasskeyLogin')&&!customerLoginUi.includes('"totp"'),'Customer login uses password-manager fields without additional ceremonies');
+const operatorEntra=await readPageFile('lib/server/operator/entra.ts','utf8');
+const operatorSessions=await readPageFile('lib/server/operator/session.ts','utf8');
+assert.ok(operatorEntra.includes('if(!hasEntraMfaProof(principal.claims??[]))return null')&&operatorSessions.includes('platform_auth_sessions')&&operatorSessions.includes("if(env.appMode==='production'&&!identity)return null"),'Customer login changes must preserve separate Entra-MFA operator sessions');
 assert.ok(recoverRoute.includes('domainConfig.passwordResetMinutes'),'Password recovery must use the canonical reset lifetime');
 assert.ok(provisioningSource.includes('input.language??"de"'),'Persisted profile language must remain schema-compatible');
 assert.ok(provisioningSource.includes('const expiresAt=null'),'Trial expiry must not start before first email verification');

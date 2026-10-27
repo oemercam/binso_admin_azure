@@ -7,7 +7,7 @@ export const runtime='nodejs';
 export async function POST(request:NextRequest){try{
  assertSameOrigin(request);await enforceRateLimit(request,'passkey-options',10,15*60_000);
  const b=await readJson<{mode?:unknown;password?:unknown;code?:unknown;label?:unknown}>(request,8192);
- if(b.mode==='authenticate')return json(await beginPasskeyAuthentication());
+ if(b.mode==='authenticate')throw new ApiError(410,'password_login_required','Bitte melde dich mit E-Mail und Passwort an.');
  if(b.mode==='reauthenticate')return json(await beginPasskeyAuthentication(await requireSession({allowMfaEnrollment:true})));
  if(b.mode!=='register')throw new ApiError(400,'action_invalid','Ungültige Aktion.');
  return json(await beginPasskeyRegistration(await requireSession({allowMfaEnrollment:true}),b.password,b.code,b.label));

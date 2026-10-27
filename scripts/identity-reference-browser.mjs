@@ -6,7 +6,7 @@ import {verifyCanonicalFieldRegression} from './shared-control-browser.mjs';
 export async function assertIdentityReference({page,context,width,output}){
   await page.getByRole('button',{name:'Anmelden',exact:true}).waitFor();
   assert.equal(await page.getByRole('button',{name:'Mit Passkey anmelden',exact:true}).count(),0,'The approved login uses the native password manager without a separate passkey button');
-  assert.equal(await page.locator('input[name="username"][autocomplete="username webauthn"]').count(),1);
+  assert.equal(await page.locator('input[name="username"][autocomplete="username"]').count(),1);
   assert.equal(await page.locator('input[name="password"][autocomplete="current-password"]').count(),1);
   assert.equal(await page.locator('.auth-workspace-intro').count(),0,'Revision7 identity has one quiet column, without the retired promotional panel');
   await page.evaluate(()=>document.fonts.ready);assert.equal(await page.evaluate(()=>[...document.fonts].some(face=>face.family==='Inter'&&face.status==='loaded')),true,'Inter is genuinely loaded from the project, not merely named in CSS');

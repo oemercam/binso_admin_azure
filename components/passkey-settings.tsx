@@ -35,9 +35,9 @@ export function PasskeySettings({demo,onChanged}:{demo:boolean;onChanged:()=>voi
   }catch(e){await load();setError(passkeyError(e))}finally{pending.current=false;setBusy(false)}
  };
  if(demo)return null;
- return <SettingsGroup title="Passkeys">
+ return <SettingsGroup title="Passkeys für Sicherheitsbestätigungen">
   <>
-   <p className="settings-note"><LocalizedText>{'Melde dich mit Face ID, Fingerabdruck oder deiner Geräteentsperrung an. Richte möglichst einen zweiten Passkey auf einem anderen Gerät ein.'}</LocalizedText></p>
+   <p className="settings-note"><LocalizedText>{'Vorhandene Passkeys dienen der Bestätigung kritischer Kontoänderungen. Die Anmeldung verwendet E-Mail und Passwort.'}</LocalizedText></p>
    {loading?<LoadingState/>:<div className="action-list">{keys.map(key=><ActionRow key={key.id} icon="lock" verbatim title={key.label} description={translate('Zuletzt verwendet')} metadata={key.last_used_at?new Date(key.last_used_at).toLocaleString(localeTags[locale]):translate('Noch nie verwendet')} onClick={()=>{setLabel(key.label);setTarget(key);setOpen(true)}}/>)}</div>}
    {supportsPasskeys()&&<Button variant="secondary" disabled={busy} onClick={()=>{setTarget(null);setOpen(true)}}><LocalizedText>{'Passkey hinzufügen'}</LocalizedText></Button>}
    {!!keys.length&&<div className="action-list"><ActionRow icon="lock" title="Neue Wiederherstellungscodes erstellen" disabled={busy} onClick={()=>void save('recovery')}/></div>}

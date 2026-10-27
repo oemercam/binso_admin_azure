@@ -61,6 +61,12 @@ try{
  await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'owner','active')",[org,user,s.email]);
  await db.query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at) values($1,$2,$3,$4,now()+interval '1 hour')",[s.sessionId,user,org,hash('pk-current-token').toString('hex')]);
  const keys=await import(await load('lib/server/passkeys.ts')),session=await import(await load('lib/server/session.ts'));
+ const optionsRoute=await import(await load('app/api/auth/passkeys/options/route.ts')),verifyRoute=await import(await load('app/api/auth/passkeys/verify/route.ts'));
+ const loginRequest=(path,body,origin='https://fixture.invalid')=>({headers:new Headers({Origin:origin}),nextUrl:new URL('https://fixture.invalid'+path),body:new Response(JSON.stringify(body)).body});
+ assert.equal((await optionsRoute.POST(loginRequest('/api/auth/passkeys/options',{mode:'authenticate'}))).status,410,'Public passkey login is retired for customers');
+ assert.equal((await verifyRoute.POST(loginRequest('/api/auth/passkeys/verify',{mode:'authenticate',response:{id:'synthetic-retired-key'}}))).status,410,'Old browser clients cannot finish a retired passkey login');
+ assert.equal((await optionsRoute.POST(loginRequest('/api/auth/passkeys/options',{mode:'authenticate'},'https://foreign.invalid'))).status,403,'Retired routes retain origin protection');
+ assert.equal((await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,1,'Retired public ceremonies cannot create additional customer sessions');
  const begin=()=>keys.beginPasskeyRegistration(s,password,totp.totp(secret),'Synthetic key');
  globalThis.__passkey.appUrl='http://evil.invalid';assert.throws(()=>keys.passkeyRelyingParty(),e=>e.code==='passkey_unavailable');globalThis.__passkey.appUrl='https://fixture.invalid';
  await assert.rejects(()=>keys.beginPasskeyRegistration(s,password,totp.totp(secret),'key'),e=>e.code==='fresh_authentication_required','Registration requires a server-side fresh proof, not merely request fields');
@@ -100,7 +106,8 @@ try{
  await db.query('update organizations set employee_mfa_required=true where id=$1',[org]);await db.query('update app_users set mfa_enabled=false where id=$1',[user]);
  assert.ok(await session.getSession(),'A previously UV-proven session satisfies the company strong-auth policy');
  await session.createSession({userId:user,organizationId:org,email:s.email,name:'Synthetic',role:'owner',persistent:false});
- assert.equal(await session.getSession(),null,'A password-only session cannot inherit passkey assurance');
+ assert.ok(await session.getSession(),'Historical company MFA flags cannot block an authorized password login');
+ assert.equal((await session.getSession()).passkeyVerified,false,'Password login never fabricates passkey assurance');
  const freshRoute=await import(await load('app/api/auth/reauthenticate/route.ts'));
  const freshRequest=body=>({headers:new Headers(),nextUrl:new URL('https://fixture.invalid/api/auth/reauthenticate'),body:new Response(JSON.stringify({password,...body})).body});
  const proofChoice=await freshRoute.POST(freshRequest({action:'challenge'}));assert.equal((await proofChoice.json()).method,'recovery','An existing passkey cannot be downgraded to email step-up');
@@ -195,5 +202,5 @@ try{
  await db.query("update organization_memberships set role='admin' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(user,{action:'deactivate'})).status,409,'Admins cannot suspend their own remaining access');
  await db.query("update organization_memberships set role='reader' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(normalUser,{role:'admin'})).status,403,'A downgraded actor cannot reuse an old admin session for privilege assignment');
  await db.query("update organization_memberships set role='owner' where organization_id=$1 and user_id=$2",[org,user]);
- console.log('Passkey: real P-256 signatures, RP/origin/UV/challenge/counter/user-handle negatives, UV strong sessions without extra TOTP, password-only policy denial, session-bound step-up, rename, last-method protection, email plus single-use recovery, RLS, replay/expiry, notices and revoke guards passed. Physical authenticators remain untested.');
+ console.log('Passkey: real P-256 signatures, RP/origin/UV/challenge/counter/user-handle negatives, UV strong sessions without extra TOTP, password login without legacy enrollment gate, session-bound step-up, rename, last-method protection, email plus single-use recovery, RLS, replay/expiry, notices and revoke guards passed. Physical authenticators remain untested.');
 }finally{if(native)await db.end();else await db.close();delete globalThis.__passkey}
