@@ -127,6 +127,8 @@ jobs:
       - run: pnpm test
       - name: Legacy checksum attestation adversaries
         run: node scripts/legacy-checksum-attestation-test.mjs
+      - name: Zurich browser calendar boundaries
+        run: node scripts/browser-calendar-test.mjs
       - name: Fast UX compliance contracts
         # Runtime/rate-limit/demo/navigation contracts already ran in pnpm test.
         run: |
