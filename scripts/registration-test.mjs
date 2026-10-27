@@ -1,4 +1,5 @@
 import {verifySinglePageCompanySetup} from './company-setup-cases.mjs';
+import {verifyProjectBudgets} from './project-budget-cases.mjs';
 import {verifyWebPush} from './phase1-push-cases.mjs';
 import {pathToFileURL} from 'node:url';
 import {createRequire} from 'node:module';
@@ -243,6 +244,7 @@ try{
  jar.set('binso_session',validSessionCookie);
  const current=await actualSession.getSession();assert.ok(current);
  await verifySinglePageCompanySetup({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
+  await verifyProjectBudgets({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
  await verifyCompanyMfaPolicy({db,load,actualSession,request,jar,current,foreignOrganizationId:secondSession.organizationId});
  await verifyTimeReview({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
  await verifyWebPush({db,load,request,current,foreignOrganizationId:secondSession.organizationId});

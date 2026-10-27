@@ -1,0 +1,13 @@
+{
+  "baseSha": "72948d6d4b8eb345bdd0618202e40a1dd9f37ceb",
+  "sha256": "325f37c4ef2e7bbaed3ce69eca60ab09409d16a4d11b4607f5f625015c64744a",
+  "bytes": 17387,
+  "complete": true,
+  "endsAt": "23.14: Kunden-Zentrale → Fach",
+  "missingRemainderRequested": true,
+  "securityDecision": "Owner explicitly confirmed: keep the current email/password customer login. V8 does not reintroduce customer login MFA/passkeys.",
+  "originalSourceComplete": false,
+  "primarySource": "source-full.md",
+  "fullSourceSha256": "ec824a2c8603494e3620756bdeddc0bedf665743ec05ddb3d2984a063b9a0ab0",
+  "fullSourceOrigin": "Owner text reply to the missing-source question"
+}

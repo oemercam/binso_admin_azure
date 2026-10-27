@@ -109,7 +109,8 @@
     "0105_organization_mfa_policy.sql",
     "0106_web_push.sql",
     "0107_push_dispatch_lifecycle.sql",
-    "0108_passkey_assurance.sql"
+    "0108_passkey_assurance.sql",
+    "0109_project_budget_presence.sql"
   ],
   "tables": [
     {
@@ -7977,6 +7978,69 @@
       ]
     },
     {
+      "name": "project_financial_budgets",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "cost_budget",
+          "type": "numeric(14,2)",
+          "required": false
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "updated_by_user_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "project_budget_insert",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": null,
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (updated_by_user_id = current_setting('app.user_id'::text, true)) AND app_project_budget_access(project_id, true))"
+        },
+        {
+          "policyname": "project_budget_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_project_budget_access(project_id))",
+          "with_check": null
+        },
+        {
+          "policyname": "project_budget_update",
+          "cmd": "UPDATE",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_project_budget_access(project_id, true))",
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (updated_by_user_id = current_setting('app.user_id'::text, true)) AND app_project_budget_access(project_id, true))"
+        }
+      ]
+    },
+    {
       "name": "projects",
       "rls": true,
       "forced": true,
@@ -8024,7 +8088,7 @@
         {
           "name": "hours_budget",
           "type": "numeric(12,2)",
-          "required": true
+          "required": false
         },
         {
           "name": "progress",

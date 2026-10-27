@@ -122,7 +122,7 @@ function AppShellFrame({
   const title=formPageTitle??routeTitle;
   useEffect(()=>{
    const main=document.querySelector('main.page-container');if(!main)return;
-   const update=()=>setFormPageTitle(Array.from(main.querySelectorAll(':scope > .form-page')).at(-1)?.getAttribute('aria-label')??null);
+   const update=()=>setFormPageTitle(Array.from(main.querySelectorAll(':scope > .form-page[data-form-page-root]')).at(-1)?.getAttribute('aria-label')??null);
    const observer=new MutationObserver(update);observer.observe(main,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-label']});queueMicrotask(update);return()=>observer.disconnect();
   },[loading]);
   const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();

@@ -1,6 +1,6 @@
 "use client";
 import {LocalizedText} from "@/lib/client/locale";
-import {safeAppPath} from "@/lib/navigation";
+import {safeAppPath,withAppReturnTo} from "@/lib/navigation";
 import {useEffect,useRef,useState} from 'react';
 import {useSearchParams,useRouter} from 'next/navigation';
 import {apiPost} from '@/lib/client/backend';
@@ -46,7 +46,7 @@ export function ProjectForm(){
   if(busy.current||!recovery.ready||loading||loadError||sourceOffer&&initializedSource.current!==sourceOffer)return;
   if(name.trim().length<2){setError('Bitte eine Bezeichnung mit mindestens zwei Zeichen erfassen.');return;}
   setError(null);busy.current=true;setSaving(true);
-  try{const body={name:name.trim(),customerId,sourceOffer},serialized=JSON.stringify(body);const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({name,customerId,replay:attempt});const result=await apiPost<{item?:{id:string}}>('/api/projects',body,{idempotencyKey:attempt.key});if(typeof result.item?.id!=='string'||!result.item.id)throw new Error('Die Auftraganlage konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.');setSaved(true);recovery.clear();allowDraftNavigation();router.push(returnTo==='/projekte'?'/projekte/'+encodeURIComponent(result.item.id):'/zeit?projectId='+encodeURIComponent(result.item.id));}
+  try{const body={name:name.trim(),customerId,sourceOffer},serialized=JSON.stringify(body);const attempt=replay?.body===serialized?replay:{body:serialized,key:crypto.randomUUID()};setReplay(attempt);recovery.persist({name,customerId,replay:attempt});const result=await apiPost<{item?:{id:string}}>('/api/projects',body,{idempotencyKey:attempt.key});if(typeof result.item?.id!=='string'||!result.item.id)throw new Error('Die Auftraganlage konnte nicht bestätigt werden. Bitte den gespeicherten Stand prüfen.');setSaved(true);recovery.clear();allowDraftNavigation();router.push(withAppReturnTo('/projekte/'+encodeURIComponent(result.item.id),returnTo));}
   catch(e){setError(e instanceof Error?e.message:'Auftrag konnte nicht erstellt werden.');}
   finally{busy.current=false;setSaving(false)}
  };

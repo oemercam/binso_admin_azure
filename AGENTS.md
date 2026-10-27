@@ -10,6 +10,20 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # BINso One — binding product and UI rules
 
+## V8 Global Simple UX & Workflow (27 October 2026)
+
+The full owner reply in docs/architecture/v8-global-simple-workflow/source-full.md
+supersedes the truncated original V8 attachment; see contract.md, the pre-change
+inventory and matrix. The owner separately confirmed keeping the existing
+password-only customer login. V8 does not reintroduce customer login MFA/passkeys.
+The owner explicitly authorized local implementation and isolated tests for the
+six shared billing models and absent-versus-zero budgets described in that folder's
+critical-changes.md. Preserve the existing financial engines and immutable historic
+documents; no inferred repricing or second financial/permission implementation.
+Existing V7.1 navigation/FAB, central UI and five-language owners remain binding.
+No productive migration, GitHub push/merge, Azure deployment or new paid service
+is authorized. Keep actual QA/device/provider gaps explicit.
+
 The user's original ZIP in docs/audit/v24/reference/ is the binding visual source.
 Read docs/audit/v24/reference/IMPLEMENTIERUNG.md and
 docs/architecture/reference-foundation.md before UI work.

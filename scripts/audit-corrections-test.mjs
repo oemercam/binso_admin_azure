@@ -159,7 +159,7 @@ try{
    '@/lib/client/use-api-query':{useApiQuery:()=>({loading:false,data:{item:base},refresh(){}})},
    '@/lib/client/page-access':{usePageAccess:()=>({write:scenario!=='read-only'})},
    '@/lib/navigation':{safeAppPath},'@/lib/setup-readiness':readiness,'@/lib/action-readiness':compile('lib/action-readiness.ts',{'./navigation':{safeAppPath}}),
-   './use-browser-back-guard':{allowDraftNavigation(){},useBrowserBackGuard:()=>()=>{}},
+   './use-browser-back-guard':{allowDraftNavigation(){},useBrowserBackGuard:()=>()=>{}},'./use-process-draft':{useProcessDraft:()=>({ready:true,clear(){}})},
    '@/lib/client/backend':{apiPatch:async(path,payload)=>{calls.push({path,payload});if(scenario==='save-error')throw Error('Save failed');return {item:{...base,name:payload.name,street:scenario==='stale-response'?'':payload.street,postal_code:payload.postalCode,city:payload.city,country_code:payload.countryCode,iban:payload.iban,qr_iban:payload.qrIban}}}},
   });
   const render=()=>{cursor=0;return SetupProcess()};let tree=render();
@@ -169,7 +169,7 @@ try{
   const input=(id,value)=>{const node=walk(tree).find(node=>node.props.id===id);assert.ok(node,id);node.props.onChange({target:{value}});tree=render()};
   for(const id of ['setup-company-name','setup-street','setup-postal-code','setup-city','setup-iban'])assert.ok(walk(tree).some(n=>n.props.id===id),'All required areas are present together: '+id);
   if(scenario==='clean-exit'||scenario==='dirty-exit'){
-   if(scenario==='dirty-exit')input('setup-street','Changed');walk(tree).find(n=>n.props.children==='Später fortsetzen').props.onClick();tree=render();assert.equal(routes.length,scenario==='clean-exit'?1:0);if(scenario==='dirty-exit')assert.ok(walk(tree).some(n=>n.props.open===true&&n.props.title==='Änderungen verwerfen?'));continue;
+   if(scenario==='dirty-exit')input('setup-street','Changed');walk(tree).find(n=>n.props.children==='Abbrechen').props.onClick();tree=render();assert.equal(routes.length,scenario==='clean-exit'?1:0);if(scenario==='dirty-exit')assert.ok(walk(tree).some(n=>n.props.open===true&&n.props.title==='Änderungen verwerfen?'));continue;
   }
   if(scenario!=='incomplete'){input('setup-street','Testweg');input('setup-postal-code','8000');input('setup-city','Zürich');input('setup-iban',scenario==='invalid-bank'?'CH123':'CH9300762011623852957');}
   const submit=walk(tree).find(n=>n.type==='form').props.onSubmit;await Promise.all([submit({preventDefault(){}}),submit({preventDefault(){}})]);tree=render();

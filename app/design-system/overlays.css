@@ -385,23 +385,23 @@
 .action-row>svg:first-child{width:18px;height:18px}
 
 /* Route and domain editors reuse the page header, margins and one scroll owner. */
-.page-container:has(>.form-page)>:not(.form-page):not(.page-head){display:none}
-.page-container:has(>.form-page)>.page-head .page-actions{display:none}
-.form-page{display:flex;flex-direction:column;min-width:0;min-height:0;height:var(--form-page-height,auto)}
+.page-container:has(>.form-page[data-form-page-root])>:not(.form-page[data-form-page-root]):not(.page-head){display:none}
+.page-container:has(>.form-page[data-form-page-root])>.page-head .page-actions{display:none}
+.form-page[data-form-page-root]{display:flex;flex-direction:column;min-width:0;min-height:0;height:var(--form-page-height,auto)}
 .form-page-body{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;scroll-padding-block:12px calc(var(--form-page-footer-height,80px) + 16px)}
 .form-page-body:has(>.sheet-form-layout,>form>.form-wizard,>.form-wizard){overflow:hidden}
 .form-page-body>.sheet-form-layout,.form-page-body>form:has(>.form-wizard),.form-page-body>.form-wizard{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden;margin:0}
-.form-page .sheet-form-content{flex:1;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:var(--field-group-gap);scroll-padding-block:12px calc(var(--form-page-footer-height,80px) + 16px)}
-.form-page :is(.sheet-form-footer,.form-page-actions){position:static;flex:none;background:var(--color-bg);border-top:1px solid var(--color-line);padding-block:12px max(12px,var(--safe-bottom))}
-.form-page .mobile-sticky-save{position:static;display:flex;gap:var(--field-group-gap);margin:0;padding:0;flex:none}
-.form-page .form-wizard[data-guided],.form-page-body>form>.form-wizard{display:flex;flex-direction:column;flex:1;height:auto;min-height:0}
-.form-page .form-wizard .wizard-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:var(--field-group-gap)}
-.form-page .form-wizard>.mobile-sticky-save{padding-block:12px max(12px,var(--safe-bottom));border-top:1px solid var(--color-line)}
-.form-page :is(input,select,textarea){scroll-margin-block:16px calc(var(--form-page-footer-height,80px) + 16px)}
-.form-page .button{white-space:normal}
+.form-page[data-form-page-root] .sheet-form-content{flex:1;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:var(--field-group-gap);scroll-padding-block:12px calc(var(--form-page-footer-height,80px) + 16px)}
+.form-page[data-form-page-root] :is(.sheet-form-footer,.form-page-actions){position:static;flex:none;background:var(--color-bg);border-top:1px solid var(--color-line);padding-block:12px max(12px,var(--safe-bottom))}
+.form-page[data-form-page-root] .mobile-sticky-save{position:static;display:flex;gap:var(--field-group-gap);margin:0;padding:0;flex:none}
+.form-page[data-form-page-root] .form-wizard[data-guided],.form-page-body>form>.form-wizard{display:flex;flex-direction:column;flex:1;height:auto;min-height:0}
+.form-page[data-form-page-root] .form-wizard .wizard-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-bottom:var(--field-group-gap)}
+.form-page[data-form-page-root] .form-wizard>.mobile-sticky-save{padding-block:12px max(12px,var(--safe-bottom));border-top:1px solid var(--color-line)}
+.form-page[data-form-page-root] :is(input,select,textarea){scroll-margin-block:16px calc(var(--form-page-footer-height,80px) + 16px)}
+.form-page[data-form-page-root] .button{white-space:normal}
 
-.page-container>.form-page:has(~.form-page){display:none}
-.app-root:has(.form-page) .mobile-detail-actions{display:none}
+.page-container>.form-page[data-form-page-root]:has(~.form-page[data-form-page-root]){display:none}
+.app-root:has(.form-page[data-form-page-root]) .mobile-detail-actions{display:none}
 .form-page-content{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:auto}
 .form-page-content:has(>.sheet-form-layout,>form>.form-wizard,>.form-wizard),.form-page-content.sheet-form-layout{overflow:hidden}
 .form-page-content>.sheet-form-layout,.form-page-content>form:has(>.form-wizard),.form-page-content>.form-wizard{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden;margin:0}

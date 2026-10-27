@@ -60,6 +60,8 @@ export function planChanges(files,{level='standard'}={}){
  let dependencyRoutes=[];try{const catalog=JSON.parse(fs.readFileSync('docs/architecture/ux-inventory.json','utf8'));dependencyRoutes=catalog.routes.filter(r=>modulePaths.some(p=>r.components.some(c=>c.startsWith(p+'#')))).map(r=>r.route).filter(r=>!r.startsWith('/preview')&&!r.startsWith('/operator')).map(r=>r.replace('[id]',r.startsWith('/kunden')?'customer-one':r.startsWith('/produkte')?'product-one':r.startsWith('/mitarbeiter')?'employee-one':r.startsWith('/lieferanten')?'supplier-one':r.startsWith('/spesen')?'expense-one':r.startsWith('/zahlungen')?'payment-one':r.startsWith('/support')?'ticket-one':r.startsWith('/rechnungen')?'RE-TEST-1':'AN-TEST-1'));}catch{}
  const routes=full?fullRoutes:broad?representative:modulePaths.length&&dependencyRoutes.length?[...new Set([...dependencyRoutes,...matched.flatMap(g=>g.routes).filter(r=>r.startsWith('/einstellungen/zeiterfassung'))])]:[...new Set(matched.flatMap(g=>g.routes))];
  const suites=new Set();
+ if(paths.some(p=>/project.*budget|0109_project_budget|project-workspace|lib\/projects|pages\/projects/.test(p)))suites.add('project-budget-migration-test');
+ if(paths.some(p=>/billing-model|lib\/money/.test(p)))suites.add('billing-model-test');
  if(global||paths.some(p=>/customer-workspace|workspace-navigation|v7-navigation|pages\/(customers|finance|projects|payments|support)/.test(p)))suites.add('v7-navigation-test');
  if(global||paths.some(p=>/pwa-|startup|app\/api\/dashboard|components\/pages\/time/.test(p)))suites.add('pwa-transition-test');
  if(global||paths.some(p=>/components\/(setup-process|setup-guide|directory-select|select-control|documents|document-settings|entity-files|offer-history|pages\/(customers|time|dashboard|payments))|lib\/(setup-readiness|display-format|server\/repositories\/customer-activity)|scripts\/audit-corrections-test/.test(p)))suites.add('audit-corrections-test');
@@ -78,6 +80,7 @@ export function planChanges(files,{level='standard'}={}){
  if(paths.some(p=>/locale|localization|app\/layout|prepare-ui-build/.test(p)))suites.add('locale-catalogue-test');
  if(paths.some(p=>/session|auth/.test(p))){suites.add('client-session-test');suites.add('session-navigation-test');suites.add('auth-integrity-test');}
  if(paths.some(p=>/file-scan|app\/api\/files\/|app\/api\/settings\/company/.test(p))){suites.add('file-scan-test');suites.add('auth-integrity-test');}
+ if(paths.some(p=>/receipt-scan|scan-receipt|config\/limits|lib\/server\/http/.test(p)))suites.add('receipt-scan-test');
  if(paths.some(p=>/http|logger|email|public\/sw/.test(p)))suites.add('runtime-integrity-test');
  if(paths.some(p=>/ux-compliance|scripts\/compliance/.test(p))){suites.add('compliance/selftest');suites.add('compliance/report-test');}
  if(paths.some(p=>/permission|role|page-access/.test(p)))suites.add('permission-selfcheck');

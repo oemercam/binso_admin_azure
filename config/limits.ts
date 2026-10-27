@@ -1,6 +1,11 @@
 export const limitsConfig = {
   rateLimitMemoryBuckets: 5000,
   maxFileUploadBytes: 10 * 1024 * 1024,
+  receiptScanMaxResponseBytes: 2 * 1024 * 1024,
+  receiptScanTimeoutMs: 20_000,
+  receiptScanPollIntervalMs: 1000,
+  receiptScanPollAttempts: 12,
+  receiptScanRequestsPerMinute: 20,
   maxDemoAttachmentBytes: 1_500_000,
   maxSupportRequestBytes: 1_500_000,
   maxSupportScreenshotDataUrlChars: 1_200_000,

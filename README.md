@@ -15,6 +15,7 @@ Prüfergebnisse. Nur die für den konkreten Auftrag relevanten Quellen lesen.
 
 | Gesucht | Einstieg |
 | --- | --- |
+| Master V8, aktuelle lokale Umsetzung | [Vollständiger Auftrag](docs/architecture/v8-global-simple-workflow/source-full.md), [Inventur](docs/architecture/v8-global-simple-workflow/matrix.md), [Paketstand und offene Nachweise](docs/architecture/v8-global-simple-workflow/implementation-status.md) |
 | V26 Revision3, lokale Umsetzung ohne Push | [Tatsächlicher Paketstand und Prüfgrenzen](docs/architecture/v26-execution.md), [Modul-/Übergabeverträge](docs/architecture/v26-module-contracts.md), [Gap-Matrix und Pakete](docs/architecture/v26-gap-and-packages.md) |
 | Freigegebene UX und Rangfolge | [Originalreferenzen](docs/audit/v24/reference/IMPLEMENTIERUNG.md), [Vorschau](docs/audit/v24/reference/index.html) |
 | UI-Architektur und Komponenten-Owner | [Reference Foundation](docs/architecture/reference-foundation.md), `app/design-system/manifest.json` |

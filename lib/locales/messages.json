@@ -21792,5 +21792,11 @@
     "Saisissez d’abord l’IBAN de votre entreprise dans Paramètres → Documents.",
     "Inserisci prima l’IBAN aziendale in Impostazioni → Documenti.",
     "Önce Ayarlar → Belgeler bölümüne şirketinizin IBAN’ını girin."
-  ]
+  ],
+  "Belegerkennung lieferte eine ungültige Antwort.": ["Receipt recognition returned an invalid response.", "La reconnaissance du reçu a renvoyé une réponse non valide.", "Il riconoscimento della ricevuta ha restituito una risposta non valida.", "Fiş tanıma geçersiz bir yanıt döndürdü."],
+  "Kostenbudget": ["Cost budget", "Budget des coûts", "Budget dei costi", "Maliyet bütçesi"],
+  "Budgetwährung": ["Budget currency", "Devise du budget", "Valuta del budget", "Bütçe para birimi"],
+  "Nicht festgelegt": ["Not set", "Non défini", "Non impostato", "Belirlenmedi"],
+  "Bitte ein gültiges Budget mit höchstens zwei Dezimalstellen eingeben.": ["Enter a valid budget with at most two decimal places.", "Saisissez un budget valide avec au maximum deux décimales.", "Inserisci un budget valido con al massimo due decimali.", "En fazla iki ondalık basamak içeren geçerli bir bütçe girin."],
+  "Die Angaben zum Abrechnungsmodell sind ungültig.": ["The billing model details are invalid.", "Les informations du modèle de facturation sont invalides.", "I dati del modello di fatturazione non sono validi.", "Faturalandırma modeli bilgileri geçersiz."]
 }

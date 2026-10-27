@@ -4581,6 +4581,8 @@
         "components/pages/settings.tsx#CompanySettingsPage",
         "components/setup-process.tsx#SetupProcess",
         "components/setup-process.tsx#Company",
+        "components/use-process-draft.ts#useProcessDraft",
+        "components/setup-process.tsx#editableSetupFields",
         "components/use-browser-back-guard.ts#useBrowserBackGuard",
         "components/use-browser-back-guard.ts#DraftGuard",
         "components/use-browser-back-guard.ts#guards",
@@ -4685,6 +4687,8 @@
         "components/binso-ux.tsx#pageHasExit",
         "components/binso-ux.tsx#pageActionText",
         "components/binso-ux.tsx#pageHasActions",
+        "components/setup-guide.tsx#SetupProgress",
+        "components/ui.tsx#ProgressBar",
         "components/pages/settings.tsx#CompanySettingsDetail",
         "components/use-setup-field.ts#useSetupField",
         "components/file-upload.tsx#FileUpload",
@@ -7759,9 +7763,9 @@
         "components/binso-ux.tsx#pageHasExit",
         "components/binso-ux.tsx#pageActionText",
         "components/binso-ux.tsx#pageHasActions",
-        "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
         "components/ui.tsx#SectionTitle",
+        "components/binso-ux.tsx#DetailDisclosure",
         "components/ui.tsx#Toast"
       ],
       "layouts": [
@@ -8329,9 +8333,9 @@
         "components/binso-ux.tsx#pageHasExit",
         "components/binso-ux.tsx#pageActionText",
         "components/binso-ux.tsx#pageHasActions",
-        "components/form-wizard.tsx#FormWizard",
         "components/ui.tsx#FormSection",
         "components/ui.tsx#SectionTitle",
+        "components/binso-ux.tsx#DetailDisclosure",
         "components/ui.tsx#Toast"
       ],
       "layouts": [
