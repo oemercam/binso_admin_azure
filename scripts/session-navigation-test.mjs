@@ -6,6 +6,7 @@ const load=async file=>{const exports={};Function('exports',compile(await fs.rea
 const {watchSession}=await load('lib/client/session-watch.ts');
 const {safeAppPath}=await load('lib/navigation.ts');
 const settle=()=>new Promise(setImmediate);
+const pageShown=persisted=>{const event=new Event('pageshow');Object.defineProperty(event,'persisted',{value:persisted});window.dispatchEvent(event);};
 const browser=new EventTarget(),doc=new EventTarget();let tick;
 globalThis.window=browser;globalThis.document=doc;doc.visibilityState='visible';
 window.setInterval=(callback,delay)=>{assert.equal(delay,60000);tick=callback;return 1};window.clearInterval=()=>{tick=null};
@@ -15,9 +16,19 @@ try{
  await settle();assert.equal(checks,1);tick();await settle();assert.equal(checks,2);
  status=new Error('offline');window.dispatchEvent(new Event('online'));await settle();assert.equal(ended,0,'Offline is not logout');
  status=true;doc.visibilityState='hidden';const hiddenChecks=checks;tick();await settle();assert.equal(checks,hiddenChecks,'Hidden tabs do not poll');doc.visibilityState='visible';doc.dispatchEvent(new Event('visibilitychange'));await settle();assert.equal(checks,hiddenChecks+1);
- for(const name of ['focus','pageshow','binso-session-invalid']){const before=checks;window.dispatchEvent(new Event(name));await settle();assert.equal(checks,before+1);}
+ for(const name of ['focus','binso-session-invalid']){const before=checks;window.dispatchEvent(new Event(name));await settle();assert.equal(checks,before+1);}
+ const beforeInitialShow=checks;pageShown(false);await settle();assert.equal(checks,beforeInitialShow,'Normal first pageshow does not duplicate the fresh startup check');
+ pageShown(true);await settle();assert.equal(checks,beforeInitialShow+1,'A real bfcache return still rechecks the authoritative session');
  const storage=new Event('storage');storage.key='binso.session.changed';status=false;window.dispatchEvent(storage);await settle();assert.equal(ended,1);window.dispatchEvent(new Event('focus'));await settle();assert.equal(ended,1,'End navigation happens once');stop();assert.equal(tick,null);
  let resolve,requests=0;const stopPending=watchSession(()=>{requests++;return new Promise(r=>{resolve=r})},()=>ended++);window.dispatchEvent(new Event('focus'));assert.equal(requests,1);resolve(true);await settle();assert.equal(requests,2,'Events during a pending read trigger a fresh follow-up');stopPending();resolve(false);await settle();assert.equal(ended,1,'Unmounted pages cannot redirect');
+ for(const persisted of [false,true]){
+  let release,initialRequests=0;const beforeEnded=ended;
+  const stopInitial=watchSession(()=>{initialRequests++;return new Promise(r=>{release=r})},()=>ended++);
+  pageShown(persisted);assert.equal(initialRequests,1,'An event cannot create parallel authoritative requests');
+  release(true);await settle();assert.equal(initialRequests,persisted?2:1,'Only a persisted pageshow queues a fresh follow-up during startup');
+  if(persisted){release(false);await settle();assert.equal(ended,beforeEnded+1,'Expiry discovered after bfcache resume still ends the session');}
+  stopInitial();pageShown(true);await settle();assert.equal(initialRequests,persisted?2:1,'Unmount removes the bfcache listener');
+ }
 
  // Execute the real React session effects with controlled server responses.
  for(const file of ['components/app-shell.tsx','components/operator.tsx']){

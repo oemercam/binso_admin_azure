@@ -44,7 +44,13 @@ try{
    await new Promise(r=>setTimeout(r,150));return route.fulfill({json:{items:[],tracker:null}});
   };
   await context.addInitScript(mode=>{localStorage.setItem('binso.theme.mode',mode);localStorage.setItem('binso.privacy.preferences.v1',JSON.stringify({essential:true,performance:false,updatedAt:'2026-10-09'}));window.loadingFrames=[];const capture=()=>{const visible=selector=>{const el=document.querySelector(selector);return !!el&&el.getBoundingClientRect().height>0&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none';};window.loadingFrames.push({at:performance.now(),phase:['.app-launch-screen','.app-session-loading','.app-launch','.app-root'].filter(visible),content:document.querySelector('.page-container')?.innerText??'',visibleLoadingCopy:[...document.querySelectorAll('.page-container *')].some(el=>el.childElementCount===0&&/\b(?:wird|werden)\b.*\b(?:geladen|abgerufen)\b/i.test(el.textContent??'')&&!el.closest('.sr-only,.visually-hidden')&&el.checkVisibility()),iconWidth:document.querySelector('.app-start-icon')?parseFloat(getComputedStyle(document.querySelector('.app-start-icon')).width):null,iconAnimation:document.querySelector('.app-start-icon')?getComputedStyle(document.querySelector('.app-start-icon')).animationName:null});requestAnimationFrame(capture)};requestAnimationFrame(capture)},theme);
-  let page=await context.newPage();
+  async function newForegroundPage(){
+   const next=await context.newPage();await next.bringToFront();
+   await next.waitForFunction(()=>document.visibilityState==='visible');
+   await next.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   return next;
+  }
+  let page=await newForegroundPage();
   async function measure(label,action,ready='Keine Kunden erfasst'){
    const before=authCalls,requestsBefore={...calls},pending=new Set();
    const requested=request=>pending.add(request),finished=request=>pending.delete(request);
@@ -58,6 +64,7 @@ try{
    const phases=[...new Set(frames.map(f=>f.phase.join(',')))];const durations={};
    for(let i=0;i<frames.length-1;i++)for(const phase of frames[i].phase)if(phase!=='.app-root')durations[phase]=(durations[phase]||0)+frames[i+1].at-frames[i].at;
    const row={theme,viewport,label,firstMeaningfulMs:readyFrame?.at,contentReadyMs:frames.find(f=>f.content.includes(ready))?.at,authRequests:authCalls-before,requests:Object.fromEntries(Object.entries(calls).map(([p,n])=>[p,n-(requestsBefore[p]||0)]).filter(([,n])=>n)),phases,loaderDurationMs:durations,startup:frames.find(f=>f.iconWidth)};results.push(row);
+   await writeTestOutput(output+'/measurements.partial.json',JSON.stringify({baseline,browser:process.env.BINSO_UX_BROWSER??'webkit',results,physicalPwa:false},null,2));
    if(!baseline){assert(!phases.some(p=>p.includes('.app-session-loading')||p.split(',').includes('.app-launch')),'No retired/sequential start loader');assert.equal(row.authRequests,1,'One fresh auth check per page startup');assert.ok(!frames.some(frame=>frame.visibleLoadingCopy),'No visible intermediate loading copy during cold/refresh/reopen');}
    await page.screenshot({path:output+'/'+theme+'-'+viewport.width+'-'+label+'.png'});
   }
@@ -109,7 +116,7 @@ try{
   const detailBack=page.getByRole('link',{name:'Kunden',exact:true}).and(page.locator('.mobile-back,.desktop-back')).filter({visible:true});assert.equal(await detailBack.count(),1,'The contextual mobile or desktop header exposes one visible return action');await detailBack.click();await page.waitForURL('**/kunden');
   if(!baseline)assert(await page.evaluate(()=>window.navBefore===document.querySelector('.bottom-nav')),'Detail/overview retains navigation');showCustomer=false;
   // PWA-like close/reopen of the same browser context, not physical installation.
-  await page.close();page=await context.newPage();await measure('reopen',()=>page.goto(base+'/kunden'));
+  await page.waitForLoadState('networkidle');await page.close();page=await newForegroundPage();await measure('reopen',()=>page.goto(base+'/kunden'));
   delay=1200;await measure('slow-refresh',()=>page.reload());delay=350;
   authMode='expired';await page.reload();await page.waitForURL(url=>url.pathname==='/login'&&url.searchParams.get('next')==='/kunden');assert.equal(await page.locator('.records-inline-controls').count(),0,'Expired session redirects to login and hides business content');
   authMode='error';await page.goto(base+'/kunden');await page.getByText('Initialisierung fehlgeschlagen',{exact:true}).waitFor();authMode='valid';await page.getByRole('button',{name:'Erneut versuchen',exact:true}).click();await page.getByText('Keine Kunden erfasst',{exact:true}).waitFor();

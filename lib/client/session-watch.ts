@@ -11,14 +11,17 @@ export function watchSession(check:()=>Promise<boolean>,onEnded:()=>void){
   finally{pending=false;if(queued){queued=false;void refresh();}}
  };
  const visible=()=>{if(document.visibilityState==='visible')void refresh();};
+ // A fresh document already checks above. Only a bfcache restoration is a
+ // pageshow resume; the normal first pageshow must not queue a second startup.
+ const restored=(event:PageTransitionEvent)=>{if(event.persisted===true)void refresh();};
  const storage=(event:StorageEvent)=>{if(event.key==='binso.session.changed')void refresh();};
  window.addEventListener('focus',refresh);
  window.addEventListener('online',refresh);
- window.addEventListener('pageshow',refresh);
+ window.addEventListener('pageshow',restored);
  window.addEventListener('binso-session-invalid',refresh);
  window.addEventListener('storage',storage);
  document.addEventListener('visibilitychange',visible);
  const timer=window.setInterval(visible,60000);
  void refresh();
- return()=>{active=false;window.clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('online',refresh);window.removeEventListener('pageshow',refresh);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);document.removeEventListener('visibilitychange',visible);};
+ return()=>{active=false;window.clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener('online',refresh);window.removeEventListener('pageshow',restored);window.removeEventListener('binso-session-invalid',refresh);window.removeEventListener('storage',storage);document.removeEventListener('visibilitychange',visible);};
 }
