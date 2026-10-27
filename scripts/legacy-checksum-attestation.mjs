@@ -17,7 +17,9 @@ export const legacyVersions=Object.freeze([
  '0016_self_service_signup.sql'
 ]);
 export const digest=value=>createHash('sha256').update(typeof value==='string'?value:JSON.stringify(value)).digest('hex');
-const rows=async client=>(await client.query('select version,checksum,applied_at from public.schema_migrations order by version')).rows.map(row=>({...row,applied_at:new Date(row.applied_at).toISOString()}));
+// Keep PostgreSQL's microseconds; JavaScript Date would truncate them and make
+// a valid timestamp-bound update fail (or lose precision in the evidence).
+const rows=async client=>(await client.query('select version,checksum,applied_at::text as applied_at from public.schema_migrations order by version')).rows;
 
 export async function createAttestationPlan(client,sourceSha){
  if(!/^[a-f0-9]{40}$/.test(sourceSha))throw Error('Full source SHA required');

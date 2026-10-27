@@ -10,7 +10,7 @@ const snapshot=async()=>JSON.stringify((await db.query('select * from schema_mig
 try{
  await db.exec('create extension pgcrypto;create role schema_owner;grant usage,create on schema public to schema_owner;set role schema_owner;create table schema_migrations(version text primary key,checksum text,applied_at timestamptz not null)');
  const files=await migrationFiles();
- for(const version of files){const sql=await fs.readFile('database/migrations/'+version,'utf8');await db.exec(sql);await db.query('insert into schema_migrations values($1,$2,$3)',[version,legacyVersions.includes(version)?null:digest(sql),'2026-10-01T12:00:00Z']);}
+ for(const version of files){const sql=await fs.readFile('database/migrations/'+version,'utf8');await db.exec(sql);await db.query('insert into schema_migrations values($1,$2,$3)',[version,legacyVersions.includes(version)?null:digest(sql),'2026-10-01T12:00:00.123456Z']);}
  // An unrelated historic record is preserved byte-for-byte as well.
  await db.query("insert into schema_migrations values('historical-import-marker','preserve-me','2026-09-01T00:00:00Z')");
  const original=await snapshot(),plan=await createAttestationPlan(client,sha),hash=digest(plan);
@@ -20,7 +20,7 @@ try{
  // Changed row/timestamp after review must invalidate the reviewed plan.
  await db.query("update schema_migrations set applied_at='2026-10-02' where version=$1",[files[0]]);
  await assert.rejects(applyAttestation(client,sha,hash),/Reviewed plan changed/);
- await db.query("update schema_migrations set applied_at='2026-10-01T12:00:00Z' where version=$1",[files[0]]);
+ await db.query("update schema_migrations set applied_at='2026-10-01T12:00:00.123456Z' where version=$1",[files[0]]);
  for(const [sql,args,pattern] of [
   ['update schema_migrations set checksum=$1 where version=$2',['wrong',files.at(-1)],/Non-legacy checksum/],
   ['update schema_migrations set checksum=null where version=$1',[files.at(-1)],/Non-legacy checksum/],
