@@ -1,5 +1,7 @@
 # Aktueller Einstieg und Regelrangfolge
 
+Jüngste Kunden-Auth-Korrektur vom 27. Oktober: [E-Mail-Bestätigung und anschließender Passwortlogin](architecture/customer-password-login-20261027.md). Diese Regel ersetzt frühere zusätzliche Kunden-Loginfaktoren; Operator-MFA und kritische Kontoänderungen bleiben getrennt.
+
 Stand dieses Dokuments: 26. Oktober 2026. Ausgelieferte Ausgangsbasis:
 `02a061a4db4c3f0f55b1f829900b2577bfc9c21f`.
 Dieser Commit ist die Basis der Auditkorrekturen, nicht automatisch deren Release.

@@ -5,8 +5,6 @@ import {createSession,endDemoSession} from "@/lib/server/session";
 import {ApiError,apiError,assertSameOrigin,json,readJson} from "@/lib/server/http";
 import {asObject,emailField,stringField} from "@/lib/server/validation";
 import {enforceRateLimit} from "@/lib/server/rate-limit";
-import {decryptSecret} from "@/lib/server/crypto";
-import {consumeRecoveryCode,verifyTotp} from "@/lib/server/totp";
 import {consumeEmailCode} from "@/lib/server/email-otp";
 
 
@@ -21,7 +19,6 @@ export async function POST(request:NextRequest){
   const body=asObject(await readJson(request,16_000));
   const email=emailField(body);
   const password=stringField(body,"password",{max:256,min:1});
-  const mfaCode=body.mfaCode!=null?stringField(body,"mfaCode",{max:64,min:4}):"";
   const emailCode=body.emailCode!=null?stringField(body,"emailCode",{max:6,min:6}):"";
   // Credential lookup is identity-only. Tenant discovery follows password proof.
   const identity=(await query<{
@@ -53,14 +50,8 @@ export async function POST(request:NextRequest){
 
   }
 
-  if(user.mfa_enabled){
-   if(!mfaCode)return json({mfaRequired:true,mfaMethod:"totp"},202);
-   let ok=false;
-   if(/^\d{6}$/.test(mfaCode)&&user.mfa_secret_enc)ok=verifyTotp(decryptSecret(user.mfa_secret_enc),mfaCode);
-   else ok=await consumeRecoveryCode({query},{userId:user.id,passwordHash:user.password_hash,mfaSecretEnc:user.mfa_secret_enc,code:mfaCode});
-   if(!ok)return json({error:"invalid_mfa",message:"Der MFA-Code ist ungültig.",mfaRequired:true,mfaMethod:"totp"},401);
-  }
-
+  // Customer login requires a verified email and password only. Existing factors
+  // remain stored for recovery and fresh proof of sensitive account changes.
   await query("update app_users set last_login_at=now(),updated_at=now() where id=$1",[user.id]);
   await query("update platform_tenants set last_active_at=now() where organization_id=$1",[user.organization_id]);
   await endDemoSession();

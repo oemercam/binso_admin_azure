@@ -56,7 +56,7 @@ generierte Bestände aus Standardsuchen; für gezielte Audits beispielsweise
 - Azure App Service
 - Azure Database for PostgreSQL
 - serverseitige, datenbankgestützte Sessions
-- E-Mail + Passwort, E-Mail-Verifikation, freiwillige TOTP/Recovery Codes und sitzungsgebundene Bestätigung kritischer Aktionen
+- E-Mail + Passwort nach E-Mail-Verifikation; sitzungsgebundene Bestätigung kritischer Aktionen
 - Microsoft Entra ID für interne Binso-Operatoren
 - Microsoft Graph / Microsoft 365 als einziger produktiver E-Mail-Pfad
 - Stripe Checkout, Billing Portal und signierte/idempotente Webhooks
@@ -69,6 +69,8 @@ Es gibt keinen Fallback auf einen zweiten E-Mail-Provider.
 
 ## Sicherheitsmodell
 
+Aktuellste Kundenanmeldung: [E-Mail-Bestätigung und anschließender Passwortlogin](docs/architecture/customer-password-login-20261027.md). Diese Owner-Korrektur ersetzt frühere zusätzliche Kunden-Loginfaktoren; Operator-MFA und Bestätigungen kritischer Änderungen bleiben getrennt.
+
 Passkey-Erweiterung vom27.Oktober: [Architektur, Konfiguration, Recovery und
 Prüfgrenzen](docs/architecture/passkeys-20261027/implementation.md).
 Der vollständige PowerShell-Ablauf für Installation, QA, überprüften Commit,
@@ -78,9 +80,9 @@ Pull mit Rebase, Push und Pipelineprüfung liegt in
 ### Kunden
 - Registrierung mit E-Mail und Passwort
 - sechsstellige E-Mail-Verifikation vor produktivem Session-Zugriff
-- zusätzlicher Login-Faktor
-- TOTP mit einmaligen Recovery Codes
-- TOTP ist für Kundenrollen freiwillig, sofern die Firmenrichtlinie keinen starken Faktor verlangt; bei Passwortanmeldungen bleiben aktivierte Faktoren verbindlich. Passkeys mit verifizierter Geräteentsperrung erfüllen die starke Anmeldung. Kritische Änderungen benötigen frische sitzungsgebundene Bestätigung.
+- Kundenlogin ausschließlich mit E-Mail und Passwort nach E-Mail-Bestätigung
+- Vorhandene TOTP/Recovery-Nachweise für kritische Kontoänderungen und Wiederherstellung
+- Historische Firmen-MFA-Regeln und eingerichtete Faktoren erzeugen keine zusätzliche Loginabfrage. Kritische Änderungen und Wiederherstellung behalten ihre vorhandenen Nachweise.
 - HttpOnly/Secure/SameSite Session-Cookies
 - serverseitige Rollen- und Tenant-Prüfung
 - PostgreSQL-RLS und zusammengesetzte Tenant-Fremdschlüssel

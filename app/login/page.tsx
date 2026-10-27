@@ -10,9 +10,8 @@ import {PasswordInput} from '@/components/password-input';
 import {authRequest} from '@/lib/client/auth-request';
 import {clearClientSession} from "@/lib/client/backend";
 import {safeAppPath} from "@/lib/navigation";
-import {PasskeyLogin} from '@/components/passkey-login';
 
-type Stage="credentials"|"totp"|"verify";
+type Stage="credentials"|"verify";
 
 export default function Login(){
   const pending=useRef(false);
@@ -38,7 +37,6 @@ export default function Login(){
     if(response.status===202){
       setCode("");
       if(payload.requiresEmailVerification)setStage("verify");
-      else if(payload.mfaMethod==="totp")setStage("totp");
       else throw new Error("Die Anmeldung konnte nicht eindeutig bestätigt werden.");
       return;
     }
@@ -63,7 +61,7 @@ export default function Login(){
         if(!response.ok)throw new Error(typeof payload?.message==="string"?payload.message:"Code konnte nicht bestätigt werden.");
         finish(payload);return;
       }
-      await loginRequest({mfaCode:code});
+      throw new Error("Anmeldung nicht möglich.");
     }catch(error){setError(error instanceof Error?error.message:"Code konnte nicht bestätigt werden.");}
     finally{pending.current=false;setLoading(false);}
   };
@@ -78,22 +76,21 @@ export default function Login(){
   };
 
   if(stage!=="credentials")return <AuthWorkspace><section className="auth-card">
-    <h1><LocalizedText>{stage==="totp"?"Authenticator-Code":"E-Mail bestätigen"}</LocalizedText></h1>
-    <p><LocalizedText>{stage==="totp"?"Öffne deine Authenticator-App und gib den aktuellen Code oder einen Recovery Code ein.":`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</LocalizedText></p>
+    <h1><LocalizedText>{"E-Mail bestätigen"}</LocalizedText></h1>
+    <p><LocalizedText>{`Wir haben einen 6-stelligen Code an ${email} gesendet.`}</LocalizedText></p>
     <form onSubmit={submitCode}>
-      <Field label={stage==="totp"?"Authenticator- oder Recovery-Code":"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(stage==="totp"?e.target.value:e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={stage==="totp"?"text":"numeric"} autoComplete="one-time-code" placeholder={stage==="totp"?"000000 oder Recovery Code":"000000"}/></Field>
+      <Field label={"6-stelliger Code"}><Input required autoFocus value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,"").slice(0,6))} inputMode={"numeric"} autoComplete="one-time-code" placeholder={"000000"}/></Field>
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
       <Button type="submit" disabled={loading||!code.trim()}><LocalizedText>{loading?"Wird geprüft…":"Anmeldung abschliessen"}</LocalizedText></Button>
     </form>
-    {stage!=="totp"&&<button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}><LocalizedText>{"Code erneut senden"}</LocalizedText></button>}
+    <button type="button" className="auth-inline-action" disabled={loading} onClick={()=>void resend()}><LocalizedText>{"Code erneut senden"}</LocalizedText></button>
     <button type="button" className="auth-inline-action" onClick={()=>{setStage("credentials");setCode("");setError("");}}><LocalizedText>{"Zurück"}</LocalizedText></button>
   </section></AuthWorkspace>;
 
   return <AuthWorkspace><section className="auth-card">
     <h1><LocalizedText>{"Willkommen zurück"}</LocalizedText>.</h1><p><LocalizedText>{"Melde dich sicher in deinem Binso One Konto an."}</LocalizedText></p>
-    <PasskeyLogin remember={rememberMe} onAuthenticated={finish} disabled={loading} onBusy={value=>{pending.current=value;setLoading(value)}}/>
     <form onSubmit={submitCredentials}>
-      <Field label="E-Mail"><Input name="username" autoCapitalize="none" spellCheck={false} required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="username webauthn" placeholder="name@firma.ch"/></Field>
+      <Field label="E-Mail"><Input name="username" autoCapitalize="none" spellCheck={false} required value={email} onChange={e=>setEmail(e.target.value)} type="email" inputMode="email" autoComplete="username" placeholder="name@firma.ch"/></Field>
       <Field label="Passwort"><PasswordInput name="password" required value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••"/></Field>
       <div className="auth-options"><label><Input type="checkbox" checked={rememberMe} onChange={event=>setRememberMe(event.target.checked)}/><LocalizedText>{"Angemeldet bleiben"}</LocalizedText></label><div className="form-link"><Link href="/passwort-vergessen"><LocalizedText>{"Passwort vergessen?"}</LocalizedText></Link></div></div>
       {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
