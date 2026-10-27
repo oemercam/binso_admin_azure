@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "engine": "chromium",
+  "virtualAuthenticator": true,
+  "physicalDevice": false,
+  "conditionalCoordination": "held synthetic chooser cancelled before real explicit WebAuthn",
+  "nativeAutofillSelection": false,
+  "backend": "synthetic HTTP fixture; actual backend tested separately",
+  "loginVerifications": 1,
+  "reauthVerifications": 1
+}

@@ -13,7 +13,7 @@ import {safeAppPath} from "@/lib/navigation";
 import Image from 'next/image';
 import {PasskeySettings} from './passkey-settings';
 
-type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean};
+type MfaState={enabled:boolean;required:boolean;role:string;demo?:boolean;passkeyVerified?:boolean;hasPasskey?:boolean};
 type SessionItem={id:string;userAgent:string|null;lastSeenAt:string|null;expiresAt:string;current:boolean};
 
 function sessionLabel(userAgent:string|null){
@@ -62,7 +62,7 @@ export function SecuritySettingsPage(){
   },[]);
   useEffect(()=>{void loadMfa();void loadSessions()},[loadMfa,loadSessions]);
 
-  useEffect(()=>{if(next&&mfa?.required&&!mfa.enabled&&!mfa.demo)queueMicrotask(()=>setPanel("mfa"))},[next,mfa]);
+  useEffect(()=>{if(next&&mfa?.required&&!mfa.enabled&&!mfa.hasPasskey&&!mfa.passkeyVerified&&!mfa.demo)queueMicrotask(()=>setPanel("mfa"))},[next,mfa]);
 
   const startSetup=async()=>{setToastTone("danger");
     if(mutation.current)return;mutation.current=true;setBusy(true);
@@ -118,8 +118,8 @@ export function SecuritySettingsPage(){
 
   return <AppShell title="Sicherheit" subtitle="Mehrstufiger Schutz für dein Binso One Konto." active="einstellungen" backHref="/einstellungen" backLabel="Einstellungen" unsavedChanges={!!(currentPassword||newPassword||confirmPassword||code||setup||recovery.length)}>
     {mfaError&&panel!=="mfa"&&<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>}
-    <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":mfa.required?"Verpflichtend":"Optional"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
-    {mfa&&<PasskeySettings demo={mfa.demo===true} onChanged={()=>void loadSessions()}/>}
+    <SettingsGroup title="Anmeldeschutz"><div className="action-list"><ActionRow icon="lock" title="Passwort ändern" onClick={()=>setPanel("password")}/><ActionRow icon="lock" title="Zwei-Faktor-Authentifizierung" description={!mfa?(mfaError?"Anmeldeschutzstatus nicht verfügbar.":undefined):mfa.demo?"Demo":mfa.enabled?"Aktiv":mfa.hasPasskey?"Durch Passkey geschützt":mfa.required&&!mfa.hasPasskey?"Verpflichtend":"Optional"} endAdornment={!mfa&&!mfaError?<LoadingState/>:undefined} onClick={()=>setPanel("mfa")}/></div></SettingsGroup>
+    {mfa&&<PasskeySettings demo={mfa.demo===true} onChanged={()=>{void loadSessions();void loadMfa();}}/>}
     <FormSheet open={panel==="password"} label="Passwort ändern" onClose={()=>setPanel(null)} busy={busy} dirty={!!(currentPassword||newPassword||confirmPassword)}><section className="settings-form">
       <div className="form-grid">
         <Field label="Aktuelles Passwort"><Input value={currentPassword} onChange={e=>setCurrentPassword(e.target.value)} type="password" autoComplete="current-password"/></Field>
@@ -130,7 +130,7 @@ export function SecuritySettingsPage(){
     </section></FormSheet>
     <FormSheet busy={busy} open={panel==="mfa"} label="Zwei-Faktor-Authentifizierung" onClose={()=>setPanel(null)} dirty={!!(setup||code||recovery.length)}><section className="settings-form">
       {!mfa?mfaError?<ErrorState onRetry={()=>{setMfaError("");void loadMfa()}} retryLabel="Erneut versuchen"><LocalizedText>{mfaError}</LocalizedText></ErrorState>:<LoadingState><LocalizedText>{"Sicherheitsstatus wird geladen…"}</LocalizedText></LoadingState>:mfa.demo?<div className="context-block"><Status tone="info"><LocalizedText>{"Demo"}</LocalizedText></Status><b><LocalizedText>{"Keine Authenticator-Einrichtung für die Demo nötig"}</LocalizedText></b><span><LocalizedText>{"Produktive Konten verwenden E-Mail-Codes oder einen Authenticator. Die Demo benötigt keinen Login."}</LocalizedText></span></div>:mfa.enabled?<div className="context-block"><Status tone="success"><LocalizedText>{"Aktiv"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App ist eingerichtet"}</LocalizedText></b><span><LocalizedText>{"Bei der Anmeldung wird nach E-Mail und Passwort zusätzlich ein zeitbasierter Authenticator-Code verlangt."}</LocalizedText></span></div>:<>
-        <div className="context-block"><Status tone="info"><LocalizedText>{mfa.required?"Verpflichtend":"Optional"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{mfa.required?"Dein Unternehmen verlangt eine Authenticator-App. Richte sie ein, um Binso One zu verwenden.":"Der Authenticator ist optional. Für sicherheitsrelevante Änderungen ist eine erneute Bestätigung erforderlich."}</LocalizedText></span></div>
+        <div className="context-block"><Status tone="info"><LocalizedText>{mfa.required&&!mfa.hasPasskey?"Verpflichtend":"Optional"}</LocalizedText></Status><b><LocalizedText>{"Authenticator-App aktivieren"}</LocalizedText></b><span><LocalizedText>{mfa.required&&!mfa.hasPasskey?"Dein Unternehmen verlangt eine starke Anmeldung. Richte einen Passkey oder Authenticator ein.":"Der Authenticator ist optional. Für sicherheitsrelevante Änderungen ist eine erneute Bestätigung erforderlich."}</LocalizedText></span></div>
         {!setup&&<Button disabled={busy} onClick={()=>void startSetup()}><LocalizedText>{"Authenticator einrichten"}</LocalizedText></Button>}
       </>}
       {setup&&<div className="form-grid">
@@ -142,7 +142,7 @@ export function SecuritySettingsPage(){
         <Button onClick={()=>void confirmSetup()} disabled={busy||code.length!==6}><LocalizedText>{"Authenticator bestätigen"}</LocalizedText></Button>
       </div>}
       {recovery.length>0&&<div className="context-block"><Status tone="warning"><LocalizedText>{"Einmal anzeigen"}</LocalizedText></Status><b><LocalizedText>{"Recovery Codes sicher speichern"}</LocalizedText></b><span><LocalizedText>{"Jeder Code kann nur einmal verwendet werden. Bewahre sie getrennt von deinem Passwort auf."}</LocalizedText></span><pre>{recovery.join("\n")}</pre></div>}
-      {mfa?.enabled&&!mfa.required&&<ActionRow icon="lock" title="Authenticator deaktivieren" onClick={()=>setDisableMfa(true)}/>}
+      {mfa?.enabled&&(!mfa.required||mfa.hasPasskey)&&<ActionRow icon="lock" title="Authenticator deaktivieren" onClick={()=>setDisableMfa(true)}/>}
       {mfa?.enabled&&next&&<Button onClick={()=>router.push(safeAppPath(next))}><LocalizedText>{"Weiter zu Binso One"}</LocalizedText></Button>}
     </section></FormSheet>
 

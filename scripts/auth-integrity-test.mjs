@@ -101,14 +101,15 @@ try{
  const distinct=await Promise.all([1,2].map(i=>login.POST(req({email:'integrity@fixture.invalid',password,mfaCode:recovery[i]}))));assert.ok(distinct.every(r=>r.status===200));assert.equal(created,3);const remaining=(await query('select recovery_code_hashes from app_users where id=$1',[user])).rows[0].recovery_code_hashes;assert.equal(remaining.length,5);assert.ok(!recovery.slice(0,3).some(c=>remaining.includes(totp.hashRecoveryCode(c))));
  const tokens=await import(await load('lib/server/auth-tokens.ts')),reset=await import(await load('app/api/auth/password/route.ts'));
  const token=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
- const resetBody={token,password:'Synthetic-replacement-password-456'};
+ const resetBody={token,password:'Synthetic-replacement-password-456',recoveryCode:recovery[3]};
+ assert.equal((await reset.PATCH(req({...resetBody,recoveryCode:''}))).status,403,'Email recovery cannot bypass an enrolled factor');
  fault=true;const failed=await reset.PATCH(req(resetBody));fault=false;assert.equal(failed.status,500);
  assert.equal((await query("select consumed_at from auth_tokens where user_id=$1 and token_type='password_reset'",[user])).rows[0].consumed_at,null,'Reset token rolls back with failed session revocation');assert.equal((await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash,hash,'Password change also rolls back');
  assert.equal((await reset.PATCH(req(resetBody))).status,200);assert.equal((await reset.PATCH(req(resetBody))).status,400);assert.ok(await passwords.verifyPassword(resetBody.password,(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash));
  const nextToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
  const thirdPassword='Synthetic-third-password-after-reset-789';
  const cookiesBeforeStaleLogin=cookieSets;
- const staleLogin=await raceAfterRead(sql=>sql.includes('select id,display_name as name,email,password_hash'),()=>login.POST(req({email:'integrity@fixture.invalid',password:resetBody.password,mfaCode:totp.totp(secret)})),async()=>assert.equal((await reset.PATCH(req({token:nextToken,password:thirdPassword}))).status,200));
+ const staleLogin=await raceAfterRead(sql=>sql.includes('select id,display_name as name,email,password_hash'),()=>login.POST(req({email:'integrity@fixture.invalid',password:resetBody.password,mfaCode:totp.totp(secret)})),async()=>assert.equal((await reset.PATCH(req({token:nextToken,password:thirdPassword,recoveryCode:totp.totp(secret)}))).status,200));
  const lateSessions=(await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n;
  assert.equal(staleLogin.status,401,'An old-password proof cannot mint a session after reset');assert.equal(lateSessions,0,'No late session survives reset');
  assert.equal(cookieSets,cookiesBeforeStaleLogin,'Rejected stale authentication never publishes a new session cookie');
@@ -117,7 +118,7 @@ try{
  await seedFreshSession();
  const finalToken=await tokens.createAuthToken({type:'password_reset',email:'integrity@fixture.invalid',userId:user,ttlMinutes:10});
  const finalPassword='Synthetic-final-password-after-reset-012';
- const staleChange=await raceAfterRead(sql=>sql==='select password_hash from app_users where id=$1',()=>reset.PATCH(req({currentPassword:thirdPassword,password:'Synthetic-stale-password-must-not-win-345'})),async()=>assert.equal((await reset.PATCH(req({token:finalToken,password:finalPassword}))).status,200));
+ const staleChange=await raceAfterRead(sql=>sql==='select password_hash from app_users where id=$1',()=>reset.PATCH(req({currentPassword:thirdPassword,password:'Synthetic-stale-password-must-not-win-345'})),async()=>assert.equal((await reset.PATCH(req({token:finalToken,password:finalPassword,recoveryCode:totp.totp(secret)}))).status,200));
  assert.equal(staleChange.status,409,'A started password change cannot overwrite a completed reset');assert.ok(await passwords.verifyPassword(finalPassword,(await query('select password_hash from app_users where id=$1',[user])).rows[0].password_hash));assert.equal((await query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,0);
  console.log(JSON.stringify({probe:'stale-password-change-after-committed-reset',status:staleChange.status,resetPasswordPreserved:true,synthetic:true}));
  const sessionInput={userId:user,organizationId:org,email:'integrity@fixture.invalid',name:'Synthetic Auth',role:'owner'};

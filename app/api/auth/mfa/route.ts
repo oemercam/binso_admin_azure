@@ -14,7 +14,8 @@ export async function GET(){
     if(!session)return json({error:"unauthorized",message:"Anmeldung erforderlich."},401);
     const user=await query<{mfa_enabled:boolean}>("select mfa_enabled from app_users where id=$1 limit 1",[session.userId]);
     const enabled=user.rows[0]?.mfa_enabled===true;
-    return json({enabled,required:session.mfaRequired===true,role:session.role,demo:session.isDemo===true});
+    const hasPasskey=await withTenant(session.organizationId,session.userId,async client=>!!(await client.query('select 1 from auth_passkeys where user_id=$1 and organization_id=$2 and revoked_at is null',[session.userId,session.organizationId])).rowCount);
+    return json({enabled,hasPasskey,required:session.mfaRequired===true,passkeyVerified:session.passkeyVerified===true,role:session.role,demo:session.isDemo===true});
   }catch(error){return apiError(error);}
 }
 export async function DELETE(request:NextRequest){try{
@@ -22,8 +23,9 @@ export async function DELETE(request:NextRequest){try{
  const session=await getSession();if(!session)throw new ApiError(401,'unauthorized','Anmeldung erforderlich.');
  await requireFreshAuthentication(session);
  await withTenant(session.organizationId,session.userId,async client=>{
+  await client.query("select id from app_users where id=$1 and status='active' for update",[session.userId]);
   const policy=(await client.query('select employee_mfa_required from organizations where id=$1 for update',[session.organizationId])).rows[0];
-  if(policy?.employee_mfa_required)throw new ApiError(403,'mfa_required','Dein Unternehmen verlangt den Authenticator. Er kann nicht einzeln deaktiviert werden.');
+  if(policy?.employee_mfa_required&&!(await client.query('select 1 from auth_passkeys where user_id=$1 and organization_id=$2 and revoked_at is null',[session.userId,session.organizationId])).rowCount)throw new ApiError(403,'mfa_required','Richte zuerst eine weitere starke Anmeldemethode ein.');
   const user=(await client.query("select mfa_enabled from app_users where id=$1 and status='active' for update",[session.userId])).rows[0];
   if(!user?.mfa_enabled)throw new ApiError(409,'mfa_not_enabled','Der Authenticator ist nicht aktiviert.');
   await client.query('update app_users set mfa_enabled=false,mfa_secret_enc=null,mfa_pending_secret_enc=null,mfa_pending_expires_at=null,recovery_code_hashes=\'[]\'::jsonb,updated_at=now() where id=$1',[session.userId]);

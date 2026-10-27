@@ -8,7 +8,15 @@ export function generateTotpSecret(){return base32Encode(randomBytes(20))}
 export function totp(secret:string,time=Date.now(),step=30,digits=6){const counter=Math.floor(time/1000/step);const buf=Buffer.alloc(8);buf.writeBigUInt64BE(BigInt(counter));const h=createHmac("sha1",base32Decode(secret)).update(buf).digest();const offset=h[h.length-1]&15;const code=((h.readUInt32BE(offset)&0x7fffffff)%10**digits).toString().padStart(digits,"0");return code}
 export function verifyTotp(secret:string,code:string){const normalized=code.replace(/\s/g,"");for(const drift of [-1,0,1]){const expected=totp(secret,Date.now()+drift*30_000);const a=Buffer.from(expected);const b=Buffer.from(normalized);if(a.length===b.length&&timingSafeEqual(a,b))return true}return false}
 export function generateRecoveryCodes(){return Array.from({length:8},()=>`${randomBytes(3).toString("hex").toUpperCase()}-${randomBytes(3).toString("hex").toUpperCase()}`)}
+export function generatePasskeyRecoveryCodes(){return Array.from({length:8},()=>randomBytes(16).toString('hex').toUpperCase().match(/.{8}/g)!.join('-'));}
 export function hashRecoveryCode(code:string){return createHash("sha256").update(code.toUpperCase()).digest("hex")}
+/** The passkey recovery path never disables TOTP or removes registered keys. */
+export async function consumePasskeyRecoveryCode(database:{query:(sql:string,values:unknown[])=>Promise<{rowCount:number|null}>},input:{userId:string;passwordHash:string|null;mfaEnabled:boolean;mfaSecretEnc:string|null;code:string}){
+ const target=hashRecoveryCode(input.code);
+ const result=await database.query(`update app_users set passkey_recovery_hashes=passkey_recovery_hashes - (select ordinality::int-1 from jsonb_array_elements_text(passkey_recovery_hashes) with ordinality where value=$1 limit 1),updated_at=now()
+ where id=$2 and status='active' and password_hash is not distinct from $3 and mfa_enabled=$4 and mfa_secret_enc is not distinct from $5 and passkey_recovery_hashes @> $6::jsonb returning id`,[target,input.userId,input.passwordHash,input.mfaEnabled,input.mfaSecretEnc,JSON.stringify([target])]);
+ return result.rowCount===1;
+}
 /** Consume one code against current credentials; concurrent writers never restore
  * a previously consumed code or authorize proof from changed credentials. */
 export async function consumeRecoveryCode(database:{query:(sql:string,values:unknown[])=>Promise<{rowCount:number|null}>},input:{userId:string;passwordHash:string;mfaSecretEnc:string|null;code:string}){

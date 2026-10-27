@@ -309,3 +309,16 @@ Keep security, tenant and financial boundaries, existing mandatory gates, origin
 source archives and exact-SHA production approval. Never treat prepared scanner,
 network, restore, legal, device or delivery work as executed acceptance.
 See docs/operations/system-hardening-20261026.md and the evidence register.
+
+## Passkeys (27 October 2026)
+
+The owner's complete request is preserved in docs/architecture/passkeys-20261027/source.md.
+It explicitly replaces the earlier extra-TOTP-after-passkey rule: cryptographically
+verified WebAuthn with required user verification satisfies strong tenant login and
+fresh session-bound confirmation. Password logins retain their enrolled TOTP and
+company-policy boundaries. Preserve Entra operators, single-company membership,
+navigation/FAB and existing sessions; email recovery alone must not bypass strong
+authentication. Real Face ID/Touch ID/Windows Hello/Android/iOS-PWA evidence cannot
+be claimed from virtual authenticators. Exact-SHA merge/migration/deployment gates
+remain mandatory. Implementation and source ZIP preparation are authorized; this
+request does not approve an as-yet-unknown production source SHA.

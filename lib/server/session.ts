@@ -7,6 +7,7 @@ import {ApiError} from "@/lib/server/http";
 import {env} from "@/lib/server/env";
 import {expireUnpaidTrials} from "@/lib/server/subscription-lifecycle";
 import {requireFreshAuthentication} from './fresh-authentication';
+import {audit} from './audit';
 
 export type SessionUser={
  moduleProfile?:import('@/lib/permissions').ModuleProfile;
@@ -19,6 +20,7 @@ export type SessionUser={
  name:string;
  role:"owner"|"admin"|"finance"|"hr"|"project_manager"|"manager"|"member"|"reader";
  mfaEnabled:boolean;
+ passkeyVerified?:boolean;
  mfaRequired?:boolean;
 };
 
@@ -43,11 +45,13 @@ export async function createSession(input:{userId:string;organizationId:string;e
   if(input.expectedPasskeyId&&!(await client.query('select 1 from auth_passkeys where credential_id=$1 and user_id=$2 and organization_id=$3 and revoked_at is null',[input.expectedPasskeyId,input.userId,input.organizationId])).rowCount)throw new ApiError(401,'auth_state_changed','Bitte erneut anmelden.');
   const membership=(await client.query("select organization_id from organization_memberships where user_id=$1 and status='active'",[input.userId])).rows;
   if(membership.length!==1||membership[0].organization_id!==input.organizationId)throw new ApiError(401,'membership_ambiguous','Die Firmenzuordnung muss vor der Anmeldung geklärt werden.');
-  return client.query<{id:string}>(
-   `insert into auth_sessions(user_id,organization_id,token_hash,expires_at,user_agent,ip_hash)
-    values($1,$2,$3,$4,$5,$6) returning id`,
-   [input.userId,input.organizationId,hash,expiresAt,ua,ipHash(ip)]
+  const issued=await client.query<{id:string}>(
+   `insert into auth_sessions(user_id,organization_id,token_hash,expires_at,user_agent,ip_hash,passkey_verified)
+    values($1,$2,$3,$4,$5,$6,$7) returning id`,
+   [input.userId,input.organizationId,hash,expiresAt,ua,ipHash(ip),!!input.expectedPasskeyId]
   );
+  if(input.expectedPasskeyId)await audit(client,{organizationId:input.organizationId,userId:input.userId,action:'auth.passkey_login',entityType:'auth_sessions',entityId:issued.rows[0].id,metadata:{method:'passkey',userVerified:true}});
+  return issued;
  });
  const jar=await cookies();
  jar.set(input.cookieName??env.sessionCookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",...(input.persistent===false?{}:{expires:expiresAt})});
@@ -78,7 +82,7 @@ export async function getSession(options:{allowMfaEnrollment?:boolean}={}):Promi
    if(!context)return {rows:[] as SessionUser[]};
    await client.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[context.organization_id,context.user_id]);
    const authenticated=await client.query<SessionUser>(
-   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled",o.employee_mfa_required as "mfaRequired"
+   `select s.id as "sessionId",u.id as "userId",s.organization_id as "organizationId",u.email,u.display_name as name,m.role,m.module_profile as "moduleProfile",o.status as "organizationStatus",o.is_demo as "isDemo",u.mfa_enabled as "mfaEnabled",o.employee_mfa_required as "mfaRequired",s.passkey_verified as "passkeyVerified"
       from auth_sessions s
       join app_users u on u.id=s.user_id and u.status='active'
       join organization_memberships m on m.user_id=u.id and m.organization_id=s.organization_id and m.status='active'
@@ -102,7 +106,7 @@ export async function getSession(options:{allowMfaEnrollment?:boolean}={}):Promi
  });
  const session=result.rows[0]||null;
  if(session)void query(`update auth_sessions set last_seen_at=now() where id=$1 and last_seen_at<now()-interval '5 minutes'`,[session.sessionId]).catch(()=>{});
- if(session?.mfaRequired&&!session.mfaEnabled&&!options.allowMfaEnrollment)return null;
+ if(session?.mfaRequired&&!session.mfaEnabled&&!session.passkeyVerified&&!options.allowMfaEnrollment)return null;
  return session;
 }
 
@@ -112,7 +116,7 @@ export async function requireSession(options:{allowMfaEnrollment?:boolean;freshA
  if(!session){const {ApiError}=await import("@/lib/server/http");throw new ApiError(401,"unauthorized","Anmeldung erforderlich.");}
  // Phase 1: only the existing enrollment/security flow is reachable until a
  // required factor is enrolled. No role or alternate login exempts the policy.
- if(session.mfaRequired&&!session.mfaEnabled&&!options.allowMfaEnrollment)throw new ApiError(403,'mfa_enrollment_required','Dein Unternehmen verlangt eine Authenticator-App. Bitte richte sie unter Sicherheit ein.');
+ if(session.mfaRequired&&!session.mfaEnabled&&!session.passkeyVerified&&!options.allowMfaEnrollment)throw new ApiError(403,'mfa_enrollment_required','Dein Unternehmen verlangt eine starke Anmeldung. Bitte richte sie unter Sicherheit ein.');
   if(options.freshAuthentication)await requireFreshAuthentication(session);
   return session;
 }

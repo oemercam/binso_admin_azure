@@ -107,6 +107,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -128,7 +129,8 @@
         "components/directory-select.tsx#Page",
         "components/absence-requests.tsx#reviewTitles"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/abwesenheiten/page.tsx",
@@ -236,6 +238,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -257,7 +260,8 @@
         "components/directory-select.tsx#Page",
         "components/absence-requests.tsx#reviewTitles"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/lieferanten/[id]/page.tsx",
@@ -370,6 +374,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -410,7 +415,8 @@
         "components/directory-select.tsx#Page",
         "components/ui.tsx#Toggle"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/lieferanten/neu/page.tsx",
@@ -523,6 +529,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -563,7 +570,8 @@
         "components/directory-select.tsx#Page",
         "components/ui.tsx#Toggle"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/lieferanten/page.tsx",
@@ -679,6 +687,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -698,7 +707,8 @@
         "components/records.tsx#RecordsPagination",
         "components/records.tsx#RecordRow"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/vertraege/[id]/page.tsx",
@@ -810,6 +820,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -846,7 +857,8 @@
         "components/commercial-contracts.tsx#ConditionDraft",
         "components/commercial-contracts.tsx#rootConfirmTitles"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/vertraege/page.tsx",
@@ -958,6 +970,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -985,7 +998,8 @@
         "components/directory-select.tsx#Page",
         "components/commercial-contracts.tsx#billingLabels"
       ],
-      "evidence": []
+      "evidence": [],
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     }
   ]
 }

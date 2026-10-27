@@ -389,6 +389,13 @@ jobs:
           BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
           BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
         run: node scripts/pwa-browser-test.mjs
+      - name: Passkey native-browser regression
+        if: matrix.lane == 'functional' && matrix.engine == 'chromium'
+        env:
+          BINSO_PLAYWRIGHT_MODULE: ${{ runner.temp }}/binso-browser/node_modules/playwright/index.mjs
+          BINSO_UX_SERVER_FILE: ${{ runner.temp }}/binso-candidate/server.js
+          BINSO_PASSKEY_OUTPUT: ${{ runner.temp }}/binso-ux-chromium/passkeys
+        run: node scripts/passkey-browser-test.mjs
       - name: Startup, session and persistent navigation regression
         if: matrix.lane == 'functional'
         env:
