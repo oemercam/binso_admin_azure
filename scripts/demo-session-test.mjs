@@ -20,6 +20,7 @@ for(const path of ['demo/session','demo/data','demo/dashboard','demo/finance','d
 let reads=0;
 const jar=new Map([['binso_demo',{value:'1'}],['binso_demo_write',{value:'old-token'}]]);
 const session=await load('lib/server/session.ts',{
+ './audit':{audit:async()=>{throw Error('Legacy/demo validation must not create a login audit')}},
  './fresh-authentication':await load('lib/server/fresh-authentication.ts',{'server-only':{},'./db':{withTenant:()=>{throw Error('Legacy session must not request fresh proof')}},'./http':{ApiError:class extends Error{}}}),
  'server-only':{},'node:crypto':await import('node:crypto'),
  'next/headers':{cookies:async()=>jar,headers:async()=>new Headers()},
