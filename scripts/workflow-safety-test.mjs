@@ -50,6 +50,16 @@ for(const event_name of ['push','schedule','workflow_dispatch'])for(const apply_
 assert.equal(graph.on.workflow_dispatch.inputs.send_self_test.default,false);
 assert.equal(retention.on.workflow_dispatch.inputs.apply_cleanup.default,false);
 const deploy=workflows['deploy-azure.yml'].jobs.deploy;
+const attestation=workflows['legacy-checksum-attestation.yml'];
+assert.deepEqual(Object.keys(attestation.on),['workflow_dispatch'],'Legacy metadata correction is manual only');
+assert.equal(attestation.on.workflow_dispatch.inputs.apply.default,false,'Read-only plan is the default');
+assert.equal(attestation.concurrency.group,'production-deploy','No concurrent deployment and checksum correction');
+assert.equal(attestation.concurrency['cancel-in-progress'],false);
+assert.equal(attestation.jobs.attest.environment,'production','Existing human environment gate remains');
+assert(attestation.jobs.attest.steps.find(step=>step.name==='Verify exact main identity').run.includes('"$SOURCE_SHA" = "$GITHUB_SHA"'));
+assert(attestation.jobs.attest.steps.some(step=>step.env?.BINSO_APPROVED_PLAN_SHA256==='${{ inputs.plan_sha256 }}'));
+assert.equal(attestation.jobs.attest.steps.at(-1).if,'always()','Scoped firewall cleanup survives rejection or failure');
+assert(workflows['quality.yml'].jobs.checks.steps.some(step=>step.run==='node scripts/legacy-checksum-attestation-test.mjs'),'Attestation adversaries are mandatory in CI');
 assert.equal(workflows['deploy-azure.yml'].permissions['id-token'],undefined,'OIDC is job-scoped');
 assert.equal(deploy.permissions['id-token'],'write');
 const guard=deploy.steps[0];

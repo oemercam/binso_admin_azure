@@ -125,6 +125,8 @@ jobs:
           BINSO_PRODUCTION_EVIDENCE_ROOT: ${{ inputs.production_evidence_run_id != '' && '.production-evidence' || '.' }}
         run: pnpm ops:readiness --production
       - run: pnpm test
+      - name: Legacy checksum attestation adversaries
+        run: node scripts/legacy-checksum-attestation-test.mjs
       - name: Fast UX compliance contracts
         # Runtime/rate-limit/demo/navigation contracts already ran in pnpm test.
         run: |

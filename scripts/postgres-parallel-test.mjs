@@ -5,6 +5,8 @@ import fs from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';
 import pg from 'pg';
 import {acquireMigrationLock} from './migration-lock.mjs';
+import {createAttestationPlan,applyAttestation,digest,legacyVersions} from './legacy-checksum-attestation.mjs';
+import {checkMigrationVersions} from './schema-contract.mjs';
 import {moduleUrl,financialModuleUrl,localeTestModuleUrl,documentAmountSqlModuleUrl} from './data-test-modules.mjs';
 // Deliberately accept only this disposable localhost test database. No DATABASE_URL
 // fallback, production credentials, schema reset or destructive cleanup is used.
@@ -27,6 +29,22 @@ try{
  for(const name of (await fs.readdir('database/migrations')).filter(name=>name.endsWith('.sql')).sort()){
   const c=await pool.connect();try{await c.query('begin');const sql=await fs.readFile('database/migrations/'+name,'utf8');await c.query(sql);await c.query('insert into schema_migrations(version,checksum) values($1,$2)',[name,createHash('sha256').update(sql).digest('hex')]);await c.query('commit');}catch(error){await c.query('rollback');throw error;}finally{c.release();}
  }
+ // Exercise the real PostgreSQL transaction/lock semantics on this disposable
+ // localhost fixture, before running the existing business concurrency matrix.
+ await pool.query('alter table schema_migrations alter column checksum drop not null');
+ await pool.query('update schema_migrations set checksum=null where version=any($1::text[])',[legacyVersions]);
+ const releaseAttestationLock=await acquireMigrationLock(pool),attestationClient=await pool.connect();
+ try{
+  // Only adapt the production database-name identity in this localhost fixture;
+  // every lock, query, update, rollback and checksum check uses real PostgreSQL.
+  const fixtureClient={query:(sql,args)=>sql==='select current_database() as database,current_user as actor'?Promise.resolve({rows:[{database:'binso_platform',actor:'binso_test'}]}):attestationClient.query(sql,args)};
+  const sourceSha='a'.repeat(40),plan=await createAttestationPlan(fixtureClient,sourceSha);
+  await assert.rejects(applyAttestation(fixtureClient,sourceSha,'0'.repeat(64)),/Reviewed plan changed/);
+  assert.equal((await pool.query('select count(*)::int n from schema_migrations where checksum is null')).rows[0].n,16,'Rejected native plan makes no partial changes');
+  const receipt=await applyAttestation(fixtureClient,sourceSha,digest(plan));assert.equal(receipt.updatedVersions.length,16);
+  await checkMigrationVersions((await pool.query('select * from schema_migrations')).rows,{checksums:true});
+ }finally{attestationClient.release();await releaseAttestationLock();}
+ await pool.query('alter table schema_migrations alter column checksum set not null');
  globalThis.__binsoParallelPool=pool;
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
  const permissions=moduleUrl(await fs.readFile('lib/permissions.ts','utf8'));

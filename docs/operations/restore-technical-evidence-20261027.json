@@ -1,0 +1,39 @@
+{
+  "kind": "executed point-in-time restore technical evidence",
+  "verifiedAt": "2026-10-27T07:04:30.824Z",
+  "restorePoint": "2026-10-27T06:43:31Z",
+  "activeDatabase": "binso_platform",
+  "postgresVersion": "18.6",
+  "tlsVerified": true,
+  "readOnly": true,
+  "schemaTables": 125,
+  "schemaContract": "passed",
+  "requiredMigrations": 108,
+  "missingMigrations": [],
+  "marker": {
+    "version": "0107_push_dispatch_lifecycle.sql",
+    "appliedAt": "2026-10-24T19:14:04.926Z"
+  },
+  "matchingChecksums": 92,
+  "missingLegacyChecksums": [
+    "0001_baseline.sql",
+    "0002_auth_memberships.sql",
+    "0003_registration_onboarding.sql",
+    "0004_subscription_billing.sql",
+    "0005_stripe_payment_provider.sql",
+    "0006_production_saas.sql",
+    "0007_subscription_lifecycle.sql",
+    "0008_production_completion.sql",
+    "0009_multitenant_rbac_business_model.sql",
+    "0010_product_simplicity_devsecops.sql",
+    "0011_saas_platform_foundation.sql",
+    "0012_v74_production_hardening.sql",
+    "0013_v75_complete_product_foundation.sql",
+    "0014_v79_demo_access.sql",
+    "0015_v82_normalized_business_core.sql",
+    "0016_self_service_signup.sql"
+  ],
+  "temporaryCopiesDeleted": true,
+  "fullReadEvidenceSha256": "5d70d90d6ebea241a238e459e62874ccd9ea92af7c26cc5d060adedac0e6f06a",
+  "scope": "Active application only. Older preview database not qualified. No historical SQL-byte provenance assertion; no global production acceptance."
+}
