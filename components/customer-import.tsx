@@ -9,7 +9,7 @@ import {reportCsv} from '@/lib/report-export';
 import {LocalizedText} from '@/lib/client/locale';
 import {useTranslation} from '@/lib/client/locale';
 import {FileUpload} from './file-upload';
-import {ActionsMenu,ActionRow,FormSheet,ListRow} from './binso-ux';
+import {ActionsMenu,ActionRow,FormPage,ListRow} from './binso-ux';
 import {Button,Field,Select,FormActions,ErrorState,Status} from './ui';
 type Table={headers:string[];rows:string[][];sheets:string[];sheet:string;rowNumbers:number[]};
 type Reviewed={row:number;input:Record<string,unknown>;issues:string[];duplicate:boolean};
@@ -44,7 +44,7 @@ export function CustomerImportControl({customerId,onOpenArchive,onOpenMerge,head
  };
  const report=()=>{if(!review)return;const rows=[['Zeile','Status','Hinweis'],...review.map(row=>[String(row.row),translate(row.issues.length?'Prüfen':'Bereit'),row.issues.map(issue=>translate(issue)).join(' ')])];const url=URL.createObjectURL(new Blob([reportCsv(rows)],{type:'text/csv;charset=utf-8'})),anchor=document.createElement('a');anchor.href=url;anchor.download='binso-importbericht.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  if(!allowed)return tools&&extraActions?<ActionsMenu tools label="Listenwerkzeuge">{extraActions}</ActionsMenu>:null;
- return <>{showTrigger&&<ActionsMenu header={header} tools={tools} label={tools?"Listenwerkzeuge":customerId?'Kontaktaktionen':'Kundenaktionen'}>{extraActions}<ActionRow title="Importieren" icon="upload" onClick={()=>{reset();setOpen(true)}}/>{onOpenMerge&&<ActionRow title="Dubletten zusammenführen" icon="users" onClick={onOpenMerge}/>}{onOpenArchive&&<ActionRow title="Archiv" icon="file" onClick={onOpenArchive}/>}</ActionsMenu>}<FormSheet label={customerId?'Kontakte importieren':'Kunden importieren'} open={open||openRequested} headerActions={review?<ActionsMenu header label="Importbericht"><ActionRow title="CSV exportieren" icon="file" onClick={report}/></ActionsMenu>:undefined} onClose={()=>{setOpen(false);onRequestedClose?.();reset()}} busy={busy} dirty={!!file&&count===null}>
+ return <>{showTrigger&&<ActionsMenu header={header} tools={tools} label={tools?"Listenwerkzeuge":customerId?'Kontaktaktionen':'Kundenaktionen'}>{extraActions}<ActionRow title="Importieren" icon="upload" onClick={()=>{reset();setOpen(true)}}/>{onOpenMerge&&<ActionRow title="Dubletten zusammenführen" icon="users" onClick={onOpenMerge}/>}{onOpenArchive&&<ActionRow title="Archiv" icon="file" onClick={onOpenArchive}/>}</ActionsMenu>}<FormPage label={customerId?'Kontakte importieren':'Kunden importieren'} open={open||openRequested} headerActions={review?<ActionsMenu header label="Importbericht"><ActionRow title="CSV exportieren" icon="file" onClick={report}/></ActionsMenu>:undefined} onClose={()=>{setOpen(false);onRequestedClose?.();reset()}} busy={busy} dirty={!!file&&count===null}>
  {count!==null?<Status tone="success"><LocalizedText>Import abgeschlossen</LocalizedText>: {count}</Status>:<>
  {!table?<FileUpload label="Importdatei" file={file} accept={['.csv','.xlsx','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']} maxBytes={importLimits.bytes} busy={busy} onSelect={file=>{setFile(file);setReview(null)}} onRemove={()=>{setFile(null);setReview(null)}}/>:<>
  {table.sheets.length>1&&<Field label="Arbeitsblatt"><Select disabled={busy} value={table.sheet} onChange={event=>void load(event.target.value)}>{table.sheets.map(sheet=><option key={sheet} value={sheet}>{sheet}</option>)}</Select></Field>}
@@ -58,5 +58,5 @@ export function CustomerImportControl({customerId,onOpenArchive,onOpenMerge,head
  </>}
  {error&&<ErrorState>{error}</ErrorState>}
  <FormActions sheet><Button variant="secondary" disabled={busy} onClick={()=>{if(review&&count===null){setReview(null);replay.current=null;}else if(table&&count===null){setTable(null);}else{setOpen(false);reset();}}}><LocalizedText>{count!==null?'Schliessen':table?'Zurück':'Abbrechen'}</LocalizedText></Button>{count===null&&<Button disabled={busy||!file||!!table&&!review&&fields.some(([key,,required])=>required&&(mapping[key]??-1)<0)||!!review&&!valid.length} onClick={()=>void (!table?load():review?commit():preview())}><LocalizedText>{busy?'Wird geprüft …':!table?'Datei prüfen':review?'Neue Datensätze importieren':'Vorschau prüfen'}</LocalizedText></Button>}</FormActions>
- </FormSheet></>;
+ </FormPage></>;
 }

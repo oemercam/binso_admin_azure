@@ -8,7 +8,7 @@ import {domainConfig} from '@/config/domain';
 import {LocalizedText} from '@/lib/client/locale';
 import {AppShell} from '../app-shell';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select} from '../ui';
-import {ActionRow,ActionsMenu,CreateAction,FormSheet} from '../binso-ux';
+import {FormPage,ActionRow,ActionsMenu,CreateAction} from '../binso-ux';
 import {RecordRow,RecordsControls,RecordsView,useRecordsController} from '../records';
 import {useRecordList} from './shared';
 import {useDirtySnapshot} from '../use-dirty-snapshot';
@@ -69,7 +69,7 @@ export function SupplierForm({supplierId}:{supplierId?:string}){
   {!editing&&supplierId&&tenantCan(role,'bank:read',profile)&&<SupplierBank supplierId={supplierId} mayWrite={tenantCan(role,'bank:write',profile)} onSaved={query.refresh}/>}
   {!editing&&supplierId&&<SupplierInvoices supplierId={supplierId} mayWrite={tenantCan(role,'purchasing:write',profile)}/>}
   {!editing&&supplierId&&['owner','admin'].includes(role)&&<ExternalResources supplierId={supplierId}/>}
-  <FormSheet workspace open={editing} onClose={close} label={existing?'Lieferant bearbeiten':'Lieferant hinzufügen'} busy={busy} dirty={dirty}>
+  <FormPage open={editing} onClose={close} label={existing?'Lieferant bearbeiten':'Lieferant hinzufügen'} busy={busy} dirty={dirty}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Lieferant"><Input required maxLength={200} value={draft.name} onChange={event=>field('name',event.target.value)}/></Field>
     <Field label="Kontakt"><Input maxLength={200} value={draft.contactName} onChange={event=>field('contactName',event.target.value)}/></Field>
@@ -82,6 +82,6 @@ export function SupplierForm({supplierId}:{supplierId?:string}){
    </div></form>
    {error&&<ErrorState>{error}</ErrorState>}
    <FormActions sheet><Button variant="secondary" disabled={busy} onClick={close}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy||!existing&&!recovery.ready}><LocalizedText>{'Speichern'}</LocalizedText></Button></FormActions>
-  </FormSheet>
+  </FormPage>
  </AppShell>;
 }

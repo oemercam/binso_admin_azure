@@ -5,7 +5,7 @@ import {useApiQuery,useDataRevision} from '@/lib/client/use-api-query';
 import {localeTags} from '@/lib/locales/config';
 import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {formatQuantity,formatTimestampDate} from '@/lib/display-format';
-import {FormSheet} from './binso-ux';
+import {FormPage} from './binso-ux';
 import {DirectorySelect} from './directory-select';
 import {Button,ErrorState,Field,FormActions,Input,LoadingState,Select} from './ui';
 
@@ -38,7 +38,7 @@ export function TimePriceSource({entryId,billable,trigger}:{entryId:string;billa
   try{await apiPost('/api/time-entries/'+encodeURIComponent(entryId)+'/pricing',body,{idempotencyKey:attempt.key});close()}catch(e){setError(e instanceof Error?e.message:'Preisquelle konnte nicht gespeichert werden.')}finally{busy.current=false;setSaving(false)}
  };
  const Trigger=trigger?.type;
- return <>{trigger&&Trigger?<Trigger {...trigger.props} onClick={launch}/>:<button type="button" className="text-action" onClick={launch}><LocalizedText>{"Preisquelle"}</LocalizedText></button>}<FormSheet label="Preisquelle bestätigen" description="Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt." open={open} onClose={close} busy={saving} dirty={!!selection}>
+ return <>{trigger&&Trigger?<Trigger {...trigger.props} onClick={launch}/>:<button type="button" className="text-action" onClick={launch}><LocalizedText>{"Preisquelle"}</LocalizedText></button>}<FormPage label="Preisquelle bestätigen" description="Einkauf und Verkauf werden getrennt gespeichert. Es wird keine Rechnung erzeugt." open={open} onClose={close} busy={saving} dirty={!!selection}>
   <Field label="Richtung"><Select value={side} disabled={saving} onChange={e=>void load(e.target.value as Side)}><option value="sale" disabled={!billable}><LocalizedText>{"Verkauf"}</LocalizedText></option><option value="purchase"><LocalizedText>{"Einkauf"}</LocalizedText></option></Select></Field>
   {loading&&<LoadingState/>}{error&&<ErrorState>{error}</ErrorState>}{error&&state&&<Button variant="secondary" disabled={saving} onClick={()=>void load(side)}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button>}
   {!loading&&!state&&<Button variant="secondary" onClick={()=>void load(side)}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button>}
@@ -54,5 +54,5 @@ export function TimePriceSource({entryId,billable,trigger}:{entryId:string;billa
    </>}
   </>}
   <FormActions sheet><Button variant="secondary" disabled={saving} onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={saving||!state||state.allocated||!selection||!detail||selectionChanged||contract.loading} onClick={()=>void save()}><LocalizedText>{"Preisquelle bestätigen"}</LocalizedText></Button></FormActions>
- </FormSheet></>;
+ </FormPage></>;
 }

@@ -76,7 +76,7 @@ function accessFromSession(session:ClientSession|null){
 }
 
 function AppShellFrame({
-  title,
+  title:routeTitle,
   titleIsUserContent=false,
   headingPlacement="content",
   recordLabel,
@@ -118,6 +118,13 @@ function AppShellFrame({
   editing?: boolean;
   unsavedChanges?: boolean;
 }) {
+  const [formPageTitle,setFormPageTitle]=useState<string|null>(null);
+  const title=formPageTitle??routeTitle;
+  useEffect(()=>{
+   const main=document.querySelector('main.page-container');if(!main)return;
+   const update=()=>setFormPageTitle(Array.from(main.querySelectorAll(':scope > .form-page')).at(-1)?.getAttribute('aria-label')??null);
+   const observer=new MutationObserver(update);observer.observe(main,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-label']});queueMicrotask(update);return()=>observer.disconnect();
+  },[loading]);
   const {navigationCollapsed,toggleNavigation}=useDesktopNavigation();
   const translate=useTranslation();
   const pathname=usePathname();
@@ -130,7 +137,7 @@ function AppShellFrame({
   const identityRevision=useDataRevision(["/api/auth/session"]);
   const router=useRouter();
   useNavigationScroll(pathname);
-  const formActive=editing||pathname.endsWith("/neu");
+  const formActive=editing||pathname.endsWith("/neu")||!!formPageTitle;
   const chatActive=conversation;
   const [access,setAccess]=useState<{role:string;plan:PlanId;readOnly:boolean;moduleProfile:ModuleProfile;enrollmentRequired:boolean}|null>(null);
   const workspaceReady=!!access;

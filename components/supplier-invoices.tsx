@@ -9,7 +9,7 @@ import type {SupplierMatchInput} from '@/lib/supplier-invoice-match';
 import type {compareSupplierInvoice} from '@/lib/supplier-invoice-match';
 import {apApprovalRoles,type APApprovalPolicy} from '@/lib/supplier-approval-policy';
 import {EntityFiles} from './entity-files';
-import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
+import {ActionRow,ActionsMenu,FormPage} from './binso-ux';
 import {Button,Checkbox,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select,Textarea} from './ui';
 
 type Invoice={id:string;supplier_invoice_no:string|null;invoice_date:string|null;due_date:string|null;net_amount:string|null;vat_amount:string|null;total_amount:string|null;currency:string|null;note:string|null;version:number;status:string;v26_review_id:string|null};
@@ -46,8 +46,8 @@ export function SupplierInvoices({supplierId,mayWrite}:{supplierId:string;mayWri
   {matching?.scope===scope&&<SupplierInvoiceMatch key={scope+matching.invoice.id} supplierId={supplierId} invoice={matching.invoice} mayWrite={mayWrite&&matching.invoice.status==='draft'} onClose={()=>setMatching(null)}/>}
   {reviewing?.scope===scope&&<SupplierInvoiceReview key={scope+reviewing.invoice.id} supplierId={supplierId} invoice={reviewing.invoice} mayWrite={mayWrite} onClose={()=>setReviewing(null)} onSaved={()=>{setReviewing(null);query.refresh();}} onMatch={()=>{setMatching({invoice:reviewing.invoice,scope});setReviewing(null);}}/>}
   {policyOpen&&<SupplierApprovalPolicy key={scope} onClose={()=>setPolicyOpen(false)}/>}
-  {receipts&&<FormSheet open onClose={()=>setReceipts(null)} label="Eingangsrechnungsbelege"><EntityFiles purpose="supplier_invoice_receipt" entityId={receipts.id} readOnly={!mayWrite||receipts.status!=='draft'} title="Belege"/></FormSheet>}
-  <FormSheet open={open} onClose={()=>setOpen(false)} label="Eingangsrechnungsentwurf" busy={busy} dirty={JSON.stringify(draft)!==original}>
+  {receipts&&<FormPage open onClose={()=>setReceipts(null)} label="Eingangsrechnungsbelege"><EntityFiles purpose="supplier_invoice_receipt" entityId={receipts.id} readOnly={!mayWrite||receipts.status!=='draft'} title="Belege"/></FormPage>}
+  <FormPage open={open} onClose={()=>setOpen(false)} label="Eingangsrechnungsentwurf" busy={busy} dirty={JSON.stringify(draft)!==original}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Rechnungsnummer"><Input maxLength={120} value={draft.number} onChange={event=>field('number',event.target.value)}/></Field>
     <Field label="Währung"><Select value={draft.currency} onChange={event=>field('currency',event.target.value)}><option value=""><LocalizedText>{'Währung ungeklärt'}</LocalizedText></option><option value="CHF">CHF</option><option value="EUR">EUR</option></Select></Field>
@@ -60,14 +60,14 @@ export function SupplierInvoices({supplierId,mayWrite}:{supplierId:string;mayWri
    </div></form>
    {error&&<ErrorState>{error}</ErrorState>}
    <FormActions sheet><Button variant="secondary" disabled={busy} onClick={()=>setOpen(false)}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy}><LocalizedText>{'Entwurf speichern'}</LocalizedText></Button></FormActions>
-  </FormSheet>
+  </FormPage>
  </section>;
 }
 
 function SupplierApprovalPolicy({onClose}:{onClose:()=>void}){
  const query=useApiQuery<{item:{policy:APApprovalPolicy;revision:number};canConfigure:boolean}>('/api/suppliers/approval-policy');
  if(query.data&&!query.loading&&!query.error)return <SupplierApprovalPolicyEditor key={query.data.item.revision} initial={query.data.item} canConfigure={query.data.canConfigure} onClose={onClose}/>;
- return <FormSheet open label="Freigaberegeln" onClose={onClose}>{query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<LoadingState/>}</FormSheet>;
+ return <FormPage open label="Freigaberegeln" onClose={onClose}>{query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:<LoadingState/>}</FormPage>;
 }
 function SupplierApprovalPolicyEditor({initial,canConfigure,onClose}:{initial:{policy:APApprovalPolicy;revision:number};canConfigure:boolean;onClose:()=>void}){
  const [policy,setPolicy]=useState(initial.policy),[busy,setBusy]=useState(false),[error,setError]=useState('');const attempt=useRef<{body:string;key:string}|null>(null),pending=useRef(false);
@@ -76,13 +76,13 @@ function SupplierApprovalPolicyEditor({initial,canConfigure,onClose}:{initial:{p
   try{const body={expectedRevision:initial.revision,policy},serialized=JSON.stringify(body);if(attempt.current?.body!==serialized)attempt.current={body:serialized,key:crypto.randomUUID()};await apiPost('/api/suppliers/approval-policy',body,{idempotencyKey:attempt.current.key});onClose();}catch(e){setError(e instanceof Error?e.message:'Freigaberegel konnte nicht gespeichert werden.');}finally{pending.current=false;setBusy(false);}
  };
  const roleLabels={owner:'Inhaber',admin:'Administrator',finance:'Finanzen'};
- return <FormSheet open label="Freigaberegeln" busy={busy} onClose={onClose} dirty={JSON.stringify(policy)!==JSON.stringify(initial.policy)}>
+ return <FormPage open label="Freigaberegeln" busy={busy} onClose={onClose} dirty={JSON.stringify(policy)!==JSON.stringify(initial.policy)}>
   <p><LocalizedText>{'Diese Regeln gelten für Lieferantenrechnungen. Sie lösen keine Zahlung aus. Ein berechtigter Solo-Owner darf selbst freigeben.'}</LocalizedText></p>
   <Field label="Unabhängige Vier-Augen-Prüfung bei mehreren Benutzern"><Checkbox disabled={!canConfigure||busy} checked={policy.fourEyes} onChange={e=>setPolicy(p=>({...p,fourEyes:e.target.checked}))}/></Field>
   <p><LocalizedText>{'Leere Betragsgrenzen bedeuten keine zusätzliche Obergrenze. Betragsgrenzen beziehen sich auf den Gesamtbetrag inklusive MwSt. und gelten nur in der angegebenen Währung. Abweichungen werden nicht automatisch toleriert.'}</LocalizedText></p>
   {apApprovalRoles.map(role=><section className="form-section" key={role}><SectionTitle title={roleLabels[role]}/><div className="form-grid two">{['CHF','EUR'].map(currency=><Field key={currency} label={currency}><Input inputMode="decimal" disabled={!canConfigure||busy} value={policy.limits[role+'_'+currency]??''} onChange={e=>setPolicy(p=>{const limits={...p.limits},key=role+'_'+currency,value=e.target.value.replace(',','.');if(value)limits[key]=value;else delete limits[key];return {...p,limits};})}/></Field>)}</div></section>)}
   {error&&<ErrorState>{error}</ErrorState>}<FormActions sheet><Button variant="secondary" disabled={busy} onClick={onClose}><LocalizedText>{'Schliessen'}</LocalizedText></Button>{canConfigure&&<Button disabled={busy} onClick={()=>void save()}><LocalizedText>{'Freigaberegel speichern'}</LocalizedText></Button>}</FormActions>
- </FormSheet>;
+ </FormPage>;
 }
 
 function SupplierInvoiceReview({supplierId,invoice,mayWrite,onClose,onSaved,onMatch}:{supplierId:string;invoice:Invoice;mayWrite:boolean;onClose:()=>void;onSaved:()=>void;onMatch:()=>void}){
@@ -94,7 +94,7 @@ function SupplierInvoiceReview({supplierId,invoice,mayWrite,onClose,onSaved,onMa
   try{const body={decision,note,expectedRevision:query.data.invoice.version,expectedPolicyRevision:query.data.policyRevision,matchId:decision==='approve'?query.data.match?.id:null},serialized=JSON.stringify(body);if(attempt.current?.body!==serialized)attempt.current={body:serialized,key:crypto.randomUUID()};const response=await apiPost<{item:{id:string}}>(endpoint,body,{idempotencyKey:attempt.current.key});if(!response.item?.id)throw Error('Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.');onSaved();}catch(e){setError(e instanceof Error?e.message:'Rechnungsprüfung konnte nicht gespeichert werden.');}finally{pending.current=false;setBusy(false);}
  };
  const state=query.data,editable=mayWrite&&state?.canReview&&state.invoice.status==='draft',reviewLabels:Record<string,string>={approve:'Freigegeben',query:'Rückfrage'};
- return <FormSheet open label="Rechnung prüfen" description={invoice.supplier_invoice_no??''} busy={busy} dirty={!!note} onClose={onClose}>
+ return <FormPage open label="Rechnung prüfen" description={invoice.supplier_invoice_no??''} busy={busy} dirty={!!note} onClose={onClose}>
   <p><LocalizedText>{'Eine Freigabe bestätigt diese Rechnungsrevision. Sie löst keine Zahlung aus.'}</LocalizedText></p>
   {query.loading?<LoadingState/>:query.error?<ErrorState onRetry={query.refresh}>{query.error}</ErrorState>:state&&<>
    <p><LocalizedText>{state.queryUnresolved?'Eine Rückfrage ist offen. Bitte den Entwurf überarbeiten und erneut abgleichen.':state.mayApprove?'Rechnung ist zur ausdrücklichen Freigabe bereit.':'Freigabe nicht möglich: Abgleich, Vier-Augen-Regel und Betragsgrenzen prüfen.'}</LocalizedText></p>
@@ -103,7 +103,7 @@ function SupplierInvoiceReview({supplierId,invoice,mayWrite,onClose,onSaved,onMa
    {state.reviews.length>0&&<section className="form-section"><SectionTitle title="Prüfverlauf"/>{state.reviews.map(r=><div key={r.id}><b><LocalizedText>{reviewLabels[r.decision]??'—'}</LocalizedText></b><p>{r.note}</p></div>)}</section>}
   </>}{error&&<ErrorState>{error}</ErrorState>}
   <FormActions sheet><Button variant="secondary" disabled={busy} onClick={onClose}><LocalizedText>{'Schliessen'}</LocalizedText></Button>{editable&&!query.loading&&!query.error&&<><Button requiresWrite variant="secondary" disabled={busy||note.trim().length<10} onClick={()=>void save('query')}><LocalizedText>{'Rückfrage speichern'}</LocalizedText></Button><Button requiresWrite disabled={busy||!state?.mayApprove} onClick={()=>void save('approve')}><LocalizedText>{'Rechnung freigeben'}</LocalizedText></Button></>}</FormActions>
- </FormSheet>;
+ </FormPage>;
 }
 
 type Match={id:string;invoice_version:number;stale:boolean;input_snapshot:SupplierMatchInput;result:ReturnType<typeof compareSupplierInvoice>};
@@ -125,7 +125,7 @@ function SupplierInvoiceMatch({supplierId,invoice,mayWrite,onClose}:{supplierId:
  };
  const value=(v:string|null)=>({required:'Angabe fehlt',clean_receipt:'Geprüfter Beleg',quarantine:'Beleg noch in Quarantäne',one_contract_price_tax_currency:'Einheitliche Vertragskondition',mixed_sources:'Unterschiedliche Vertragskonditionen',approved_purchase_source:'Bestätigte Einkaufsquelle'} as Record<string,string>)[v??'']??v??'—';
  const labels:Record<string,string>={minutes:'Minuten',unit_price:'Stundensatz',currency:'Währung',net:'Nettobetrag',tax:'MwSt.-Betrag',total:'Gesamtbetrag',number:'Rechnungsnummer',invoiceDate:'Rechnungsdatum',dueDate:'Fällig am',receipt:'Belege',sources:'Einkaufsquelle',source_groups:'Getrennte Vertragspositionen erforderlich'};
- return <FormSheet open label="Leistungen abgleichen" description={invoice.supplier_invoice_no??''} busy={busy} onClose={onClose} dirty={Boolean(selection.length||minutes||price)&&savedBody!==JSON.stringify({from,until,selection,minutes,price})}>
+ return <FormPage open label="Leistungen abgleichen" description={invoice.supplier_invoice_no??''} busy={busy} onClose={onClose} dirty={Boolean(selection.length||minutes||price)&&savedBody!==JSON.stringify({from,until,selection,minutes,price})}>
   <div className="sheet-body">
    <p><LocalizedText>{'Der Abgleich dokumentiert Abweichungen. Er gibt keine Rechnung frei und löst keine Zahlung aus.'}</LocalizedText></p>
    <div className="form-grid two"><Field label="Leistungsbeginn"><Input type="date" value={from} onChange={e=>{setFrom(e.target.value);setSelection([]);}}/></Field><Field label="Leistungsende"><Input type="date" value={until} min={from} onChange={e=>{setUntil(e.target.value);setSelection([]);}}/></Field></div>
@@ -137,5 +137,5 @@ function SupplierInvoiceMatch({supplierId,invoice,mayWrite,onClose}:{supplierId:
    {latest&&<section className="form-section"><SectionTitle title="Letzter Abgleich"/><p>{latest.input_snapshot.period.start} – {latest.input_snapshot.period.end}</p><p><LocalizedText>{latest.stale?'Abgleich ist veraltet. Bitte die aktuelle Revision erneut abgleichen.':latest.result.ready?'Abgleich ohne ungeklärte Abweichungen':'Ungeklärte Abweichungen'}</LocalizedText></p>{latest.result.expected&&<p>{latest.result.expected.minutes} <LocalizedText>{'Minuten'}</LocalizedText> · {latest.result.expected.currency} {latest.result.expected.total}</p>}{latest.result.differences.map(d=><p key={d.code}><LocalizedText>{labels[d.code]??d.code}</LocalizedText>: <LocalizedText>{'Erwartet'}</LocalizedText> <LocalizedText>{value(d.expected)}</LocalizedText> · <LocalizedText>{'Erfasst'}</LocalizedText> <LocalizedText>{value(d.actual)}</LocalizedText></p>)}</section>}
    {error&&<ErrorState>{error}</ErrorState>}
   </div><FormActions sheet><Button variant="secondary" disabled={busy} onClick={onClose}><LocalizedText>{'Schliessen'}</LocalizedText></Button>{mayWrite&&<Button disabled={busy||query.loading||Boolean(query.error)||!selection.length||!minutes||!price} onClick={()=>void save()}><LocalizedText>{'Abgleich speichern'}</LocalizedText></Button>}</FormActions>
- </FormSheet>;
+ </FormPage>;
 }

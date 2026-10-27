@@ -6,7 +6,7 @@ import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {formatQuantity,formatTimestampDate} from '@/lib/display-format';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Status} from './ui';
-import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
+import {ActionRow,ActionsMenu,FormPage} from './binso-ux';
 
 type Period={id:string;period_id:string;revision:number;is_current:boolean;starts_on:string;ends_on:string|null;workload_percent:string;weekly_hours:string;vacation_days:string;job_title:string;work_location:string|null};
 type Draft={startsOn:string;endsOn:string;workloadPercent:string;weeklyHours:string;vacationDays:string;jobTitle:string;workLocation:string};
@@ -41,7 +41,7 @@ export function EmploymentPeriods({employeeId,mayWrite,prefill}:{employeeId:stri
    <Status tone={period.is_current?'info':'neutral'}><LocalizedText>{period.is_current?'Aktueller Vertragsstand':'Frühere Revision'}</LocalizedText>{' · '}{period.revision}</Status>
    {mayWrite&&period.is_current&&<ActionsMenu label="Anstellungsaktionen"><ActionRow requiresWrite icon="edit" title="Vertragsstand korrigieren" onClick={()=>edit(period)}/></ActionsMenu>}
   </div>)}</div>}
-  <FormSheet open={open} onClose={()=>setOpen(false)} label={selected?'Vertragsstand korrigieren':'Anstellungsperiode hinzufügen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
+  <FormPage open={open} onClose={()=>setOpen(false)} label={selected?'Vertragsstand korrigieren':'Anstellungsperiode hinzufügen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
    <form id={formId} onSubmit={event=>{event.preventDefault();void save();}}>
     <div className="form-grid two">
      <Field label="Eintritt"><Input required type="date" value={draft.startsOn} onChange={event=>field('startsOn',event.target.value)}/></Field>
@@ -55,6 +55,6 @@ export function EmploymentPeriods({employeeId,mayWrite,prefill}:{employeeId:stri
    </form>
    {error&&<ErrorState>{error}</ErrorState>}
    <FormActions sheet><Button variant="secondary" disabled={busy} onClick={()=>setOpen(false)}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy}><LocalizedText>{'Speichern'}</LocalizedText></Button></FormActions>
-  </FormSheet>
+  </FormPage>
  </section>;
 }

@@ -1,4 +1,5 @@
 {
+  "Firma vervollständigen": ["Complete company details", "Compléter les informations de l’entreprise", "Completa i dati dell’azienda", "Şirket bilgilerini tamamla"],
   "Bitte melde dich mit E-Mail und Passwort an.": ["Please sign in with email and password.", "Veuillez vous connecter avec votre e-mail et votre mot de passe.", "Accedi con e-mail e password.", "Lütfen e-posta ve parolayla giriş yap."],
   "Die Kundenanmeldung verwendet E-Mail und Passwort.": ["Customer sign-in uses email and password.", "La connexion des clients utilise l’e-mail et le mot de passe.", "L’accesso dei clienti usa e-mail e password.", "Müşteri girişi e-posta ve parolayla yapılır."],
   "Nach der E-Mail-Bestätigung melden sich Kunden mit E-Mail und Passwort an.": ["After email verification, customers sign in with email and password.", "Après confirmation de leur adresse e-mail, les clients se connectent avec leur e-mail et leur mot de passe.", "Dopo la conferma dell’e-mail, i clienti accedono con e-mail e password.", "Müşteriler e-postalarını doğruladıktan sonra e-posta ve parolayla giriş yapar."],

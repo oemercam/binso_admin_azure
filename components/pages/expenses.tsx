@@ -10,7 +10,7 @@ import {localeTags} from "@/lib/locales/config";
 import {formatTimestampDate} from "@/lib/display-format";
 import {safeAppPath} from "@/lib/navigation";
 import {useApiQuery} from "@/lib/client/use-api-query";
-import {ActionSheet,FormSheet} from "../binso-ux";
+import {FormPage,ActionSheet,FormSheet} from "../binso-ux";
 
 import { businessDate,formatCurrency,formatDate } from "@/lib/financial-status";
 import Link from "next/link";
@@ -194,7 +194,7 @@ export function ExpenseForm({ existing = false, expenseId }: { existing?: boolea
     </div>
   </>;
   return <AppShell titleIsUserContent={false} editing={!existing||editingExpense} unsavedChanges={existing&&editedExpense&&!savedExpense} title={existing?"Spese":"Spese erfassen"} status={existing?status:undefined} statusTone={status==="Genehmigt"||status==="Verbucht"?"success":status==="Abgelehnt"?"danger":status==="Eingereicht"?"warning":"neutral"} subtitle={existing ? employeeLabel : undefined} active="spesen" backHref={returnTo} backLabel="Spesen" actions={existing&&!editingExpense?<Button variant="ghost" icon="more" ariaLabel="Spesenaktionen" onClick={()=>setExpenseActions(true)}/>:undefined}>
-    {existing&&!editingExpense?workspace:<FormSheet workspace label={existing?"Spese bearbeiten":"Spese erfassen"} description="Beleg fotografieren oder Datei auswählen." open onClose={close} busy={expenseBusy||scanState==="scanning"} dirty={editedExpense&&!savedExpense} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}><LocalizedText>{existing?"Speichern":"Einreichen"}</LocalizedText></Button></>}>{workspace}</FormSheet>}
+    {existing&&!editingExpense?workspace:<FormPage label={existing?"Spese bearbeiten":"Spese erfassen"} description="Beleg fotografieren oder Datei auswählen." open onClose={close} busy={expenseBusy||scanState==="scanning"} dirty={editedExpense&&!savedExpense} actions={<><Button variant="secondary" onClick={close}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button requiresWrite disabled={expenseBusy||scanState==="scanning"} onClick={()=>void save()}><LocalizedText>{existing?"Speichern":"Einreichen"}</LocalizedText></Button></>}>{workspace}</FormPage>}
     {reimbursementOpen&&<FormSheet label={"Erfolgte Erstattung erfassen"} description={"Die Zahlung muss bereits erfolgt sein. Es wird keine Überweisung ausgelöst."} open={true} onClose={()=>setReimbursementOpen(false)} busy={expenseBusy} className={""} layerClassName={""} ariaLabel={"Erstattung erfassen"}><p>{formatCurrency(Number(amount),currency,localeTags[locale])}</p><Field label="Tatsächliches Zahlungsdatum"><Input type="date" max={businessDate()} value={reimbursementDate} onChange={e=>setReimbursementDate(e.target.value)}/></Field><Field label="Zahlungsreferenz"><Input value={reimbursementRef} onChange={e=>setReimbursementRef(e.target.value)}/></Field><FormActions sheet><Button variant="secondary" onClick={()=>setReimbursementOpen(false)}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={expenseBusy||!reimbursementRef.trim()||!reimbursementDate} onClick={()=>void recordReimbursement()}><LocalizedText>{"Erstattung erfassen"}</LocalizedText></Button></FormActions></FormSheet>}
     {existing&&toast&&<Toast title={toast} tone={["Spese und Beleg gespeichert.","Spese gespeichert.","Spese eingereicht.","Erstattung erfasst."].includes(toast)?"success":"danger"}/>}
   </AppShell>;

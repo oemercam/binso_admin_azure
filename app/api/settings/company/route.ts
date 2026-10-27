@@ -5,6 +5,10 @@ import { authorize } from "@/lib/server/rbac";
 import { withTenant } from "@/lib/server/db";
 import {canAccessFile} from "@/lib/server/file-access";
 
+import {requireFreshAuthentication} from '@/lib/server/fresh-authentication';
+import {normalizeIban,validSwissIban,invoicePaymentRequirements} from '@/lib/qr-bill';
+import {isQRIBAN} from 'swissqrbill/utils';
+
 type CompanyBody=Record<string,unknown>;
 const fields=`id,is_demo,name,legal_name,legal_form,uid,vat_number,street,building_number,postal_code,city,country_code,email,phone,website,logo_url,vat_rate,payment_terms_days,iban,qr_iban,invoice_intro_text,invoice_footer_text,quote_intro_text,quote_footer_text,mail_sender_name,mail_reply_to,mail_signature`;
 
@@ -23,8 +27,20 @@ export async function PATCH(request:NextRequest){
   const textFields:Record<string,[string,number]>={name:['name',160],legalName:['legal_name',160],legalForm:['legal_form',80],uid:['uid',40],vatNumber:['vat_number',40],street:['street',160],buildingNumber:['building_number',30],postalCode:['postal_code',20],city:['city',120],countryCode:['country_code',2],email:['email',320],phone:['phone',80],website:['website',240],logoUrl:['logo_url',1000]};
   const data:Record<string,unknown>={};
   for(const [key,[column,max]] of Object.entries(textFields))if(b[key]!==undefined){const value=cleanText(b[key],max);if(key==='name'&&!value)return json({error:'name_required',message:'Firmenname ist erforderlich.'},400);if(key==='email'&&value&&!validEmail(value))return json({error:'email_invalid',message:'Ungültige Firmen-E-Mail.'},400);data[column]=key==='countryCode'?(value||'CH').toUpperCase():value||null;}
+  if(b.completeCompanySetup===true){
+   await requireFreshAuthentication(s);
+   const iban=normalizeIban(b.iban),qrIban=normalizeIban(b.qrIban);
+   if((iban&&!validSwissIban(iban))||(qrIban&&(!validSwissIban(qrIban)||!isQRIBAN(qrIban))))return json({error:'iban_invalid',message:'Bitte eine gültige IBAN bzw. QR-IBAN erfassen.'},400);
+   data.iban=iban||null;data.qr_iban=qrIban||null;
+  }
   const keys=Object.keys(data);if(!keys.length)return json({error:'empty_update',message:'Keine Änderungen angegeben.'},400);
   const item=await withTenant(s.organizationId,s.userId,async c=>{
+   if(b.completeCompanySetup===true){
+    await requireFreshAuthentication(s,c);
+    const current=(await c.query(`select ${fields} from organizations where id=$1 for update`,[s.organizationId])).rows[0];
+    const issues=invoicePaymentRequirements({...current,...data});
+    if(issues.length)throw new ApiError(400,'company_setup_incomplete',issues[0].message);
+   }
    if(data.logo_url){
     const match=String(data.logo_url).match(/^\/api\/files\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/download$/i);
     if(!match)throw new ApiError(400,'logo_reference_invalid','Bitte ein geprüftes Firmenlogo hochladen.');

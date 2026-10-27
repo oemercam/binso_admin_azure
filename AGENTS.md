@@ -29,9 +29,14 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
-- Business creation/editing uses the existing FormSheet modal owner: bottom sheet on
-  mobile, centered dialog on desktop; expanded editors retain a scrollable body
-  and bottom actions. Stable labeled navigation, contextual
+- The 27 October global surface instruction supersedes the blanket FormSheet rule:
+  extensive forms, multistep business processes and full details use FormPage or
+  existing routes; short contextual inputs/selections use the existing FormSheet
+  (mobile bottom sheet, compact desktop dialog/menu). Company completion is one
+  full page, with optional preferences outside that process. Reuse the existing
+  shell header, common spacing and safe-area/keyboard-aware scrolling/actions.
+  Evaluate existing surfaces by business scope, preserve working flows and avoid
+  nested visible sheets. Stable labeled navigation, contextual
   headers follow ux-current-approval.md. Creation belongs to the common content
   command bar beside search/filter on desktop, never the global header or navigation.
   The approved 19 October mobile CreateAction is one blue floating plus above the

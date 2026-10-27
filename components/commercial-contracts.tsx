@@ -11,7 +11,7 @@ import {formatQuantity,formatTimestampDate} from '@/lib/display-format';
 import {commercialContractIssue,contractConditionIssue,commercialUnits,contractExpensePolicies,type CommercialContractInput,type ContractConditionInput} from '@/lib/commercial-contract';
 import {AppShell} from './app-shell';
 import {RecordRow,RecordsView,RecordsControls,useRecordsController} from './records';
-import {ActionRow,ActionsMenu,CreateAction,FormSheet} from './binso-ux';
+import {ActionRow,ActionsMenu,CreateAction,FormPage} from './binso-ux';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select,Status,Textarea} from './ui';
 import {DirectorySelect} from './directory-select';
 import {EntityFiles} from './entity-files';
@@ -41,7 +41,7 @@ function ContractEditor({item,prefill,onClose,onSaved}:{item?:Contract;prefill?:
    if(!result.item?.id)throw Error('Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.');onSaved(result.item.id);
   }catch(cause){setError(cause instanceof Error?cause.message:'Änderung konnte nicht gespeichert werden.');}finally{pending.current=false;setBusy(false);}
  };
- return <FormSheet open onClose={onClose} label={item?'Vertragsentwurf bearbeiten':'Vertrag erstellen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
+ return <FormPage open onClose={onClose} label={item?'Vertragsentwurf bearbeiten':'Vertrag erstellen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
   <form id={formId} onSubmit={e=>{e.preventDefault();void save();}}><div className="form-grid two">
    <Field label="Bezeichnung"><Input required maxLength={200} value={draft.name} onChange={e=>field('name',e.target.value)}/></Field>
    <Field label="Vertragsart"><Select disabled={!!item} value={draft.side} onChange={e=>setDraft(d=>({...d,side:e.target.value as CommercialContractInput['side'],partyId:'',projectId:null}))}>{Object.entries(sideLabels).map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</Select></Field>
@@ -52,7 +52,7 @@ function ContractEditor({item,prefill,onClose,onSaved}:{item?:Contract;prefill?:
    <Field label="Abrechnungsperiode"><Select value={draft.billingInterval} onChange={e=>field('billingInterval',e.target.value as CommercialContractInput['billingInterval'])}>{Object.entries(billingLabels).map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</Select></Field>
   </div><Field label="Notizen"><Textarea maxLength={4000} value={draft.notes} onChange={e=>field('notes',e.target.value)}/></Field></form>
   {error&&<ErrorState>{error}</ErrorState>}<FormActions sheet><Button variant="secondary" disabled={busy} onClick={onClose}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy}><LocalizedText>{'Entwurf speichern'}</LocalizedText></Button></FormActions>
- </FormSheet>;
+ </FormPage>;
 }
 
 export function CommercialContractsPage(){
@@ -83,7 +83,7 @@ function ConditionEditor({parent,item,onClose,onSaved}:{parent:Contract;item:Con
    const result=item?await apiPatch<{item:Condition}>(path+'/'+encodeURIComponent(item.condition_id),body,undefined,{idempotencyKey:attempt.current.key}):await apiPost<{item:Condition}>(path,body,{idempotencyKey:attempt.current.key});if(!result.item?.id)throw Error('Die Speicherung konnte nicht bestätigt werden. Bitte erneut versuchen.');onSaved();
   }catch(cause){setError(cause instanceof Error?cause.message:'Änderung konnte nicht gespeichert werden.');}finally{pending.current=false;setBusy(false);}
  };
- return <FormSheet open onClose={onClose} label={item?'Konditionsrevision erfassen':'Konditionen erfassen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
+ return <FormPage open onClose={onClose} label={item?'Konditionsrevision erfassen':'Konditionen erfassen'} dirty={JSON.stringify(draft)!==initial} busy={busy}>
   <p><LocalizedText>{'Unvollständige Konditionen bleiben ein Entwurf. Eine neue Revision ersetzt den freigegebenen Preis erst nach unabhängiger Prüfung.'}</LocalizedText></p>
   <form id={formId} onSubmit={e=>{e.preventDefault();void save();}}><div className="form-grid two">
    {parent.side==='sale'&&parent.project_id&&!item&&<Field label="Ressourcenlieferant (optional)"><DirectorySelect endpoint="/api/suppliers" label="Lieferant" value={supplier} onChange={value=>{setSupplier(value);field('resourceId','');}}/></Field>}
@@ -99,7 +99,7 @@ function ConditionEditor({parent,item,onClose,onSaved}:{parent:Contract;item:Con
   </div></form>
   {resources.error&&<ErrorState onRetry={resources.refresh}>{resources.error}</ErrorState>}{error&&<ErrorState>{error}</ErrorState>}
   <FormActions sheet><Button variant="secondary" disabled={busy} onClick={onClose}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy}><LocalizedText>{'Entwurf speichern'}</LocalizedText></Button></FormActions>
- </FormSheet>;
+ </FormPage>;
 }
 
 export function CommercialContractDetail({contractId}:{contractId:string}){

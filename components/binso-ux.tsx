@@ -214,6 +214,40 @@ export function ActionSheet(props:SheetProps){
  if(desktop&&!props.dirty&&!props.busy&&!props.wizard)return props.open?<HeaderPanel kind="actions" label={props.ariaLabel??props.label} onClose={props.onClose}>{props.description&&<p><LocalizedText>{props.description}</LocalizedText></p>}{props.children}{props.actions}</HeaderPanel>:null;
  return <Sheet {...props} kind="action"/>;
 }
+function pageActionText(node:ReactNode):string{return typeof node==='string'?node:Array.isArray(node)?node.map(pageActionText).join(''):isValidElement<{children?:ReactNode}>(node)?pageActionText(node.props.children):'';}
+function pageHasExit(node:ReactNode):boolean{return Children.toArray(node).some(child=>isValidElement<{children?:ReactNode}>(child)&&((child.type===Button&&/^(Abbrechen|Schliessen|Zurück|Später fortsetzen)$/.test(pageActionText(child.props.children).trim()))||pageHasExit(child.props.children)));}
+function pageActions(node:ReactNode,cancel:ReactNode):ReactNode{
+ if(!isValidElement<{children?:ReactNode}>(node))return node;
+ if(node.type===FormActions)return cloneElement(node,{children:<>{!pageHasExit(node.props.children)&&cancel}{node.props.children}</>});
+ if(node.props.children===undefined)return node;
+ return cloneElement(node,{children:Children.map(node.props.children,child=>pageActions(child,cancel))});
+}
+function pageHasActions(node:ReactNode):boolean{return Children.toArray(node).some(child=>isValidElement<{children?:ReactNode;cancelAction?:ReactNode}>(child)&&(child.type===FormActions||!!child.props.cancelAction||pageHasActions(child.props.children)));}
+/** Route-backed editors share the shell header and never create a modal layer. */
+export function FormPage({label,open,onClose,children,busy=false,dirty=false,description,actions,headerActions,guarded=true}:SheetProps&{guarded?:boolean}){
+ const router=useRouter(),root=useRef<HTMLElement>(null),anchor=useRef<HTMLSpanElement>(null),trigger=useRef<HTMLElement|null>(null),{translate}=useLocale();
+ const [host,setHost]=useState<HTMLElement|null>(null);
+ useEffect(()=>{let active=true;if(open)queueMicrotask(()=>{if(active)setHost(anchor.current?.closest<HTMLElement>('main.page-container')??document.querySelector<HTMLElement>('main.page-container'))});return()=>{active=false}},[open]);
+ useEffect(()=>{if(!open)return;trigger.current=document.activeElement instanceof HTMLElement?document.activeElement:null;return()=>{const previous=trigger.current;requestAnimationFrame(()=>{if(previous?.isConnected&&previous.getClientRects().length)previous.focus({preventScroll:true})})}},[open]);
+ useEffect(()=>{if(!open||!host)return;const frame=requestAnimationFrame(()=>{if(root.current&&!root.current.contains(document.activeElement))root.current.focus({preventScroll:true})});return()=>cancelAnimationFrame(frame)},[open,host]);
+ const [discard,setDiscard]=useState(false),[destination,setDestination]=useState<string|null>(null),[backDiscard,setBackDiscard]=useState(false);
+ const leave=useBrowserBackGuard(open&&guarded&&(dirty||busy),()=>{if(!busy){setBackDiscard(true);setDiscard(true)}},open&&guarded&&(dirty||busy),href=>{if(!busy){setDestination(href);setDiscard(true)}});
+ useEffect(()=>{
+  if(!open)return;
+  const viewport=window.visualViewport;
+  const update=()=>{const node=root.current;if(!node?.getClientRects().length)return;const footer=node.querySelector<HTMLElement>('.form-page-actions,.sheet-form-footer,.mobile-sticky-save');const viewportBottom=(viewport?.height??window.innerHeight)+(viewport?.offsetTop??0);const nav=document.querySelector<HTMLElement>('.bottom-nav');const navTop=nav?.getClientRects().length?nav.getBoundingClientRect().top:viewportBottom;node.style.setProperty('--form-page-height',`${Math.max(0,Math.min(viewportBottom,navTop)-Math.max(node.getBoundingClientRect().top,document.querySelector<HTMLElement>(window.innerWidth<=760?'.mobile-header':'.desktop-appbar')?.getBoundingClientRect().bottom??0)-12)}px`);node.style.setProperty('--form-page-footer-height',`${footer?.getBoundingClientRect().height??0}px`);node.style.setProperty('--form-page-keyboard',`${Math.max(0,window.innerHeight-(viewport?.height??window.innerHeight)-(viewport?.offsetTop??0))}px`);const focused=document.activeElement;if(focused instanceof HTMLElement&&node.contains(focused)&&focused.matches('input,textarea,select'))focused.scrollIntoView({block:'nearest'});};
+  let frame=0;const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(update)};
+  const observer=new ResizeObserver(schedule);if(root.current)observer.observe(root.current);
+  viewport?.addEventListener('resize',update);viewport?.addEventListener('scroll',update);window.addEventListener('resize',update);update();
+  return()=>{cancelAnimationFrame(frame);observer.disconnect();viewport?.removeEventListener('resize',update);viewport?.removeEventListener('scroll',update);window.removeEventListener('resize',update)};
+ },[open,host]);
+ if(!open)return null;
+ const cancel=<Button variant="secondary" disabled={busy} onClick={()=>{if(busy)return;if(dirty)setDiscard(true);else onClose()}}><LocalizedText>Abbrechen</LocalizedText></Button>;
+ const page=<LocalizedElement as="section" ref={root} tabIndex={-1} className="form-page" aria-label={label} aria-busy={busy||undefined} data-unsaved={dirty||busy||undefined} onClickCapture={event=>{const button=event.target instanceof Element?event.target.closest('button'):null;if(button&&[translate('Abbrechen'),translate('Schliessen')].includes(button.textContent?.trim()??'')&&(busy||dirty)){event.preventDefault();event.stopPropagation();if(!busy)setDiscard(true)}}}>
+ {description&&<p className="settings-note"><LocalizedText>{description}</LocalizedText></p>}<div className="form-page-body" inert={busy}>{sheetForm(pageActions(<div className="form-page-content">{children}</div>,cancel))}</div>{(actions||headerActions||!pageHasActions(children))&&<div className="form-page-actions"><FormActions>{!pageHasExit(actions)&&!pageHasExit(children)&&!pageHasActions(children)&&cancel}{headerActions}{actions}</FormActions></div>}
+ </LocalizedElement>;
+ return <><span ref={anchor} hidden aria-hidden="true"/>{host&&createPortal(page,host)}<ConfirmDialog open={discard} busy={busy} title="Änderungen verwerfen?" message="Deine Änderungen sind noch nicht gespeichert und gehen verloren." confirmLabel="Verwerfen" onCancel={()=>{setDiscard(false);setDestination(null);setBackDiscard(false)}} onConfirm={()=>{setDiscard(false);if(destination){allowDraftNavigation();router.push(destination)}else if(backDiscard){setBackDiscard(false);leave()}else onClose()}}/></>;
+}
 export function FormSheet({workspace,...props}:SheetProps){return <Sheet {...props} className={[props.className,workspace?"form-sheet-expanded":undefined].filter(Boolean).join(" ")} kind="form"/>}
 export function FilterSheet(props:SheetProps){return <Sheet {...props} kind="filter"/>}
 
