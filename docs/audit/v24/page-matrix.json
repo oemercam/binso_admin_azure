@@ -503,6 +503,7 @@
         "components/settings-navigation.tsx#SettingsNavigation",
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/app-shell.tsx#NotificationPanel",
@@ -699,7 +700,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/angebote/neu/page.tsx",
@@ -863,6 +865,7 @@
         "components/settings-navigation.tsx#SettingsNavigation",
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/app-shell.tsx#NotificationPanel",
@@ -1059,7 +1062,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/angebote/page.tsx",
@@ -1161,6 +1165,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -1300,7 +1305,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/auftragsbearbeitung/page.tsx",
@@ -1554,6 +1560,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -1744,7 +1751,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/benachrichtigungen/page.tsx",
@@ -1845,6 +1853,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -1974,7 +1983,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/bericht/page.tsx",
@@ -2244,6 +2254,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -2442,7 +2453,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/dashboard/page.tsx",
@@ -2544,6 +2556,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -2691,7 +2704,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/datenschutz/page.tsx",
@@ -3492,6 +3506,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -3626,7 +3641,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/benachrichtigungen/page.tsx",
@@ -3726,6 +3742,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -3857,7 +3874,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/darstellung/page.tsx",
@@ -3957,6 +3975,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -4085,7 +4104,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/datenschutz/page.tsx",
@@ -4191,6 +4211,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -4320,7 +4341,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/dokumente/page.tsx",
@@ -4421,6 +4443,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -4555,7 +4578,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/firma/page.tsx",
@@ -4657,6 +4681,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -4808,7 +4833,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/konto/page.tsx",
@@ -4908,6 +4934,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -5055,7 +5082,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/page.tsx",
@@ -5155,6 +5183,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -5285,7 +5314,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/rechtliches/[document]/page.tsx",
@@ -5391,6 +5421,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -5520,7 +5551,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "New V5 internal legal route; local checks do not grant global acceptance",
-      "correction": "Complete role, locale, responsive and visual acceptance"
+      "correction": "Complete role, locale, responsive and visual acceptance",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/rechtliches/page.tsx",
@@ -5619,6 +5651,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -5753,7 +5786,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "New V5 internal legal route; local checks do not grant global acceptance",
-      "correction": "Complete role, locale, responsive and visual acceptance"
+      "correction": "Complete role, locale, responsive and visual acceptance",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/sicherheit/page.tsx",
@@ -5855,6 +5889,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -6013,7 +6048,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/sprache/page.tsx",
@@ -6113,6 +6149,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -6240,7 +6277,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/team/page.tsx",
@@ -6343,6 +6381,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -6536,7 +6575,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/einstellungen/zeiterfassung/page.tsx",
@@ -6636,6 +6676,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -6762,7 +6803,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/email-bestaetigen/page.tsx",
@@ -7011,6 +7053,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -7169,7 +7212,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/finanzen/page.tsx",
@@ -7271,6 +7315,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -7461,7 +7506,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/impressum/page.tsx",
@@ -7714,6 +7760,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -7850,7 +7897,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/kunden/[id]/page.tsx",
@@ -7952,6 +8000,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -8171,7 +8220,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/kunden/neu/page.tsx",
@@ -8273,6 +8323,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -8409,7 +8460,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/kunden/page.tsx",
@@ -8521,6 +8573,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -8709,7 +8762,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/login/page.tsx",
@@ -8971,6 +9025,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -9191,7 +9246,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/mitarbeiter/neu/page.tsx",
@@ -9293,6 +9349,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -9513,7 +9570,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/mitarbeiter/page.tsx",
@@ -9621,6 +9679,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -9758,7 +9817,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/offline/page.tsx",
@@ -12516,6 +12576,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -12656,7 +12717,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/produkte/neu/page.tsx",
@@ -12758,6 +12820,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -12898,7 +12961,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/produkte/page.tsx",
@@ -13006,6 +13070,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -13143,7 +13208,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/projekte/[id]/page.tsx",
@@ -13247,6 +13313,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -13405,7 +13472,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/projekte/neu/page.tsx",
@@ -13507,6 +13575,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -13642,7 +13711,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/projekte/page.tsx",
@@ -13744,6 +13814,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -13881,7 +13952,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/rechnungen/[id]/page.tsx",
@@ -14045,6 +14117,7 @@
         "components/settings-navigation.tsx#SettingsNavigation",
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/app-shell.tsx#NotificationPanel",
@@ -14241,7 +14314,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/rechnungen/neu/page.tsx",
@@ -14405,6 +14479,7 @@
         "components/settings-navigation.tsx#SettingsNavigation",
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/app-shell.tsx#NotificationPanel",
@@ -14601,7 +14676,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/rechnungen/page.tsx",
@@ -14703,6 +14779,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -14842,7 +14919,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/registrieren/page.tsx",
@@ -15124,6 +15202,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -15271,7 +15350,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/spesen/neu/page.tsx",
@@ -15372,6 +15452,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -15519,7 +15600,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/spesen/page.tsx",
@@ -15627,6 +15709,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -15764,7 +15847,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/support/[id]/page.tsx",
@@ -15866,6 +15950,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -16012,7 +16097,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/support/neu/page.tsx",
@@ -16114,6 +16200,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -16248,7 +16335,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/support/page.tsx",
@@ -16348,6 +16436,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -16485,7 +16574,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/unterauftragsbearbeiter/page.tsx",
@@ -17010,6 +17100,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -17145,7 +17236,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/zahlungen/neu/page.tsx",
@@ -17246,6 +17338,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -17382,7 +17475,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/zahlungen/page.tsx",
@@ -17490,6 +17584,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -17627,7 +17722,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/zeit/page.tsx",
@@ -17768,6 +17864,7 @@
         "components/settings-navigation.tsx#SettingsNavigation",
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/app-shell.tsx#NotificationPanel",
@@ -17988,7 +18085,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Keine visuelle Ursache nachgewiesen; statischer Komponentengraph siehe Komponenten.",
-      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich"
+      "correction": "Laufzeitprüfung gegen freigegebene Referenzen erforderlich",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     },
     {
       "file": "app/hilfe/page.tsx",
@@ -18088,6 +18186,7 @@
         "components/settings-navigation.tsx#settingsGroups",
         "components/binso-ux.tsx#SettingsGroup",
         "components/ui.tsx#EmptyState",
+        "components/passkey-setup-offer.tsx#PasskeySetupOffer",
         "components/app-chrome.tsx#MobileDock",
         "components/app-shell.tsx#SearchPanel",
         "components/ui.tsx#LoadingState",
@@ -18214,7 +18313,8 @@
       "status": "nicht geprüft",
       "evidence": [],
       "cause": "Phase 1 derived help page; no original reference supplied.",
-      "correction": "Visual and device acceptance pending"
+      "correction": "Visual and device acceptance pending",
+      "passkeyDependencyUpdate": "docs/architecture/passkeys-20261027/source.md; current AST dependency assignment only, no new visual acceptance"
     }
   ],
   "operatorVariants": [

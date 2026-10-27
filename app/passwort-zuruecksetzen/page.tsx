@@ -5,7 +5,7 @@ import {AuthWorkspace} from "@/components/auth-workspace";
 import {clearClientSession} from "@/lib/client/backend";
 import {LocalizedText} from "@/lib/client/locale";
 import { FormEvent, useEffect, useRef, useState } from "react";
-import {Button, Field, ErrorState,LoadingState} from "@/components/ui";
+import {Button, Field, Input, ErrorState,LoadingState} from "@/components/ui";
 import {PasswordInput} from '@/components/password-input';
 import {authRequest} from '@/lib/client/auth-request';
 
@@ -21,6 +21,7 @@ export default function Page(){
   const [loading,setLoading]=useState(false);
   const [done,setDone]=useState(false);
   const [error,setError]=useState("");
+  const [factorRequired,setFactorRequired]=useState(false),[recoveryCode,setRecoveryCode]=useState('');
 
   const [discard,setDiscard]=useState(false);
   const leaveBack=useBrowserBackGuard(!done&&!!(password||confirm),()=>setDiscard(true));
@@ -37,9 +38,9 @@ export default function Page(){
     if(password!==confirm){setError("Die Passwörter stimmen nicht überein.");return;}
     pending.current=true;setLoading(true);
     try{
-      const response=await authRequest("/api/auth/password",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({password,token:new URLSearchParams(window.location.search).get("token")})});
+      const response=await authRequest("/api/auth/password",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({password,recoveryCode,token:new URLSearchParams(window.location.search).get("token")})});
       const payload=await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(typeof payload?.message==="string"?payload.message:"Passwort konnte nicht geändert werden.");
+      if(!response.ok){if(payload.error==='recovery_factor_required')setFactorRequired(true);throw new Error(typeof payload?.message==="string"?payload.message:"Passwort konnte nicht geändert werden.");}
       clearClientSession();const url=new URL(window.location.href);url.searchParams.delete("token");window.history.replaceState(window.history.state,"",url);setPassword("");setConfirm("");setDone(true);
     }catch(error){
       setError(error instanceof Error?error.message:"Passwort konnte nicht geändert werden.");
@@ -53,6 +54,7 @@ export default function Page(){
       <form onSubmit={submit}>
         <Field label="Neues Passwort" hint="Mindestens 12 Zeichen."><PasswordInput required minLength={12} maxLength={256} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password"/></Field>
         <Field label="Passwort bestätigen"><PasswordInput required minLength={12} maxLength={256} value={confirm} onChange={e=>setConfirm(e.target.value)} autoComplete="new-password"/></Field>
+        {factorRequired&&<Field label="Authenticator- oder Wiederherstellungscode"><Input required value={recoveryCode} onChange={e=>setRecoveryCode(e.target.value)} maxLength={80} autoComplete="one-time-code"/></Field>}
         {error&&<ErrorState className="auth-error"><LocalizedText>{error}</LocalizedText></ErrorState>}
         <Button type="submit" disabled={loading}><LocalizedText>{loading?"Wird gespeichert…":"Passwort speichern"}</LocalizedText></Button>
       </form>

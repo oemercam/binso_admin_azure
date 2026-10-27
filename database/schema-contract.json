@@ -108,7 +108,8 @@
     "0104_supplier_invoice_reviews.sql",
     "0105_organization_mfa_policy.sql",
     "0106_web_push.sql",
-    "0107_push_dispatch_lifecycle.sql"
+    "0107_push_dispatch_lifecycle.sql",
+    "0108_passkey_assurance.sql"
   ],
   "tables": [
     {
@@ -563,6 +564,16 @@
           "name": "mfa_pending_expires_at",
           "type": "timestamp with time zone",
           "required": false
+        },
+        {
+          "name": "passkey_prompt_after",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "passkey_recovery_hashes",
+          "type": "jsonb",
+          "required": true
         }
       ],
       "policies": []
@@ -953,6 +964,11 @@
           "name": "step_up_at",
           "type": "timestamp with time zone",
           "required": false
+        },
+        {
+          "name": "passkey_verified",
+          "type": "boolean",
+          "required": true
         }
       ],
       "policies": []

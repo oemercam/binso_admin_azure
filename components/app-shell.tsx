@@ -13,6 +13,7 @@ import {AppStart} from "./app-start";
 import {WorkspaceStartup} from './workspace-startup';
 import {useNavigationScroll} from "./use-navigation-scroll";
 import {TimerResumeNotice} from "./timer-resume-notice";
+import {PasskeySetupOffer} from './passkey-setup-offer';
 import { hasBlockingModal } from "./use-dialog-focus";
 import {pageOrientation} from "@/lib/page-orientation";
 import {safeAppPath} from "@/lib/navigation";
@@ -383,6 +384,7 @@ function AppShellFrame({
         {allowed&&orientation&&<p className="page-orientation"><LocalizedText>{orientation}</LocalizedText></p>}
         <SettingsWorkspace>
         {allowed&&(bodyControls||contentCreate&&!headingCreate||!headerOwnsDetail&&headerActions)&&<div className="workspace-command-bar" inert={loading||undefined}>{bodyControls}{contentCreate&&!headingCreate&&visibleActions}{!headerOwnsDetail&&headerActions}</div>}
+        <PasskeySetupOffer enabled={!!access&&!preview&&!loading&&allowed&&pathname===homeHref}/>
         {accessError?<div role="alert"><p><LocalizedText>{accessError}</LocalizedText></p><FormActions sheet><Button onClick={()=>{invalidateClientSession();setAccessError(null);setAccessRetry(value=>value+1)}}><LocalizedText>{"Erneut versuchen"}</LocalizedText></Button><Link className="button button-secondary" href="/login"><LocalizedText>{"Anmelden"}</LocalizedText></Link></FormActions></div>:!access?null:allowed?pageChildren:<EmptyState  title="Kein Zugriff" description="Diese Seite ist für deine Rolle oder deinen Plan nicht verfügbar."/>}
         </SettingsWorkspace>
       </main>

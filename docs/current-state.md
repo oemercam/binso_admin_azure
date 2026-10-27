@@ -21,6 +21,13 @@ Aktuellen Main, vollständige Quality und Live-SHA stets getrennt prüfen.
 
 ## Gegenwärtige Arbeit
 
+Neuer Implementierungsauftrag vom 27. Oktober: [Passkeys, starke Anmeldung und
+Wiederherstellung](architecture/passkeys-20261027/implementation.md), mit
+[vollständiger Originalanforderung](architecture/passkeys-20261027/source.md).
+Die Regel für UV-bestätigte Passkeys ersetzt in diesem Umfang die frühere
+zusätzliche TOTP-Pflicht. Dies ist ein lokaler Entwicklungsstand und keine
+Behauptung über den produktiv freigegebenen Release.
+
 Die Nutzerfreigabe vom 26. Oktober umfasst die Korrekturen des Systemaudits:
 Datei-Scan-Verfügbarkeit, Netz-/TLS-Härtung, vollständige Schema-Gates,
 PostgreSQL-18-Parität, reproduzierbare QA, Betriebsüberwachung und Dokumentation.

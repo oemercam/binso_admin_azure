@@ -69,12 +69,18 @@ Es gibt keinen Fallback auf einen zweiten E-Mail-Provider.
 
 ## Sicherheitsmodell
 
+Passkey-Erweiterung vom27.Oktober: [Architektur, Konfiguration, Recovery und
+Prüfgrenzen](docs/architecture/passkeys-20261027/implementation.md).
+Der vollständige PowerShell-Ablauf für Installation, QA, überprüften Commit,
+Pull mit Rebase, Push und Pipelineprüfung liegt in
+[`scripts/passkey-delivery.ps1`](scripts/passkey-delivery.ps1). Er deployt nicht.
+
 ### Kunden
 - Registrierung mit E-Mail und Passwort
 - sechsstellige E-Mail-Verifikation vor produktivem Session-Zugriff
 - zusätzlicher Login-Faktor
 - TOTP mit einmaligen Recovery Codes
-- TOTP ist für Kundenrollen freiwillig; aktivierte Faktoren bleiben beim Login verbindlich. Kritische Änderungen benötigen frische sitzungsgebundene Bestätigung.
+- TOTP ist für Kundenrollen freiwillig, sofern die Firmenrichtlinie keinen starken Faktor verlangt; bei Passwortanmeldungen bleiben aktivierte Faktoren verbindlich. Passkeys mit verifizierter Geräteentsperrung erfüllen die starke Anmeldung. Kritische Änderungen benötigen frische sitzungsgebundene Bestätigung.
 - HttpOnly/Secure/SameSite Session-Cookies
 - serverseitige Rollen- und Tenant-Prüfung
 - PostgreSQL-RLS und zusammengesetzte Tenant-Fremdschlüssel

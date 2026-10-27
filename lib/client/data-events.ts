@@ -8,12 +8,16 @@ let channel:BroadcastChannel|null=null;
 let listening=false;
 export function dataDomains(path:string):DataDomain[]{
  const url=new URL(path,'https://binso.invalid');
+ if(url.pathname==='/api/auth/passkeys'||url.pathname.startsWith('/api/auth/passkeys/'))return ['settings'];
  const name=url.pathname.split('/')[2];
  if(name==='demo')return dataDomains('/api/'+(url.searchParams.get('collection')||url.pathname.split('/')[3]||'session'));
  const map:Record<string,DataDomain>={'time-entries':'time','time-tracker':'timer',auth:'identity',business:'records'};
  return [map[name]??(name as DataDomain)];
 }
 export function affectedDomains(path:string):DataDomain[]{
+ // Credential metadata does not replace the current identity. Preserve the
+ // owning view's one-time recovery receipt while reloading its security data.
+ if(path==='/api/auth/passkeys'||path.startsWith('/api/auth/passkeys/'))return ['settings'];
  const [domain]=dataDomains(path);
  if(path.startsWith('/api/workforce-assignments'))return ['identity','customers','projects','time','files','employees','settings','dashboard'];
  if(domain==='identity')return ['identity','session'];

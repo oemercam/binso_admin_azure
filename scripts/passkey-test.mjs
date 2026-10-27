@@ -11,6 +11,7 @@ const uri=s=>'data:text/javascript;base64,'+Buffer.from(s).toString('base64');
 const native=process.argv.includes('--postgres');
 let db;
 if(native){const url=new URL(process.env.BINSO_DB_PARALLEL_TEST_URL??'invalid:');assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/binso_v213_test'&&url.username==='binso_test','Refuse any non-disposable PostgreSQL');db=new pg.Pool({connectionString:url.href,max:6})}else db=new PGlite({extensions:{pgcrypto}});
+const executeDDL=sql=>native?db.query(sql):db.exec(sql);
 const jar=new Map(),sent=[],org=randomUUID(),other=randomUUID(),user='passkey-fixture';
 const s={organizationId:org,userId:user,sessionId:randomUUID(),role:'owner',email:'passkey@fixture.invalid',mfaEnabled:true};
 const transaction=async fn=>{if(!native)return db.transaction(fn);const c=await db.connect();try{await c.query('begin');const result=await fn(c);await c.query('commit');return result}catch(e){await c.query('rollback');throw e}finally{c.release()}};
@@ -35,15 +36,17 @@ const adapters={
 };
 const cache=new Map();async function load(file){if(adapters[file])return adapters[file];if(cache.has(file))return cache.get(file);let source=ts.transpileModule(await fs.readFile(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;for(const match of [...source.matchAll(/(?:from\s*|import\s*)(['"])([^'"]+)\1/g)]){const name=match[2];let dep=adapters[name];if(!dep&&(name.startsWith('@/')||name.startsWith('.'))){let p=name.startsWith('@/')?name.slice(2):path.posix.join(path.posix.dirname(file),name);if(!p.endsWith('.ts'))p+='.ts';dep=await load(p)}if(dep)source=source.replace(match[0],match[0].replace(match[1]+name+match[1],JSON.stringify(dep)))}const result=uri(source);cache.set(file,result);return result}
 const hash=b=>createHash('sha256').update(b).digest(),b64=b=>Buffer.from(b).toString('base64url');
-const pair=generateKeyPairSync('ec',{namedCurve:'prime256v1'}),jwk=pair.publicKey.export({format:'jwk'}),credential=randomBytes(32),credentialId=b64(credential);
-const cose=isoCBOR.encode(new Map([[1,2],[3,-7],[-1,1],[-2,Buffer.from(jwk.x,'base64url')],[-3,Buffer.from(jwk.y,'base64url')]]));
-function registration(options,{origin='https://fixture.invalid',uv=true,challenge=options.challenge}={}){
+const makeCredential=()=>{const pair=generateKeyPairSync('ec',{namedCurve:'prime256v1'}),jwk=pair.publicKey.export({format:'jwk'}),credential=randomBytes(32);return {pair,credential,credentialId:b64(credential),cose:isoCBOR.encode(new Map([[1,2],[3,-7],[-1,1],[-2,Buffer.from(jwk.x,'base64url')],[-3,Buffer.from(jwk.y,'base64url')]]))};};
+const primary=makeCredential(),{credentialId}=primary;
+function registration(options,{origin='https://fixture.invalid',uv=true,challenge=options.challenge,key=primary,backedUp=false}={}){
+ const {credential,credentialId,cose}=key;
  const size=Buffer.alloc(2);size.writeUInt16BE(credential.length);
- const data=Buffer.concat([hash('fixture.invalid'),Buffer.from([uv?0x45:0x41]),Buffer.alloc(4),Buffer.alloc(16),size,credential,Buffer.from(cose)]);
+ const data=Buffer.concat([hash('fixture.invalid'),Buffer.from([(uv?0x45:0x41)|(backedUp?24:0)]),Buffer.alloc(4),Buffer.alloc(16),size,credential,Buffer.from(cose)]);
  return {id:credentialId,rawId:credentialId,type:'public-key',clientExtensionResults:{},response:{clientDataJSON:b64(JSON.stringify({type:'webauthn.create',challenge,origin})),attestationObject:b64(isoCBOR.encode(new Map([['fmt','none'],['attStmt',new Map()],['authData',data]]))),transports:['internal']}};
 }
-function authentication(options,{origin='https://fixture.invalid',rp='fixture.invalid',uv=true,counter=1,invalidSignature=false,challenge=options.challenge}={}){
- const count=Buffer.alloc(4);count.writeUInt32BE(counter);const authData=Buffer.concat([hash(rp),Buffer.from([uv?5:1]),count]),clientData=Buffer.from(JSON.stringify({type:'webauthn.get',challenge,origin}));
+function authentication(options,{origin='https://fixture.invalid',rp='fixture.invalid',uv=true,counter=1,invalidSignature=false,challenge=options.challenge,key=primary,backedUp=false}={}){
+ const {pair,credentialId}=key;
+ const count=Buffer.alloc(4);count.writeUInt32BE(counter);const authData=Buffer.concat([hash(rp),Buffer.from([(uv?5:1)|(backedUp?24:0)]),count]),clientData=Buffer.from(JSON.stringify({type:'webauthn.get',challenge,origin}));
  const signature=sign('sha256',Buffer.concat([authData,hash(clientData)]),pair.privateKey);if(invalidSignature)signature[signature.length-1]^=1;
  return {id:credentialId,rawId:credentialId,type:'public-key',clientExtensionResults:{},response:{authenticatorData:b64(authData),clientDataJSON:b64(clientData),signature:b64(signature),userHandle:b64(hash(user))}};
 }
@@ -80,14 +83,58 @@ try{
  assert.equal((await keys.listPasskeys(s)).length,1);assert.deepEqual(Object.keys((await keys.listPasskeys(s))[0]).sort(),['created_at','id','label','last_used_at']);
  assert.equal((await runtime(other,'other-user',false,c=>c.query('select * from auth_passkeys'))).rows.length,0,'Foreign tenant cannot read credentials');
  for(const negative of [{origin:'https://evil.invalid'},{rp:'evil.invalid'},{uv:false},{invalidSignature:true},{challenge:'not-the-challenge'}]){const opt=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(opt,negative),totp.totp(secret),false),e=>e.code==='invalid_credentials');}
- let auth=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth),'',false),e=>e.code==='passkey_mfa_required','Passkey does not replace privileged TOTP');assert.equal(jar.has('binso_session'),false);
- auth=await keys.beginPasskeyAuthentication();const logged=await keys.finishPasskeyAuthentication(authentication(auth),totp.totp(secret),false);assert.equal(logged.ok,true);assert.equal(logged.mfaSetupRequired,false);assert.ok(jar.has('binso_session'));
+ let auth=await keys.beginPasskeyAuthentication();const logged=await keys.finishPasskeyAuthentication(authentication(auth),'',false);assert.equal(logged.ok,true);assert.equal(logged.mfaSetupRequired,false);assert.ok(jar.has('binso_session'),'UV passkey logs in an enrolled owner without a manual TOTP');
+ assert.equal((await db.query('select passkey_verified from auth_sessions where token_hash=$1',[hash(jar.get('binso_session').value).toString('hex')])).rows[0].passkey_verified,true);
  await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth),totp.totp(secret),false),e=>e.code==='passkey_challenge_invalid','Replay cannot mint another session');
  auth=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth),totp.totp(secret),false),e=>e.code==='invalid_credentials','Cloned non-zero counter is rejected');
  auth=await keys.beginPasskeyAuthentication();await db.query("update auth_passkey_challenges set expires_at=now()-interval '1 second'");await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth,{counter:2}),totp.totp(secret),false),e=>e.code==='passkey_challenge_invalid');
- await assert.rejects(()=>keys.removePasskey(s,credentialId,password,totp.totp(secret)),e=>e.code==='fresh_authentication_required','The enrollment proof is invalidated when the security state changes');
+ const sessionsBeforeStepup=(await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n;
+ auth=await keys.beginPasskeyAuthentication(s);await keys.finishPasskeyAuthentication(authentication(auth,{counter:2}),undefined,false,s);
+ assert.equal((await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,sessionsBeforeStepup,'Step-up updates the existing session and cannot create a parallel login');
+ assert.ok((await db.query('select step_up_at from auth_sessions where id=$1',[s.sessionId])).rows[0].step_up_at);
+ await keys.renamePasskey(s,credentialId,'Renamed key');assert.equal((await keys.listPasskeys(s))[0].label,'Renamed key');
+ await assert.rejects(()=>keys.renamePasskey(s,credentialId,'Again'),e=>e.code==='fresh_authentication_required','A consumed management proof cannot authorize another change');
+ auth=await keys.beginPasskeyAuthentication(s);await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth,{counter:3}),undefined,false),e=>e.code==='passkey_challenge_invalid','Session-bound proof cannot be used as public login');
+ auth=await keys.beginPasskeyAuthentication();const mismatch=authentication(auth,{counter:3});mismatch.response.userHandle=b64(hash('other-user'));await assert.rejects(()=>keys.finishPasskeyAuthentication(mismatch,'',false),e=>e.code==='invalid_credentials','A mismatched discoverable user handle is rejected');
+ auth=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth,{counter:3,backedUp:true}),'',false),e=>e.code==='invalid_credentials','The signed backup eligibility cannot change from the original registration');
+ await db.query('update organizations set employee_mfa_required=true where id=$1',[org]);await db.query('update app_users set mfa_enabled=false where id=$1',[user]);
+ assert.ok(await session.getSession(),'A previously UV-proven session satisfies the company strong-auth policy');
+ await session.createSession({userId:user,organizationId:org,email:s.email,name:'Synthetic',role:'owner',persistent:false});
+ assert.equal(await session.getSession(),null,'A password-only session cannot inherit passkey assurance');
+ const freshRoute=await import(await load('app/api/auth/reauthenticate/route.ts'));
+ const freshRequest=body=>({headers:new Headers(),nextUrl:new URL('https://fixture.invalid/api/auth/reauthenticate'),body:new Response(JSON.stringify({password,...body})).body});
+ const proofChoice=await freshRoute.POST(freshRequest({action:'challenge'}));assert.equal((await proofChoice.json()).method,'recovery','An existing passkey cannot be downgraded to email step-up');
+ assert.equal((await freshRoute.POST(freshRequest({action:'confirm',code:'123456'}))).status,403,'An email-shaped code cannot replace a strong passkey recovery proof');
+ await executeDDL("create function passkey_fixture_audit_failure() returns trigger language plpgsql as $$begin raise exception 'Synthetic fresh-proof audit failure';end$$;create trigger passkey_fixture_audit_failure before insert on audit_events for each row execute function passkey_fixture_audit_failure()");
+ assert.equal((await freshRoute.POST(freshRequest({action:'confirm',code:created.recoveryCodes[1]}))).status,500);
+ await executeDDL('drop trigger passkey_fixture_audit_failure on audit_events;drop function passkey_fixture_audit_failure()');
+ assert.ok((await db.query('select passkey_recovery_hashes from app_users where id=$1',[user])).rows[0].passkey_recovery_hashes.includes(totp.hashRecoveryCode(created.recoveryCodes[1])),'A failed proof/audit transaction must roll back the recovery-code consumption');
+ assert.equal((await freshRoute.POST(freshRequest({action:'confirm',code:created.recoveryCodes[1]}))).status,200);
+ assert.equal((await freshRoute.POST(freshRequest({action:'confirm',code:created.recoveryCodes[1]}))).status,403,'Offline recovery proof is single-use across step-up and recovery');
+ assert.ok(created.recoveryCodes.every(code=>/^[0-9A-F]{8}(?:-[0-9A-F]{8}){3}$/.test(code)),'Every passkey recovery code has 128 random bits');
  await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
- const removed=await keys.removePasskey(s,credentialId,password,totp.totp(secret));assert.equal(removed.ok,true);assert.equal((await keys.listPasskeys(s)).length,0);assert.equal(sent.length,2);
+ await assert.rejects(()=>keys.removePasskey(s,credentialId,password,''),e=>e.code==='last_signin_method','Cannot remove the last mandatory strong method');
+ await db.query('update organizations set employee_mfa_required=false where id=$1',[org]);
+ const resetTokens=await import(await load('lib/server/auth-tokens.ts')),resetRoute=await import(await load('app/api/auth/password/route.ts'));
+ const resetToken=await resetTokens.createAuthToken({type:'password_reset',email:s.email,userId:user,ttlMinutes:30});
+ const reset=code=>resetRoute.PATCH({headers:new Headers(),nextUrl:new URL('https://fixture.invalid/api/auth/password'),body:new Response(JSON.stringify({token:resetToken,password:'Replacement-passkey-password-123',recoveryCode:code})).body});
+ assert.equal((await reset('')).status,403,'Email alone cannot reset a passkey-protected account, even without TOTP');
+ assert.equal((await reset('INVALID-CODE')).status,403);
+ assert.equal((await reset(created.recoveryCodes[0])).status,200,'Email token plus a single-use recovery code restores access without deleting passkeys');
+ assert.equal((await reset(created.recoveryCodes[0])).status,400,'A consumed reset link cannot be replayed');
+ assert.equal((await keys.listPasskeys(s)).length,1,'Recovery preserves the registered public key');
+ assert.equal((await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,0,'Recovery revokes all existing sessions');
+ await db.query('update app_users set password_hash=$2,mfa_enabled=true where id=$1',[user,passwordHash]);
+ await db.query("insert into auth_sessions(id,user_id,organization_id,token_hash,expires_at) values($1,$2,$3,$4,now()+interval '1 hour')",[s.sessionId,user,org,hash('pk-current-token').toString('hex')]);
+ await assert.rejects(()=>keys.removePasskey(s,credentialId,password,totp.totp(secret)),e=>e.code==='fresh_authentication_required','The enrollment proof is invalidated when the security state changes');
+ const synced=makeCredential();await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
+ options=await begin();await keys.finishPasskeyRegistration(s,registration(options,{key:synced,backedUp:true}));assert.equal((await keys.listPasskeys(s)).length,2,'Multiple independent passkeys belong to the same existing identity');
+ for(let i=0;i<2;i++){auth=await keys.beginPasskeyAuthentication();assert.equal((await keys.finishPasskeyAuthentication(authentication(auth,{key:synced,counter:0,backedUp:true}),'',false)).ok,true,'Synced zero-counter credentials remain usable without fabricating monotonic counters');}
+ const syncRow=(await db.query('select device_type,backed_up,counter from auth_passkeys where credential_id=$1',[synced.credentialId])).rows[0];assert.equal(syncRow.device_type,'multiDevice');assert.equal(syncRow.backed_up,true);assert.equal(Number(syncRow.counter),0);
+ await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);await keys.removePasskey(s,synced.credentialId,password,'');assert.equal((await keys.listPasskeys(s)).length,1);
+ await db.query('update auth_sessions set step_up_at=now() where id=$1',[s.sessionId]);
+ const beforeRevokeNotices=sent.length;
+ const removed=await keys.removePasskey(s,credentialId,password,totp.totp(secret));assert.equal(removed.ok,true);assert.equal((await keys.listPasskeys(s)).length,0);assert.equal(sent.length,beforeRevokeNotices+1);
  assert.equal((await db.query('select count(*)::int n from auth_sessions where user_id=$1',[user])).rows[0].n,1,'Only the explicitly current session remains after credential revoke');
  await assert.rejects(()=>session.createSession({userId:user,organizationId:org,email:s.email,name:'Synthetic',role:'owner',expectedPasskeyId:credentialId,expectedAuth:{passwordHash,mfaEnabled:true,mfaSecretEnc:encryptedSecret}}),e=>e.code==='auth_state_changed','Revoked credentials cannot issue a late session');
  auth=await keys.beginPasskeyAuthentication();await assert.rejects(()=>keys.finishPasskeyAuthentication(authentication(auth,{counter:2}),totp.totp(secret),false),e=>e.code==='invalid_credentials');
@@ -148,5 +195,5 @@ try{
  await db.query("update organization_memberships set role='admin' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(user,{action:'deactivate'})).status,409,'Admins cannot suspend their own remaining access');
  await db.query("update organization_memberships set role='reader' where organization_id=$1 and user_id=$2",[org,user]);assert.equal((await memberPatch(normalUser,{role:'admin'})).status,403,'A downgraded actor cannot reuse an old admin session for privilege assignment');
  await db.query("update organization_memberships set role='owner' where organization_id=$1 and user_id=$2",[org,user]);
- console.log('Passkey: real P-256/WebAuthn registration and signature verification, RP/origin/UV/challenge/counter negatives, fresh session-bound proof, stale-proof denial, RLS, replay/expiry, configured optional TOTP enforced without a role enrollment barrier, notices and revoke/session guards passed. Physical authenticators remain untested.');
+ console.log('Passkey: real P-256 signatures, RP/origin/UV/challenge/counter/user-handle negatives, UV strong sessions without extra TOTP, password-only policy denial, session-bound step-up, rename, last-method protection, email plus single-use recovery, RLS, replay/expiry, notices and revoke guards passed. Physical authenticators remain untested.');
 }finally{if(native)await db.end();else await db.close();delete globalThis.__passkey}
