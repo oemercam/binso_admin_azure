@@ -47,7 +47,14 @@ const previewState=process.env.BINSO_UX_PREVIEW_STATE;
 if(previewState&&(previewState!=='error'||process.env.BINSO_UX_MATRIX_ONLY!=='1'))throw Error('Preview state requires the isolated matrix-only error case');
 // Keep period assertions valid as the real Swiss calendar advances; never freeze
 // Date.now, which would corrupt timer/recovery interactions in the same suite.
-const statisticToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const zurichBusinessDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Zurich',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+function statisticCaption(today,months){
+ const [year,month]=today.split('-').map(Number);
+ const from=new Date(Date.UTC(year,month-months,1)).toISOString().slice(0,10);
+ const format=day=>new Intl.DateTimeFormat('de-CH',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));
+ return format(from)+' – '+format(today);
+}
+const statisticToday=zurichBusinessDay();
 const [statisticYear,statisticMonth]=statisticToday.split('-').map(Number);
 const previousStatisticFrom=new Date(Date.UTC(statisticYear,statisticMonth-2,1)).toISOString().slice(0,10);
 const previousStatisticTo=new Date(Date.UTC(statisticYear,statisticMonth-1,0)).toISOString().slice(0,10);
@@ -510,10 +517,16 @@ try{
       if(route==='/dashboard'){assert.equal(overview.actions,1,'Dashboard has one page-owned creation trigger');assert.equal(overview.legacyActions,0,'Dashboard has no competing legacy quick links');}
       else{
        const overview=page.locator('.bo-cash-overview'),control=overview.locator('.bo-period-control');await control.waitFor();assert.equal(await control.locator('.bo-period-segments>button').count(),5,'Shared 1/3/6/12-month and custom controls remain available');
-       const expectedFrom=new Date(Date.UTC(statisticYear,statisticMonth-6,1)).toISOString().slice(0,10),format=day=>new Intl.DateTimeFormat('de-CH',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(day+'T12:00:00Z'));
        await withNavigationPreferenceLock(async()=>{
         await page.bringToFront();await waitForFiniteAnimations(page);
-        await chooseStatisticPeriod(page,overview,6);assert.equal(await control.getAttribute('title'),format(expectedFrom)+' – '+format(statisticToday),'Compact caption reflects the same inclusive calendar window');assert.equal(await overview.locator('.bo-statistics-dates').count(),0,'No duplicate date line');
+        const before=zurichBusinessDay();
+        await chooseStatisticPeriod(page,overview,6);
+        const caption=await control.getAttribute('title'),after=zurichBusinessDay();
+        // A long full-browser shard may cross Zurich midnight while the state update renders.
+        // Keep the exact inclusive-window assertion for every day actually spanned.
+        const expectedCaptions=[...new Set([before,after].map(day=>statisticCaption(day,6)))];
+        assert.ok(expectedCaptions.includes(caption),'Compact caption reflects the same inclusive calendar window: '+JSON.stringify({caption,before,after,expectedCaptions}));
+        assert.equal(await overview.locator('.bo-statistics-dates').count(),0,'No duplicate date line');
         await chooseStatisticPeriod(page,overview,1);
        });
       }
