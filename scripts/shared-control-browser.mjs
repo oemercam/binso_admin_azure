@@ -167,6 +167,16 @@ async function verifyAnimationStabilityRegression(page){
 export async function assertMobileHeaderTargets(page){
  const selector='.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back';
  const targets=page.locator(selector).filter({visible:true});
+ if(await page.locator('.app-root.app-preview').count()){
+  assert.equal(await page.locator('.mobile-header').filter({visible:true}).count(),0,'Embedded previews intentionally suppress the duplicate app header');return targets;
+ }
+ await page.locator('.mobile-header').waitFor({state:'visible'});
+ if(await page.locator('.app-root.app-editing').count()&&!await targets.count()){
+  const form=page.locator('.form-page,.bottom-sheet[data-sheet-kind="form"]').filter({visible:true});
+  await form.first().waitFor({state:'visible'});
+  await form.locator('button,a[href]').filter({visible:true}).first().waitFor({state:'visible'});
+  return targets; // Active forms own their controls; a title-only shell is valid.
+ }
  await targets.first().waitFor({state:'visible'});
  await waitForFiniteAnimations(page);
  // Playwright resolves evaluateAll's array before its separate evaluation task.

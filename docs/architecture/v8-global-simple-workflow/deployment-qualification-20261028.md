@@ -34,3 +34,24 @@ Workflow-Läufen des freigegebenen finalen Commits zu entnehmen.
 Ein Abnahme-Deployment ist keine bestandene reale E-Mail-, Geräte-, Wiederherstellungs-
 oder Betriebsprüfung. Siehe release-readiness-device-acceptance.md. Ein neuer Commit
 benötigt die genaue Freigabe vor Veröffentlichung; rote Gates werden nicht umgangen.
+
+## Weiterer GitHub-Gegenlauf
+
+Auf Commit 16a9bca7 bestanden Build, native HTTP-/PostgreSQL-Prüfung, vollständige
+Pflichtprogramme, Sicherheitsanalyse, beide Avatar-Browser, Rabatt-/Rechnungsprüfung
+und die zusätzliche Responsive-Stichprobe. Die breite Browsermatrix meldete noch
+einen unzutreffenden Header-Vertrag: Vorschauen unterdrücken ihren App-Header
+absichtlich, aktive Erfassungsseiten dürfen einen Titel ohne Headeraktionen haben.
+Der zentrale Test unterscheidet diese Zustände nun ausdrücklich: Vorschauheader
+muss verborgen sein; eine aktive Erfassung ohne Headeraktionen muss ein sichtbares
+Formular mit sichtbaren Bedienelementen besitzen. Alle vorhandenen Headeraktionen
+behalten die unveränderte 44-Pixel-Mindestprüfung. Die zwölf gezielten Erfassungs-/
+Vorschaufälle bestanden lokal in Chromium und WebKit.
+
+Die wiederholte GitHub-Zeitüberschreitung der Dokumentliste ist nicht als ursächlich
+behoben zu deklarieren: Windows- und Linux-PostgreSQL 18.6 sowie ein späterer
+GitHub-Lauf bestanden; frühere Läufe scheiterten nach 15 Sekunden. Eine Messung
+zeigte aktive Verarbeitung ohne blockierende Transaktion. Die nur im isolierten
+Testserver geladene SQL-Sonde erhält unveränderte Zeitlimits und erfasst bei einem
+erneuten langsamen Aufruf den tatsächlichen SQL-Plan. Diese Einschränkung bleibt
+im abschliessenden Release-Nachweis sichtbar.
