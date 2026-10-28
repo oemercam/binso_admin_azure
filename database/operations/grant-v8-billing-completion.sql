@@ -1,4 +1,5 @@
--- REVIEWED OPERATION ONLY after the V8 migrations; never run automatically.
+-- REVIEWED OPERATION ONLY after the V8 migrations; separate from automatic migrations.
+-- A manual deployment must explicitly opt in to this operation for its exact SHA.
 -- Existing runtime roles need only these additive object grants. No DDL/ownership.
 begin;
 do $$begin

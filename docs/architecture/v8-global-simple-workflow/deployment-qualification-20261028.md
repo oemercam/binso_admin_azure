@@ -69,3 +69,23 @@ vier der sechs breiten Seitenmatrixgruppen, Build, Pflichtprogramme, Sicherheit,
 Avatar, Rabatt/Rechnungsprüfung und UX-Compliance grün. Nur die beiden Gruppen mit
 dem oben nachgewiesenen Kunden-Fixture-Fehler und damit der Quality-Aggregator
 waren rot. Diese Ergebnisse werden nicht rückwirkend als bestanden umgeschrieben.
+
+## Bestehende produktive Runtime-Rolle
+
+Die Freigabe von Migrationen allein installiert noch keine Objektrechte für eine
+bereits vorhandene Runtime-Rolle. `provision-runtime-role.sql` ist ausdrücklich für
+neue Rollen vorgesehen und setzt keine Standardrechte für zukünftige Tabellen.
+Der manuelle Deployment-Workflow bietet deshalb eine separate, standardmässig
+ausgeschaltete Option `apply_v8_runtime_grants`. Nur bei ausdrücklicher Zustimmung
+für den konkreten Commit führt er nach den Migrationen das vorhandene
+`database/operations/grant-v8-billing-completion.sql` aus, vor Runtime-Validierung
+und App-Deployment. Keine Rollen-Neuanlage, Eigentumsänderung oder RLS-Umgehung.
+
+Geprüft wurden tatsächliche SQL-Rechte, idempotente Wiederholung, fehlender Zugriff
+auf eine fremde Tabelle, unveränderte Rollenflags, weiter erzwungene RLS sowie die
+Abweisung einer BYPASSRLS-Rolle. Die Gegenprüfung besteht mit PGlite und nativem
+PostgreSQL 18 in einer leeren, getrennten Loopback-Testdatenbank. Belege:
+`v8-grants-workflow-test.log` und `v8-grants-native.log` im externen Nachweisordner.
+Der YAML-Vertrag prüft Default-false, False/True-Fälle, verifiziertes TLS und die
+Reihenfolge nach Migration und vor Runtime-Validierung. Produktiv nicht ausgeführt;
+eine neue genaue Freigabe muss diese gesonderten Objektrechte ausdrücklich umfassen.
