@@ -280,5 +280,5 @@ let completedText='';for(let n=1;n<=completedPdfDoc.numPages;n++)completedText+=
 completedText=completedText.replace(/\s+/g,' ');
 for(const expected of ['AP-TRACE','54.05','259.25','Authored Alpha agreement text','Authored Beta agreement text'])assert.ok(completedText.includes(expected),'Actual generated consolidated/advance PDF retains '+expected);
 assert.ok(completedText.includes('8.1')&&completedText.includes('2.6'),'Both actual tax groups are printed');
-await writeTestOutput('../audit-20261028-v8/completion-issued-fixture.pdf',completedPdf);
+await writeTestOutput(path.join(pdfOutput,'completion-issued-fixture.pdf'),completedPdf);
 console.log('Consolidated actual PDF: canonical reduced claim, original line prices, both tax rates, numbered advance reference and unchanged authored agreement conditions passed.');
