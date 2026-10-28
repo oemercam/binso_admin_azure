@@ -53,12 +53,10 @@ try{
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let i=0;;i++){if(server.exitCode!==null)throw new Error('Synthetic HTTP server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>80)throw new Error('Synthetic server unavailable');await new Promise(resolve=>setTimeout(resolve,250));}
  const get=async(path,cookie)=>{
-  try{const response=await fetch(base+path,{headers:{cookie},redirect:'manual',signal:AbortSignal.timeout(15000)});return {status:response.status,data:response.headers.get('content-type')?.includes('json')?await response.json():await response.arrayBuffer()};}
-  catch(error){
-   // Diagnose this disposable database only; never print cookies or extend the
-   // HTTP/server deadlines. Preserve the original failure even if diagnostics fail.
-   const actor=[...cookies].find(([,value])=>value===cookie)?.[0];
-   console.error('Isolated HTTP read failed',{path,actor,error:error.message});
+  // Sample before the unchanged 15-second deadline cancels the SQL statement;
+  // after cancellation pg_stat_activity no longer contains the responsible query.
+  const actor=[...cookies].find(([,value])=>value===cookie)?.[0];
+  const diagnose=async()=>{
    try{
     const activity=(await pool.query("select pid,state,wait_event_type,wait_event,extract(epoch from clock_timestamp()-query_start) seconds,pg_blocking_pids(pid) blockers,query from pg_stat_activity where datname=current_database() and pid<>pg_backend_pid() and state<>'idle'")).rows;
     console.error('Isolated database activity',JSON.stringify(activity));
@@ -71,8 +69,11 @@ try{
      }finally{await c.query('rollback');c.release();}
     }
    }catch(diagnosticError){console.error('Isolated HTTP diagnostics unavailable',diagnosticError.message);}
-   console.error('Isolated server tail',logs.slice(-4000));throw error;
-  }
+  };
+  let diagnostics;const timer=setTimeout(()=>{diagnostics=diagnose();},10000);timer.unref();
+  try{const response=await fetch(base+path,{headers:{cookie},redirect:'manual',signal:AbortSignal.timeout(15000)});return {status:response.status,data:response.headers.get('content-type')?.includes('json')?await response.json():await response.arrayBuffer()};}
+  catch(error){console.error('Isolated HTTP read failed',{path,actor,error:error.message});await diagnostics;console.error('Isolated server tail',logs.slice(-4000));throw error;}
+  finally{clearTimeout(timer);}
  };
  const positive=[];
  for(const [path,table] of [['customers','customers'],['employees','employees'],['products','products_services'],['expenses','expenses'],['payments','payments']]){
