@@ -1,3 +1,5 @@
+import {normalizeBillingTerms} from '@/lib/billing-model';
+import {invoiceBillingContext} from '@/lib/server/billing-agreements';
 import {minuteAllocations,prepareMinuteLine} from '@/lib/server/repositories/business-api';
 import {calculateDocument} from "@/lib/money";
 import {NextRequest} from "next/server";
@@ -8,7 +10,7 @@ import {authorize} from "@/lib/server/rbac";
 import {requireModuleEntitlement} from "@/lib/server/plan-access";
 import {documentLogo} from "@/lib/server/document-logo";
 import {documentPdf} from "@/lib/server/document-pdf";
-type Body={discount?:unknown;output?:unknown;kind?:unknown;customerId?:unknown;number?:unknown;sourceNumber?:unknown;date?:unknown;due?:unknown;currency?:unknown;note?:unknown;positions?:Array<{timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;description?:unknown;quantity?:unknown;price?:unknown;vatRate?:unknown;unit?:unknown}>};
+type Body={billingTerms?:unknown;billingContext?:unknown;discount?:unknown;output?:unknown;kind?:unknown;customerId?:unknown;number?:unknown;sourceNumber?:unknown;date?:unknown;due?:unknown;currency?:unknown;note?:unknown;positions?:Array<{timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;description?:unknown;quantity?:unknown;price?:unknown;vatRate?:unknown;unit?:unknown}>};
 /** Read-only preview: all client-supplied documents are drafts, never final bills. */
 export async function POST(request:NextRequest){try{
  assertSameOrigin(request);const s=await requireSession(),body=await readJson<Body>(request,262144);
@@ -32,7 +34,8 @@ export async function POST(request:NextRequest){try{
   if(saved?.calculation&&((saved.calculation.discount.kind!=='none'&&body.discount===undefined)||(saved.calculation.lines.some((l:Record<string,unknown>)=>(l.discount as Record<string,unknown>).kind!=='none')&&body.positions!.some(l=>l.discount===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte die gespeicherten Rabatte ausdrücklich übernehmen.');
   if(body.output==='calculation')return {calculation,customerDiscountProposal:customer?.discount===undefined?null:{kind:'percent',value:String(customer.discount),applied:false}};
   const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;
-  const document={document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};
+  const billing=body.billingTerms?normalizeBillingTerms(body.billingTerms):null;
+  const document={billing_context:invoice&&billing?invoiceBillingContext(billing,body.billingContext??{procedure:'standard'}):undefined,document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};
   return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));
  });
  if(!Buffer.isBuffer(pdf))return json(pdf);

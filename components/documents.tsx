@@ -1,4 +1,6 @@
 "use client";
+import {BillingTermsEditor,billingModelLabels} from './billing-terms-editor';
+import {billingTermsKey,type BillingTerms,type BillingRateOption} from '@/lib/billing-model';
 import {domainConfig} from "@/config/domain";
 import {documentDefaults,invoiceDraftFromOffer} from "@/lib/document-defaults";
 import {LocalizedText,LocalizedElement,useLocale,useTranslation} from "@/lib/client/locale";
@@ -38,6 +40,7 @@ import { apiGet, apiPatch, apiPost, apiDelete, isProductionBackendEnabled, useBa
 type DocumentKind = "Rechnung" | "Angebot";
 
 type LineItem = {
+  billingPart?:'fixed'|'time'|'quantity';billingSourcePosition?:number;
   id: string;
   description: string;
   quantity: string;
@@ -55,6 +58,7 @@ type LineItem = {
 };
 
 type DocumentDraft = {
+  billingTemplatePositions?:LineItem[];billingCompletedMilestones?:string[];billingRateOptions?:BillingRateOption[];sourceProject?:string;billingTerms?:BillingTerms;billingContext?:{procedure:string;period?:number|string;milestoneId?:string};billingAgreementId?:string;
   discount?:Discount;
   discountOrigin?:'manual'|'customer'|'removed';
   calculation?:ReturnType<typeof calculateDocument>;
@@ -141,6 +145,7 @@ function invoiceDueIso(date:string,days:string) {
 
 function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
   return {
+    sourceProject:draft.sourceProject,billingTerms:draft.billingTerms,billingContext:draft.billingContext,
     discount:cleanDiscount(draft.discount,draft.currency??'CHF'),
     discountOrigin:draft.discount?.kind==='none'?'removed':draft.id?'manual':draft.discountOrigin??'manual',
     calculationRevision:1,
@@ -155,7 +160,7 @@ function documentPayload(kind:DocumentKind,draft:DocumentDraft) {
     vatRate:numberValue(draft.vatRate),
     note:draft.note,
     currency:draft.currency??"CHF",
-    items:draft.positions.map(item=>({discount:cleanDiscount(item.discount,draft.currency??'CHF'),taxExempt:item.taxExempt??false,unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),expenseIds:item.expenseIds??[],timeEntryIds:item.timeEntryIds??[],priceBaseQuantity:item.priceBaseQuantity??1,timeAllocations:item.timeAllocations??[]})),
+    items:draft.positions.map(item=>({billingPart:item.billingPart,billingSourcePosition:item.billingSourcePosition,discount:cleanDiscount(item.discount,draft.currency??'CHF'),taxExempt:item.taxExempt??false,unit:item.unit??"Stück",description:item.description,quantity:numberValue(item.quantity),unitPrice:numberValue(item.price),vatRate:numberValue(item.vatRate??draft.vatRate),expenseIds:item.expenseIds??[],timeEntryIds:item.timeEntryIds??[],priceBaseQuantity:item.priceBaseQuantity??1,timeAllocations:item.timeAllocations??[]})),
   };
 }
 
@@ -191,6 +196,7 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     due=Number.isFinite(days)?String(days):"";
   }
   return {
+    billingCompletedMilestones:Array.isArray(item.billing_completed_milestones)?item.billing_completed_milestones.map(String):[],sourceProject:kind==='Rechnung'?String(item.project_id??''):undefined,billingTerms:item.billing_terms as BillingTerms|undefined,billingAgreementId:String(item.billing_agreement_id??''),billingContext:item.billing_context?{...(item.billing_context as {procedure:string}),...((item.billing_context as {period?:string}).period!==undefined?{period:Number((item.billing_context as {period?:string}).period)}:{})}:undefined,
     discount:(item.calculation as DocumentDraft['calculation'])?.discount??{kind:'none'},
     calculation:item.calculation as DocumentDraft['calculation'],
     updatedAt:String(item.document_revision??item.updated_at??''),
@@ -216,16 +222,16 @@ function remoteDraftFromItem(item:Record<string,unknown>,kind:DocumentKind):Docu
     revisions:Array.isArray(item.revisions)?item.revisions:[],
     invoiceNumber:String(item.invoice_number??""),
     projectId:String(item.project_id??""),
-    subtotal:Number(item.subtotal),
-    vat:Number(item.vat_amount),
-    total:Number(item.total),
+    subtotal:item.subtotal==null?undefined:Number(item.subtotal),
+    vat:item.vat_amount==null?undefined:Number(item.vat_amount),
+    total:item.total==null?undefined:Number(item.total),
     number:String(item.number??""),
     date:issueDate,
     due,
     vatRate:String(item.vat_rate??"8.1"),
     note:String(item.note??""),
     positions:rawItems.sort((a,b)=>Number(a.position??0)-Number(b.position??0)).map((line,index)=>({
-      id:String(line.id??("line-"+(index+1))),
+      id:String(line.id??("line-"+(index+1))),billingPart:line.billing_part as LineItem['billingPart'],billingSourcePosition:line.billing_source_position?Number(line.billing_source_position):kind==='Angebot'?Number(line.position??index+1):undefined,
       discount:line.discount as Discount??{kind:'none'},
       taxExempt:line.tax_exempt===true,
       lineTotal:String(line.line_total??0),
@@ -259,7 +265,7 @@ function useExistingDocument(kind:DocumentKind,documentKey:string|undefined,setD
   return {loading,error,refresh:()=>setRefreshVersion(value=>value+1)};
 }
 
-function editableDocumentSnapshot(draft:DocumentDraft){const value={...draft};delete value.subtotal;delete value.vat;delete value.total;delete value.calculation;return JSON.stringify(value);}
+function editableDocumentSnapshot(draft:DocumentDraft){const value:Record<string,unknown>={...draft};if(draft.billingTerms)value.billingTerms=billingTermsKey(draft.billingTerms);delete value.subtotal;delete value.vat;delete value.total;delete value.calculation;return JSON.stringify(value);}
 
 export function OfferEditor({ existing = false, documentKey }: { existing?: boolean; documentKey?: string }) {
   return <DocumentPage kind="Angebot" existing={existing} documentKey={documentKey}/>;
@@ -328,28 +334,32 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
   const initializedCustomer=useRef<string|null>(null);
   useEffect(()=>{if(!selectedCustomerId||initializedCustomer.current===selectedCustomerId)return;const customer=Object.entries(directory).find(([,item])=>item.id===selectedCustomerId);if(customer){initializedCustomer.current=selectedCustomerId;setDraft(current=>({...current,customer:customer[1].name??customer[0],customerId:selectedCustomerId}));}},[selectedCustomerId,directory,setDraft]);
   const sourceOffer=kind==="Rechnung"?searchParams.get("sourceOffer"):null;
+  const sourceProject=kind==='Rechnung'?searchParams.get('sourceProject'):null;
+  const projectSource=useApiQuery<{item:Record<string,unknown>}>(!existing&&sourceProject?'/api/projects/'+encodeURIComponent(sourceProject):null);
+  const initializedProject=useRef<string|null>(null);
+  useEffect(()=>{if(existing||sourceOffer||!sourceProject||!projectSource.data?.item||company.loading||customersLoading||initializedProject.current===sourceProject)return;const item=projectSource.data.item;initializedProject.current=sourceProject;queueMicrotask(()=>setDraft(current=>{const terms=item.billing_terms as BillingTerms|undefined;const snapshot=item.billing_snapshot as {note?:string;items?:Record<string,unknown>[];calculation?:Record<string,unknown>}|undefined;const positions=snapshot?.items?.map((line,index)=>({...line,position:index+1,billing_source_position:index+1}));const source=remoteDraftFromItem({customer_id:item.customer_id,customer:{name:item.customer_name},currency:terms?.currency??current.currency,number:item.source_offer??'',issue_date:current.date,note:snapshot?.note??'',calculation:snapshot?.calculation,items:positions??[{description:item.name,quantity:1,unit:terms?.model==='time'?'Stunden':'Stück',unit_price:terms&&'amount' in terms?terms.amount??'0':terms&&'hourlyRate' in terms?terms.hourlyRate??'0':'0',vat_rate:current.vatRate}],billing_terms:terms,billing_completed_milestones:item.billing_completed_milestones},'Angebot');return {...invoiceDraftFromOffer(source,current,company.raw,resolveCustomer(source,directory)),billingTemplatePositions:snapshot?.items?source.positions:undefined,sourceProject,sourceOffer:String(item.source_offer??''),billingContext:{procedure:'standard',...(terms?.model==='recurring'?{period:0}:{})}}}));},[existing,sourceOffer,sourceProject,projectSource.data,company.loading,company.raw,customersLoading,directory,setDraft]);
   const sourceTimeEntriesParam=kind==="Rechnung"?(searchParams.get("timeEntries")??""):"";
 
   const sourceQuery=useApiQuery<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(!existing&&sourceOffer?("/api/documents/"+encodeURIComponent(sourceOffer)):null);
   const sourceItem=sourceQuery.data?.item??sourceQuery.data?.items?.[0];
   const sourceCustomer=useApiQuery<{item?:Parameters<typeof customerDirectory>[0][number]}>(sourceItem?.customer_id&&sourceOffer?"/api/customers/"+encodeURIComponent(String(sourceItem.customer_id)):null);
-  const sourceLoading=sourceQuery.loading||sourceCustomer.loading;
-  const sourceInvalid=!existing&&sourceOffer&&!sourceLoading&&!sourceQuery.error&&(!sourceItem||sourceItem.kind!=="offer"||sourceItem.status!=="accepted"||Boolean(sourceItem.invoice_number));
-  const sourceError=sourceQuery.error||sourceCustomer.error||(sourceInvalid?"Das Ursprungsangebot muss angenommen und noch nicht verrechnet sein.":null);
+  const sourceLoading=sourceQuery.loading||sourceCustomer.loading||projectSource.loading;
+  const sourceInvalid=!existing&&sourceOffer&&!sourceLoading&&!sourceQuery.error&&(!sourceItem||sourceItem.kind!=="offer"||sourceItem.status!=="accepted"||Boolean(sourceItem.invoice_number)&&!sourceItem.billing_agreement_id);
+  const sourceError=projectSource.error||sourceQuery.error||sourceCustomer.error||(sourceInvalid?"Das Ursprungsangebot muss angenommen und noch nicht verrechnet sein.":null);
   const initializedOffer=useRef<string|null>(null);
   useEffect(()=>{
     if(existing||!sourceOffer||!sourceItem||sourceError||company.loading||customersLoading||sourceCustomer.loading||sourceCustomer.error||initializedOffer.current===sourceOffer)return;
     initializedOffer.current=sourceOffer;
     const source=remoteDraftFromItem(sourceItem,"Angebot");
-    queueMicrotask(()=>setDraft(current=>invoiceDraftFromOffer(source,current,company.raw,sourceCustomer.data?.item??resolveCustomer(source,directory))));
-  },[existing,sourceOffer,sourceItem,sourceError,company.loading,company.raw,customersLoading,sourceCustomer.loading,sourceCustomer.error,sourceCustomer.data,directory,setDraft]);
+    queueMicrotask(()=>setDraft(current=>({...invoiceDraftFromOffer(source,current,company.raw,sourceCustomer.data?.item??resolveCustomer(source,directory)),billingTemplatePositions:source.positions,billingContext:{procedure:searchParams.get("procedure")==="partial"?"partial":"standard",...(source.billingTerms?.model==="recurring"?{period:0}:{})}})));
+  },[existing,sourceOffer,sourceItem,sourceError,company.loading,company.raw,customersLoading,sourceCustomer.loading,sourceCustomer.error,sourceCustomer.data,directory,setDraft,searchParams]);
 
   const sourceExpenseParam=kind==='Rechnung'?(searchParams.get('expenses')??''):'';
   const recovery=useProcessDraft({process:kind+":"+searchParams.toString(),value:{draft,step:wizardStep,replay:draftReplay},dirty,enabled:!existing&&!customersLoading&&!customersError&&!sourceLoading&&!sourceError&&!sourceTimeEntriesParam&&!sourceExpenseParam,onRestore:stored=>{
     if(!stored?.draft||!Array.isArray(stored.draft.positions)||!stored.draft.positions.length||stored.draft.id||stored.draft.number||['customer','number','date','due','vatRate','note'].some(key=>typeof (stored.draft as unknown as Record<string,unknown>)[key]!=='string')||stored.draft.positions.some(item=>!item||['id','description','quantity','price'].some(key=>typeof (item as unknown as Record<string,unknown>)[key]!=='string'))||stored.replay&&(typeof stored.replay.body!=='string'||typeof stored.replay.key!=='string'))return;
     draftBaseline.current=editableDocumentSnapshot(draft);setDraft(stored.draft);setWizardStep(Math.max(0,Math.min(3,Number(stored.step)||0)));createRequest.current=stored.replay??null;setDraftReplay(stored.replay??null);setDirty(true);
   }});
-  const timeSource=useApiQuery<{items:Array<{id:string;hours:number;description?:string;sales_rate:number;customer_id:string;customer_name:string;project_name:string;external_resource_id?:string;remaining_minutes?:number;price_source_id?:string;price_currency?:string;vat_rate?:string;tax_treatment?:string}>}>(kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?minuteAllocations=1&ids='+encodeURIComponent(sourceTimeEntriesParam):null);
+  const timeSource=useApiQuery<{items:Array<{id:string;hours:number;description?:string;sales_rate:number;billing_agreement_id?:string;billing_terms?:BillingTerms;billing_rate_options?:BillingRateOption[];billing_source_position?:number;billing_discount?:Discount;billing_document_discount?:Discount;customer_id:string;customer_name:string;project_name:string;external_resource_id?:string;remaining_minutes?:number;price_source_id?:string;price_currency?:string;vat_rate?:string;tax_treatment?:string}>}>(kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?minuteAllocations=1&ids='+encodeURIComponent(sourceTimeEntriesParam):null);
   const expenseSource=useApiQuery<{items:Array<{id:string;customer_id:string;customer_name:string;description:string;quantity:number;unit_price:number;vat_rate:number;currency:string}>}>(kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null);
   const [billingSourceError,setBillingSourceError]=useState<string|null>(null);
   const billingLoading=timeSource.loading||expenseSource.loading;
@@ -367,12 +377,12 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       if(!customer||sources.some(i=>i.customer_id!==customer)||existing&&draft.customerId!==customer)throw new Error('Alle Positionen müssen zum Kunden dieser Rechnung gehören.');
       if(existing&&draft.status!=='draft')throw new Error('Zeiten und Spesen können nur einem Rechnungsentwurf hinzugefügt werden.');
       if(expenses.some(i=>i.currency!==(existing?draft.currency:expenses[0].currency)))throw new Error('Die Währungen der Spesen und Rechnung müssen übereinstimmen.');
-      const currency=existing?draft.currency:expenses[0]?.currency??times.find(t=>t.external_resource_id)?.price_currency??draft.currency;
-      if(times.some(t=>(t.external_resource_id?t.price_currency:'CHF')!==currency)||expenses.some(e=>e.currency!==currency))throw new Error('Leistungspreis und Rechnungswährung müssen übereinstimmen. Es erfolgt keine automatische Umrechnung.');
-      const groups=Object.values(times.filter(t=>!t.external_resource_id).reduce<Record<string,typeof times>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate)])]??=[]).push(item);return all},{}));
-      const positions:LineItem[]=[...groups.map((items,index)=>({id:"time-"+index,description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id) })),...times.filter(t=>t.external_resource_id).map(t=>({id:'minute-'+t.id,description:t.project_name+(t.description?' · '+t.description:''),quantity:String(t.remaining_minutes),unit:'min',price:String(t.sales_rate),vatRate:String(t.vat_rate??0),taxExempt:t.tax_treatment!=='taxable',priceBaseQuantity:60 as const,availableMinutes:t.remaining_minutes,timeAllocations:[{timeEntryId:t.id,minutes:Number(t.remaining_minutes),priceSourceId:t.price_source_id!}]})),...expenses.map(i=>({id:'expense-'+i.id,description:i.description,quantity:String(i.quantity),price:String(i.unit_price),unit:'Stück',vatRate:String(i.vat_rate),expenseIds:[i.id]}))];
+      const currency=existing?draft.currency:expenses[0]?.currency??times.find(t=>t.price_currency)?.price_currency??draft.currency??'CHF';
+      if(times.some(t=>(t.price_currency??'CHF')!==currency)||expenses.some(e=>e.currency!==currency))throw new Error('Leistungspreis und Rechnungswährung müssen übereinstimmen. Es erfolgt keine automatische Umrechnung.');
+      const groups=Object.values(times.filter(t=>!t.external_resource_id).reduce<Record<string,typeof times>>((all,item)=>{(all[JSON.stringify([item.project_name,Number(item.sales_rate),item.billing_agreement_id,item.billing_source_position,item.vat_rate,item.billing_rate_options&&item.billing_rate_options.length>1&&!item.billing_source_position?item.id:undefined])]??=[]).push(item);return all},{}));
+      const positions:LineItem[]=[...groups.map((items,index)=>({id:"time-"+index,billingPart:'time' as const,discount:items[0].billing_discount,billingSourcePosition:items[0].billing_source_position,vatRate:items[0].vat_rate,taxExempt:items[0].tax_treatment==='exempt',description:items[0].project_name,quantity:items.reduce((sum,item)=>sum+Number(item.hours),0).toFixed(2),unit:"Stunden",price:String(items[0].sales_rate||0),timeEntryIds:items.map(item=>item.id) })),...times.filter(t=>t.external_resource_id).map(t=>({id:'minute-'+t.id,billingPart:'time' as const,description:t.project_name+(t.description?' · '+t.description:''),quantity:String(t.remaining_minutes),unit:'min',price:String(t.sales_rate),vatRate:String(t.vat_rate??0),taxExempt:t.tax_treatment!=='taxable',priceBaseQuantity:60 as const,availableMinutes:t.remaining_minutes,timeAllocations:[{timeEntryId:t.id,minutes:Number(t.remaining_minutes),priceSourceId:t.price_source_id!}]})),...expenses.map(i=>({id:'expense-'+i.id,description:i.description,quantity:String(i.quantity),price:String(i.unit_price),unit:'Stück',vatRate:String(i.vat_rate),expenseIds:[i.id]}))];
       draftBaseline.current??=editableDocumentSnapshot(draft);
-      setDraft(current=>({...current,customer:sources[0].customer_name,customerId:customer,currency:currency??current.currency,positions:existing?[...current.positions,...positions]:positions,subtotal:undefined,vat:undefined,total:undefined}));setDirty(true);setEditing(true);setBillingSourceError(null);
+      setDraft(current=>({...current,billingTerms:current.billingTerms??times.find(t=>t.billing_terms)?.billing_terms,billingAgreementId:current.billingAgreementId??times.find(t=>t.billing_agreement_id)?.billing_agreement_id,billingRateOptions:times.find(t=>t.billing_rate_options?.length)?.billing_rate_options,discount:existing?current.discount:times.find(t=>t.billing_document_discount)?.billing_document_discount??current.discount,customer:sources[0].customer_name,customerId:customer,currency:currency??current.currency,positions:existing?[...current.positions.filter(item=>!((current.billingTerms?.model==='time'||item.billingPart==='time')&&!item.timeEntryIds?.length&&!item.timeAllocations?.length)),...positions]:positions,subtotal:undefined,vat:undefined,total:undefined}));setDirty(true);setEditing(true);setBillingSourceError(null);
     };void load().catch(e=>{importedSources.current='';setBillingSourceError(e instanceof Error?e.message:'Positionen konnten nicht geladen werden.');});
   },[existing,kind,sourceTimeEntriesParam,sourceExpenseParam,documentLoad.loading,draft,documentKey,setDraft,billingLoading,timeSource.data,timeSource.error,expenseSource.data,expenseSource.error]);
 
@@ -394,7 +404,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     try{
       {}
       {
-        const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||undefined,customerId:resolveCustomer(draft,directory)?.id??draft.customerId};
+        const payload={...documentPayload(kind,draft),sourceOffer:sourceOffer||draft.sourceOffer||undefined,sourceProject:sourceProject||draft.sourceProject||undefined,customerId:resolveCustomer(draft,directory)?.id??draft.customerId};
         const requestBody=JSON.stringify(payload);
         if(createRequest.current?.body!==requestBody){createRequest.current={body:requestBody,key:crypto.randomUUID()};setDraftReplay(createRequest.current);}
         if(!existing)recovery.persist({draft,step:wizardStep,replay:createRequest.current});
@@ -452,7 +462,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
     {editing&&companyPending&&<LoadingState><LocalizedText>{"Firmendaten werden geladen …"}</LocalizedText></LoadingState>}
     {editing&&paymentIssue&&<div className="document-source-note" role="status"><span><LocalizedText>{paymentIssue}</LocalizedText></span>{tenantCan(documentRole,"organization:write")&&(existing?<Link href={setupDestination(paymentRequirement?.field??"iban","/"+plural+"/"+encodeURIComponent(documentKey??draft.number)+"?"+searchParams.toString())}><LocalizedText>Angaben ergänzen</LocalizedText></Link>:<Button variant="ghost" disabled={!recovery.ready} onClick={()=>{if(dirty)recovery.persist({draft,step:wizardStep,replay:draftReplay});allowDraftNavigation();router.push(setupDestination(paymentRequirement?.field??"iban","/"+plural+"/neu?"+searchParams.toString()))}}><LocalizedText>Angaben ergänzen</LocalizedText></Button>)}</div>}
     {sourceOffer&&!existing&&<div className="document-source-note"><span><LocalizedText>{"Erstellt aus Angebot"}</LocalizedText></span><b>{sourceOffer}</b></div>}
-    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceLoading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh()}}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
+    {customersLoading?<LoadingState><LocalizedText>{"Kunden werden geladen …"}</LocalizedText></LoadingState>:customersError?<ErrorState onRetry={refreshCustomers}><LocalizedText>{customersError}</LocalizedText></ErrorState>:sourceLoading?<LoadingState><LocalizedText>{"Ursprungsangebot wird geladen …"}</LocalizedText></LoadingState>:sourceError?<ErrorState onRetry={()=>{sourceQuery.refresh();sourceCustomer.refresh();projectSource.refresh()}}><LocalizedText>{sourceError}</LocalizedText></ErrorState>:billingLoading?<LoadingState><LocalizedText>{"Verrechenbare Positionen werden geladen …"}</LocalizedText></LoadingState>:billingError?<ErrorState onRetry={()=>{timeSource.refresh();expenseSource.refresh()}}><LocalizedText>{billingError}</LocalizedText></ErrorState>:documentLoad.loading?<LoadingState><LocalizedText>{"Dokument wird geladen …"}</LocalizedText></LoadingState>:documentLoad.error?<EmptyState  title="Dokument konnte nicht geladen werden" description={documentLoad.error}/>:existing&&!editing
       ? <div className="document-desktop-workspace">
           <div className="document-desktop-detail">
             <DocumentReadView type={kind} draft={draft} directory={directory} canWrite={canWrite} followup={kind==="Angebot"&&canWrite?<OfferFollowup number={draft.number} open={followupOpen} onClose={()=>setFollowupOpen(false)}/>:undefined}/>
@@ -460,7 +470,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
           </div>
 
         </div>
-      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={requestCloseEditor} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,calculation:undefined,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer)} step={!existing?wizardStep:undefined}/>}
+      : !existing?<FormWizard cancelAction={<Button variant="secondary" onClick={requestCloseEditor} disabled={saving}><LocalizedText>{"Abbrechen"}</LocalizedText></Button>} labels={["Kunde und Dokumentdaten","Positionen",kind==="Angebot"?"Gültig bis":"Zahlungsbedingungen","Prüfen und als Entwurf speichern"]} step={wizardStep} onStep={setWizardStep} busy={saving} action={<Button disabled={saving||productQuery.loading||Boolean(productQuery.error)||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":"Als Entwurf speichern"}</LocalizedText></Button>}><DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,calculation:undefined,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer||sourceProject||draft.sourceOffer||draft.sourceProject)} step={!existing?wizardStep:undefined}/>{wizardStep===3&&<DocumentReview type={kind} draft={draft} onStep={setWizardStep}/>}{wizardStep===1&&editing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(existing?draft.number:"")+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}</FormWizard>:<DocumentEditor type={kind} draft={draft} onChange={next=>{draftBaseline.current??=editableDocumentSnapshot(draft);setDirty(editableDocumentSnapshot(next)!==draftBaseline.current);setDraft({...next,subtotal:undefined,vat:undefined,total:undefined})}} directory={directory} lockedCustomer={Boolean(sourceOffer||sourceProject||draft.sourceOffer||draft.sourceProject)} step={!existing?wizardStep:undefined}/>}
     {editing&&existing&&kind==="Rechnung"&&draft.customerId&&tenantCan(documentRole,"invoices:write")&&<Button variant="secondary" href={"/zeit?invoice="+encodeURIComponent(draft.number)+"&customerId="+encodeURIComponent(draft.customerId)}><LocalizedText>{"Freigegebene Zeiten hinzufügen"}</LocalizedText></Button>}
     {editing&&existing&&<FormActions><Button variant="secondary" onClick={requestCloseEditor}><LocalizedText>{"Abbrechen"}</LocalizedText></Button><Button disabled={saving||companyPending||Boolean(company.error)||documentLoad.loading||customersLoading||Boolean(customersError)||Boolean(documentLoad.error)} onClick={()=>void save()}><LocalizedText>{saving?"Wird gespeichert…":existing?"Speichern":kind+" erstellen"}</LocalizedText></Button></FormActions>}
   </>;
@@ -474,6 +484,7 @@ function DocumentPage({kind,existing=false,documentKey}:{kind:DocumentKind;exist
       {canRecordPayment&&<ActionRow href={"/zahlungen/neu?invoice="+encodeURIComponent(documentKey??draft.number)} icon="wallet" title="Zahlung erfassen"/>}
       {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"projects:write")&&<ActionRow href={draft.projectId?"/projekte/"+encodeURIComponent(draft.projectId):"/projekte/neu?customerId="+encodeURIComponent(draft.customerId??"")+"&sourceOffer="+encodeURIComponent(draft.number)} icon="clock" title={draft.projectId?"Auftrag öffnen":"Auftrag starten"}/>}
       {kind==="Angebot"&&draft.status==="accepted"&&tenantCan(documentRole,"invoices:write")&&<ActionRow href={draft.invoiceNumber?"/rechnungen/"+encodeURIComponent(draft.invoiceNumber):"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)} icon="receipt" title={draft.invoiceNumber?"Rechnung öffnen":"Rechnung erstellen"}/>}
+      {kind==="Angebot"&&draft.status==="accepted"&&draft.billingAgreementId&&draft.invoiceNumber&&tenantCan(documentRole,"invoices:write")&&<ActionRow href={"/rechnungen/neu?sourceOffer="+encodeURIComponent(documentKey??draft.number)+"&procedure=partial"} icon="receipt" title="Teilrechnung"/>}
       <ActionRow onClick={()=>{setMoreOpen(false);setPreview(true)}} icon="file" title="Vorschau" navigation/>
       <ActionRow href={"/api/documents/"+encodeURIComponent(documentKey??draft.number)+"/pdf"} icon="file" title="PDF herunterladen"/>
       {canWrite&&!(kind==='Rechnung'&&draft.status==='draft')&&!['cancelled','declined','expired','revised'].includes(draft.status??'')&&<ActionRow disabled={demoDocument||actionBusy} onClick={()=>{recipientTouched.current=false;setRecipient(resolveCustomer(draft,directory)?.email??"");setMailSubject(translate(kind)+" "+draft.number);setMailMessage(translate(kind==="Angebot"?"Guten Tag\n\nIm Anhang findest du unser Angebot. Über den sicheren Link kannst du das Angebot prüfen und beantworten.\n\nFreundliche Grüsse":"Guten Tag\n\nIm Anhang findest du unsere Rechnung.\n\nFreundliche Grüsse"));setSendPurpose('document');setSendKey(crypto.randomUUID());setActionError(null);setMoreOpen(false);setSendOpen(true)}} icon="mail" title={demoDocument?'Versand in der Demo deaktiviert':'Per E-Mail senden'} navigation/>}
@@ -557,13 +568,13 @@ function DocumentReadView({type,draft,directory,canWrite,followup}:{type:Documen
       <MetricTile label="Bereits bezahlt" value={`${currency} ${money(Number(draft.paidAmount??0),localeTags[locale])}`}/>
     </LocalizedElement>}
     {!isInvoice&&draft.number&&<OfferHistory number={draft.number} canWrite={canWrite}/>}{followup}
-    {(Boolean(draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
+    {(Boolean(draft.billingTerms||draft.credits?.length||draft.reminders?.length||draft.refunds?.length||draft.revisesOffer||draft.revisions?.length||draft.sourceOffer||draft.invoiceNumber||draft.note))&&<DetailDisclosure label="Weitere Angaben">
     {isInvoice&&Boolean(draft.credits?.length)&&<section className="document-detail-section"><SectionTitle title="Gutschriften"/>{draft.credits?.map(credit=><p key={credit.number}><b>{credit.number}</b> · {credit.date.split('-').reverse().join('.')} · {currency} {money(Number(credit.amount),localeTags[locale])}<br/>{credit.reason}</p>)}</section>}
     {isInvoice&&Boolean(draft.reminders?.length)&&<section className="document-detail-section"><SectionTitle title="Mahnhistorie"/>{draft.reminders?.map(reminder=><p key={reminder.id}><b><LocalizedText>{reminder.stage===1?'Zahlungserinnerung':reminder.stage===2?'1. Mahnung':'2. Mahnung'}</LocalizedText></b> · <LocalizedText>{deliveryLabel(reminder.status)}</LocalizedText><br/>{reminder.recipient} · {currency} {money(Number(reminder.amount),localeTags[locale])} · <LocalizedText>{"Zahlungsfrist"}</LocalizedText>: {reminder.deadline.split('-').reverse().join('.')}</p>)}</section>}
     {isInvoice&&Boolean(draft.refunds?.length)&&<section className="document-detail-section"><SectionTitle title="Rückerstattungen"/>{draft.refunds?.map(refund=><p key={refund.id}>{refund.date.split('-').reverse().join('.')} · {currency} {money(Number(refund.amount),localeTags[locale])}<br/>{refund.reason}</p>)}</section>}
     {draft.revisesOffer&&<p><LocalizedText>{"Vorherige Angebotsversion"}</LocalizedText>: <Link href={'/angebote/'+encodeURIComponent(draft.revisesOffer)}>{draft.revisesOffer}</Link></p>}
     {Boolean(draft.revisions?.length)&&<section className="document-detail-section"><SectionTitle title="Überarbeitete Angebotsversionen"/>{draft.revisions?.map(revision=>{const label=financialStatusText(revision.status,'offer');return <p key={revision.number}><Link href={'/angebote/'+encodeURIComponent(revision.number)}>{revision.number}</Link> · <LocalizedText>{label}</LocalizedText></p>})}</section>}
-    {draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
+    {draft.billingTerms&&<p><LocalizedText>Abrechnungsmodell</LocalizedText>: <LocalizedText>{billingModelLabels[draft.billingTerms.model]}</LocalizedText></p>}{draft.sourceOffer&&<p><LocalizedText>{"Ursprungsangebot: "}</LocalizedText><Link href={"/angebote/"+encodeURIComponent(draft.sourceOffer)}>{draft.sourceOffer}</Link></p>}{draft.invoiceNumber&&<p><LocalizedText>{"Rechnung: "}</LocalizedText><Link href={"/rechnungen/"+encodeURIComponent(draft.invoiceNumber)}>{draft.invoiceNumber}</Link></p>}
     {draft.note&&<section className="document-detail-section"><span className="eyebrow"><LocalizedText>{"NOTIZ"}</LocalizedText></span><p>{draft.note}</p></section>}
     </DetailDisclosure>}
   </div>;
@@ -585,12 +596,24 @@ function DocumentTotals({draft,totals}:{draft:DocumentDraft;totals:ReturnType<ty
  <strong><LocalizedText>{"Total"}</LocalizedText><b>{currency} {money(totals.total,localeTags[locale])}</b></strong></div>;
 }
 
+function BillingContextFields({draft,onChange,type}:{draft:DocumentDraft;onChange:(draft:DocumentDraft)=>void;type:DocumentKind}){
+ const {locale}=useLocale();const terms=draft.billingTerms;if(!terms)return null;
+ const context={procedure:'standard',...(terms.model==='recurring'?{period:0}:{}),...draft.billingContext};
+ const patch=(value:{procedure?:string;period?:number;milestoneId?:string})=>{const milestone=terms.model==='milestone'?terms.milestones.find(m=>m.id===value.milestoneId):null;onChange({...draft,billingContext:{...context,...value},...(milestone&&draft.billingTemplatePositions?{positions:draft.billingTemplatePositions.filter(line=>line.billingSourcePosition===(terms.model==='milestone'?terms.milestones.findIndex(m=>m.id===milestone.id)+1:0))}:milestone&&draft.positions.length===1?{positions:[{...draft.positions[0],price:milestone.amount??'0'}]}:{})})};
+ return <div className="form-grid">
+  {type==='Rechnung'&&<><Field label="Rechnungsverfahren"><Select value={context.procedure} onChange={e=>patch({procedure:e.target.value})}><option value="standard"><LocalizedText>Rechnung</LocalizedText></option>{(terms.model==='fixed'||terms.model==='recurring'||terms.model==='milestone'||terms.model==='mixed'&&terms.amount!==null)&&<option value="advance"><LocalizedText>Akonto</LocalizedText></option>}<option value="partial"><LocalizedText>Teilrechnung</LocalizedText></option><option value="final"><LocalizedText>Schlussrechnung</LocalizedText></option></Select></Field>{terms.model==='recurring'&&<Field label="Periodennummer"><Input type="number" min="1" max="120001" step="1" value={Number(context.period??0)+1} onChange={e=>patch({period:Number(e.target.value)-1})}/></Field>}{terms.model==='milestone'&&<Field label="Meilenstein"><Select value={context.milestoneId??''} onChange={e=>patch({milestoneId:e.target.value})}><option value=""><LocalizedText>Bitte wählen</LocalizedText></option>{terms.milestones.map(m=><option key={m.id} value={m.id} disabled={!m.completed&&!draft.billingCompletedMilestones?.includes(m.id)}>{m.label}</option>)}</Select></Field>}</>}
+  {!!draft.billingRateOptions?.length&&draft.positions.filter(item=>item.timeEntryIds?.length).map(item=><Field key={item.id} label="Stundensatz"><Select value={item.billingSourcePosition??(draft.billingRateOptions!.length===1?'agreed':'')} onChange={e=>{const option=draft.billingRateOptions!.find(p=>String(p.position??'agreed')===e.target.value);if(option)onChange({...draft,positions:draft.positions.map(l=>l.id===item.id?{...l,billingSourcePosition:option.position,price:option.unitPrice,vatRate:option.vatRate??l.vatRate,taxExempt:option.taxExempt??l.taxExempt,discount:option.discount??l.discount}:l)})}}><option value=""><LocalizedText>Bitte wählen</LocalizedText></option>{draft.billingRateOptions!.map((option,index)=><option key={index} value={option.position??'agreed'}>{option.description??''} · {terms.currency} {money(Number(option.unitPrice),localeTags[locale])}</option>)}</Select></Field>)}
+  {terms.model==='mixed'&&draft.positions.map(item=><Field key={item.id} label="Leistungsart"><Select value={item.billingPart??''} onChange={e=>onChange({...draft,positions:draft.positions.map(l=>l.id===item.id?{...l,billingPart:e.target.value as LineItem['billingPart']}:l)})}><option value=""><LocalizedText>Bitte wählen</LocalizedText></option>{terms.amount!==null&&<option value="fixed"><LocalizedText>Pauschal/Fixpreis</LocalizedText></option>}{terms.additionalTime&&<option value="time"><LocalizedText>Nach Aufwand</LocalizedText></option>}{terms.quantity&&<option value="quantity"><LocalizedText>Nach Menge</LocalizedText></option>}</Select><small translate="no">{item.description}</small></Field>)}
+ </div>;
+}
+
 function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=false }: { type:DocumentKind; draft:DocumentDraft; onChange:(draft:DocumentDraft)=>void; directory:CustomerDirectory;step?:number;lockedCustomer?:boolean }) {
  const {locale}=useLocale();
 
   const company=useDocumentCompany();
   const totals=useDocumentTotals(draft);
   const names=Object.keys(directory);
+  const sourceLinked=draft.positions.some(item=>Boolean(item.timeEntryIds?.length||item.timeAllocations?.length||item.expenseIds?.length));
   const [noteOpen,setNoteOpen]=useState(Boolean(draft.note));
   const [mobilePositionId,setMobilePositionId]=useState<string|null>(null);
   const [positionDraft,setPositionDraft]=useState<LineItem|null>(null);
@@ -627,8 +650,9 @@ function DocumentEditor({ type, draft, onChange, directory, step,lockedCustomer=
   return <div className="invoice-workspace">
     <section className={`invoice-form ${type==="Angebot"?"offer-form":""}`}>
       <div hidden={step!==undefined&&step!==0} className="form-section customer-form-section">
+        <BillingTermsEditor positionsOwnRates value={draft.billingTerms} currency={draft.currency==='EUR'?'EUR':'CHF'} disabled={type==='Rechnung'&&!!(draft.sourceOffer||draft.sourceProject||draft.billingAgreementId&&sourceLinked&&step!==undefined)} onChange={billingTerms=>onChange({...draft,billingTerms,currency:billingTerms.currency,positions:draft.positions.map(l=>({...l,billingPart:billingTerms.model==='mixed'?(draft.billingTerms?.model==='mixed'?l.billingPart:undefined):billingTerms.model==='time'?'time':billingTerms.model==='quantity'?'quantity':'fixed',...(billingTerms.model==='time'||billingTerms.model==='mixed'&&l.billingPart==='time'?{unit:'Stunden',...('hourlyRate' in billingTerms&&billingTerms.hourlyRate!=null?{price:billingTerms.hourlyRate}:{})}:{})}))})}/><BillingContextFields draft={draft} onChange={onChange} type={type}/>
         <span className="compact-section-label"><LocalizedText>{"Kunde"}</LocalizedText></span>
-        <Field label="Kunde auswählen"><DirectorySelect label="Kunde auswählen" disabled={lockedCustomer||draft.positions.some(item=>Boolean(item.timeAllocations?.length))} required endpoint={"/api/customers"} value={draft.customerId??''} onChange={(value,item)=>{if(item)onChange({...draft,customer:String(item.name??''),customerId:value,...(type==='Rechnung'?{due:documentDefaults(company.raw,{paymentDays:item.paymentDays==null?undefined:Number(item.paymentDays)},'Rechnung',draft.date).due}:{})})}}/></Field>
+        <Field label="Kunde auswählen"><DirectorySelect label="Kunde auswählen" disabled={lockedCustomer||sourceLinked} required endpoint={"/api/customers"} value={draft.customerId??''} onChange={(value,item)=>{if(item)onChange({...draft,customer:String(item.name??''),customerId:value,...(type==='Rechnung'?{due:documentDefaults(company.raw,{paymentDays:item.paymentDays==null?undefined:Number(item.paymentDays)},'Rechnung',draft.date).due}:{})})}}/></Field>
       </div>
       <div hidden={step!==undefined&&step!==0&&step!==2} className="form-section">
         <h2><LocalizedText>{step===2?(type==="Angebot"?"Gültig bis":"Zahlungsbedingungen"):"Dokumentdaten"}</LocalizedText></h2>

@@ -1,4 +1,87 @@
-# V8 – laufender Paketstand
+# V8 – lokaler Implementierungsstand, 28. Oktober 2026
+
+Fortsetzung auf dem unveränderten Budget-Checkpoint 39f6a19c3cf3972907b1643153ba9dd5fa253829.
+Noch kein neuer Release und keine V8-Gesamtabnahme. Details, führende Dateien und
+bekannte Grenzen: [Abrechnungsintegration](billing-integration.md).
+
+| Anforderung | Status | Beleg / Restumfang |
+| --- | --- | --- |
+| Budgetkorrekturen erhalten | Erledigt | Keine Änderung an Migration 0109, lib/projects.ts und Budget-Testfällen; tatsächliche API/RLS-Budgetregression erneut ausgeführt |
+| Gemeinsame sechs Modelle | Erledigt lokal | Bestehender gemeinsamer Vertrag erweitert; eine unveränderte Geld-/Steuer-Engine |
+| Angebot → Auftrag → Rechnung | Erledigt lokal für sechs Standardketten | Echte APIs, Migrationen, eingeschränkte Datenbankrolle und Ausstellung je Modell |
+| Preis/Menge/Steuer/Quellen | Erledigt lokal im geprüften Umfang | Unveränderliche Vereinbarung, Positions-/Quellbindung, Kapazitätsgrenzen; erweiterte Rabatt-/Cent-Gegenfälle offen |
+| Zeiterfassung | Teilweise | Enthaltene Stunden ausgeschlossen, reale Freigaben/Quellen und feste Rate gebunden; externe Minutenvarianten im neuen Modell noch nicht vollständig qualifiziert |
+| Teil/Akonto/Schluss/Gutschrift | Teilweise | Gemeinsame Kapazität, Rabattbudget, bisherige Rechnungen, Null-Schluss, Korrektur ohne stillschweigende Quellenfreigabe; variable Akonto-Verrechnung ohne Fixanteil nicht implementiert |
+| Mehrere unabhängige Vereinbarungen in einer Rechnung | Offen | Neue strukturierte Auswahl wird sicher begrenzt; bestehende unmodellierte Flüsse erhalten |
+| Rollen/RLS/Status/Audit/Idempotenz | Erledigt lokal im geprüften Umfang | Reale eingeschränkte Datenbank-/API-Gegenfälle, unveränderliche historische Snapshots |
+| Übersetzungen | Teilweise | Neue Bedien-/PDF-Texte in DE/FR/IT/EN/TR; vollständige linguistische/visuelle Abnahme offen |
+| Browser | Gezielt grün | 66 Fälle: 26 Übernahmen aus Angebot/Auftrag/Zeit, 32 Fälle über acht Breiten in Light/Dark, acht schmale FR/IT/EN/TR-Fälle; keine physische Geräteabnahme |
+| Nativer Konkurrenztest | Blockiert | Keine laufende lokale PostgreSQL-Engine; PGlite ersetzt keine überlappenden nativen Transaktionen |
+| Physische Safari/iOS-PWA/iPad-Abnahme | Blockiert | Keine tatsächliche Geräteprüfung; Browseremulation wird getrennt ausgewiesen |
+| Vollständige Pflichtprüfungen finaler Zustand | Grün lokal | pnpm lint, typecheck, build und vollständiger pnpm test mit 92 Pflichtprogrammen erfolgreich; native und physische Gates bleiben offen |
+| Übriges V8 | Offen/teilweise | Vorher-Matrix bleibt Inventur, keine automatische Gesamtabnahme |
+
+Keine produktive Migration, kein GitHub-Push, Merge oder Azure-Deployment.
+Keine kostenpflichtigen Dienste aktiviert. Kundenlogin und Navigation/FAB bleiben erhalten.
+
+
+## Nachweise des abschliessenden lokalen Stands
+
+- Vollständiges Lint: Exit 0, v8-billing-lint-final-source.log.
+- TypeScript: Exit 0, v8-billing-typecheck-final-source.log.
+- Produktionsbuild: Exit 0, v8-billing-build-final-source.log.
+- Vollständiger pnpm-test-Lauf (92 Programme): Exit 0, v8-billing-tests-final-source.log.
+- 26 Browserfälle für alle sechs Modelle aus Angebot/Auftrag sowie direkte
+  Stundenübernahme, einschliesslich Kunden-/Modell-/Währungssperre, korrekter
+  Anfangssumme und erneutem Auftragsabruf nach Fehler: Chromium/WebKit, 390 px.
+- 32 gemeinsame Oberflächenfälle: Chromium/WebKit, 320/375/390/430/768/820/1024/1440 px,
+  Light/Dark. Zusätzlich acht WebKit-Fälle mit 320 px, FR/IT/EN/TR und Light/Dark.
+  Die explizite EUR-Wahl bleibt beim Modellwechsel erhalten. Synthetische
+  HTTP-Darstellungsdaten; echte API-/Datenbankintegrität separat geprüft.
+- Tatsächliche API-/RLS-Ketten mit allen Migrationen: sechs Modelle, zusätzlich
+  gemischte Pauschale plus ausdrücklich vereinbarte reale Zusatzstunden,
+  EUR-Stundenrechnung ohne Umrechnung, früh datierter nachträglicher Entwurf
+  gegen ausgestellte Schlussrechnung, legitime Verwaltung alter Teilrechnungen,
+  feste Rabatte über Teilrechnungen/Perioden, Akonto, Null-Schluss, Gutschrift,
+  Wiederholung, Fremdmandant, Rollen, Nur-Lesen und Audit-Rollback.
+- Neue Tabellen: Exportfähigkeit, direkte Unveränderlichkeit und tatsächliche
+  Kaskade in kontrollierter Löschreihenfolge geprüft. Die vollständige bestehende
+  Lösch-CLI ist damit ausdrücklich nicht qualifiziert; siehe Integrationsbericht.
+- Online-Prüfung der Produktivabhängigkeiten: Exit 0, keine bekannten Hinweise
+  in den gemeldeten Schwereklassen. Keine Abhängigkeiten verändert.
+- Budgetdateien gegenüber 39f6a19c3cf3972907b1643153ba9dd5fa253829 identisch;
+  gemeinsame Auftragsdateien enthalten additive Abrechnungsintegration. Die
+  Budget-API-/RLS-Regression bleibt im erfolgreichen Pflichtlauf aktiv.
+
+Alle Protokolle, Ergebnis-JSONs und Screenshots liegen vom Checkout aus unter
+../audit-20261026/v8-billing-*. Geänderte Dateien sind dort zusätzlich nach Bereichen
+in v8-billing-changed-files.json aufgelistet. Git-Identität und abschliessende
+Prüfmanifest-Datei: v8-billing-final-evidence.json; der finale lokale Commit wird
+in der Übergabe genannt. Kein Release-SHA und keine produktive Freigabe.
+
+Ausgewählte echte Browseraufnahmen (isolierte Darstellungsdaten):
+
+- [Direkte Stundenübernahme, WebKit](../../../../audit-20261026/v8-billing-inheritance-browser-final-source/webkit-time-time.png)
+- [Gemischtes Modell, 320 px, Dark](../../../../audit-20261026/v8-billing-surface-verified/webkit-de-320-dark-billing-mixed.png)
+- [Meilensteine, Türkisch, 320 px](../../../../audit-20261026/v8-billing-locales-verified/webkit-tr-320-dark-billing-milestone.png)
+
+Zwischenprüfungen fanden eine fehlende Übersetzung, einen veralteten Testadapter,
+fehlende Summen im neuen Auftragsentwurf, unvollständige Übernahmesperren und die
+Abschlussreihenfolge. Diese wurden korrigiert und die betroffenen Gegenfälle
+geprüft; keine Pflichtprüfung deaktiviert. Ein Zwischenlauf brach lokal mit
+Windows-Prozesscode 0xC0000005 ab. Der betroffene Block und anschliessend der
+vollständige Abschlusslauf waren erfolgreich; die genaue Prozessursache ist
+nicht abschliessend bestimmt. Gescheiterte Zwischenprotokolle bleiben erhalten.
+
+Offen bleiben insbesondere die in billing-integration.md genannten unabhängigen
+Vereinbarungen je Sammelrechnung, variable Akonto-Verrechnung ohne Fixanteil,
+automatische Rabatt-/Cent-Verteilung bei Teilmengen, vollständige neue externe
+Minutenvarianten, die Lösch-CLI sowie native Konkurrenz- und echte Geräteprüfungen.
+V8 ist daher weiterhin keine vollständig abgenommene Release-Fassung.
+
+---
+
+# Vorheriger Budget-/Foundation-Checkpoint (historischer Nachweis)
 
 Basis `72948d6d`, Branch `feat/v8-global-simple-workflow-20261027`.
 Noch kein neuer Release und keine V8-Gesamtabnahme.

@@ -15,7 +15,7 @@ await fs.mkdir(output,{recursive:true});
 // by company-setup-cases.mjs in the disposable migrated registration database.
 const env={...process.env,APP_URL:base,APP_MODE:'local',DATABASE_URL:'',SESSION_COOKIE_NAME:'binso_surface_fixture',PORT:String(port),HOSTNAME:'127.0.0.1'};
 for(const key of Object.keys(env))if(/^(STRIPE_|GRAPH_|AZURE_STORAGE_|IDENTITY_|ACTIONS_ID_TOKEN_)/.test(key))env[key]='';
-const server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',String(port)],{env,stdio:['ignore','pipe','pipe']});
+const server=spawn(process.execPath,['node_modules/next/dist/bin/next',...(process.env.BINSO_SURFACE_DEV==='1'?['dev','--webpack']:['start']),'--hostname','127.0.0.1','--port',String(port)],{env,stdio:['ignore','pipe','pipe']});
 let logs='';server.stdout.on('data',value=>logs+=value);server.stderr.on('data',value=>logs+=value);
 const results=[];
 try{
@@ -35,7 +35,7 @@ try{
     if(path==='/api/auth/session')return respond({authenticated:true,user:{id:'fixture'},security:{mfaEnabled:false,enrollmentRequired:false},tenant:{id:'fixture-company',role:'owner',plan:'pro'}});
     if(path==='/api/settings/profile')return respond({item:{id:'fixture',name:'Fixture',display_name:'Fixture',email:'fixture@example.invalid',language:locale,theme:colorScheme}});
     if(path==='/api/time-tracker')return respond({item:null});
-    if(path==='/api/projects'&&route.request().method()==='POST'){projectsCreated++;return respond({item:{id:createdProjectId}});}
+    if(path==='/api/projects'&&route.request().method()==='POST'){const body=route.request().postDataJSON();assert.equal(body.billingTerms.model,'time');assert.equal(body.billingTerms.hourlyRate,'120.00');projectsCreated++;return respond({item:{id:createdProjectId}});}
     if(path==='/api/projects/'+createdProjectId)return respond({item:{id:createdProjectId,name:'Fixture created project',status:'planned',hours_budget:null,cost_budget:null,budget_currency:null,version:1,customer_id:null,customer_name:null,notes:''},time:[],totals:{hours:0,invoiced_hours:0,entries:0},invoices:[]});
     if(path==='/api/settings/company'){
      if(route.request().method()==='PATCH'){const body=route.request().postDataJSON();assert.equal(body.completeCompanySetup,true);assert.equal(body.vatRate,undefined);assert.equal(body.paymentTermsDays,undefined);saved++;company={...company,name:body.name};}
@@ -129,8 +129,22 @@ try{
    assert.equal(await expense.getByLabel(t('Beschreibung'),{exact:true}).isVisible(),true);
    await page.screenshot({path:`${output}/${engine}-${locale}-${width}-${colorScheme}-expense.png`,fullPage:true});
    await resetScenario();await page.goto(base+'/projekte/neu?returnTo=%2Fprojekte%3Fstatus%3Dplanned');
-   const project=page.getByRole('dialog',{name:t('Auftrag starten'),exact:true});await project.waitFor();
+   const project=page.getByRole('region',{name:t('Auftrag starten'),exact:true});await project.waitFor();
    await project.getByLabel(t('Bezeichnung *'),{exact:true}).fill('Fixture created project');
+   const chooseBilling=async model=>{const labels={fixed:'Pauschal/Fixpreis',time:'Nach Aufwand',quantity:'Nach Menge',mixed:'Gemischt',recurring:'Wiederkehrend',milestone:'Nach Meilensteinen'};await project.getByLabel(t('Abrechnungsmodell'),{exact:true}).click();await page.getByRole('option').filter({hasText:t(labels[model])}).click();};
+   for(const model of ['fixed','time','quantity','mixed','recurring','milestone']){
+    await chooseBilling(model);
+    if(['fixed','mixed','recurring'].includes(model))await project.getByLabel(t('Vereinbarter Nettobetrag'),{exact:true}).fill('100');
+    if(['time','mixed'].includes(model))await project.getByLabel(t('Stundensatz'),{exact:true}).fill('120');
+    if(model==='recurring'){await project.getByLabel(t('Beginn'),{exact:true}).fill('2026-01-31');await project.getByLabel(t('Ende'),{exact:true}).fill('2026-12-31');await project.getByLabel(t('Abrechnungsintervall'),{exact:true}).click();await page.getByRole('option').filter({hasText:t('Quartalsweise')}).click();}
+    if(model==='milestone'){await project.getByRole('button',{name:t('Meilenstein hinzufügen'),exact:true}).click();await project.getByLabel(t('Meilenstein'),{exact:true}).fill('Delivered stage');await project.getByLabel(t('Vereinbarter Nettobetrag'),{exact:true}).fill('100');}
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth),'Billing model '+model+' must not overflow');
+    await page.screenshot({path:output+'/'+engine+'-'+locale+'-'+width+'-'+colorScheme+'-billing-'+model+'.png',fullPage:true});
+   }
+   await project.getByLabel(t('Währung'),{exact:true}).click();await page.getByRole('option').filter({hasText:'EUR'}).click();
+   await chooseBilling('time');assert.ok((await project.getByLabel(t('Währung'),{exact:true}).innerText()).includes('EUR'),'Changing the model preserves the explicitly selected currency');
+   await project.getByLabel(t('Währung'),{exact:true}).click();await page.getByRole('option').filter({hasText:'CHF'}).click();
+   await chooseBilling('time');await project.getByLabel(t('Stundensatz'),{exact:true}).fill('120');
    await project.getByRole('button',{name:t('Auftrag starten'),exact:true}).click();
    await page.waitForURL(url=>url.pathname==='/projekte/'+createdProjectId&&url.searchParams.get('returnTo')==='/projekte?status=planned');
    assert.equal(projectsCreated,1,'A confirmed create opens its detail with the actual caller preserved');

@@ -11,7 +11,7 @@ import {sealOfferVersion} from './offer-versions';
 import {businessDate} from '@/lib/financial-status';
 import {addDays,domainConfig} from '@/config/domain';
 export async function createOfferRevision(c:PoolClient,s:SessionUser,number:string,key:string){
- authorize(s,'sales:write');await requireModuleEntitlement(s.organizationId,'offerten');
+ authorize(s,'sales:write');await requireModuleEntitlement(s.organizationId,'offerten',c);
  return idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'offer.revision',key,body:{number}},async()=>{
   const source=(await c.query('select * from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update',[s.organizationId,number])).rows[0];
   if(!source)throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');

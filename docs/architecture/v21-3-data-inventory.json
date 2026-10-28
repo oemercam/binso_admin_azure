@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 158,
-    "consumers": 61,
-    "migrations": 110,
-    "tables": 126
+    "apis": 159,
+    "consumers": 62,
+    "migrations": 111,
+    "tables": 129
   },
   "apis": [
     {
@@ -1770,16 +1770,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/repositories/contacts.ts"
@@ -1824,16 +1826,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/repositories/contacts.ts"
@@ -1878,16 +1882,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -1925,10 +1931,12 @@
         "lib/server/repositories/customers.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/database.ts",
         "lib/business-list-query.ts",
         "lib/server/repositories/operator-customer-overview.ts",
@@ -2028,10 +2036,12 @@
         "lib/server/repositories/customers.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
-        "lib/money.ts"
+        "lib/financial-status.ts"
       ],
       "evidence": [
         {
@@ -2082,10 +2092,12 @@
         "lib/server/repositories/customers.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
-        "lib/money.ts"
+        "lib/financial-status.ts"
       ],
       "evidence": [
         {
@@ -2127,10 +2139,12 @@
         "lib/server/repositories/customers.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/repositories/contacts.ts"
       ],
       "evidence": [
@@ -2190,10 +2204,12 @@
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/customers.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/customer-merge.ts"
       ],
       "evidence": [
@@ -2233,10 +2249,12 @@
         "lib/server/repositories/customers.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/validation.ts"
       ],
       "evidence": [
@@ -2294,11 +2312,13 @@
         "lib/server/repositories/finance.ts",
         "lib/server/repositories/dashboard.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
-        "lib/money.ts"
+        "lib/financial-status.ts"
       ],
       "evidence": [
         {
@@ -2432,9 +2452,11 @@
         "lib/server/audit.ts",
         "lib/server/credit-notes.ts",
         "lib/server/document-process.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/qr-bill.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -2543,11 +2565,13 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/document-logo.ts",
         "lib/server/storage.ts",
         "lib/server/document-pdf.ts",
@@ -2623,9 +2647,11 @@
         "lib/server/audit.ts",
         "lib/server/credit-notes.ts",
         "lib/server/document-process.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/qr-bill.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -2680,10 +2706,12 @@
         "lib/server/plan-access.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/offer-versions.ts",
         "lib/server/document-pdf.ts",
         "lib/locales/index.ts",
@@ -2731,11 +2759,13 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/database.ts",
         "lib/business-list-query.ts",
         "lib/server/repositories/operator-customer-overview.ts",
@@ -2749,7 +2779,7 @@
       "evidence": [
         {
           "callee": "tenantList",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "\"documents\"",
             "\"id,kind,number,status,issue_date,due_date,valid_until,vat_rate,note,currency,subtotal,vat_amount,total,customer:customers(name,sector,street,postal_code,city),items:document_items(id,position,description,quantity,unit_price,line_total)\"",
@@ -2758,12 +2788,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 40,
+          "line": 41,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 40,
+          "line": 41,
           "arguments": [
             "session",
             "kind==='invoice'?'invoices:write':'sales:write'"
@@ -2771,7 +2801,7 @@
         },
         {
           "callee": "tenantList",
-          "line": 41,
+          "line": 42,
           "arguments": [
             "\"customers\"",
             "\"id\"",
@@ -2780,15 +2810,15 @@
         },
         {
           "callee": "tenantRpc",
-          "line": 61,
+          "line": 62,
           "arguments": [
             "\"update_document_atomic\"",
-            "{\n      p_expected_updated_at:body.expectedUpdatedAt,\n      p_current_number:currentNumber,\n      p_idempotency_key:request.headers.get(\"idempotency-key\")?.trim()??\"\",\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_number:number,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
+            "{\n      p_expected_updated_at:body.expectedUpdatedAt,\n      p_current_number:currentNumber,\n      p_idempotency_key:request.headers.get(\"idempotency-key\")?.trim()??\"\",\n      ...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_number:number,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
           ]
         },
         {
           "callee": "tenantRpc",
-          "line": 86,
+          "line": 88,
           "arguments": [
             "'discard_invoice_draft'",
             "{p_kind:'invoice',p_number:number,p_expected_updated_at:body?.expectedUpdatedAt,p_idempotency_key:request.headers.get('idempotency-key')??''}"
@@ -2818,6 +2848,8 @@
         "lib/server/fresh-authentication.ts",
         "lib/server/audit.ts",
         "lib/server/document-process.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/qr-bill.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
@@ -2978,9 +3010,11 @@
         "lib/server/fresh-authentication.ts",
         "lib/server/audit.ts",
         "lib/server/document-process.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/qr-bill.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts",
@@ -3187,21 +3221,23 @@
         "POST"
       ],
       "dependencies": [
-        "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/http.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
-        "lib/permissions.ts",
+        "lib/server/billing-agreements.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
         "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/server/repositories/business-api.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
+        "lib/permissions.ts",
         "lib/server/rbac.ts",
         "lib/server/plan-access.ts",
         "lib/server/document-logo.ts",
@@ -3216,12 +3252,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 14,
+          "line": 16,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "s",
             "invoice?'invoices:read':'sales:read'"
@@ -3229,16 +3265,16 @@
         },
         {
           "callee": "withTenant",
-          "line": 20,
+          "line": 22,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  for(const item of items)await prepareMinuteLine(c,s,item,body.customerId,body.currency||'CHF',invoice);\n let calculation:ReturnType<typeof calculateDocument>;\n try{calculation=calculateDocument(items,String(body.currency||'CHF'),body.discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}\n const subtotal=Number(calculation.subtotal),vat=Number(calculation.vat),total=Number(calculation.total);\n items.forEach((item,i)=>{item.line_total=Number(calculation.lines[i].net);});\n if(!Number.isFinite(total)||total>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const customer=body.customerId?(await c.query('select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null',[s.organizationId,cleanText(body.customerId,80)])).rows[0]:{};\n  if(body.customerId&&!customer)throw new ApiError(404,'customer_missing','Kunde wurde nicht gefunden.');\n  const saved=body.sourceNumber?(await c.query(`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`,[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;\n  if(body.sourceNumber&&!saved)throw new ApiError(404,'draft_missing','Entwurf wurde nicht gefunden.');\n  if(saved?.calculation&&((saved.calculation.discount.kind!=='none'&&body.discount===undefined)||(saved.calculation.lines.some((l:Record<string,unknown>)=>(l.discount as Record<string,unknown>).kind!=='none')&&body.positions!.some(l=>l.discount===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte die gespeicherten Rabatte ausdrücklich übernehmen.');\n  if(body.output==='calculation')return {calculation,customerDiscountProposal:customer?.discount===undefined?null:{kind:'percent',value:String(customer.discount),applied:false}};\n  const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;\n  const document={document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};\n  return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));\n }"
+            "async c=>{\n  for(const item of items)await prepareMinuteLine(c,s,item,body.customerId,body.currency||'CHF',invoice);\n let calculation:ReturnType<typeof calculateDocument>;\n try{calculation=calculateDocument(items,String(body.currency||'CHF'),body.discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}\n const subtotal=Number(calculation.subtotal),vat=Number(calculation.vat),total=Number(calculation.total);\n items.forEach((item,i)=>{item.line_total=Number(calculation.lines[i].net);});\n if(!Number.isFinite(total)||total>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const customer=body.customerId?(await c.query('select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null',[s.organizationId,cleanText(body.customerId,80)])).rows[0]:{};\n  if(body.customerId&&!customer)throw new ApiError(404,'customer_missing','Kunde wurde nicht gefunden.');\n  const saved=body.sourceNumber?(await c.query(`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`,[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;\n  if(body.sourceNumber&&!saved)throw new ApiError(404,'draft_missing','Entwurf wurde nicht gefunden.');\n  if(saved?.calculation&&((saved.calculation.discount.kind!=='none'&&body.discount===undefined)||(saved.calculation.lines.some((l:Record<string,unknown>)=>(l.discount as Record<string,unknown>).kind!=='none')&&body.positions!.some(l=>l.discount===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte die gespeicherten Rabatte ausdrücklich übernehmen.');\n  if(body.output==='calculation')return {calculation,customerDiscountProposal:customer?.discount===undefined?null:{kind:'percent',value:String(customer.discount),applied:false}};\n  const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;\n  const billing=body.billingTerms?normalizeBillingTerms(body.billingTerms):null;\n  const document={billing_context:invoice&&billing?invoiceBillingContext(billing,body.billingContext??{procedure:'standard'}):undefined,document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};\n  return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 27,
+          "line": 29,
           "arguments": [
             "'select * from organizations where id=$1'",
             "[s.organizationId]"
@@ -3246,7 +3282,7 @@
         },
         {
           "callee": "c.query",
-          "line": 28,
+          "line": 30,
           "arguments": [
             "'select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null'",
             "[s.organizationId,cleanText(body.customerId,80)]"
@@ -3254,7 +3290,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 32,
           "arguments": [
             "`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`",
             "[s.organizationId,cleanText(body.sourceNumber,80)]"
@@ -3281,11 +3317,13 @@
         "lib/server/rbac.ts",
         "lib/permissions.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/database.ts",
         "lib/business-list-query.ts",
         "lib/server/repositories/operator-customer-overview.ts",
@@ -3299,7 +3337,7 @@
       "evidence": [
         {
           "callee": "tenantListPage",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "\"documents\"",
             "request.nextUrl.searchParams",
@@ -3309,12 +3347,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 33,
+          "line": 34,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 33,
+          "line": 34,
           "arguments": [
             "session",
             "kind==='invoice'?'invoices:write':'sales:write'"
@@ -3322,7 +3360,7 @@
         },
         {
           "callee": "tenantList",
-          "line": 34,
+          "line": 35,
           "arguments": [
             "\"customers\"",
             "\"id\"",
@@ -3331,10 +3369,10 @@
         },
         {
           "callee": "tenantRpc",
-          "line": 54,
+          "line": 55,
           "arguments": [
             "\"create_document_atomic\"",
-            "{\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_idempotency_key:requestKey,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
+            "{\n      ...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_idempotency_key:requestKey,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
           ]
         }
       ]
@@ -3665,16 +3703,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3809,16 +3849,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -3916,16 +3958,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4065,16 +4109,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -4573,6 +4619,8 @@
         "lib/money.ts",
         "lib/server/repositories/dashboard.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
@@ -5027,16 +5075,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -5194,16 +5244,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -5244,16 +5296,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -5676,16 +5730,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -5980,16 +6036,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6033,16 +6091,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6103,16 +6163,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6192,16 +6254,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6238,16 +6302,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6310,16 +6376,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6356,16 +6424,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts"
       ],
@@ -6376,6 +6446,68 @@
           "arguments": [
             "\"products\"",
             "request.nextUrl.searchParams"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/projects/[id]/milestones/[milestoneId]/route.ts",
+      "path": "/api/projects/[id]/milestones/[milestoneId]",
+      "methods": [
+        "POST"
+      ],
+      "dependencies": [
+        "lib/server/http.ts",
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 9,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 9,
+          "arguments": [
+            "s",
+            "'projects:write'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 10,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{\n   const p=(await c.query('select id,version,billing_agreement_id from projects where organization_id=$1 and id::text=$2 and archived_at is null for update',[s.organizationId,id])).rows[0];if(!p||body.version!==p.version||!p.billing_agreement_id)throw billingIssue();\n   const a=await readBillingAgreement(c,s,p.billing_agreement_id);if(a.terms.model!=='milestone'||!a.terms.milestones.some(m=>m.id===milestoneId))throw billingIssue();\n   const inserted=await c.query('insert into billing_milestone_completions(organization_id,agreement_id,milestone_id,completed_by_user_id) values($1,$2,$3,$4) on conflict do nothing returning milestone_id',[s.organizationId,a.id,milestoneId,s.userId]);\n   if(inserted.rowCount)await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.milestone.completed',entityType:'project',entityId:id,metadata:{agreementId:a.id,milestoneId}});\n   return {milestoneId,completed:true};\n  }"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 11,
+          "arguments": [
+            "'select id,version,billing_agreement_id from projects where organization_id=$1 and id::text=$2 and archived_at is null for update'",
+            "[s.organizationId,id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 13,
+          "arguments": [
+            "'insert into billing_milestone_completions(organization_id,agreement_id,milestone_id,completed_by_user_id) values($1,$2,$3,$4) on conflict do nothing returning milestone_id'",
+            "[s.organizationId,a.id,milestoneId,s.userId]"
           ]
         }
       ]
@@ -6400,9 +6532,11 @@
         "lib/permissions.ts",
         "lib/server/validation.ts",
         "lib/server/repositories/project-workspace.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/projects.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/document-amount-sql.ts"
       ],
       "evidence": [
@@ -6461,8 +6595,9 @@
         "POST"
       ],
       "dependencies": [
-        "lib/permissions.ts",
-        "lib/server/repositories/project-workspace.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/env.ts",
@@ -6471,10 +6606,11 @@
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
         "lib/server/audit.ts",
+        "lib/permissions.ts",
+        "lib/server/repositories/project-workspace.ts",
         "lib/server/rbac.ts",
         "lib/projects.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/document-amount-sql.ts",
         "lib/server/plan-access.ts",
         "lib/server/business-idempotency.ts"
@@ -6482,12 +6618,12 @@
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 12,
+          "line": 13,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s",
             "'projects:read'"
@@ -6495,7 +6631,7 @@
         },
         {
           "callee": "withTenant",
-          "line": 12,
+          "line": 13,
           "arguments": [
             "s.organizationId",
             "s.userId",
@@ -6505,12 +6641,12 @@
         },
         {
           "callee": "requireSession",
-          "line": 13,
+          "line": 14,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 13,
+          "line": 14,
           "arguments": [
             "s",
             "'projects:write'"
@@ -6518,24 +6654,24 @@
         },
         {
           "callee": "withTenant",
-          "line": 15,
+          "line": 16,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{const write=async()=>{let quoteId=null;\n if(sourceOffer){const q=(await c.query(\"select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}\n if(customerId&&!(await c.query('select id from customers where organization_id=$1 and id=$2 and archived_at is null',[s.organizationId,customerId])).rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');\n await requireProjectCapacity(s.organizationId,s.userId,c);\n const result=(await c.query(\"insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status\",[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.created',entityType:'project',entityId:result.id});return result;};return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'project.create',key:requestKey,body:{name,customerId,sourceOffer}},write):write();}"
+            "async c=>{const write=async()=>{let quoteId=null;let agreementId:string|null=null;const projectId=randomUUID();\n if(sourceOffer){const q=(await c.query(\"select id,customer_id,billing_agreement_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\",[s.organizationId,sourceOffer])).rows[0];if(!q||q.customer_id!==customerId)throw new ApiError(409,'offer_invalid','Bitte ein angenommenes Angebot dieses Kunden auswählen.');quoteId=q.id;agreementId=q.billing_agreement_id;const previous=(await c.query('select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null',[s.organizationId,quoteId])).rows[0];if(previous)return previous;}\n if(customerId&&!(await c.query('select id from customers where organization_id=$1 and id=$2 and archived_at is null',[s.organizationId,customerId])).rowCount)throw new ApiError(400,'customer_invalid','Kunde wurde nicht gefunden.');\n await requireProjectCapacity(s.organizationId,s.userId,c);\n if(body.billingTerms!==undefined&&!sourceOffer)agreementId=await createBillingAgreement(c,s,customerId||null,billingTerms(body.billingTerms),null,'project',projectId);\n const result=(await c.query(\"insert into projects(id,organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id,billing_agreement_id) values($8,$1,$2,$3,$4,case when $7::uuid is null then 'active' else 'planned' end,$5,$6,$7) returning id,name,customer_id,status\",[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId,agreementId,projectId])).rows[0];await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'project.created',entityType:'project',entityId:result.id});return result;};return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:'project.create',key:requestKey,body:{name,customerId,sourceOffer,billingTerms:body.billingTerms}},write):write();}"
           ]
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 17,
           "arguments": [
-            "\"select id,customer_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\"",
+            "\"select id,customer_id,billing_agreement_id from quotes where organization_id=$1 and quote_no=$2 and status='accepted' and archived_at is null for update\"",
             "[s.organizationId,sourceOffer]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 17,
           "arguments": [
             "'select id,name,customer_id,status from projects where organization_id=$1 and source_quote_id=$2 and archived_at is null'",
             "[s.organizationId,quoteId]"
@@ -6543,7 +6679,7 @@
         },
         {
           "callee": "c.query",
-          "line": 17,
+          "line": 18,
           "arguments": [
             "'select id from customers where organization_id=$1 and id=$2 and archived_at is null'",
             "[s.organizationId,customerId]"
@@ -6551,10 +6687,10 @@
         },
         {
           "callee": "c.query",
-          "line": 19,
+          "line": 21,
           "arguments": [
-            "\"insert into projects(organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id) values($1,$2,$3,$4,'active',$5,$6) returning id,name,customer_id,status\"",
-            "[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId]"
+            "\"insert into projects(id,organization_id,external_id,name,customer_id,status,source_quote_id,created_by_user_id,billing_agreement_id) values($8,$1,$2,$3,$4,case when $7::uuid is null then 'active' else 'planned' end,$5,$6,$7) returning id,name,customer_id,status\"",
+            "[s.organizationId,randomUUID(),name,customerId||null,quoteId,s.userId,agreementId,projectId]"
           ]
         }
       ]
@@ -7032,11 +7168,13 @@
         "lib/permissions.ts",
         "lib/server/plan-access.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/search.ts"
       ],
       "evidence": [
@@ -7341,16 +7479,18 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
-        "lib/expense-payment.ts",
-        "lib/server/business-idempotency.ts",
-        "lib/server/document-amount-sql.ts",
-        "lib/financial-status.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/money.ts",
-        "lib/server/audit.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/expense-payment.ts",
+        "lib/server/business-idempotency.ts",
+        "lib/server/document-amount-sql.ts",
+        "lib/financial-status.ts",
         "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/server/auth.ts"
@@ -8741,11 +8881,13 @@
         "lib/server/repositories/operator-api.ts",
         "lib/server/operator/audit.ts",
         "lib/server/repositories/business-api.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
         "lib/financial-status.ts",
-        "lib/money.ts",
         "lib/server/plan-access.ts"
       ],
       "evidence": [
@@ -8933,27 +9075,30 @@
         "GET"
       ],
       "dependencies": [
-        "lib/server/plan-access.ts",
-        "lib/server/http.ts",
-        "lib/server/db.ts",
-        "lib/server/env.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts",
         "lib/server/session.ts",
         "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
         "lib/server/subscription-lifecycle.ts",
         "lib/server/fresh-authentication.ts",
         "lib/server/audit.ts",
+        "lib/server/plan-access.ts",
         "lib/server/rbac.ts",
         "lib/permissions.ts"
       ],
       "evidence": [
         {
           "callee": "requireSession",
-          "line": 10,
+          "line": 12,
           "arguments": []
         },
         {
           "callee": "authorize",
-          "line": 10,
+          "line": 12,
           "arguments": [
             "s",
             "\"invoices:write\""
@@ -8961,19 +9106,27 @@
         },
         {
           "callee": "withTenant",
-          "line": 15,
+          "line": 17,
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>(await c.query(`\n      select t.id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`,[s.organizationId,ids,minutes,draft])).rows"
+            "async c=>{const items=(await c.query(`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`,[s.organizationId,ids,minutes,draft])).rows;\n      const agreementIds=[...new Set(items.map(row=>row.billing_agreement_id).filter(Boolean))];\n      const agreements=agreementIds.length?(await c.query('select id,terms,commercial_snapshot,currency from billing_agreements where organization_id=$1 and id=any($2::uuid[])',[s.organizationId,agreementIds])).rows:[];\n      const plans=new Map<string,{terms:BillingTerms;currency:string;options:BillingRateOption[];documentDiscount?:unknown}>(agreements.map(a=>[String(a.id),{documentDiscount:a.commercial_snapshot?.calculation?.discount,currency:String(a.currency),terms:billingTerms(a.terms),options:billingRateOptions(billingTerms(a.terms),a.commercial_snapshot)}]));\n      return items.flatMap(item=>{const plan=plans.get(item.billing_agreement_id);if(!plan)return [item];if(!billingTermsReady(plan.terms))return [];const options=plan.options;const first=options[0],uniform=first&&options.every(o=>o.unitPrice===first.unitPrice&&o.vatRate===first.vatRate&&o.taxExempt===first.taxExempt);return [{...item,price_currency:plan.currency,...(!item.external_resource_id&&uniform?{sales_rate:first.unitPrice,vat_rate:first.vatRate,tax_treatment:first.taxExempt?'exempt':'taxable',billing_discount:first.discount,billing_source_position:first.position}:{}),...(ids.length?{billing_terms:plan.terms,billing_rate_options:options,billing_document_discount:(plan as {documentDiscount?:unknown}).documentDiscount}:{})}];});\n    }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 15,
+          "line": 17,
           "arguments": [
-            "`\n      select t.id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`",
+            "`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`",
             "[s.organizationId,ids,minutes,draft]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 30,
+          "arguments": [
+            "'select id,terms,commercial_snapshot,currency from billing_agreements where organization_id=$1 and id=any($2::uuid[])'",
+            "[s.organizationId,agreementIds]"
           ]
         }
       ]
@@ -9263,14 +9416,14 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{const write=async()=>{\n      const project=cleanText(body.projectName,200),projectId=cleanText(body.projectId,80),customerId=cleanText(body.customerId,80);\n      const found=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query(\"select id,name,customer_id,status from projects where organization_id=$1 and id=$2 and archived_at is null for share\",[s.organizationId,projectId]):await c.query(\"select id,name,customer_id,status from projects where organization_id=$1 and name=$2 and archived_at is null for share\",[s.organizationId,project]);\n      if(found.rowCount&&found.rowCount>1)throw new ApiError(409,\"ambiguous_project\",\"Bitte einen eindeutigen Auftrag auswählen.\");\n      if(projectId&&found.rowCount!==1)throw new ApiError(400,\"project_invalid\",\"Bitte einen gültigen Auftrag auswählen.\");\n      if(found.rows[0]&&!projectAllowsTime(found.rows[0].status))throw new ApiError(409,\"project_not_active\",\"Für diesen Auftrag können momentan keine Zeiten erfasst werden.\");\n      const customers=customerId?await c.query(\"select id from customers where organization_id=$1 and id=$2 and archived_at is null\",[s.organizationId,customerId]):null;\n      if(customerId&&customers?.rowCount!==1)throw new ApiError(400,\"customer_invalid\",\"Bitte einen gültigen Kunden auswählen.\");\n      if(customerId&&found.rows[0]?.customer_id&&String(found.rows[0].customer_id)!==customerId)throw new ApiError(400,\"project_customer_mismatch\",\"Der Auftrag gehört nicht zum gewählten Kunden.\");\n      const resolvedCustomer=customers?.rows[0]?.id??found.rows[0]?.customer_id??null;\n      if(body.billable===true&&!resolvedCustomer)throw new ApiError(400,\"billable_customer_required\",\"Verrechenbare Zeiten benötigen einen Kunden.\");\n      await assertTimeAssignment(c,s,resolvedCustomer,found.rows[0]?.id??null,workDate.toISOString().slice(0,10));\n      if(reportMonth&&(!resolvedCustomer||body.billable===false))throw new ApiError(400,\"report_customer_required\",\"Ein Monatsrapport benötigt einen Kunden und verrechenbare Stunden.\");\n      const billable=Boolean(resolvedCustomer)&&body.billable!==false;\n      const employee=await c.query(\"select id from employees where organization_id=$1 and archived_at is null and active and user_id=$2\",[s.organizationId,s.userId]);\n      if([\"member\",\"project_manager\",\"manager\"].includes(s.role)&&!employee.rowCount)throw new ApiError(403,\"employee_unlinked\",\"Der Benutzerzugang ist keinem aktiven Mitarbeiter zugeordnet.\");\n      if(classification?.payrollRelevant&&!employee.rowCount)throw new ApiError(400,'employee_required','Lohnrelevante Zeit benötigt ein Mitarbeiterdossier.');\n      const approvalRequired=(await c.query(\"select not app_is_solo_owner() as time_approval_required from organizations where id=$1\",[s.organizationId])).rows[0]?.time_approval_required!==false;\n      const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate,report_month,time_category,is_work_time,payroll_relevant)\n        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,$14,$8,$13,$15,$16,$17,$18)\n        returning id,time_category,is_work_time,payroll_relevant,created_by_user_id,report_month,project_id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,\n        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,billable,[\"member\"].includes(s.role)?0:salesRate,reportMonth?false:billable&&!approvalRequired,reportMonth?reportMonth+\"-01\":null,classification?.category??null,classification?.isWorkTime??null,classification?.payrollRelevant??null]);\n      const context=(await c.query(\"select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2\",[result.rows[0].id,s.organizationId])).rows[0];\n      return {...result.rows[0],...context};\n    };return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:\"time.manual.create\",key:requestKey,body},write):write();}"
+            "async c=>{const write=async()=>{\n      const project=cleanText(body.projectName,200),projectId=cleanText(body.projectId,80),customerId=cleanText(body.customerId,80);\n      const found=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query(\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and id=$2 and archived_at is null for share\",[s.organizationId,projectId]):await c.query(\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and name=$2 and archived_at is null for share\",[s.organizationId,project]);\n      if(found.rowCount&&found.rowCount>1)throw new ApiError(409,\"ambiguous_project\",\"Bitte einen eindeutigen Auftrag auswählen.\");\n      if(projectId&&found.rowCount!==1)throw new ApiError(400,\"project_invalid\",\"Bitte einen gültigen Auftrag auswählen.\");\n      if(found.rows[0]&&!projectAllowsTime(found.rows[0].status))throw new ApiError(409,\"project_not_active\",\"Für diesen Auftrag können momentan keine Zeiten erfasst werden.\");\n      const customers=customerId?await c.query(\"select id from customers where organization_id=$1 and id=$2 and archived_at is null\",[s.organizationId,customerId]):null;\n      if(customerId&&customers?.rowCount!==1)throw new ApiError(400,\"customer_invalid\",\"Bitte einen gültigen Kunden auswählen.\");\n      if(customerId&&found.rows[0]?.customer_id&&String(found.rows[0].customer_id)!==customerId)throw new ApiError(400,\"project_customer_mismatch\",\"Der Auftrag gehört nicht zum gewählten Kunden.\");\n      if(body.billable!==false&&found.rows[0]?.billing_agreement_id&&(await c.query('select 1 from billing_closures where organization_id=$1 and agreement_id=$2',[s.organizationId,found.rows[0].billing_agreement_id])).rowCount)throw new ApiError(409,'project_not_active','Für diesen Auftrag können momentan keine Zeiten erfasst werden.');\n      const resolvedCustomer=customers?.rows[0]?.id??found.rows[0]?.customer_id??null;\n      if(body.billable===true&&!resolvedCustomer)throw new ApiError(400,\"billable_customer_required\",\"Verrechenbare Zeiten benötigen einen Kunden.\");\n      await assertTimeAssignment(c,s,resolvedCustomer,found.rows[0]?.id??null,workDate.toISOString().slice(0,10));\n      if(reportMonth&&(!resolvedCustomer||body.billable===false))throw new ApiError(400,\"report_customer_required\",\"Ein Monatsrapport benötigt einen Kunden und verrechenbare Stunden.\");\n      const billable=Boolean(resolvedCustomer)&&body.billable!==false;\n      const employee=await c.query(\"select id from employees where organization_id=$1 and archived_at is null and active and user_id=$2\",[s.organizationId,s.userId]);\n      if([\"member\",\"project_manager\",\"manager\"].includes(s.role)&&!employee.rowCount)throw new ApiError(403,\"employee_unlinked\",\"Der Benutzerzugang ist keinem aktiven Mitarbeiter zugeordnet.\");\n      if(classification?.payrollRelevant&&!employee.rowCount)throw new ApiError(400,'employee_required','Lohnrelevante Zeit benötigt ein Mitarbeiterdossier.');\n      const approvalRequired=(await c.query(\"select not app_is_solo_owner() as time_approval_required from organizations where id=$1\",[s.organizationId])).rows[0]?.time_approval_required!==false;\n      const result=await c.query(`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate,report_month,time_category,is_work_time,payroll_relevant)\n        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,$14,$8,$13,$15,$16,$17,$18)\n        returning id,time_category,is_work_time,payroll_relevant,created_by_user_id,report_month,project_id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`,\n        [s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,billable,[\"member\"].includes(s.role)?0:salesRate,reportMonth?false:billable&&!approvalRequired,reportMonth?reportMonth+\"-01\":null,classification?.category??null,classification?.isWorkTime??null,classification?.payrollRelevant??null]);\n      const context=(await c.query(\"select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2\",[result.rows[0].id,s.organizationId])).rows[0];\n      return {...result.rows[0],...context};\n    };return requestKey?idempotentBusiness(c,{organizationId:s.organizationId,userId:s.userId,operation:\"time.manual.create\",key:requestKey,body},write):write();}"
           ]
         },
         {
           "callee": "c.query",
           "line": 38,
           "arguments": [
-            "\"select id,name,customer_id,status from projects where organization_id=$1 and id=$2 and archived_at is null for share\"",
+            "\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and id=$2 and archived_at is null for share\"",
             "[s.organizationId,projectId]"
           ]
         },
@@ -9278,7 +9431,7 @@
           "callee": "c.query",
           "line": 38,
           "arguments": [
-            "\"select id,name,customer_id,status from projects where organization_id=$1 and name=$2 and archived_at is null for share\"",
+            "\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and name=$2 and archived_at is null for share\"",
             "[s.organizationId,project]"
           ]
         },
@@ -9292,7 +9445,15 @@
         },
         {
           "callee": "c.query",
-          "line": 50,
+          "line": 45,
+          "arguments": [
+            "'select 1 from billing_closures where organization_id=$1 and agreement_id=$2'",
+            "[s.organizationId,found.rows[0].billing_agreement_id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 51,
           "arguments": [
             "\"select id from employees where organization_id=$1 and archived_at is null and active and user_id=$2\"",
             "[s.organizationId,s.userId]"
@@ -9300,7 +9461,7 @@
         },
         {
           "callee": "c.query",
-          "line": 53,
+          "line": 54,
           "arguments": [
             "\"select not app_is_solo_owner() as time_approval_required from organizations where id=$1\"",
             "[s.organizationId]"
@@ -9308,7 +9469,7 @@
         },
         {
           "callee": "c.query",
-          "line": 54,
+          "line": 55,
           "arguments": [
             "`insert into time_entries(organization_id,external_id,project_id,customer_id,employee_id,project_label,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,sales_rate,report_month,time_category,is_work_time,payroll_relevant)\n        values($1,$2,$3,$9,$10,$11,$4,'employee',$5,$6,$7,$12,$14,$8,$13,$15,$16,$17,$18)\n        returning id,time_category,is_work_time,payroll_relevant,created_by_user_id,report_month,project_id,project_label as project_name,description,work_date as started_at,round(hours*60) as duration_minutes,customer_id,employee_id,billable,approved,invoiced_invoice_id,sales_rate,created_at`",
             "[s.organizationId,randomUUID(),found.rows[0]?.id??null,s.name,workDate.toISOString().slice(0,10),duration/60,cleanText(body.description,2000)||project,s.userId,customers?.rows[0]?.id??found.rows[0]?.customer_id??null,employee.rows[0]?.id??null,found.rows[0]?.name??project,billable,[\"member\"].includes(s.role)?0:salesRate,reportMonth?false:billable&&!approvalRequired,reportMonth?reportMonth+\"-01\":null,classification?.category??null,classification?.isWorkTime??null,classification?.payrollRelevant??null]"
@@ -9316,7 +9477,7 @@
         },
         {
           "callee": "c.query",
-          "line": 58,
+          "line": 59,
           "arguments": [
             "\"select c.name customer_name,coalesce(nullif(concat_ws(' ',e.first_name,e.last_name),''),t.person_name) employee_name from time_entries t left join customers c on c.id=t.customer_id and c.organization_id=t.organization_id left join employees e on e.id=t.employee_id and e.organization_id=t.organization_id where t.id=$1 and t.organization_id=$2\"",
             "[result.rows[0].id,s.organizationId]"
@@ -9397,7 +9558,7 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n      await c.query(\"select pg_advisory_xact_lock(hashtextextended($1,0))\",[s.organizationId+\":\"+s.userId]);\n      const result=await c.query(\"select *, accumulated_seconds + case when state='running' and active_since is not null then greatest(0,extract(epoch from now()-active_since)::integer) else 0 end as seconds from active_time_trackers where organization_id=$1 and user_id=$2 for update\",[s.organizationId,s.userId]);\n      const current=result.rows[0];const seconds=Number(current?.seconds??0);\n      const label=cleanText(body.project,200)||current?.project_label||\"Arbeitszeit\";\n      if(body.action===\"finish\"){\n        if(!current)return {tracker:null};\n        if(seconds<=0)throw new ApiError(400,\"empty_tracker\",\"Es läuft noch keine Zeitmessung.\");\n        await assertTimeAssignment(c,s,current.customer_id,current.project_id,businessDate());\n        const entry=await c.query(`insert into time_entries(organization_id,external_id,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,project_id,project_label,employee_id,customer_id)\n          values($1,$2,$3,'employee',(now() at time zone 'Europe/Zurich')::date,$4,$5,$6,$6 and app_is_solo_owner(),$7,$8,$9,(select id from employees where organization_id=$1 and user_id=$7 and archived_at is null limit 1),coalesce($10::uuid,(select customer_id from projects where id=$8 and organization_id=$1))) returning id,description,work_date,hours,created_at`,\n          [s.organizationId,randomUUID(),s.name,seconds/3600,current.project_label+\" · \"+current.activity_label,current.billable,s.userId,current.project_id,current.project_label,current.customer_id]);\n        await c.query(\"delete from active_time_trackers where organization_id=$1 and user_id=$2\",[s.organizationId,s.userId]);\n        return {tracker:null,item:entry.rows[0]};\n      }\n      if(body.action===\"pause\"){\n        if(!current)return {tracker:null};\n        const paused=await c.query(\"update active_time_trackers set state='paused',active_since=null,accumulated_seconds=$3,updated_at=now() where organization_id=$1 and user_id=$2 returning *,accumulated_seconds as seconds\",[s.organizationId,s.userId,seconds]);\n        return {tracker:paused.rows[0]};\n      }\n      const projectId=body.projectId===undefined?current?.project_id:cleanText(body.projectId,80);\n      const customerId=body.customerId===undefined?current?.customer_id:cleanText(body.customerId,80);\n      if(customerId){const customer=await c.query(\"select id from customers where organization_id=$1 and id=$2 and archived_at is null\",[s.organizationId,customerId]);if(customer.rowCount!==1)throw new ApiError(400,\"customer_invalid\",\"Bitte einen gültigen Kunden auswählen.\");}\n      const projects=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query(\"select id,name,customer_id,status from projects where organization_id=$1 and id=$2 and archived_at is null for share\",[s.organizationId,projectId]):await c.query(\"select id,name,customer_id,status from projects where organization_id=$1 and name=$2 and archived_at is null for share\",[s.organizationId,label]);\n      if(projects.rowCount&&projects.rowCount>1)throw new ApiError(409,\"ambiguous_project\",\"Bitte einen eindeutigen Auftrag auswählen.\");\n      if(projectId&&projects.rowCount!==1)throw new ApiError(400,\"project_invalid\",\"Bitte einen gültigen Auftrag auswählen.\");\n      if(body.action!==\"pause\"&&projects.rows[0]&&!projectAllowsTime(projects.rows[0].status))throw new ApiError(409,\"project_not_active\",\"Für diesen Auftrag können momentan keine Zeiten erfasst werden.\");\n      if(customerId&&projects.rows[0]?.customer_id&&String(projects.rows[0].customer_id)!==customerId)throw new ApiError(400,\"project_customer_mismatch\",\"Der Auftrag gehört nicht zum gewählten Kunden.\");\n      const resolvedCustomer=customerId||projects.rows[0]?.customer_id||null;\n      if(body.action!==\"pause\")await assertTimeAssignment(c,s,resolvedCustomer,projects.rows[0]?.id??null,businessDate());\n      if(current&&seconds>0&&(String(current.customer_id??\"\")!==String(resolvedCustomer??\"\")||String(current.project_id??\"\")!==String(projects.rows[0]?.id??\"\")||current.project_label!==label))throw new ApiError(409,\"tracker_context_locked\",\"Bitte die erfasste Zeit zuerst stoppen, bevor du den Kunden oder Auftrag wechselst.\");\n      const running=body.action===\"start\"||(body.action===\"project\"&&current?.state===\"running\");\n      const saved=await c.query(`insert into active_time_trackers(organization_id,user_id,state,active_since,accumulated_seconds,project_label,project_id,customer_id,billable)\n        values($1,$2,$3,case when $3='running' then now() else null end,$4,$5,$6,$7,$8)\n        on conflict(organization_id,user_id) do update set state=excluded.state,active_since=excluded.active_since,\n        accumulated_seconds=excluded.accumulated_seconds,project_label=excluded.project_label,project_id=excluded.project_id,customer_id=excluded.customer_id,billable=excluded.billable,updated_at=now() returning *,accumulated_seconds as seconds`,\n        [s.organizationId,s.userId,running?\"running\":\"paused\",seconds,label,projects.rows[0]?.id??null,resolvedCustomer,Boolean(resolvedCustomer)]);\n      return {tracker:{...saved.rows[0],customer_id:resolvedCustomer}};\n    }"
+            "async c=>{\n      await c.query(\"select pg_advisory_xact_lock(hashtextextended($1,0))\",[s.organizationId+\":\"+s.userId]);\n      const result=await c.query(\"select *, accumulated_seconds + case when state='running' and active_since is not null then greatest(0,extract(epoch from now()-active_since)::integer) else 0 end as seconds from active_time_trackers where organization_id=$1 and user_id=$2 for update\",[s.organizationId,s.userId]);\n      const current=result.rows[0];const seconds=Number(current?.seconds??0);\n      const label=cleanText(body.project,200)||current?.project_label||\"Arbeitszeit\";\n      if(body.action===\"finish\"){\n        if(!current)return {tracker:null};\n        if(seconds<=0)throw new ApiError(400,\"empty_tracker\",\"Es läuft noch keine Zeitmessung.\");\n        await assertTimeAssignment(c,s,current.customer_id,current.project_id,businessDate());\n        const entry=await c.query(`insert into time_entries(organization_id,external_id,person_name,worker_type,work_date,hours,description,billable,approved,created_by_user_id,project_id,project_label,employee_id,customer_id)\n          values($1,$2,$3,'employee',(now() at time zone 'Europe/Zurich')::date,$4,$5,$6,$6 and app_is_solo_owner(),$7,$8,$9,(select id from employees where organization_id=$1 and user_id=$7 and archived_at is null limit 1),coalesce($10::uuid,(select customer_id from projects where id=$8 and organization_id=$1))) returning id,description,work_date,hours,created_at`,\n          [s.organizationId,randomUUID(),s.name,seconds/3600,current.project_label+\" · \"+current.activity_label,current.billable,s.userId,current.project_id,current.project_label,current.customer_id]);\n        await c.query(\"delete from active_time_trackers where organization_id=$1 and user_id=$2\",[s.organizationId,s.userId]);\n        return {tracker:null,item:entry.rows[0]};\n      }\n      if(body.action===\"pause\"){\n        if(!current)return {tracker:null};\n        const paused=await c.query(\"update active_time_trackers set state='paused',active_since=null,accumulated_seconds=$3,updated_at=now() where organization_id=$1 and user_id=$2 returning *,accumulated_seconds as seconds\",[s.organizationId,s.userId,seconds]);\n        return {tracker:paused.rows[0]};\n      }\n      const projectId=body.projectId===undefined?current?.project_id:cleanText(body.projectId,80);\n      const customerId=body.customerId===undefined?current?.customer_id:cleanText(body.customerId,80);\n      if(customerId){const customer=await c.query(\"select id from customers where organization_id=$1 and id=$2 and archived_at is null\",[s.organizationId,customerId]);if(customer.rowCount!==1)throw new ApiError(400,\"customer_invalid\",\"Bitte einen gültigen Kunden auswählen.\");}\n      const projects=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query(\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and id=$2 and archived_at is null for share\",[s.organizationId,projectId]):await c.query(\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and name=$2 and archived_at is null for share\",[s.organizationId,label]);\n      if(projects.rowCount&&projects.rowCount>1)throw new ApiError(409,\"ambiguous_project\",\"Bitte einen eindeutigen Auftrag auswählen.\");\n      if(projectId&&projects.rowCount!==1)throw new ApiError(400,\"project_invalid\",\"Bitte einen gültigen Auftrag auswählen.\");\n      if(body.action!==\"pause\"&&projects.rows[0]&&!projectAllowsTime(projects.rows[0].status))throw new ApiError(409,\"project_not_active\",\"Für diesen Auftrag können momentan keine Zeiten erfasst werden.\");\n      if(customerId&&projects.rows[0]?.customer_id&&String(projects.rows[0].customer_id)!==customerId)throw new ApiError(400,\"project_customer_mismatch\",\"Der Auftrag gehört nicht zum gewählten Kunden.\");\n      if(projects.rows[0]?.billing_agreement_id&&(await c.query('select 1 from billing_closures closed join projects p on p.organization_id=closed.organization_id and p.billing_agreement_id=closed.agreement_id where p.organization_id=$1 and p.id=$2 limit 1',[s.organizationId,projects.rows[0].id])).rowCount)throw new ApiError(409,'project_not_active','Für diesen Auftrag können momentan keine Zeiten erfasst werden.');\n      const resolvedCustomer=customerId||projects.rows[0]?.customer_id||null;\n      if(body.action!==\"pause\")await assertTimeAssignment(c,s,resolvedCustomer,projects.rows[0]?.id??null,businessDate());\n      if(current&&seconds>0&&(String(current.customer_id??\"\")!==String(resolvedCustomer??\"\")||String(current.project_id??\"\")!==String(projects.rows[0]?.id??\"\")||current.project_label!==label))throw new ApiError(409,\"tracker_context_locked\",\"Bitte die erfasste Zeit zuerst stoppen, bevor du den Kunden oder Auftrag wechselst.\");\n      const running=body.action===\"start\"||(body.action===\"project\"&&current?.state===\"running\");\n      const saved=await c.query(`insert into active_time_trackers(organization_id,user_id,state,active_since,accumulated_seconds,project_label,project_id,customer_id,billable)\n        values($1,$2,$3,case when $3='running' then now() else null end,$4,$5,$6,$7,$8)\n        on conflict(organization_id,user_id) do update set state=excluded.state,active_since=excluded.active_since,\n        accumulated_seconds=excluded.accumulated_seconds,project_label=excluded.project_label,project_id=excluded.project_id,customer_id=excluded.customer_id,billable=excluded.billable,updated_at=now() returning *,accumulated_seconds as seconds`,\n        [s.organizationId,s.userId,running?\"running\":\"paused\",seconds,label,projects.rows[0]?.id??null,resolvedCustomer,Boolean(resolvedCustomer)]);\n      return {tracker:{...saved.rows[0],customer_id:resolvedCustomer}};\n    }"
           ]
         },
         {
@@ -9452,7 +9613,7 @@
           "callee": "c.query",
           "line": 48,
           "arguments": [
-            "\"select id,name,customer_id,status from projects where organization_id=$1 and id=$2 and archived_at is null for share\"",
+            "\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and id=$2 and archived_at is null for share\"",
             "[s.organizationId,projectId]"
           ]
         },
@@ -9460,13 +9621,21 @@
           "callee": "c.query",
           "line": 48,
           "arguments": [
-            "\"select id,name,customer_id,status from projects where organization_id=$1 and name=$2 and archived_at is null for share\"",
+            "\"select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and name=$2 and archived_at is null for share\"",
             "[s.organizationId,label]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 57,
+          "line": 53,
+          "arguments": [
+            "'select 1 from billing_closures closed join projects p on p.organization_id=closed.organization_id and p.billing_agreement_id=closed.agreement_id where p.organization_id=$1 and p.id=$2 limit 1'",
+            "[s.organizationId,projects.rows[0].id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 58,
           "arguments": [
             "`insert into active_time_trackers(organization_id,user_id,state,active_since,accumulated_seconds,project_label,project_id,customer_id,billable)\n        values($1,$2,$3,case when $3='running' then now() else null end,$4,$5,$6,$7,$8)\n        on conflict(organization_id,user_id) do update set state=excluded.state,active_since=excluded.active_since,\n        accumulated_seconds=excluded.accumulated_seconds,project_label=excluded.project_label,project_id=excluded.project_id,customer_id=excluded.customer_id,billable=excluded.billable,updated_at=now() returning *,accumulated_seconds as seconds`",
             "[s.organizationId,s.userId,running?\"running\":\"paused\",seconds,label,projects.rows[0]?.id??null,resolvedCustomer,Boolean(resolvedCustomer)]"
@@ -10092,98 +10261,105 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 96,
+          "line": 100,
           "arguments": [
             "enabled?(\"/api/customers?limit=50\"):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 97,
+          "line": 101,
           "arguments": [
             "enabled&&selectedId&&true?\"/api/customers/\"+encodeURIComponent(selectedId):null"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 254,
+          "line": 260,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 254,
+          "line": 260,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 254,
+          "line": 260,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 303,
+          "line": 309,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 303,
+          "line": 309,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 303,
+          "line": 309,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 324,
+          "line": 330,
           "arguments": [
             "selectedProductId?\"/api/products/\"+encodeURIComponent(selectedProductId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 333,
+          "line": 338,
+          "arguments": [
+            "!existing&&sourceProject?'/api/projects/'+encodeURIComponent(sourceProject):null"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 343,
           "arguments": [
             "!existing&&sourceOffer?(\"/api/documents/\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 335,
+          "line": 345,
           "arguments": [
             "sourceItem?.customer_id&&sourceOffer?\"/api/customers/\"+encodeURIComponent(String(sourceItem.customer_id)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 352,
+          "line": 362,
           "arguments": [
             "kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?minuteAllocations=1&ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 353,
+          "line": 363,
           "arguments": [
             "kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 401,
+          "line": 411,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload",
@@ -10193,7 +10369,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 401,
+          "line": 411,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -10202,14 +10378,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 418,
+          "line": 428,
           "arguments": [
             "\"/api/settings/readiness?\"+new URLSearchParams({action:\"issue_invoice\",number})"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 418,
+          "line": 428,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -10217,14 +10393,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 418,
+          "line": 428,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 422,
+          "line": 432,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)",
             "{expectedUpdatedAt:draft.updatedAt}",
@@ -10233,7 +10409,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 427,
+          "line": 437,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)+'/revision'",
             "{}",
@@ -10242,7 +10418,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 428,
+          "line": 438,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+(adjustmentIsRefund?\"/refunds\":\"/credits\")",
             "{amount:Number(creditAmount),reason:creditReason,...(adjustmentIsRefund?{date:refundDate}:{})}",
@@ -10251,14 +10427,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 428,
+          "line": 438,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 429,
+          "line": 439,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose===\"document\"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind===\"Angebot\"&&draft.status===\"draft\"}:{})}"
@@ -10266,21 +10442,21 @@
         },
         {
           "callee": "apiGet",
-          "line": 429,
+          "line": 439,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 606,
+          "line": 628,
           "arguments": [
             "sourceIds?'/api/time-entries/billing?'+new URLSearchParams({minuteAllocations:'1',ids:sourceIds,...(draft.id?{draft:draft.number}:{})}):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 662,
+          "line": 685,
           "arguments": [
             "'/api/settings/company'"
           ]
@@ -11211,24 +11387,24 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 31,
+          "line": 34,
           "arguments": [
             "'/api/projects?'+query.toString()"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 39,
+          "line": 42,
           "arguments": [
             "'/api/projects/'+encodeURIComponent(id)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 48,
+          "line": 51,
           "arguments": [
             "'/api/projects/'+encodeURIComponent(id)",
-            "{name:draft.name,status:draft.status,notes:draft.notes,hoursBudget:draft.hoursBudget,version:draft.version,...(access.hasPermission?.('finance-overview:read')?{costBudget:draft.costBudget,budgetCurrency:draft.budgetCurrency}:{})}"
+            "{billingTerms:draft.billingTerms,name:draft.name,status:draft.status,notes:draft.notes,hoursBudget:draft.hoursBudget,version:draft.version,...(access.hasPermission?.('finance-overview:read')?{costBudget:draft.costBudget,budgetCurrency:draft.budgetCurrency}:{})}"
           ]
         }
       ],
@@ -11785,25 +11961,42 @@
       ]
     },
     {
+      "file": "components/project-billing.tsx",
+      "calls": [
+        {
+          "callee": "apiPost",
+          "line": 11,
+          "arguments": [
+            "'/api/projects/'+encodeURIComponent(id)+'/milestones/'+encodeURIComponent(milestoneId)",
+            "{version}"
+          ]
+        }
+      ],
+      "pages": [
+        "app/projekte/[id]/page.tsx",
+        "app/projekte/page.tsx"
+      ]
+    },
+    {
       "file": "components/project-form.tsx",
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 26,
+          "line": 29,
           "arguments": [
             "'/api/customers'"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 27,
+          "line": 30,
           "arguments": [
             "sourceOffer?'/api/documents/'+encodeURIComponent(sourceOffer):null"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 49,
+          "line": 52,
           "arguments": [
             "'/api/projects'",
             "body",
@@ -15043,6 +15236,86 @@
           "mode": "force"
         }
       ]
+    },
+    {
+      "file": "database/migrations/0110_shared_billing_agreements.sql",
+      "tables": [
+        "billing_agreements",
+        "billing_milestone_completions",
+        "billing_closures"
+      ],
+      "relations": [
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "customers",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "organizations",
+          "columns": "id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "invoices",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "billing_agreements",
+          "mode": "enable"
+        },
+        {
+          "table": "billing_agreements",
+          "mode": "force"
+        },
+        {
+          "table": "billing_milestone_completions",
+          "mode": "enable"
+        },
+        {
+          "table": "billing_milestone_completions",
+          "mode": "force"
+        },
+        {
+          "table": "billing_closures",
+          "mode": "enable"
+        },
+        {
+          "table": "billing_closures",
+          "mode": "force"
+        }
+      ]
     }
   ],
   "repositories": [
@@ -15202,6 +15475,7 @@
     {
       "file": "lib/server/repositories/business-api.ts",
       "imports": [
+        "lib/server/billing-agreements.ts",
         "lib/expense-payment.ts",
         "lib/server/business-idempotency.ts",
         "lib/server/document-amount-sql.ts",
@@ -15215,7 +15489,7 @@
       "calls": [
         {
           "callee": "c.query",
-          "line": 153,
+          "line": 155,
           "arguments": [
             "`select *,count(*) over()::int total_count from (${source}) q ${where.length?'where '+where.join(' and '):''} order by ${sortTerms.join(',')},q.id desc limit ${limit}${offset?' offset '+offset:''}`",
             "values"
@@ -15223,7 +15497,7 @@
         },
         {
           "callee": "c.query",
-          "line": 195,
+          "line": 197,
           "arguments": [
             "'select pg_advisory_xact_lock(hashtextextended($1,0))'",
             "[s.organizationId+':payment:'+key]"
@@ -15231,7 +15505,7 @@
         },
         {
           "callee": "c.query",
-          "line": 196,
+          "line": 198,
           "arguments": [
             "'select request_hash,response_json from business_idempotency_keys where organization_id=$1 and operation=$2 and idempotency_key=$3'",
             "[s.organizationId,operation,key]"
@@ -15239,7 +15513,7 @@
         },
         {
           "callee": "c.query",
-          "line": 204,
+          "line": 206,
           "arguments": [
             "'select id,customer_id,total_amount,paid_amount,status from invoices where id::text=$1 and organization_id=$2 and archived_at is null for update'",
             "[args.p_invoice_id,s.organizationId]"
@@ -15247,7 +15521,7 @@
         },
         {
           "callee": "c.query",
-          "line": 208,
+          "line": 210,
           "arguments": [
             "\"select coalesce(sum(amount),0) amount from credit_notes where organization_id=$1 and invoice_id=$2 and credit_date<=(now() at time zone 'Europe/Zurich')::date\"",
             "[s.organizationId,row.id]"
@@ -15255,7 +15529,7 @@
         },
         {
           "callee": "c.query",
-          "line": 209,
+          "line": 211,
           "arguments": [
             "\"select coalesce(sum(amount),0) amount from invoice_refunds where organization_id=$1 and invoice_id=$2 and refund_date<=(now() at time zone 'Europe/Zurich')::date\"",
             "[s.organizationId,row.id]"
@@ -15263,7 +15537,7 @@
         },
         {
           "callee": "c.query",
-          "line": 217,
+          "line": 219,
           "arguments": [
             "\"select coalesce(sum(amount),0) amount from payments where organization_id=$1 and invoice_id=$2 and archived_at is null and allocation_status='matched'\"",
             "[s.organizationId,row.id]"
@@ -15271,7 +15545,7 @@
         },
         {
           "callee": "c.query",
-          "line": 221,
+          "line": 223,
           "arguments": [
             "`insert into payments(organization_id,external_id,invoice_id,payer_customer_id,payment_date,amount,method,reference,allocation_status,created_by_user_id)\n   values($1,$2,$3,$4,$5,$6,$7,$8,'matched',$9) returning id,amount,payment_date paid_on`",
             "[s.organizationId,randomUUID(),row.id,row.customer_id,args.p_paid_on,amount,args.p_method,args.p_note,s.userId]"
@@ -15279,7 +15553,7 @@
         },
         {
           "callee": "c.query",
-          "line": 223,
+          "line": 225,
           "arguments": [
             "\"update invoices set paid_amount=paid_amount+$1,status=case when paid_amount+$1-$5::numeric>=greatest(0,total_amount-$4::numeric) then 'paid' else 'partial' end,updated_at=now() where id=$2 and organization_id=$3\"",
             "[amount,row.id,s.organizationId,credits,refunds]"
@@ -15287,7 +15561,7 @@
         },
         {
           "callee": "c.query",
-          "line": 224,
+          "line": 226,
           "arguments": [
             "'insert into business_idempotency_keys(organization_id,operation,idempotency_key,request_hash,response_json,created_by_user_id) values($1,$2,$3,$4,$5::jsonb,$6)'",
             "[s.organizationId,operation,key,hash,JSON.stringify(payment.rows[0]),s.userId]"
@@ -15295,7 +15569,7 @@
         },
         {
           "callee": "c.query",
-          "line": 235,
+          "line": 237,
           "arguments": [
             "`insert into business_document_counters(organization_id,kind,period,next_value) values($1,$2,$3,coalesce((select max(substring(${numberingColumn} from $4)::integer) from ${numberingTable} where organization_id=$1),0)+2) on conflict(organization_id,kind,period) do update set next_value=greatest(business_document_counters.next_value+1,excluded.next_value) returning next_value-1 number`",
             "[s.organizationId,invoice?'invoice':'quote',year,'^'+pattern]"
@@ -15303,7 +15577,7 @@
         },
         {
           "callee": "c.query",
-          "line": 241,
+          "line": 243,
           "arguments": [
             "'select id,discount from customers where id::text=$1 and organization_id=$2 and archived_at is null'",
             "[args.p_customer_id,s.organizationId]"
@@ -15311,15 +15585,15 @@
         },
         {
           "callee": "c.query",
-          "line": 245,
+          "line": 247,
           "arguments": [
-            "\"select id,status,customer_id,currency,calculation from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update\"",
+            "\"select id,status,customer_id,currency,calculation,billing_agreement_id from quotes where organization_id=$1 and quote_no=$2 and archived_at is null for update\"",
             "[s.organizationId,args.p_source_offer]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 247,
+          "line": 249,
           "arguments": [
             "'select id from invoices where organization_id=$1 and source_quote_id=$2 and archived_at is null and status<>\\'cancelled\\''",
             "[s.organizationId,quote.id]"
@@ -15327,7 +15601,7 @@
         },
         {
           "callee": "c.query",
-          "line": 253,
+          "line": 255,
           "arguments": [
             "`select id,status,calculation,updated_at::text document_revision${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
             "[args.p_current_number,s.organizationId]"
@@ -15335,7 +15609,7 @@
         },
         {
           "callee": "c.query",
-          "line": 258,
+          "line": 260,
           "arguments": [
             "\"delete from invoice_line_time_entries x using invoice_lines l where x.organization_id=$1 and l.organization_id=x.organization_id and l.id=x.invoice_line_id and l.invoice_id=$2 and x.allocated_minutes is not null\"",
             "[s.organizationId,id]"
@@ -15343,7 +15617,7 @@
         },
         {
           "callee": "c.query",
-          "line": 260,
+          "line": 262,
           "arguments": [
             "\"select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')\"",
             "[s.organizationId,id]"
@@ -15351,7 +15625,7 @@
         },
         {
           "callee": "c.query",
-          "line": 261,
+          "line": 263,
           "arguments": [
             "`update ${table} set calculation=null,${numberColumn}=$1,customer_id=$2,issue_date=$3,${invoice?'due_date':'valid_until'}=$4,note=$5,currency=$6,updated_at=now() where id=$7 and organization_id=$8`",
             "[args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,id,s.organizationId]"
@@ -15359,7 +15633,7 @@
         },
         {
           "callee": "c.query",
-          "line": 262,
+          "line": 264,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -15367,7 +15641,7 @@
         },
         {
           "callee": "c.query",
-          "line": 263,
+          "line": 265,
           "arguments": [
             "\"update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2\"",
             "[s.organizationId,id]"
@@ -15375,7 +15649,7 @@
         },
         {
           "callee": "c.query",
-          "line": 264,
+          "line": 266,
           "arguments": [
             "`delete from ${lineTable} where ${parentColumn}=$1 and organization_id=$2`",
             "[id,s.organizationId]"
@@ -15383,7 +15657,7 @@
         },
         {
           "callee": "c.query",
-          "line": 267,
+          "line": 269,
           "arguments": [
             "`insert into ${table}(id,organization_id,external_id,${numberColumn},customer_id,${invoice?'':'title,'}issue_date,${invoice?'due_date':'valid_until'},status,note,currency,created_by_user_id)\n   values($1,$2,$1::uuid::text,$3,$4,${invoice?'':'$3,'}$5,$6,'draft',$7,$8,$9)`",
             "[id,s.organizationId,args.p_number,args.p_customer_id,args.p_issue_date,invoice?args.p_due_date:args.p_valid_until,args.p_note,args.p_currency,s.userId]"
@@ -15391,23 +15665,15 @@
         },
         {
           "callee": "c.query",
-          "line": 271,
+          "line": 285,
           "arguments": [
-            "\"update invoices set source_quote_id=$3 where organization_id=$1 and id=$2\"",
-            "[s.organizationId,id,sourceQuoteId]"
+            "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate,billing_part${invoice?\",price_base_quantity,billing_source_position\":\"\"}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10${invoice?\",$11,$12\":\"\"}) returning id`",
+            "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat,raw.billing_part??null,...(invoice?[raw.price_base_quantity,raw.billing_source_position??null]:[])]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 281,
-          "arguments": [
-            "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate${invoice?\",price_base_quantity\":\"\"}) values($1,$2,$3,$4,$5,$6,$7,$8,$9${invoice?\",$10\":\"\"}) returning id`",
-            "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat,...(invoice?[raw.price_base_quantity]:[])]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 282,
+          "line": 286,
           "arguments": [
             "'insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id,allocated_minutes,price_source_id) values($1,$2,$3,$4,$5)'",
             "[s.organizationId,inserted.rows[0].id,allocation.time_entry_id,allocation.minutes,allocation.price_source_id]"
@@ -15415,7 +15681,7 @@
         },
         {
           "callee": "c.query",
-          "line": 285,
+          "line": 289,
           "arguments": [
             "\"update expenses set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and currency=$5 and billable=true and status in ('approved','posted') and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id\"",
             "[s.organizationId,ids,id,args.p_customer_id,args.p_currency]"
@@ -15423,7 +15689,7 @@
         },
         {
           "callee": "c.query",
-          "line": 287,
+          "line": 291,
           "arguments": [
             "'insert into invoice_line_expenses(organization_id,invoice_line_id,expense_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -15431,7 +15697,15 @@
         },
         {
           "callee": "c.query",
-          "line": 292,
+          "line": 294,
+          "arguments": [
+            "'select 1 from invoices where organization_id=$1 and id=$2 and billing_agreement_id is not null'",
+            "[s.organizationId,id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 296,
           "arguments": [
             "`update time_entries set invoiced_invoice_id=$3 where organization_id=$1 and id=any($2::uuid[]) and archived_at is null and customer_id=$4 and billable=true and approved=true and (invoiced_invoice_id is null or invoiced_invoice_id=$3) returning id`",
             "[s.organizationId,ids,id,args.p_customer_id]"
@@ -15439,7 +15713,7 @@
         },
         {
           "callee": "c.query",
-          "line": 294,
+          "line": 298,
           "arguments": [
             "'insert into invoice_line_time_entries(organization_id,invoice_line_id,time_entry_id) values($1,$2,$3)'",
             "[s.organizationId,inserted.rows[0].id,row.id]"
@@ -15447,7 +15721,7 @@
         },
         {
           "callee": "c.query",
-          "line": 302,
+          "line": 306,
           "arguments": [
             "'select offer_version from quotes where id=$1 and organization_id=$2'",
             "[id,s.organizationId]"
@@ -15455,7 +15729,7 @@
         },
         {
           "callee": "c.query",
-          "line": 304,
+          "line": 308,
           "arguments": [
             "`update ${table} set calculation=$3::jsonb${invoice?',subtotal=$4,vat_amount=$5,total_amount=$6':''} where id=$1 and organization_id=$2`",
             "[id,s.organizationId,JSON.stringify(calculationSnapshot),...(invoice?[calculation.subtotal,calculation.vat,calculation.total]:[])]"
@@ -15463,7 +15737,7 @@
         },
         {
           "callee": "c.query",
-          "line": 319,
+          "line": 324,
           "arguments": [
             "`select id from time_entries where organization_id=$1 and (id=any($2::uuid[]) or id in(select x.time_entry_id from invoice_line_time_entries x join invoice_lines l on l.organization_id=x.organization_id and l.id=x.invoice_line_id where x.organization_id=$1 and l.invoice_id=$3)) order by id for update`",
             "[s.organizationId,[...new Set(ids)],invoiceId]"
@@ -15471,7 +15745,7 @@
         },
         {
           "callee": "c.query",
-          "line": 327,
+          "line": 332,
           "arguments": [
             "`select t.id,t.customer_id,t.recorded_duration_minutes,p.source_snapshot from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id where t.organization_id=$1 and t.id=$2 and p.id=$3 and p.side='sale' and p.is_current and t.external_resource_id is not null and t.approved and t.submitted_at is not null and t.billable and t.archived_at is null`",
             "[s.organizationId,allocation.time_entry_id,allocation.price_source_id]"
@@ -15479,7 +15753,7 @@
         },
         {
           "callee": "c.query",
-          "line": 343,
+          "line": 348,
           "arguments": [
             "\"select m.user_id from organization_memberships m join app_users u on u.id=m.user_id join organizations o on o.id=m.organization_id where m.organization_id=$1 and m.user_id=$2 and m.status='active' and m.module_profile='standard' and m.role in ('owner','admin','finance') and u.status='active' and o.status in ('trial','active','grace_period') for share of m\"",
             "[s.organizationId,s.userId]"
@@ -15487,7 +15761,7 @@
         },
         {
           "callee": "c.query",
-          "line": 346,
+          "line": 351,
           "arguments": [
             "'select id,status,updated_at::text revision from invoices where organization_id=$1 and invoice_no=$2 and archived_at is null for update'",
             "[s.organizationId,args.p_number]"
@@ -15495,7 +15769,7 @@
         },
         {
           "callee": "c.query",
-          "line": 350,
+          "line": 355,
           "arguments": [
             "'select 1 from invoice_versions where organization_id=$1 and invoice_id=$2 union all select 1 from payments where organization_id=$1 and invoice_id=$2 union all select 1 from document_deliveries where organization_id=$1 and document_id=$2 limit 1'",
             "[s.organizationId,row.id]"
@@ -15503,7 +15777,7 @@
         },
         {
           "callee": "c.query",
-          "line": 352,
+          "line": 357,
           "arguments": [
             "'update invoices set archived_at=now(),updated_at=now() where organization_id=$1 and id=$2'",
             "[s.organizationId,row.id]"
@@ -15511,7 +15785,7 @@
         },
         {
           "callee": "c.query",
-          "line": 353,
+          "line": 358,
           "arguments": [
             "'update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2 and external_resource_id is null'",
             "[s.organizationId,row.id]"
@@ -15519,7 +15793,7 @@
         },
         {
           "callee": "c.query",
-          "line": 354,
+          "line": 359,
           "arguments": [
             "'update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2'",
             "[s.organizationId,row.id]"
@@ -17446,6 +17720,8 @@
     {
       "file": "lib/server/repositories/project-workspace.ts",
       "imports": [
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
         "lib/permissions.ts",
         "lib/server/session.ts",
         "lib/server/http.ts",
@@ -17459,7 +17735,7 @@
       "calls": [
         {
           "callee": "authorize",
-          "line": 12,
+          "line": 14,
           "arguments": [
             "s",
             "'projects:read'"
@@ -17467,15 +17743,15 @@
         },
         {
           "callee": "c.query",
-          "line": 13,
+          "line": 15,
           "arguments": [
-            "`select p.id,p.name,p.customer_id,p.status,p.source_quote_id,p.hours_budget,${tenantCan(s.role,'finance-overview:read')?\"(select b.cost_budget from project_financial_budgets b where b.organization_id=p.organization_id and b.project_id=p.id)\":'null::numeric'} cost_budget,${tenantCan(s.role,'finance-overview:read')?\"(select b.currency from project_financial_budgets b where b.organization_id=p.organization_id and b.project_id=p.id)\":'null::text'} budget_currency,p.progress,p.start_date,p.end_date,p.notes,p.version,p.updated_at,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.id::text=$2 and p.archived_at is null`",
+            "`select p.id,p.name,p.customer_id,p.status,p.billing_agreement_id,coalesce((select json_agg(done.milestone_id) from billing_milestone_completions done where done.organization_id=p.organization_id and done.agreement_id=p.billing_agreement_id),'[]'::json) billing_completed_milestones,(select b.commercial_snapshot from billing_agreements b where b.organization_id=p.organization_id and b.id=p.billing_agreement_id) billing_snapshot,(select b.terms from billing_agreements b where b.organization_id=p.organization_id and b.id=p.billing_agreement_id) billing_terms,p.source_quote_id,p.hours_budget,${tenantCan(s.role,'finance-overview:read')?\"(select b.cost_budget from project_financial_budgets b where b.organization_id=p.organization_id and b.project_id=p.id)\":'null::numeric'} cost_budget,${tenantCan(s.role,'finance-overview:read')?\"(select b.currency from project_financial_budgets b where b.organization_id=p.organization_id and b.project_id=p.id)\":'null::text'} budget_currency,p.progress,p.start_date,p.end_date,p.notes,p.version,p.updated_at,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where p.organization_id=$1 and p.id::text=$2 and p.archived_at is null`",
             "[s.organizationId,id]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 16,
+          "line": 18,
           "arguments": [
             "`select t.id,t.work_date,t.hours,t.description,t.billable,t.approved,t.invoiced_invoice_id from time_entries t where t.organization_id=$1 and t.project_id::text=$2 and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$3) order by t.work_date desc,t.created_at desc limit 100`",
             "[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')]"
@@ -17483,7 +17759,7 @@
         },
         {
           "callee": "c.query",
-          "line": 17,
+          "line": 19,
           "arguments": [
             "`select coalesce(sum(hours),0) hours,coalesce(sum(hours) filter(where invoiced_invoice_id is not null),0) invoiced_hours,count(*) entries from time_entries where organization_id=$1 and project_id::text=$2 and archived_at is null and ($4::boolean=false or created_by_user_id=$3)`",
             "[s.organizationId,id,s.userId,ownRecordOnly(s.role,'zeiterfassung')]"
@@ -17491,7 +17767,7 @@
         },
         {
           "callee": "c.query",
-          "line": 18,
+          "line": 20,
           "arguments": [
             "`select distinct i.invoice_no number,i.status,i.currency,i.total_amount,i.total_amount total,i.paid_amount,i.issue_date::text issue_date,i.due_date::text due_date,${invoiceCreditSql('i')} credit_amount,${invoiceRefundSql('i')} refund_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`",
             "[s.organizationId,id]"
@@ -17499,7 +17775,7 @@
         },
         {
           "callee": "authorize",
-          "line": 22,
+          "line": 24,
           "arguments": [
             "s",
             "'projects:write'"
@@ -17507,17 +17783,9 @@
         },
         {
           "callee": "c.query",
-          "line": 31,
+          "line": 33,
           "arguments": [
-            "'select id,version,status,hours_budget,(select currency from project_financial_budgets b where b.organization_id=projects.organization_id and b.project_id=projects.id) budget_currency from projects where organization_id=$1 and id::text=$2 and archived_at is null for update'",
-            "[s.organizationId,id]"
-          ]
-        },
-        {
-          "callee": "c.query",
-          "line": 36,
-          "arguments": [
-            "\"select 1 from active_time_trackers where organization_id=$1 and project_id::text=$2 and (state='running' or accumulated_seconds>0) limit 1\"",
+            "'select id,version,status,hours_budget,billing_agreement_id,customer_id,source_quote_id,(select currency from project_financial_budgets b where b.organization_id=projects.organization_id and b.project_id=projects.id) budget_currency from projects where organization_id=$1 and id::text=$2 and archived_at is null for update'",
             "[s.organizationId,id]"
           ]
         },
@@ -17525,13 +17793,37 @@
           "callee": "c.query",
           "line": 37,
           "arguments": [
+            "'select 1 from invoices where organization_id=$1 and billing_agreement_id=$2 limit 1'",
+            "[s.organizationId,locked.billing_agreement_id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 37,
+          "arguments": [
+            "'update projects set billing_agreement_id=$3 where organization_id=$1 and id=$2'",
+            "[s.organizationId,id,agreementId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 40,
+          "arguments": [
+            "\"select 1 from active_time_trackers where organization_id=$1 and project_id::text=$2 and (state='running' or accumulated_seconds>0) limit 1\"",
+            "[s.organizationId,id]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 41,
+          "arguments": [
             "`update projects set name=$3,status=$4,notes=$5,hours_budget=$6,version=version+1,updated_at=now() where organization_id=$1 and id::text=$2 returning id,name,status,notes,hours_budget,version`",
             "[s.organizationId,id,name,status,notes,hoursBudget]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 38,
+          "line": 42,
           "arguments": [
             "'insert into project_financial_budgets(organization_id,project_id,cost_budget,currency,updated_by_user_id) values($1,$2,$3,$4,$5) on conflict(organization_id,project_id) do update set cost_budget=excluded.cost_budget,currency=excluded.currency,updated_by_user_id=excluded.updated_by_user_id,updated_at=now()'",
             "[s.organizationId,id,costBudget,currency,s.userId]"
@@ -17539,7 +17831,7 @@
         },
         {
           "callee": "authorize",
-          "line": 43,
+          "line": 47,
           "arguments": [
             "s",
             "'projects:read'"
@@ -17547,7 +17839,7 @@
         },
         {
           "callee": "c.query",
-          "line": 54,
+          "line": 58,
           "arguments": [
             "`with input_context as(select $4::boolean own_only,$5::text actor_id) select p.id,p.name,p.customer_id,p.status,p.progress,c.name customer_name,${tenantCan(s.role,'sales:read')?'q.quote_no':'null::text'} source_offer,\n ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} hours,\n ${canTime?`coalesce((select sum(t.hours) from time_entries t where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null and t.invoiced_invoice_id is not null and ($4::boolean=false or t.created_by_user_id=$5)),0)`:'null::numeric'} invoiced_hours,\n ${canInvoices?`coalesce((select json_agg(distinct i.invoice_no) from time_entries t join invoices i on i.id=t.invoiced_invoice_id and i.organization_id=t.organization_id where t.organization_id=p.organization_id and t.project_id=p.id and t.archived_at is null),'[]'::json)`:`'[]'::json`} invoice_numbers,\n count(*) over() total_count from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id left join quotes q on q.id=p.source_quote_id and q.organization_id=p.organization_id where ${where} order by ${orders[order]} limit $6 offset $7`",
             "[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id]"
@@ -17555,7 +17847,7 @@
         },
         {
           "callee": "c.query",
-          "line": 59,
+          "line": 63,
           "arguments": [
             "`with input_context as(select $4::boolean own_only,$5::text actor_id,$6::int page_limit,$7::int page_offset) select count(*) total from projects p left join customers c on c.id=p.customer_id and c.organization_id=p.organization_id where ${where}`",
             "[s.organizationId,q,status,ownRecordOnly(s.role,'zeiterfassung'),s.userId,limit,offset,customerId,id]"

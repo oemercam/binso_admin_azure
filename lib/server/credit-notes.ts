@@ -15,7 +15,7 @@ import {moneyMinor} from '@/lib/money';
  * external payment is triggered. Caller supplies the tenant transaction. */
 export async function createCreditNote(c:PoolClient,s:SessionUser,number:string,input:{amount:number;reason:string},key:string){
  authorize(s,'invoices:write');
- await requireModuleEntitlement(s.organizationId,'rechnungen');
+ await requireModuleEntitlement(s.organizationId,'rechnungen',c);
  const reason=input.reason.trim();
  if(!Number.isFinite(input.amount)||input.amount<=0||!Number.isSafeInteger(Math.round(input.amount*100))||input.amount!==Math.round(input.amount*100)/100)throw new ApiError(400,'amount_invalid','Bitte gültigen Betrag eingeben.');
  if(reason.length<3||reason.length>2000)throw new ApiError(400,'reason_required','Bitte eine Begründung mit 3 bis 2000 Zeichen eingeben.');
@@ -46,7 +46,7 @@ export async function createCreditNote(c:PoolClient,s:SessionUser,number:string,
  * receipt rows stay intact; the refund is a separate dated ledger event. */
 export async function recordInvoiceRefund(c:PoolClient,s:SessionUser,number:string,input:{amount:number;reason:string;date:string},key:string){
  authorize(s,'payments:write');authorize(s,'invoices:write');
- await requireModuleEntitlement(s.organizationId,'zahlungen');
+ await requireModuleEntitlement(s.organizationId,'zahlungen',c);
  const reason=input.reason.trim(),today=businessDate();
  if(!Number.isFinite(input.amount)||input.amount<=0||!Number.isSafeInteger(Math.round(input.amount*100))||input.amount!==Math.round(input.amount*100)/100)throw new ApiError(400,'amount_invalid','Bitte gültigen Betrag eingeben.');
  if(reason.length<3||reason.length>2000)throw new ApiError(400,'reason_required','Bitte eine Begründung mit 3 bis 2000 Zeichen eingeben.');

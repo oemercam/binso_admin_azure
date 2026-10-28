@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-158 API route files, 61 client consumers, 110 migrations, 126 declared tables.
+159 API route files, 62 client consumers, 111 migrations, 129 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -59,12 +59,12 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/documents/[number]/pdf` | GET | `app/api/documents/[number]/pdf/route.ts` | `requireSession:10`, `withTenant:11`, `authorize:14`, `c.query:16`, `c.query:19`, `c.query:22` |
 | `/api/documents/[number]/refunds` | POST | `app/api/documents/[number]/refunds/route.ts` | `requireSession:9`, `withTenant:11` |
 | `/api/documents/[number]/revision` | POST | `app/api/documents/[number]/revision/route.ts` | `requireSession:7`, `withTenant:8` |
-| `/api/documents/[number]` | GET, PATCH, DELETE | `app/api/documents/[number]/route.ts` | `tenantList:17`, `requireSession:40`, `authorize:40`, `tenantList:41`, `tenantRpc:61`, `tenantRpc:86` |
+| `/api/documents/[number]` | GET, PATCH, DELETE | `app/api/documents/[number]/route.ts` | `tenantList:18`, `requireSession:41`, `authorize:41`, `tenantList:42`, `tenantRpc:62`, `tenantRpc:88` |
 | `/api/documents/[number]/send` | POST | `app/api/documents/[number]/send/route.ts` | `requireSession:21`, `withTenant:29`, `c.query:31`, `c.query:38`, `c.query:42`, `c.query:47`, `c.query:50`, `c.query:52`, `c.query:53`, `withTenant:64`, `withTenant:76`, `c.query:77`, `withTenant:83`, `c.query:84`, `c.query:86` |
 | `/api/documents/[number]/status` | POST | `app/api/documents/[number]/status/route.ts` | `requireSession:7`, `withTenant:9` |
 | `/api/documents/[number]/versions` | GET, POST | `app/api/documents/[number]/versions/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:15`, `c.query:16`, `c.query:21`, `c.query:25`, `c.query:26`, `c.query:30`, `requireSession:37`, `authorize:37`, `withTenant:40`, `c.query:41`, `c.query:43`, `c.query:46`, `c.query:51`, `c.query:53`, `c.query:57` |
-| `/api/documents/preview` | POST | `app/api/documents/preview/route.ts` | `requireSession:14`, `authorize:15`, `withTenant:20`, `c.query:27`, `c.query:28`, `c.query:30` |
-| `/api/documents` | GET, POST | `app/api/documents/route.ts` | `tenantListPage:17`, `requireSession:33`, `authorize:33`, `tenantList:34`, `tenantRpc:54` |
+| `/api/documents/preview` | POST | `app/api/documents/preview/route.ts` | `requireSession:16`, `authorize:17`, `withTenant:22`, `c.query:29`, `c.query:30`, `c.query:32` |
+| `/api/documents` | GET, POST | `app/api/documents/route.ts` | `tenantListPage:18`, `requireSession:34`, `authorize:34`, `tenantList:35`, `tenantRpc:55` |
 | `/api/employees/[id]/allowances/[claimId]` | PATCH | `app/api/employees/[id]/allowances/[claimId]/route.ts` | `requireSession:7`, `withTenant:8` |
 | `/api/employees/[id]/allowances` | POST | `app/api/employees/[id]/allowances/route.ts` | `requireSession:7`, `withTenant:8` |
 | `/api/employees/[id]/employment/[periodId]` | PATCH | `app/api/employees/[id]/employment/[periodId]/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:12` |
@@ -120,8 +120,9 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/payments` | GET, POST | `app/api/payments/route.ts` | `tenantListPage:9`, `tenantList:27`, `tenantList:31`, `tenantRpc:34` |
 | `/api/products/[id]` | GET, PATCH | `app/api/products/[id]/route.ts` | `tenantList:10` |
 | `/api/products` | GET, POST | `app/api/products/route.ts` | `tenantListPage:8` |
+| `/api/projects/[id]/milestones/[milestoneId]` | POST | `app/api/projects/[id]/milestones/[milestoneId]/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:10`, `c.query:11`, `c.query:13` |
 | `/api/projects/[id]` | GET, PATCH | `app/api/projects/[id]/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:9`, `requireSession:10`, `authorize:10`, `withTenant:10` |
-| `/api/projects` | GET, POST | `app/api/projects/route.ts` | `requireSession:12`, `authorize:12`, `withTenant:12`, `requireSession:13`, `authorize:13`, `withTenant:15`, `c.query:16`, `c.query:16`, `c.query:17`, `c.query:19` |
+| `/api/projects` | GET, POST | `app/api/projects/route.ts` | `requireSession:13`, `authorize:13`, `withTenant:13`, `requireSession:14`, `authorize:14`, `withTenant:16`, `c.query:17`, `c.query:17`, `c.query:18`, `c.query:21` |
 | `/api/public/offer` | POST | `app/api/public/offer/route.ts` | `c.query:19`, `c.query:25` |
 | `/api/public/report` | POST | `app/api/public/report/route.ts` |  |
 | `/api/reports/exports/[id]` | GET | `app/api/reports/exports/[id]/route.ts` | `requireSession:9`, `withTenant:10` |
@@ -157,12 +158,12 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/telemetry/web-vitals` | POST | `app/api/telemetry/web-vitals/route.ts` | `query:11` |
 | `/api/time-entries/[id]/pricing` | GET, POST | `app/api/time-entries/[id]/pricing/route.ts` | `requireSession:7`, `withTenant:9`, `requireSession:12`, `withTenant:13` |
 | `/api/time-entries/[id]` | PATCH | `app/api/time-entries/[id]/route.ts` | `requireSession:7`, `withTenant:10` |
-| `/api/time-entries/billing` | GET | `app/api/time-entries/billing/route.ts` | `requireSession:10`, `authorize:10`, `withTenant:15`, `c.query:15` |
+| `/api/time-entries/billing` | GET | `app/api/time-entries/billing/route.ts` | `requireSession:12`, `authorize:12`, `withTenant:17`, `c.query:17`, `c.query:30` |
 | `/api/time-entries/options` | GET | `app/api/time-entries/options/route.ts` | `requireSession:9`, `authorize:9`, `withTenant:11`, `withTenant:14`, `c.query:22`, `c.query:23` |
 | `/api/time-entries/policy` | GET, PATCH | `app/api/time-entries/policy/route.ts` | `requireSession:7`, `authorize:7`, `withTenant:8`, `c.query:8`, `requireSession:12`, `authorize:12`, `withTenant:15`, `c.query:16` |
 | `/api/time-entries/review` | POST | `app/api/time-entries/review/route.ts` | `requireSession:12`, `authorize:12`, `withTenant:16` |
-| `/api/time-entries` | GET, POST | `app/api/time-entries/route.ts` | `requireSession:16`, `authorize:16`, `withTenant:17`, `requireSession:22`, `authorize:22`, `withTenant:25`, `withTenant:36`, `c.query:38`, `c.query:38`, `c.query:42`, `c.query:50`, `c.query:53`, `c.query:54`, `c.query:58` |
-| `/api/time-tracker` | GET, POST | `app/api/time-tracker/route.ts` | `requireSession:13`, `authorize:13`, `withTenant:14`, `c.query:15`, `requireSession:22`, `authorize:22`, `withTenant:25`, `c.query:26`, `c.query:27`, `c.query:34`, `c.query:37`, `c.query:42`, `c.query:47`, `c.query:48`, `c.query:48`, `c.query:57` |
+| `/api/time-entries` | GET, POST | `app/api/time-entries/route.ts` | `requireSession:16`, `authorize:16`, `withTenant:17`, `requireSession:22`, `authorize:22`, `withTenant:25`, `withTenant:36`, `c.query:38`, `c.query:38`, `c.query:42`, `c.query:45`, `c.query:51`, `c.query:54`, `c.query:55`, `c.query:59` |
+| `/api/time-tracker` | GET, POST | `app/api/time-tracker/route.ts` | `requireSession:13`, `authorize:13`, `withTenant:14`, `c.query:15`, `requireSession:22`, `authorize:22`, `withTenant:25`, `c.query:26`, `c.query:27`, `c.query:34`, `c.query:37`, `c.query:42`, `c.query:47`, `c.query:48`, `c.query:48`, `c.query:53`, `c.query:58` |
 | `/api/workforce-assignments` | GET, POST, PATCH | `app/api/workforce-assignments/route.ts` | `requireSession:12`, `authorizeWorkforceManagement:12`, `withTenant:13`, `c.query:14`, `c.query:15`, `c.query:16`, `requireSession:21`, `authorizeWorkforceManagement:21`, `withTenant:25`, `withTenant:30`, `c.query:31`, `c.query:32`, `c.query:34`, `c.query:35`, `c.query:36`, `c.query:37`, `requireSession:43`, `authorizeWorkforceManagement:43`, `withTenant:44`, `c.query:45` |
 
 Full import closure, query arguments, client consumers, migration relations and RLS declarations: `v21-3-data-inventory.json`. Absence of direct evidence in this table does not mean authorization is absent: inspect delegated handlers in the JSON.

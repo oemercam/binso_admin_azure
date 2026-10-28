@@ -1,3 +1,4 @@
+import {assertBillingReadiness} from './billing-agreements';
 import {createQrBillData} from "@/lib/qr-bill";
 import {businessDate} from "@/lib/financial-status";
 import {requireModuleEntitlement} from "@/lib/server/plan-access";
@@ -11,7 +12,7 @@ import {sealOfferVersion,sealInvoiceVersion} from './offer-versions';
 export async function lockDocument(c:PoolClient,s:SessionUser,number:string){
  for(const [table,column,kind] of [['invoices','invoice_no','invoice'],['quotes','quote_no','offer']] as const){
   const row=(await c.query(`select * from ${table} where organization_id=$1 and ${column}=$2 and archived_at is null for update`,[s.organizationId,number])).rows[0];
-  if(row){authorize(s,kind==='invoice'?'invoices:write':'sales:write');await requireModuleEntitlement(s.organizationId,kind==='invoice'?'rechnungen':'offerten');return {row,table,kind};}
+  if(row){authorize(s,kind==='invoice'?'invoices:write':'sales:write');await requireModuleEntitlement(s.organizationId,kind==='invoice'?'rechnungen':'offerten',c);return {row,table,kind};}
  }
  throw new ApiError(404,'not_found','Dokument wurde nicht gefunden.');
 }
@@ -19,7 +20,8 @@ export async function changeDocumentStatus(c:PoolClient,s:SessionUser,number:str
  const {row,table,kind}=await lockDocument(c,s,number);
  if((await c.query("select id from document_deliveries where organization_id=$1 and document_id=$2 and status in ('sending','uncertain','failed')",[s.organizationId,row.id])).rowCount)throw new ApiError(409,'delivery_pending','Der Versand wird noch geprüft.');
  let next:string;
- if(action==='issue'&&row.status==='draft'){const amount=kind==='invoice'?Number(row.total_amount):row.calculation?Number(row.calculation.total):Number((await c.query('select coalesce(sum(quantity*unit_price),0) total from quote_lines where organization_id=$1 and quote_id=$2',[s.organizationId,row.id])).rows[0].total);if(amount<=0)throw new ApiError(409,'document_empty','Ein Dokument ohne positiven Betrag kann nicht ausgestellt werden.');if(kind==='invoice'){const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];const debtor=(await c.query('select name,address as street,zip as postal_code,city,country from customers where organization_id=$1 and id=$2',[s.organizationId,row.customer_id])).rows[0];try{createQrBillData(company,{number,reference:row.qr_reference,total:amount,currency:row.currency,debtor});}catch(error){throw new ApiError(409,'payment_data_invalid',error instanceof Error?error.message:'Bitte Zahlungsdaten prüfen.');}}next='sent';}
+ if(['issue','accept'].includes(action))await assertBillingReadiness(c,s,row);
+ if(action==='issue'&&row.status==='draft'){const amount=kind==='invoice'?Number(row.total_amount):row.calculation?Number(row.calculation.total):Number((await c.query('select coalesce(sum(quantity*unit_price),0) total from quote_lines where organization_id=$1 and quote_id=$2',[s.organizationId,row.id])).rows[0].total);const zeroFinal=kind==='invoice'&&amount===0&&row.billing_agreement_id&&row.billing_context?.procedure==='final';if(!Number.isFinite(amount)||amount<=0&&!zeroFinal)throw new ApiError(409,'document_empty','Ein Dokument ohne positiven Betrag kann nicht ausgestellt werden.');if(kind==='invoice'&&amount>0){const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];const debtor=(await c.query('select name,address as street,zip as postal_code,city,country from customers where organization_id=$1 and id=$2',[s.organizationId,row.customer_id])).rows[0];try{createQrBillData(company,{number,reference:row.qr_reference,total:amount,currency:row.currency,debtor});}catch(error){throw new ApiError(409,'payment_data_invalid',error instanceof Error?error.message:'Bitte Zahlungsdaten prüfen.');}}next='sent';}
  else if(kind==='offer'&&['accept','decline'].includes(action)&&row.status==='sent'){
   if(action==='accept'&&row.valid_until&&String(row.valid_until instanceof Date?row.valid_until.toISOString().slice(0,10):row.valid_until).slice(0,10)<businessDate())throw new ApiError(409,'offer_expired','Das Angebot ist abgelaufen.');
   next=action==='accept'?'accepted':'declined';

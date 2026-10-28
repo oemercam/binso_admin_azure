@@ -46,9 +46,12 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  pdf.y=Math.max(124,pdf.y+24);
  heading(t('EMPFÄNGER'));
  paragraph([customer.name,customer.contact_name,customer.address_lines||[customer.street||customer.address,customer.building_number].filter(Boolean).join(' '),customer.address_lines?'':[customer.postal_code||customer.zip,customer.city].filter(Boolean).join(' '),customer.country&& !['CH','Schweiz','Switzerland','Suisse'].includes(String(customer.country))?customer.country:''].filter(Boolean).join('\n'));
- ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(t(invoice?'RECHNUNG':'ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
+ const procedure=record(document.billing_context).procedure;const invoiceTitle=procedure==='advance'?'Akonto':procedure==='partial'?'Teilrechnung':procedure==='final'?'Schlussrechnung':'RECHNUNG';
+ ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(invoice?t(invoiceTitle).toLocaleUpperCase(localeTags[locale]):t('ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
  paragraph(t(invoice?'Rechnung Nr. ':'Angebot Nr. ')+String(document.number),11);
  if(!invoice&&Number.isInteger(document.published_version)&&Number(document.published_version)>0)paragraph(t('Version')+' '+document.published_version,9);
+ if(invoice&&procedure==='final'&&Array.isArray(document.billing_predecessors)){for(const previous of document.billing_predecessors){const value=record(previous);paragraph(t('Bereits in Rechnung gestellt')+': '+String(value.number)+' · '+String(value.currency)+' '+money(value.subtotal)+' '+t('Netto'),9);}}
+ if(invoice&&procedure==='final'&&total===0)paragraph(t('Keine Zahlung erforderlich.'),10);
  if(draft)paragraph(t('ENTWURF - nicht zur Zahlung / nicht versenden'),10);
  if(cancelled)paragraph(t('STORNIERT - keine Zahlung erforderlich'),10);
  const issueDate=date(document.issue_date),dueDate=date(invoice?document.due_date:document.valid_until);

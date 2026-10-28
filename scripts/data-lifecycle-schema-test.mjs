@@ -59,6 +59,21 @@ try{
     assert.ok(lifecycle.includes(required),"Lifecycle deletion safeguard missing: "+required);
   }
 
+  const lifecycleOrg='bbbbbbbb-1111-4111-a111-111111111111';
+  await db.query("insert into organizations(id,name,slug,status,is_demo) values($1,'Synthetic billing lifecycle','billing-lifecycle-fixture','active',false)",[lifecycleOrg]);
+  const agreement=(await db.query("insert into billing_agreements(organization_id,currency,terms,created_by_user_id,scope_kind,scope_id) values($1,'CHF',$2::jsonb,'synthetic-owner','project',gen_random_uuid()) returning id",[lifecycleOrg,JSON.stringify({revision:1,model:'fixed',currency:'CHF',amount:'100.00'})])).rows[0].id;
+  await assert.rejects(()=>db.query('delete from billing_agreements where id=$1',[agreement]),error=>error.code==='23514','Direct agreement deletion remains forbidden even to an owner');
+  for(const table of ['billing_agreements','billing_milestone_completions','billing_closures']){assert.equal(organizationConstraints.find(row=>row.table_name===table)?.confdeltype,'c',table+' follows the existing organization lifecycle');assert.equal(exportableTable(table),true);}
+  const customer=(await db.query("insert into customers(organization_id,external_id,customer_no,name) values($1,'billing-lifecycle-customer','LIFECYCLE','Synthetic') returning id",[lifecycleOrg])).rows[0].id;
+  const invoice=(await db.query("insert into invoices(organization_id,external_id,invoice_no,customer_id,issue_date,due_date,status) values($1,'billing-lifecycle-invoice','LIFECYCLE',$2,current_date,current_date,'draft') returning id",[lifecycleOrg,customer])).rows[0].id;
+  const linkedAgreement=(await db.query("insert into billing_agreements(organization_id,customer_id,currency,terms,created_by_user_id,scope_kind,scope_id) values($1,$2,'CHF',$3::jsonb,'synthetic-owner','invoice',$4) returning id",[lifecycleOrg,customer,JSON.stringify({revision:1,model:'fixed',currency:'CHF',amount:'100.00'}),invoice])).rows[0].id;
+  await db.query('insert into billing_closures(organization_id,agreement_id,invoice_id) values($1,$2,$3)',[lifecycleOrg,linkedAgreement,invoice]);
+  await db.exec('begin');
+  await db.query('delete from invoices where id=$1',[invoice]);await db.query('delete from customers where id=$1',[customer]);
+  await db.query('delete from organizations where id=$1',[lifecycleOrg]);
+  await db.exec('commit');
+  for(const table of ['billing_agreements','billing_closures'])assert.equal((await db.query('select count(*)::int n from '+table+' where organization_id=$1',[lifecycleOrg])).rows[0].n,0,'New tenant references leave no orphan after the controlled deletion order');
+  assert.equal((await db.query('select id from billing_agreements where id=$1',[agreement])).rows.length,0,'An actual organization cascade removes its otherwise immutable agreement');
   await (await import('./report-retention-contract.mjs')).verifyReportRetention(db);
   console.log("Organization data lifecycle schema and deletion safeguards passed.");
 }finally{

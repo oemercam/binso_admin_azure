@@ -12,5 +12,5 @@ export function documentDefaults(company:Record<string,unknown>,customer:{paymen
 /** Conversion preserves negotiated positions/text, but uses the invoice's own
  * identity/date and central customer/company payment terms, never a literal 30. */
 export function invoiceDraftFromOffer<T extends {number:string;date:string}>(source:T,current:{number:string;date:string},company:Record<string,unknown>,customer:{paymentDays?:number}|undefined){
- return {...source,id:undefined,status:'draft',paidAmount:0,creditAmount:0,refundAmount:0,refunds:[],revisesOffer:undefined,revisions:[],credits:[],reminders:[],paidOn:undefined,number:current.number,date:current.date,due:documentDefaults(company,customer,'Rechnung',current.date).due};
+ return {...source,sourceOffer:source.number,id:undefined,status:'draft',paidAmount:0,creditAmount:0,refundAmount:0,refunds:[],revisesOffer:undefined,revisions:[],credits:[],reminders:[],paidOn:undefined,number:current.number,date:current.date,due:documentDefaults(company,customer,'Rechnung',current.date).due};
 }

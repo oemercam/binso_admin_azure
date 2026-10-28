@@ -1,17 +1,18 @@
-import {moneyMinor} from './money';
+import {moneyMinor,type Discount} from './money';
 
 /** Commercial terms only. Totals, tax, discounts and source reservations retain
  * their existing owners. Legacy documents have no inferred BillingTerms. */
 export const billingModels=['fixed','time','quantity','mixed','recurring','milestone'] as const;
 export type BillingModel=typeof billingModels[number];
+export type BillingRateOption={position?:number;unitPrice:string;vatRate?:string;taxExempt?:boolean;description?:string;discount?:Discount};
 type Amount=string|null;
 type Currency='CHF'|'EUR';
 export type BillingMilestone={id:string;label:string;amount:Amount;completed:boolean};
 export type BillingTerms={revision:1;currency:Currency}&(
  |{model:'fixed';amount:Amount}
- |{model:'time'}
+ |{model:'time';hourlyRate?:Amount}
  |{model:'quantity'}
- |{model:'mixed';amount:Amount;additionalTime:boolean;quantity:boolean}
+ |{model:'mixed';amount:Amount;additionalTime:boolean;quantity:boolean;hourlyRate?:Amount}
  |{model:'recurring';amount:Amount;startsOn:string|null;endsOn:string|null;intervalMonths:1|3|12}
  |{model:'milestone';milestones:BillingMilestone[]}
 );
@@ -38,10 +39,11 @@ export function normalizeBillingTerms(input:unknown):BillingTerms{
  const common=['revision','currency','model'];
  switch(b.model){
   case 'fixed':keys(b,[...common,'amount']);return {...base,model:b.model,amount:amount(b.amount)};
-  case 'time':case 'quantity':keys(b,common);return {...base,model:b.model};
+  case 'time':keys(b,[...common,'hourlyRate']);return {...base,model:b.model,...(b.hourlyRate===undefined?{}:{hourlyRate:amount(b.hourlyRate)})};
+  case 'quantity':keys(b,common);return {...base,model:b.model};
   case 'mixed':
-   keys(b,[...common,'amount','additionalTime','quantity']);if(typeof b.additionalTime!=='boolean'||typeof b.quantity!=='boolean')throw invalid();
-   return {...base,model:b.model,amount:amount(b.amount),additionalTime:b.additionalTime,quantity:b.quantity};
+   keys(b,[...common,'amount','additionalTime','quantity','hourlyRate']);if(typeof b.additionalTime!=='boolean'||typeof b.quantity!=='boolean')throw invalid();
+   return {...base,model:b.model,amount:amount(b.amount),additionalTime:b.additionalTime,quantity:b.quantity,...(b.hourlyRate===undefined?{}:{hourlyRate:amount(b.hourlyRate)})};
   case 'recurring':{
    keys(b,[...common,'amount','startsOn','endsOn','intervalMonths']);if(![1,3,12].includes(Number(b.intervalMonths))||typeof b.intervalMonths!=='number')throw invalid();
    const startsOn=date(b.startsOn),endsOn=date(b.endsOn);if(endsOn&&(!startsOn||endsOn<startsOn))throw invalid();
@@ -63,8 +65,9 @@ export function normalizeBillingTerms(input:unknown):BillingTerms{
 export function billingTermsReady(terms:BillingTerms):boolean{
  switch(terms.model){
   case 'fixed':return terms.amount!==null;
-  case 'time':case 'quantity':return true;
-  case 'mixed':return Number(terms.amount!==null)+Number(terms.additionalTime)+Number(terms.quantity)>=2;
+  case 'time':return terms.hourlyRate!==null;
+  case 'quantity':return true;
+  case 'mixed':return Number(terms.amount!==null)+Number(terms.additionalTime)+Number(terms.quantity)>=2&&(!terms.additionalTime||terms.hourlyRate!==null);
   case 'recurring':return terms.amount!==null&&terms.startsOn!==null;
   case 'milestone':return terms.milestones.length>0&&terms.milestones.every(m=>m.label!==''&&m.amount!==null);
  }
@@ -89,3 +92,8 @@ export function recurringBillingPeriod(terms:Extract<BillingTerms,{model:'recurr
 /** Supplement to the existing approved/unbilled source checks, not a replacement.
  * The caller must supply the actual persisted source terms, never client claims. */
 export function billingModelAllowsTime(terms:BillingTerms){return terms.model==='time'||terms.model==='mixed'&&terms.additionalTime;}
+/** Stable dirty/retry identity; incomplete editable numbers remain editable. */
+export function billingTermsKey(value:unknown):string{
+ if(value==null)return '';
+ try{return JSON.stringify(normalizeBillingTerms(value))}catch{try{return JSON.stringify(value)}catch{return 'invalid'}}
+}

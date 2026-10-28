@@ -110,7 +110,8 @@
     "0106_web_push.sql",
     "0107_push_dispatch_lifecycle.sql",
     "0108_passkey_assurance.sql",
-    "0109_project_budget_presence.sql"
+    "0109_project_budget_presence.sql",
+    "0110_shared_billing_agreements.sql"
   ],
   "tables": [
     {
@@ -1120,6 +1121,81 @@
       ]
     },
     {
+      "name": "billing_agreements",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "scope_kind",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "scope_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "terms",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "commercial_snapshot",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "billing_agreement_insert",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": null,
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (created_by_user_id = current_setting('app.user_id'::text, true)) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'manager'::text, 'project_manager'::text])) AND ((customer_id IS NULL) OR (EXISTS ( SELECT 1\n   FROM customers c\n  WHERE ((c.organization_id = billing_agreements.organization_id) AND (c.id = billing_agreements.customer_id) AND (c.archived_at IS NULL))))) AND (EXISTS ( SELECT 1\n   FROM organizations o\n  WHERE ((o.id = billing_agreements.organization_id) AND (o.status = ANY (ARRAY['active'::text, 'trial'::text, 'grace_period'::text]))))))"
+        },
+        {
+          "policyname": "billing_agreement_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'reader'::text, 'manager'::text, 'project_manager'::text])) AND ((app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'reader'::text])) OR ((scope_kind = 'project'::text) AND app_workforce_access(customer_id, scope_id)) OR ((scope_kind = 'quote'::text) AND (EXISTS ( SELECT 1\n   FROM quotes q\n  WHERE ((q.organization_id = billing_agreements.organization_id) AND (q.id = billing_agreements.scope_id) AND (q.archived_at IS NULL))))) OR ((scope_kind = 'invoice'::text) AND (EXISTS ( SELECT 1\n   FROM invoices i\n  WHERE ((i.organization_id = billing_agreements.organization_id) AND (i.id = billing_agreements.scope_id) AND (i.archived_at IS NULL)))))) AND app_billing_actor())",
+          "with_check": null
+        }
+      ]
+    },
+    {
       "name": "billing_checkout_sessions",
       "rls": true,
       "forced": true,
@@ -1178,6 +1254,101 @@
           "roles": "{public}",
           "qual": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))",
           "with_check": "((organization_id)::text = NULLIF(current_setting('app.organization_id'::text, true), ''::text))"
+        }
+      ]
+    },
+    {
+      "name": "billing_closures",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "agreement_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "invoice_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "billing_closure_insert",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": null,
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text])) AND (EXISTS ( SELECT 1\n   FROM invoices i\n  WHERE ((i.organization_id = billing_closures.organization_id) AND (i.id = billing_closures.invoice_id) AND (i.billing_agreement_id = billing_closures.agreement_id) AND i.billing_issued AND ((i.billing_context ->> 'procedure'::text) = 'final'::text)))))"
+        },
+        {
+          "policyname": "billing_closure_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (EXISTS ( SELECT 1\n   FROM projects p\n  WHERE ((p.organization_id = billing_closures.organization_id) AND (p.billing_agreement_id = billing_closures.agreement_id)))))",
+          "with_check": null
+        }
+      ]
+    },
+    {
+      "name": "billing_milestone_completions",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "agreement_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "milestone_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "completed_by_user_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "billing_completion_insert",
+          "cmd": "INSERT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": null,
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (completed_by_user_id = current_setting('app.user_id'::text, true)) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'manager'::text, 'project_manager'::text])) AND (EXISTS ( SELECT 1\n   FROM (projects p\n     JOIN billing_agreements a ON (((a.organization_id = p.organization_id) AND (a.id = p.billing_agreement_id))))\n  WHERE ((p.organization_id = billing_milestone_completions.organization_id) AND (a.id = billing_milestone_completions.agreement_id) AND (p.archived_at IS NULL) AND (EXISTS ( SELECT 1\n           FROM jsonb_array_elements((a.terms -> 'milestones'::text)) m(value)\n          WHERE ((m.value ->> 'id'::text) = (billing_milestone_completions.milestone_id)::text)))))) AND (EXISTS ( SELECT 1\n   FROM organizations o\n  WHERE ((o.id = billing_milestone_completions.organization_id) AND (o.status = ANY (ARRAY['active'::text, 'trial'::text, 'grace_period'::text]))))))"
+        },
+        {
+          "policyname": "billing_completion_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (EXISTS ( SELECT 1\n   FROM billing_agreements a\n  WHERE ((a.organization_id = billing_milestone_completions.organization_id) AND (a.id = billing_milestone_completions.agreement_id)))))",
+          "with_check": null
         }
       ]
     },
@@ -4786,6 +4957,16 @@
           "name": "price_base_quantity",
           "type": "integer",
           "required": true
+        },
+        {
+          "name": "billing_part",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "billing_source_position",
+          "type": "integer",
+          "required": false
         }
       ],
       "policies": [
@@ -5173,6 +5354,21 @@
         },
         {
           "name": "uses_minute_allocations",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "billing_agreement_id",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "billing_context",
+          "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "billing_issued",
           "type": "boolean",
           "required": true
         }
@@ -8144,6 +8340,11 @@
           "name": "source_quote_id",
           "type": "uuid",
           "required": false
+        },
+        {
+          "name": "billing_agreement_id",
+          "type": "uuid",
+          "required": false
         }
       ],
       "policies": [
@@ -8439,6 +8640,11 @@
           "name": "external_id",
           "type": "text",
           "required": true
+        },
+        {
+          "name": "billing_part",
+          "type": "text",
+          "required": false
         }
       ],
       "policies": [
@@ -8673,6 +8879,11 @@
         {
           "name": "calculation",
           "type": "jsonb",
+          "required": false
+        },
+        {
+          "name": "billing_agreement_id",
+          "type": "uuid",
           "required": false
         }
       ],
@@ -10295,6 +10506,16 @@
         {
           "name": "payroll_relevant",
           "type": "boolean",
+          "required": false
+        },
+        {
+          "name": "billing_agreement_id",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "billing_source_position",
+          "type": "integer",
           "required": false
         }
       ],

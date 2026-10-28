@@ -62,6 +62,7 @@ export function planChanges(files,{level='standard'}={}){
  const suites=new Set();
  if(paths.some(p=>/project.*budget|0109_project_budget|project-workspace|lib\/projects|pages\/projects/.test(p)))suites.add('project-budget-migration-test');
  if(paths.some(p=>/billing-model|lib\/money/.test(p)))suites.add('billing-model-test');
+ if(paths.some(p=>/billing-model|billing-agreement|billing-terms|project-billing|0110_shared_billing|documents|project-workspace|app\/api\/(projects|time-entries|time-tracker)/.test(p))){suites.add('registration-test');suites.add('billing-model-test');suites.add('migration-test');suites.add('schema-contract-test');}
  if(global||paths.some(p=>/customer-workspace|workspace-navigation|v7-navigation|pages\/(customers|finance|projects|payments|support)/.test(p)))suites.add('v7-navigation-test');
  if(global||paths.some(p=>/pwa-|startup|app\/api\/dashboard|components\/pages\/time/.test(p)))suites.add('pwa-transition-test');
  if(global||paths.some(p=>/components\/(setup-process|setup-guide|directory-select|select-control|documents|document-settings|entity-files|offer-history|pages\/(customers|time|dashboard|payments))|lib\/(setup-readiness|display-format|server\/repositories\/customer-activity)|scripts\/audit-corrections-test/.test(p)))suites.add('audit-corrections-test');

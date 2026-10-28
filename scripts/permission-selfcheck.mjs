@@ -1,3 +1,4 @@
+import {billingAgreementModuleUrl} from './data-test-modules.mjs';
 import {expensePaymentModuleUrl} from './data-test-modules.mjs';
 import {financialModuleUrl,documentAmountSqlModuleUrl} from "./data-test-modules.mjs";
 import fs from 'node:fs/promises';
@@ -28,6 +29,7 @@ console.log('Finance and operator permission matrix passed.');
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 let businessSource=(await fs.readFile('lib/server/repositories/business-api.ts','utf8')).replace('import "server-only";','');
 const businessDependencies={
+ '../billing-agreements':billingAgreementModuleUrl,
  '@/lib/expense-payment':expensePaymentModuleUrl,
  '../document-amount-sql':documentAmountSqlModuleUrl,
  '../business-idempotency':moduleUrl('export async function idempotentBusiness(c,input,write){return write()}'),

@@ -17,8 +17,8 @@ export async function organizationPlanInTransaction(client:PoolClient,organizati
 }
 export async function getOrganizationPlan(organizationId:string):Promise<PlanId>{return withTenant(organizationId,'',client=>organizationPlanInTransaction(client,organizationId));}
 
-export async function requireModuleEntitlement(organizationId:string,moduleKey:string){
- const plan=await getOrganizationPlan(organizationId);
+export async function requireModuleEntitlement(organizationId:string,moduleKey:string,transaction?:PoolClient){
+ const plan=await (transaction?organizationPlanInTransaction(transaction,organizationId):getOrganizationPlan(organizationId));
  assertModuleEntitlement(plan,moduleKey);
  return plan;
 }
