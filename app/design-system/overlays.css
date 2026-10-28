@@ -387,7 +387,7 @@
 /* Route and domain editors reuse the page header, margins and one scroll owner. */
 .page-container:has(>.form-page[data-form-page-root])>:not(.form-page[data-form-page-root]):not(.page-head){display:none}
 .page-container:has(>.form-page[data-form-page-root])>.page-head .page-actions{display:none}
-.form-page[data-form-page-root]{display:flex;flex-direction:column;min-width:0;min-height:0;height:var(--form-page-height,auto)}
+.form-page[data-form-page-root]{--form-page-height:auto;--form-page-footer-height:80px;display:flex;flex-direction:column;min-width:0;min-height:0;height:var(--form-page-height,auto)}
 .form-page-body{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow-y:auto;overscroll-behavior:contain;scroll-padding-block:12px calc(var(--form-page-footer-height,80px) + 16px)}
 .form-page-body:has(>.sheet-form-layout,>form>.form-wizard,>.form-wizard){overflow:hidden}
 .form-page-body>.sheet-form-layout,.form-page-body>form:has(>.form-wizard),.form-page-body>.form-wizard{display:flex;flex-direction:column;flex:1;min-height:0;min-width:0;overflow:hidden;margin:0}

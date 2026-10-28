@@ -22,3 +22,6 @@ export function duplicateDocumentLine<T extends LinkedLine>(lines:readonly T[],i
  if(!canDuplicateDocumentLine(lines[index]))throw new RangeError('Verknüpfte Zeiten und Belege dürfen nicht doppelt verrechnet werden.');
  return [...lines.slice(0,index+1),{...lines[index],id:newId},...lines.slice(index+1)];
 }
+
+/** Pricing presentation only; the amount remains owned by calculateDocument. */
+export function isMinuteDocumentLine(line:{priceBaseQuantity?:unknown;price_base_quantity?:unknown;timeAllocations?:unknown;time_allocations?:unknown}){return Number(line.priceBaseQuantity??line.price_base_quantity??1)>1||Array.isArray(line.timeAllocations)&&line.timeAllocations.length>0||Array.isArray(line.time_allocations)&&line.time_allocations.length>0;}

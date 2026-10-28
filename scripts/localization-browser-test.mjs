@@ -1,6 +1,7 @@
 import {verifyConsentRejection} from './privacy-consent-browser.mjs';
 import {verifyLanguagePreference} from './language-preference-browser.mjs';
 import {createUiAuthFixture} from './ui-auth-fixture.mjs';
+import {createDocumentNavigation} from './document-navigation-browser.mjs';
 import {selectAppOption,appControlValue} from './app-select-browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
@@ -22,28 +23,25 @@ try{
  browser=await engines[process.env.BINSO_UX_BROWSER??'chromium'].launch({headless:true});
  for(const width of [390,768,1440])for(const locale of ['de','fr','it','en','tr']){
   const context=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
+  const navigation=createDocumentNavigation(context);
   await context.addCookies(uiAuth.cookies.map(cookie=>({...cookie,url:base})));
   await context.route('**/api/**',route=>{const pathname=new URL(route.request().url()).pathname;return route.fulfill({json:pathname==='/api/auth/session'?{authenticated:true,demo:true,user:{id:'fixture'},tenant:{id:'fixture',role:'owner',plan:'pro'}}:pathname==='/api/settings/profile'?{item:{display_name:'Fixture Person',language:locale}}:pathname==='/api/settings/company'?{item:{name:'Synthetic Localization Company'}}:{items:[],tracker:null}})});
-  const faults=[],cancelledReloadPrefetches=[];let reloading=false;
+  const faults=[];
   const trackedPage=async()=>{const next=await context.newPage();next.on('pageerror',error=>{
-   // WebKit reports old-document speculative RSC fetches as page errors when
-   // an explicit full reload cancels them. Keep startup/application errors and
-   // the same error outside that reload phase fatal; retain cancellation evidence.
-   if(reloading&&error.message.includes('_rsc=')&&error.message.includes('due to access control checks.'))cancelledReloadPrefetches.push(error.message);
-   else faults.push(error.message);
+   faults.push(error.message);
   });next.on('console',message=>{if(/hydration|hydrated|server rendered HTML|react\.dev\/errors\/\d+/i.test(message.text()))faults.push('React hydration/runtime: '+message.text());});return next};
   let page=await trackedPage();
-  await page.goto(base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
+  await navigation.goto(page,base+'/?lang='+locale,{waitUntil:'networkidle'});await page.locator('.reference-hero').waitFor();
   assert.equal(await page.locator('html').getAttribute('lang'),(locale==='tr'?'tr-TR':locale+'-CH'));
   await verifyConsentRejection(page,text,locale);
   const selector=page.locator('.locale-switcher .app-select-trigger:visible').first();await selectAppOption(selector, locale==='en'?'fr':'en');
   const chosen=locale==='en'?'fr':'en';await page.waitForFunction(code=>document.documentElement.lang===(code==='tr'?'tr-TR':code+'-CH'),chosen);
-  await page.waitForLoadState('networkidle');reloading=true;try{await page.reload({waitUntil:'networkidle'})}finally{reloading=false}assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
+  await navigation.reload(page,{waitUntil:'networkidle'});assert.equal(await page.locator('html').getAttribute('lang'),chosen+'-CH','Choice survives reload');
   for(const route of ['/?lang='+locale,'/dashboard?lang='+locale,'/operator?lang='+locale,'/wartung?lang='+locale,'/missing-localization-route?lang='+locale]){
-   await page.waitForLoadState('networkidle');assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
-   page.removeAllListeners('pageerror');await page.close();page=await trackedPage();
+   await navigation.settle(page);assert.deepEqual(faults,[],'No runtime failures before an isolated route reset');
+   await page.close();assert.deepEqual(faults,[],'No runtime failures while retiring an isolated route');page=await trackedPage();
    console.log('Localization route',locale,width,route);
-   await page.goto(base+route,{waitUntil:'networkidle'});await page.locator('h1:visible').first().waitFor();
+   await navigation.goto(page,base+route,{waitUntil:'networkidle'});await page.locator('h1:visible').first().waitFor();
    // Public 404 is outside the locale-query matcher; the selected cookie remains authoritative.
    assert.equal(await page.locator('html').getAttribute('lang'),(locale==='tr'?'tr-TR':locale+'-CH'));
    const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);assert.equal(overflow,false,route+' '+locale+' '+width+' overflow');
@@ -62,8 +60,9 @@ try{
     await page.screenshot({path:output+'/landing-'+locale+'-'+width+'.png',fullPage:true});
    }
   }
-  await verifyLanguagePreference(page,{base,locale,text});
-  assert.deepEqual(faults,[],'No uncaught browser errors');results.push({locale,width,passed:true,cancelledReloadPrefetches,profilePreference:'failure, pending lock, confirmation, reload and account-menu storage verified'});await context.close();
+  await verifyLanguagePreference(page,{base,locale,text,navigation});
+  await navigation.settle(page);assert.deepEqual(faults,[],'No uncaught browser errors');await context.close();assert.deepEqual(faults,[],'No runtime failures while retiring the completed context');
+  results.push({locale,width,passed:true,navigation:navigation.evidence,browserFaultPolicy:'Every pageerror is fatal; no reload exception',profilePreference:'failure, pending lock, confirmation, reload and account-menu storage verified'});
  }
  await fs.writeFile(output+'/results.json',JSON.stringify(results,null,2),{flag:'wx',mode:0o600});console.log('Five-language selection and core landing/customer/operator/404, persistent selection and responsive overflow checks passed.');
 }finally{await browser?.close();server.kill();await uiAuth.close()}

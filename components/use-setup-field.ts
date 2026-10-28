@@ -18,15 +18,18 @@ export function useSetupField(allowed:readonly SetupField[],loaded:boolean,editi
     if(focused)return;
     const input=document.getElementById(setupFieldIds[field]);
     const target=input instanceof HTMLInputElement&&input.hidden?input.closest('.form-field')?.querySelector<HTMLElement>('button'):input;
-    if(!target||target.closest('[inert]'))return;
+    if(!target||!target.getClientRects().length||target.closest('[inert]'))return;
     target.focus({preventScroll:true});
-    if(document.activeElement===target){focused=true;target.scrollIntoView({block:'nearest'});}
+    if(document.activeElement===target){focused=true;observer.disconnect();target.scrollIntoView({block:'nearest'});}
    });
   };
-  // FormSheet mounts its portal after a microtask. Retry on the existing modal
-  // lifecycle event, after its focus trap has initialized, without polling.
+  // A concurrently committed FormPage may arrive after the first animation
+  // frame. Retry when its real DOM appears or an overlay releases its inert
+  // ancestor. Stop observing after the one successful explicit recovery focus.
+  const observer=new MutationObserver(scheduleFocus);
+  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['inert','hidden']});
   window.addEventListener('binso-modal-open',scheduleFocus);scheduleFocus();
-  return()=>{cancelAnimationFrame(frame);window.removeEventListener('binso-modal-open',scheduleFocus)};
+  return()=>{observer.disconnect();cancelAnimationFrame(frame);window.removeEventListener('binso-modal-open',scheduleFocus)};
  },[editing,field]);
  return {field,returnTo:field?safeAppPath(search.get('returnTo'),'/dashboard'):null};
 }

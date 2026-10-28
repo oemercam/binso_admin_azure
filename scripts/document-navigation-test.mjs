@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';import {EventEmitter} from 'node:events';
+import {createDocumentNavigation} from './document-navigation-browser.mjs';
+const context=new EventEmitter(),page=new EventEmitter();page.evaluate=async()=>{};page.url=()=>'/old';const actions=[];page.goto=async url=>actions.push(url);page.reload=async()=>actions.push('reload');
+const request=url=>({frame:()=>({page:()=>page}),url:()=>url});
+const nav=createDocumentNavigation(context,{quietMs:20,timeoutMs:200});let completed=false;
+const first=request('/actual?_rsc=1');context.emit('request',first);const waiting=nav.goto(page,'/next').then(()=>completed=true);
+await new Promise(resolve=>setImmediate(resolve));assert.equal(completed,false,'A stale load flag cannot release an outstanding request');assert.deepEqual(actions,[]);
+context.emit('requestfinished',first);const late=request('/late?_rsc=2');context.emit('request',late);await new Promise(resolve=>setTimeout(resolve,30));assert.equal(completed,false,'A newly queued prefetch resets the quiet boundary');context.emit('requestfinished',late);await waiting;
+assert.deepEqual(actions,['/next']);assert.equal(nav.evidence.at(-1).pendingBeforeNavigation,0);
+const failed=request('/failed');context.emit('request',failed);let observed=false;context.on('requestfailed',()=>observed=true);const reload=nav.reload(page);context.emit('requestfailed',failed);await reload;assert.equal(observed,true,'The ledger never consumes or filters failure events');
+const blocked=request('/never-finishes');context.emit('request',blocked);await assert.rejects(nav.settle(page),/did not settle.*never-finishes/);context.emit('requestfinished',blocked);
+const closing=nav.settle(page);await new Promise(resolve=>setImmediate(resolve));page.emit('close');await assert.rejects(closing,/closed before/);
+console.log('Actual document navigation: outstanding and late requests block switches, failures remain visible, timeout/close reject, and no navigation begins pending.');

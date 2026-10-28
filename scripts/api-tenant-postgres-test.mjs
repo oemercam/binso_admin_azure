@@ -1,3 +1,4 @@
+import {verifyAdditionalHttpReads} from './api-additional-read-contracts.mjs';
 import {verifyConcurrentTrialExpiry} from './session-expiry-native-test.mjs';
 import assert from 'node:assert/strict';
 import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
@@ -206,13 +207,17 @@ try{
  // are absent; allowed sends must record failure with zero transport attempts.
  for(const path of ['/api/reports/exports/[id]','/api/reports/exports/[id]/send','/api/reports/exports/[id]/share'])covered.add(path);
  for(const path of ['/api/expenses/[id]','/api/documents/[number]','/api/documents/[number]/pdf','/api/documents/[number]/versions','/api/documents/[number]/followups','/api/files/[id]/download'])covered.add(path);
+ for(const path of await verifyAdditionalHttpReads({pool,base,get,cookies,roles,organizations,customer,project,employee}))covered.add(path);
  const publicEntries=new Set(['/api/auth/invitation','/api/health','/api/health/ready','/api/demo/session','/api/operator/sso/callback']);
+ const uncoveredGets=[];
  for(const api of inventory.apis.filter(item=>item.methods.includes('GET'))){
   if(api.path.startsWith('/api/operator/')&&!publicEntries.has(api.path)||api.path.startsWith('/api/demo/')&&!publicEntries.has(api.path)){
    for(const role of roles)assert.equal((await get(api.path.replace(/\[[^\]]+\]/g,customer.id)+(api.path==='/api/demo/data'?'?collection=customers':''),cookies.get('0:'+role))).status,(api.path.startsWith('/api/demo/')||api.path==='/api/operator/demo-session')?410:401,role+' separate session boundary '+api.path);covered.add(api.path);
   }
-  assert.ok(covered.has(api.path)||publicEntries.has(api.path),'Uncovered authenticated GET contract: '+api.path);
+  if(!covered.has(api.path)&&!publicEntries.has(api.path))uncoveredGets.push(api.path);
  }
+ assert.deepEqual(uncoveredGets,[],'Every inventoried GET requires an executed HTTP contract');
+ console.log('Complete GET inventory coverage: '+inventory.apis.filter(item=>item.methods.includes('GET')).length+' routes; no omitted private GETs.');
  const write=async(method,path,body,role)=>{
   const response=await fetch(base+path,{method,headers:{cookie:cookies.get('0:'+role),origin:base,'Content-Type':'application/json','Idempotency-Key':'v215-'+role+'-'+path.replaceAll('/','-')},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
   return {status:response.status,data:await response.json()};

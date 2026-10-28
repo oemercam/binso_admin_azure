@@ -21,7 +21,7 @@ async function access(c:PoolClient,s:SessionUser,supplierId:string,id:string,wri
 }
 export async function supplierMatchState(c:PoolClient,s:SessionUser,supplierId:string,id:string,from:string,until:string){
  const parent=await access(c,s,supplierId,id),period=dates(from,until);
- const sources=(await c.query(`select p.id price_source_id,t.id time_entry_id,t.work_date::text,t.recorded_duration_minutes minutes,t.description,pr.name project_name,p.source_snapshot->>'unitPrice' unit_price,p.source_snapshot->>'currency' currency,p.source_snapshot->>'vatRate' vat_rate
+ const sources=(await c.query(`select p.id price_source_id,t.id time_entry_id,t.work_date::text,t.recorded_duration_minutes minutes,t.description,pr.name project_name,p.source_snapshot->>'unitPrice' unit_price,coalesce((p.source_snapshot->>'unitMinutes')::integer,60) price_base_quantity,p.source_snapshot->>'currency' currency,p.source_snapshot->>'vatRate' vat_rate
  from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id and p.side='purchase' and p.is_current and p.time_version=t.version left join projects pr on pr.organization_id=t.organization_id and pr.id=t.project_id
  where t.organization_id=$1 and t.supplier_id::text=$2 and t.approved and t.submitted_at is not null and t.external_resource_id is not null and t.archived_at is null and t.work_date between $3::date and $4::date order by t.work_date,t.id limit 101`,[s.organizationId,supplierId,period.from,period.until])).rows;
  const matches=(await c.query(`select id,invoice_version,input_snapshot,created_at,created_by_user_id,

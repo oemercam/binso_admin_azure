@@ -2,7 +2,7 @@
 
 Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.
 
-159 API route files, 62 client consumers, 111 migrations, 129 declared tables.
+161 API route files, 62 client consumers, 114 migrations, 131 declared tables.
 
 | Endpoint | Methods | Source | Direct data/auth evidence |
 |---|---|---|---|
@@ -63,7 +63,9 @@ Static AST/source inventory, not proof that every runtime branch is tested. Call
 | `/api/documents/[number]/send` | POST | `app/api/documents/[number]/send/route.ts` | `requireSession:21`, `withTenant:29`, `c.query:31`, `c.query:38`, `c.query:42`, `c.query:47`, `c.query:50`, `c.query:52`, `c.query:53`, `withTenant:64`, `withTenant:76`, `c.query:77`, `withTenant:83`, `c.query:84`, `c.query:86` |
 | `/api/documents/[number]/status` | POST | `app/api/documents/[number]/status/route.ts` | `requireSession:7`, `withTenant:9` |
 | `/api/documents/[number]/versions` | GET, POST | `app/api/documents/[number]/versions/route.ts` | `requireSession:14`, `authorize:14`, `withTenant:15`, `c.query:16`, `c.query:21`, `c.query:25`, `c.query:26`, `c.query:30`, `requireSession:37`, `authorize:37`, `withTenant:40`, `c.query:41`, `c.query:43`, `c.query:46`, `c.query:51`, `c.query:53`, `c.query:57` |
-| `/api/documents/preview` | POST | `app/api/documents/preview/route.ts` | `requireSession:16`, `authorize:17`, `withTenant:22`, `c.query:29`, `c.query:30`, `c.query:32` |
+| `/api/documents/advances` | GET | `app/api/documents/advances/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:11`, `c.query:11` |
+| `/api/documents/billing-agreements/[id]` | GET | `app/api/documents/billing-agreements/[id]/route.ts` | `requireSession:8`, `authorize:8`, `withTenant:10`, `c.query:10`, `(await c.query('select milestone_id::text from billing_milestone_completions where organization_id=$1 and agreement_id=$2',[s.organizationId,a.id])).rows.map:10`, `c.query:10` |
+| `/api/documents/preview` | POST | `app/api/documents/preview/route.ts` | `requireSession:16`, `authorize:17`, `withTenant:22`, `c.query:26`, `c.query:32`, `c.query:33`, `c.query:35` |
 | `/api/documents` | GET, POST | `app/api/documents/route.ts` | `tenantListPage:18`, `requireSession:34`, `authorize:34`, `tenantList:35`, `tenantRpc:55` |
 | `/api/employees/[id]/allowances/[claimId]` | PATCH | `app/api/employees/[id]/allowances/[claimId]/route.ts` | `requireSession:7`, `withTenant:8` |
 | `/api/employees/[id]/allowances` | POST | `app/api/employees/[id]/allowances/route.ts` | `requireSession:7`, `withTenant:8` |

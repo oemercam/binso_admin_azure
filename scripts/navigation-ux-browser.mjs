@@ -1,6 +1,21 @@
 import assert from 'node:assert/strict';
 import {waitForFiniteAnimations} from './shared-control-browser.mjs';
 
+// Calibrate the host's native link-tabbing policy independently of Binso.
+// Windows WebKit's touch context can omit implicit anchors from Tab order.
+// Do not add tabindex or focus handlers to production navigation to mask that.
+async function nativeTabDestination(page){
+ const control=await page.context().newPage();
+ try{
+  await control.setContent('<nav><a href="#one">One</a><a href="#two">Two</a><button>More</button></nav>');
+  const targets=control.locator('nav > *');await targets.first().focus();await targets.first().press('Tab');
+  const observed=await targets.evaluateAll(nodes=>nodes.indexOf(document.activeElement));
+  assert.ok(observed===1||observed===2,'Native control must tab to the next anchor or button');
+  console.log('Independent native Tab policy',JSON.stringify({browser:page.context().browser()?.browserType().name(),implicitLinks:observed===1,physicalSafariTest:false}));
+  return observed===1?'next':'button';
+ }finally{await control.close();}
+}
+
 export async function assertFlatMobileNavigation(page){
  await waitForFiniteAnimations(page);
  const material=await page.locator('.bottom-nav,.operator-mobile-nav').evaluateAll(nodes=>nodes.filter(el=>el.checkVisibility()).map(el=>{const c=getComputedStyle(el),r=el.getBoundingClientRect();return {background:c.backgroundColor,radius:c.borderRadius,shadow:c.boxShadow,blur:c.backdropFilter,webkitBlur:c.webkitBackdropFilter,theme:document.documentElement.dataset.theme,active:[...el.querySelectorAll('.active')].map(a=>getComputedStyle(a).color),labels:[...el.querySelectorAll(":scope > a > span,:scope > button > span")].filter(a=>a.checkVisibility()&&a.getBoundingClientRect().height>0&&getComputedStyle(a).opacity!=="0").map(a=>({text:a.textContent,name:a.parentElement.getAttribute("aria-label")??a.textContent,font:parseFloat(getComputedStyle(a.parentElement).fontSize),height:a.clientHeight,scroll:a.scrollHeight,clientWidth:a.clientWidth,scrollWidth:a.scrollWidth,width:a.getBoundingClientRect().width,targetWidth:a.parentElement.getBoundingClientRect().width})),targets:[...el.children].map(a=>({width:a.getBoundingClientRect().width,height:a.getBoundingClientRect().height})),left:r.left,right:r.right,viewport:innerWidth}}));
@@ -36,10 +51,16 @@ export async function verifyFlatNavigationAdversaries(page){
   const label=labelTarget.locator(':scope > span'),spanStyle=await label.getAttribute('style');
   try{await label.evaluate(el=>el.style.setProperty('max-width','10px','important'));await assert.rejects(()=>assertFlatMobileNavigation(page),/labels remain readable/,'Horizontally clipped navigation labels must fail at runtime');}
   finally{await label.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),spanStyle);}
+  const policy=await nativeTabDestination(page);
+  const expected=policy==='next'?targets.nth(1):nav.locator(':scope > button').first();
   await targets.first().focus();await targets.first().press('Tab');
-  if(!await targets.nth(1).evaluate(el=>el===document.activeElement))console.log('Navigation keyboard diagnostics',await page.evaluate(()=>({active:document.activeElement?.outerHTML,targets:[...document.querySelectorAll('.bottom-nav>a,.bottom-nav>button')].map(el=>({name:el.textContent,tabIndex:el.tabIndex,visible:el.checkVisibility()}))})));
-  assert.equal(await targets.nth(1).evaluate(el=>el===document.activeElement),true,'Native keyboard navigation retains destination order');
-  await targets.nth(1).evaluate(el=>el.blur());await assertFlatMobileNavigation(page);
+  assert.equal(await expected.evaluate(el=>el===document.activeElement),true,'Navigation preserves the independently observed native keyboard order');
+  // Even when the host skips implicit links, each destination remains a native,
+  // focusable anchor; no app tabindex override or inert ancestor may explain it.
+  for(const target of await targets.all()){
+   await target.focus();assert.equal(await target.evaluate(el=>el===document.activeElement&&!el.closest('[inert]')&&el.tabIndex===0),true,'Every navigation destination retains native focus semantics');
+  }
+  await expected.evaluate(el=>el.blur());await assertFlatMobileNavigation(page);
  }finally{await nav.evaluate((el,style)=>style===null?el.removeAttribute('style'):el.setAttribute('style',style),original);}
 }
 

@@ -1,4 +1,5 @@
 import './reference-foundation-test.mjs';
+import './dialog-focus-test.mjs';
 import './localization-test-adapter.mjs';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
@@ -38,8 +39,10 @@ const source=fs.readFileSync('components/ui.tsx','utf8'),ast=ts.createSourceFile
 const body="const {House,Users,BriefcaseBusiness,Clock3,Ellipsis,HelpCircle}=require('lucide-react');\n"+ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const compiled=ts.transpileModule(body,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const {fieldInputHint}=await import(moduleUrl(fs.readFileSync('lib/form-input-hints.ts','utf8')));
-let write=true;const ui={};Function('require','exports','Children','cloneElement','isValidElement','useId','useState','fieldInputHint','usePageAccess','Link',compiled)(require,ui,React.Children,React.cloneElement,React.isValidElement,React.useId,React.useState,fieldInputHint,()=>({write,canOpen:()=>true}),({children,...props})=>React.createElement('a',props,children));
+let write=true;const ui={};Function('require','exports','Children','cloneElement','isValidElement','useId','useState','useSyncExternalStore','createPortal','fieldInputHint','usePageAccess','Link',compiled)(require,ui,React.Children,React.cloneElement,React.isValidElement,React.useId,React.useState,React.useSyncExternalStore,require('react-dom').createPortal,fieldInputHint,()=>({write,canOpen:()=>true}),({children,...props})=>React.createElement('a',props,children));
 const html=element=>renderToStaticMarkup(element);
+assert.equal(html(React.createElement(ui.Toast,{title:'Synthetic floating feedback'})),'','Floating feedback has a stable empty server snapshot without accessing document');
+const inlineFeedback=html(React.createElement(ui.Toast,{title:'Synthetic inline feedback',inline:true}));assert.ok(inlineFeedback.includes('role="status"')&&inlineFeedback.includes('Synthetic inline feedback'),'Inline feedback remains rendered with its field during SSR');
 for(const expanded of [false,true]){
  const disclosure=html(React.createElement(ui.Button,{'aria-expanded':expanded,'aria-controls':'further-readings','aria-label':'Weitere Auswertungen'},'Mehr anzeigen'));
  assert.ok(disclosure.includes(`aria-expanded="${expanded}"`),'Shared disclosure button exposes its actual expanded state');

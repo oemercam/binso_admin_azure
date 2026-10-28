@@ -1,7 +1,7 @@
 import {normalizeBillingTerms} from '@/lib/billing-model';
-import {invoiceBillingContext} from '@/lib/server/billing-agreements';
+import {invoiceBillingContext,applyDocumentAdvances,reconcileDocumentBilling} from '@/lib/server/billing-agreements';
 import {minuteAllocations,prepareMinuteLine} from '@/lib/server/repositories/business-api';
-import {calculateDocument} from "@/lib/money";
+import {calculateDocument,calculateBillingDocument} from "@/lib/money";
 import {NextRequest} from "next/server";
 import {ApiError,apiError,assertSameOrigin,readJson,cleanText,json} from "@/lib/server/http";
 import {requireSession} from "@/lib/server/session";
@@ -10,19 +10,22 @@ import {authorize} from "@/lib/server/rbac";
 import {requireModuleEntitlement} from "@/lib/server/plan-access";
 import {documentLogo} from "@/lib/server/document-logo";
 import {documentPdf} from "@/lib/server/document-pdf";
-type Body={billingTerms?:unknown;billingContext?:unknown;discount?:unknown;output?:unknown;kind?:unknown;customerId?:unknown;number?:unknown;sourceNumber?:unknown;date?:unknown;due?:unknown;currency?:unknown;note?:unknown;positions?:Array<{timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;description?:unknown;quantity?:unknown;price?:unknown;vatRate?:unknown;unit?:unknown}>};
+type Body={advanceApplications?:unknown;billingAgreementId?:string;billingScopes?:Array<{agreementId:string;context?:unknown;discount?:unknown}>;billingTerms?:unknown;billingContext?:unknown;discount?:unknown;output?:unknown;kind?:unknown;customerId?:unknown;number?:unknown;sourceNumber?:unknown;date?:unknown;due?:unknown;currency?:unknown;note?:unknown;positions?:Array<{billingSourcePosition?:unknown;billingAgreementId?:unknown;timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;description?:unknown;quantity?:unknown;price?:unknown;vatRate?:unknown;unit?:unknown}>};
 /** Read-only preview: all client-supplied documents are drafts, never final bills. */
 export async function POST(request:NextRequest){try{
  assertSameOrigin(request);const s=await requireSession(),body=await readJson<Body>(request,262144);
  const invoice=body.kind==='Rechnung';authorize(s,invoice?'invoices:read':'sales:read');await requireModuleEntitlement(s.organizationId,invoice?'rechnungen':'offerten');
  if(!Array.isArray(body.positions)||body.positions.length>500)throw new ApiError(400,'positions_invalid','Bitte gültige Positionen erfassen.');
- const items=body.positions.map(item=>{const quantity=Number(item.quantity),unit_price=Number(item.price),vat_rate=Number(item.vatRate||0);if(![quantity,unit_price,vat_rate].every(Number.isFinite)||quantity<0||unit_price<0||quantity>1e9||unit_price>999999999.99||vat_rate<0||vat_rate>100)throw new ApiError(400,'position_invalid','Bitte Menge, Preis und MWST prüfen.');return {time_allocations:minuteAllocations(item.timeAllocations,true),price_base_quantity:item.priceBaseQuantity??1,discount:item.discount,tax_exempt:item.taxExempt,description:cleanText(item.description,5000),quantity,unit_price,line_total:0,vat_rate,unit:cleanText(item.unit,40)};});
+ const items=body.positions.map(item=>{const quantity=Number(item.quantity),unit_price=Number(item.price),vat_rate=Number(item.vatRate||0);if(![quantity,unit_price,vat_rate].every(Number.isFinite)||quantity<0||unit_price<0||quantity>1e9||unit_price>999999999.99||vat_rate<0||vat_rate>100)throw new ApiError(400,'position_invalid','Bitte Menge, Preis und MWST prüfen.');return {billing_source_position:item.billingSourcePosition,billing_agreement_id:item.billingAgreementId,time_allocations:minuteAllocations(item.timeAllocations,true),price_base_quantity:item.priceBaseQuantity??1,discount:item.discount,tax_exempt:item.taxExempt,description:cleanText(item.description,5000),quantity,unit_price,line_total:0,vat_rate,unit:cleanText(item.unit,40)};});
  const issue=cleanText(body.date,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(issue)||!Number.isFinite(Date.parse(issue))||new Date(issue).toISOString().slice(0,10)!==issue)throw new ApiError(400,'date_invalid','Bitte ein gültiges Datum erfassen.');
  const due=invoice?new Date(Date.parse(issue)+Math.min(365,Math.max(0,Number(body.due)||0))*86400000).toISOString().slice(0,10):cleanText(body.due,10);
  const pdf=await withTenant(s.organizationId,s.userId,async c=>{
   for(const item of items)await prepareMinuteLine(c,s,item,body.customerId,body.currency||'CHF',invoice);
  let calculation:ReturnType<typeof calculateDocument>;
- try{calculation=calculateDocument(items,String(body.currency||'CHF'),body.discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}
+ try{calculation=calculateBillingDocument(items,String(body.currency||'CHF'),body.discount,body.billingScopes);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}
+ const sourceDraft=body.sourceNumber&&invoice?(await c.query("select id,billing_agreement_id,billing_context from invoices where organization_id=$1 and invoice_no=$2 and status='draft' and archived_at is null",[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;
+ const agreements=body.billingScopes??(body.billingAgreementId?[{agreementId:body.billingAgreementId,context:body.billingContext}]:sourceDraft?.billing_agreement_id?[{agreementId:sourceDraft.billing_agreement_id,context:body.billingContext??sourceDraft.billing_context}]:[]);
+ if(invoice&&agreements.length){try{calculation=await reconcileDocumentBilling(c,s,sourceDraft?.id??'',items,calculation,agreements);calculation=await applyDocumentAdvances(c,s,sourceDraft?.id??'',body.advanceApplications,calculation,{customerId:body.customerId,currency:body.currency||'CHF',agreements,invoiceId:sourceDraft?.id,issueDate:issue});}catch(error){if(error instanceof RangeError)throw new ApiError(409,'billing_preview_invalid',error.message);throw error;}}
  const subtotal=Number(calculation.subtotal),vat=Number(calculation.vat),total=Number(calculation.total);
  items.forEach((item,i)=>{item.line_total=Number(calculation.lines[i].net);});
  if(!Number.isFinite(total)||total>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');

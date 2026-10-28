@@ -1,5 +1,99 @@
 # V8 – lokaler Implementierungsstand, 28. Oktober 2026
 
+## Aktuelle RSC-Fortsetzung, 28. Oktober 2026
+
+Verbindlicher neuer Prüfstand: [RSC-Ursache, Rot-Grün und Abschlussprüfungen](quality-rsc-20261028.md).
+Der technische RSC-Lokalisierungsblocker ist geschlossen. Die Teststeuerung wartet
+vor Dokumentwechseln auf tatsächliche Request-Ruhe und eingeplante Browserarbeit;
+die frühere Reload-Fehlerausnahme ist entfernt. Vollständige WebKit- und Chromium-
+Lokalisierung (je 15 Sprach-/Viewport-Fälle), alle 94 Pflichtprogramme, Build, Lint,
+Typen, Sicherheits- und native PostgreSQL-Prüfungen sind bestanden. Nur Testdateien
+wurden geändert; Anwendung, Budgets, Migrationen, Authentifizierung und Navigation
+bleiben bytegleich. **Release weiterhin blockiert:** echte Geräte-/Produktionsabnahmen
+und ausdrückliche Produktivfreigabe bleiben offen. Kein Push, Merge oder Deployment.
+
+## Vorherige Fortsetzung der roten Qualitätsschranken, 28. Oktober 2026
+
+Verbindlicher neuer Prüfstand: [Fokus, Browsergates und Abschlussnachweise](quality-red-gates-20261028.md).
+Die zentrale Fokusrückgabe und Menüverankerung sowie Feld-Recovery und belegte
+Testbereitschaftslücken sind korrigiert. Alle 94 Pflichtprogramme, Lint, Typprüfung,
+Build, Sicherheitsabfragen und vier native PostgreSQL-Programme sind bestanden.
+Registrierung samt Import/Merge/Berichten, betroffene Einstellungen, Labor und die
+abschliessende globale WebKit-Gruppe sind bestanden. Die vollständige WebKit-
+Lokalisierung bleibt wegen streng erfasster RSC-Abbrüche rot; echte Safari-Geräte
+und betriebliche Produktionsnachweise bleiben offen. **Release weiterhin blockiert.**
+Fachcode, Budgets, Migrationen, Authentifizierung und Navigation bleiben erhalten.
+Kein Push, Merge, produktiver Eingriff oder Deployment.
+
+## Vorheriger Qualitätsabschluss vom 28. Oktober 2026
+
+Verbindlicher aktueller Stand: [Qualitätsschranken und Release-Status](quality-gates-20261028.md).
+HTTP-Inventar und verdeckte Produkt-/Profilhinweise sind korrigiert; vollständige
+Code-, Build-, native DB- und HTTP-Prüfungen bestanden. Chromium-Registrierungs-
+Gesamtprüfung bestanden, WebKit-Gesamtprüfung und weitere Browsergates noch rot.
+**Release blockiert; keine Veröffentlichung.** Die folgenden älteren Checkpoints
+bleiben historische Nachweise und überschreiben diesen Status nicht.
+
+## Abrechnungsfortsetzung vom 28. Oktober 2026
+
+Der aktuelle lokale Stand auf afaf2a91 ergänzt die drei beauftragten Bereiche:
+Sammelrechnungen mit unabhängigen Konditionen, variable Akonto-Anwendungen mit
+Stornohistorie und kumulative Rabatt-/Steuer-/Rundungsfälle. Die bisherigen
+Budgetkorrekturen, Rechenformeln und Zeitreservierungen bleiben erhalten.
+
+Aktuelle Detailmatrix, Datenbank-/API-Auswirkungen, konkrete Nachweise, Grenzen und
+Abschlussprüfung: [billing-completion-acceptance.md](billing-completion-acceptance.md).
+Die nachfolgenden älteren Prüfergebnisse bleiben historische Checkpoint-Nachweise
+und sind keine automatische Abnahme dieses Arbeitsstands. Gesamtes V8 und echte
+Geräte-/Providerabnahmen bleiben gemäss Matrix offen. Kein produktiver Eingriff.
+
+## Historischer Zwischenstand: vertragliche Zeiteinheiten (28. Oktober 2026)
+
+Dieser Abschnitt bewahrt den Zwischenstand vor den drei Abschlussbereichen.
+Aktuelle Abnahme: billing-completion-acceptance.md.
+Die weiter unten aufgeführten vollständigen Prüfungen und Screenshots gehören zum
+vorherigen Checkpoint und gelten nicht als Abnahme dieser Änderungen.
+
+- Lokal umgesetzt: ausdrücklich vereinbarte Preisbasis von 1 bis 1440 ganzen
+  Minuten. Stunde bleibt 60; eine Tages-/beliebige Einheit benötigt eine explizite
+  Dauer. Kein angenommener Achtstundentag, keine Umrechnung in gerundete Stundensätze.
+- lib/money.ts bleibt der einzige Rechenkern. Geändert sind die zulässige
+  Divisoreingabe und deren Ausgabemetadaten; die bestehenden Betrags-, Rabatt-,
+  Steuer- und Rundungsformeln bleiben erhalten. Die Erweiterung ist ausdrücklich
+  vom Nutzer freigegeben. Die vier Budgetdateien stimmen mit afaf2a91 überein.
+- Durchgängige Anbindung: Vertragsbedingungen, unabhängige Freigabe, unveränderliche
+  Preisquelle, Zeitpicker, Rechnungspositionen/Entwürfe, Vorschau, PDF und
+  Einkaufsrechnungsabgleich. Originalzeiten werden nicht verändert. Unterschiedliche
+  Einkaufs-Preiseinheiten werden nicht als identische Konditionen zusammengefasst.
+- Unveröffentlichte additive Migration 0111: optionale Vertrags-Minutenbasis,
+  erweiterte Einheitenvalidierung und bestehende Quellen-/Reservierungsschutzfunktionen.
+  Historische Migrationen und historische Preis-Snapshots bleiben unverändert.
+- Neue gezielte Tests: genaue CHF/EUR-Beträge und MwSt., Minute/15-Minuten/Tag,
+  ungültige Einheiten, fehlende Tagesdauer, Einkaufsabgleich und tatsächliche
+  Freigabe-/Preisbindungs-/Rechnungs-/Verwerfungs-APIs. Originaldauer bleibt identisch.
+- Natives PostgreSQL 18.6 läuft ausschliesslich lokal in einer isolierten Testinstanz
+  auf 127.0.0.1:55482 mit synthetischen Daten. Offizielle EDB-Binärdateien mit
+  verifiziertem SHA-256. Keine Azure-Ressource oder zusätzliche Kosten.
+- Erfolgreicher nativer Nachweis: allgemeine Geschäfts-/Zahlungsrennen, gemeinsame
+  Rechnungskapazität und zwei nachweislich gleichzeitig an derselben Zeitquelle
+  wartende physische Transaktionen: eine erfolgreiche Übernahme, eine abgewiesene
+  doppelte Übernahme, genau eine Reservierung. Dies ersetzt keine noch fehlenden
+  Konkurrenzfälle für Sammelrechnungen, variable Akontos oder alle Minutenvarianten.
+- Entwicklungstests erfolgreich: contract-time-unit-test, employee-dossier-test
+  einschliesslich neuer Vertragsbasis-APIs, document-presentation-test,
+  localization-test, TypeScript und gezieltes ESLint; native postgres-parallel-test
+  und registration-test --postgres mit dem zusätzlichen Übernahmerennen.
+  Logs: ../audit-20261028-v8/units-*.log und native-units-*.log.
+- Noch offen: mehrere unabhängige Vereinbarungen je Sammelrechnung, variable Akonto-
+  Verrechnung ohne Fixanteil, kumulative Centkorrektur bei geteilten Mengen/Rabatten,
+  vollständige Browserabnahme und physische iPhone/iPad/iOS-PWA-Prüfung.
+- Die einmalige vollständige Pflichtprüfung auf dem finalen Gesamtcode ist noch
+  nicht gestartet: der Gesamtauftrag ist noch in Umsetzung. Kein Release freigegeben,
+  keine produktive Migration, kein Push, Merge oder Deployment ausgeführt.
+
+## Historischer Checkpoint vor dieser Fortsetzung
+
+
 Fortsetzung auf dem unveränderten Budget-Checkpoint 39f6a19c3cf3972907b1643153ba9dd5fa253829.
 Noch kein neuer Release und keine V8-Gesamtabnahme. Details, führende Dateien und
 bekannte Grenzen: [Abrechnungsintegration](billing-integration.md).
@@ -86,7 +180,7 @@ V8 ist daher weiterhin keine vollständig abgenommene Release-Fassung.
 Basis `72948d6d`, Branch `feat/v8-global-simple-workflow-20261027`.
 Noch kein neuer Release und keine V8-Gesamtabnahme.
 
-## Aktueller fachlicher Status
+## Historischer fachlicher Zwischenstand
 
 Die vollständige Vorher-Matrix bleibt unverändert in `matrix.md`; diese Tabelle
 beschreibt den aktuellen Delta-Stand und vergibt keine globale Abnahme.

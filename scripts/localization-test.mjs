@@ -266,3 +266,4 @@ for(const language of config.locales)for(const compact of [false,true]){
  for(const code of config.locales)assert.ok(html.includes(config.localeNames[code]),'Existing language option retained: '+code);
 }
 console.log('Language selector V5: five short triggers and full native option names passed; persistence owner unchanged.');
+import './document-navigation-test.mjs';

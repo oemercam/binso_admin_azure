@@ -1,5 +1,52 @@
 # V8 – Integration der sechs Abrechnungsmodelle
 
+## Historischer Zwischenstand: vertragliche Zeiteinheiten (28. Oktober 2026)
+
+Dieser Abschnitt bewahrt den Zwischenstand vor den drei Abschlussbereichen.
+Aktuelle Abnahme: billing-completion-acceptance.md.
+Die weiter unten aufgeführten vollständigen Prüfungen und Screenshots gehören zum
+vorherigen Checkpoint und gelten nicht als Abnahme dieser Änderungen.
+
+- Lokal umgesetzt: ausdrücklich vereinbarte Preisbasis von 1 bis 1440 ganzen
+  Minuten. Stunde bleibt 60; eine Tages-/beliebige Einheit benötigt eine explizite
+  Dauer. Kein angenommener Achtstundentag, keine Umrechnung in gerundete Stundensätze.
+- lib/money.ts bleibt der einzige Rechenkern. Geändert sind die zulässige
+  Divisoreingabe und deren Ausgabemetadaten; die bestehenden Betrags-, Rabatt-,
+  Steuer- und Rundungsformeln bleiben erhalten. Die Erweiterung ist ausdrücklich
+  vom Nutzer freigegeben. Die vier Budgetdateien stimmen mit afaf2a91 überein.
+- Durchgängige Anbindung: Vertragsbedingungen, unabhängige Freigabe, unveränderliche
+  Preisquelle, Zeitpicker, Rechnungspositionen/Entwürfe, Vorschau, PDF und
+  Einkaufsrechnungsabgleich. Originalzeiten werden nicht verändert. Unterschiedliche
+  Einkaufs-Preiseinheiten werden nicht als identische Konditionen zusammengefasst.
+- Unveröffentlichte additive Migration 0111: optionale Vertrags-Minutenbasis,
+  erweiterte Einheitenvalidierung und bestehende Quellen-/Reservierungsschutzfunktionen.
+  Historische Migrationen und historische Preis-Snapshots bleiben unverändert.
+- Neue gezielte Tests: genaue CHF/EUR-Beträge und MwSt., Minute/15-Minuten/Tag,
+  ungültige Einheiten, fehlende Tagesdauer, Einkaufsabgleich und tatsächliche
+  Freigabe-/Preisbindungs-/Rechnungs-/Verwerfungs-APIs. Originaldauer bleibt identisch.
+- Natives PostgreSQL 18.6 läuft ausschliesslich lokal in einer isolierten Testinstanz
+  auf 127.0.0.1:55482 mit synthetischen Daten. Offizielle EDB-Binärdateien mit
+  verifiziertem SHA-256. Keine Azure-Ressource oder zusätzliche Kosten.
+- Erfolgreicher nativer Nachweis: allgemeine Geschäfts-/Zahlungsrennen, gemeinsame
+  Rechnungskapazität und zwei nachweislich gleichzeitig an derselben Zeitquelle
+  wartende physische Transaktionen: eine erfolgreiche Übernahme, eine abgewiesene
+  doppelte Übernahme, genau eine Reservierung. Dies ersetzt keine noch fehlenden
+  Konkurrenzfälle für Sammelrechnungen, variable Akontos oder alle Minutenvarianten.
+- Entwicklungstests erfolgreich: contract-time-unit-test, employee-dossier-test
+  einschliesslich neuer Vertragsbasis-APIs, document-presentation-test,
+  localization-test, TypeScript und gezieltes ESLint; native postgres-parallel-test
+  und registration-test --postgres mit dem zusätzlichen Übernahmerennen.
+  Logs: ../audit-20261028-v8/units-*.log und native-units-*.log.
+- Noch offen: mehrere unabhängige Vereinbarungen je Sammelrechnung, variable Akonto-
+  Verrechnung ohne Fixanteil, kumulative Centkorrektur bei geteilten Mengen/Rabatten,
+  vollständige Browserabnahme und physische iPhone/iPad/iOS-PWA-Prüfung.
+- Die einmalige vollständige Pflichtprüfung auf dem finalen Gesamtcode ist noch
+  nicht gestartet: der Gesamtauftrag ist noch in Umsetzung. Kein Release freigegeben,
+  keine produktive Migration, kein Push, Merge oder Deployment ausgeführt.
+
+## Historischer Checkpoint vor dieser Fortsetzung
+
+
 Lokales Implementierungspaket vom 28. Oktober 2026, auf Budget-Checkpoint
 `39f6a19c3cf3972907b1643153ba9dd5fa253829`. Keine produktive Migration oder externe Mutation.
 
@@ -88,7 +135,12 @@ um die echten gemeinsamen Module ergänzt; keine fachlichen Prüfungen deaktivie
 Die abschliessenden Pflichtprüfungen werden im Statusbericht separat ausgewiesen.
 Prüflogs/Screenshots: `../audit-20261026/v8-billing-*` ausserhalb des Checkouts.
 
-## Offen / nicht als vollständig abgenommen melden
+## Historische offene Punkte des Checkpoints afaf2a91
+
+Die folgende Liste dokumentiert den früheren Stand. Den aktuellen Abschluss der drei
+Folgepakete und ihre Nachweise führt `billing-completion-acceptance.md`.
+
+### Damalige Einschränkungen
 
 - Eine modellierte Rechnung bindet eine gemeinsame Vereinbarung. Das Kombinieren
   mehrerer unabhängiger modellierter Aufträge/Vereinbarungen in einer Rechnung

@@ -1,3 +1,4 @@
+import {verifyBillingCompletionBrowser,calculationForBrowserPreview} from './billing-completion-browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
@@ -16,7 +17,7 @@ const results=[],customerId='11111111-1111-4111-a111-111111111111',projectId='22
 const labels={fixed:'Pauschal/Fixpreis',time:'Nach Aufwand',quantity:'Nach Menge',mixed:'Gemischt',recurring:'Wiederkehrend',milestone:'Nach Meilensteinen'};
 try{
  for(let n=0;;n++){try{if((await fetch(base+'/login')).ok)break;}catch{}if(n>100||server.exitCode!==null)throw Error(logs);await new Promise(r=>setTimeout(r,200));}
- for(const engine of ['chromium','webkit']){
+ for(const engine of process.env.BINSO_BILLING_COMPLETION_SMOKE==='1'?[]:['chromium','webkit']){
   const browser=await engines[engine].launch({headless:true});
   try{for(const model of Object.keys(labels))for(const source of model==='time'?['project','offer','time']:['project','offer']){
    const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
@@ -28,6 +29,7 @@ try{
    let projectRequests=0;const retryCase=engine==='chromium'&&model==='fixed'&&source==='project';
    await context.route('**/api/**',async route=>{
     const p=new URL(route.request().url()).pathname,reply=json=>route.fulfill({json});
+    if(p==='/api/documents/preview')return reply({calculation:calculationForBrowserPreview(route.request().postDataJSON())});
     if(p==='/api/auth/session')return reply({authenticated:true,user:{id:'fixture'},security:{mfaEnabled:false,enrollmentRequired:false},tenant:{id:'fixture-company',role:'owner',plan:'pro'}});
     if(p==='/api/settings/profile')return reply({item:{id:'fixture',display_name:'Fixture',email:'fixture@example.invalid',language:'de',theme:'light'}});
     if(p==='/api/settings/company')return reply({item:{name:'Fixture AG',street:'Testweg',building_number:'2',postal_code:'8000',city:'Zürich',country_code:'CH',iban:'CH9300762011623852957',vat_rate:8.1,payment_terms_days:30}});
@@ -58,6 +60,7 @@ try{
    assert.deepEqual(errors,[]);results.push({engine,model,source,customerLocked:true,modelLocked:true,positionRetained:true});await context.close();
   }}finally{await browser.close();}
  }
+ results.push(...await verifyBillingCompletionBrowser({engines,base,output,writeFile:fs.writeFile}));
  await fs.writeFile(output+'/results.json',JSON.stringify({results,limitations:['Synthetic HTTP presentation fixtures; actual financial persistence is tested separately.','Not physical iOS/PWA acceptance.']},null,2));
  console.log('Billing inheritance browser: '+results.length+' project/offer/time-to-invoice cases passed.');
 }finally{server.kill();await fs.writeFile(output+'/server.log',logs);}

@@ -2,10 +2,10 @@
   "scope": "Static AST/source inventory, not proof that every runtime branch is tested. Calls include exact source arguments and locations; dynamic dispatch requires the domain matrix and runtime tests.",
   "base": "7b90a5c7353cf2061987fcd0f4550210bbc00f92",
   "counts": {
-    "apis": 159,
+    "apis": 161,
     "consumers": 62,
-    "migrations": 111,
-    "tables": 129
+    "migrations": 114,
+    "tables": 131
   },
   "apis": [
     {
@@ -2813,7 +2813,7 @@
           "line": 62,
           "arguments": [
             "\"update_document_atomic\"",
-            "{\n      p_expected_updated_at:body.expectedUpdatedAt,\n      p_current_number:currentNumber,\n      p_idempotency_key:request.headers.get(\"idempotency-key\")?.trim()??\"\",\n      ...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_number:number,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
+            "{\n      p_expected_updated_at:body.expectedUpdatedAt,\n      p_current_number:currentNumber,\n      p_idempotency_key:request.headers.get(\"idempotency-key\")?.trim()??\"\",\n      ...(body.billingAgreementId===undefined?{}:{p_billing_agreement_id:body.billingAgreementId}),...(body.advanceApplications===undefined?{}:{p_advance_applications:body.advanceApplications}),...(body.billingScopes===undefined?{}:{p_billing_scopes:body.billingScopes}),...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_number:number,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
           ]
         },
         {
@@ -3215,6 +3215,128 @@
       ]
     },
     {
+      "file": "app/api/documents/advances/route.ts",
+      "path": "/api/documents/advances",
+      "methods": [
+        "GET"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 8,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 8,
+          "arguments": [
+            "s",
+            "'invoices:read'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 11,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>(await c.query(`with sources as(select i.issue_date,x.id,x.billing_agreement_id agreement_id,i.invoice_no number,x.currency,x.calculation,b.terms,billing_agreement_label(x.organization_id,x.billing_agreement_id) agreement_label,\n coalesce((select json_agg(a.snapshot->'taxGroups') from invoice_advance_allocations a join invoices t on t.organization_id=a.organization_id and t.id=a.invoice_id where a.reversed_at is null and a.organization_id=x.organization_id and a.advance_invoice_id=x.id and a.agreement_id=x.billing_agreement_id and (t.billing_issued or t.archived_at is null and t.status<>'cancelled') and ($3::uuid is null or t.id<>$3::uuid)),'[]'::json) prior_allocations,\n coalesce((select sum(a.amount) from invoice_advance_allocations a join invoices t on t.organization_id=a.organization_id and t.id=a.invoice_id where a.reversed_at is null and a.organization_id=x.organization_id and a.advance_invoice_id=x.id and a.agreement_id=x.billing_agreement_id and (t.billing_issued or t.archived_at is null and t.status<>'cancelled') and ($3::uuid is null or t.id<>$3::uuid)),0) allocated_amount,\n coalesce((select sum(n.amount) from credit_notes n where n.organization_id=x.organization_id and n.invoice_id=x.id),0) credited_amount\n from billing_scope_invoices x join invoices i on i.organization_id=x.organization_id and i.id=x.id join billing_agreements b on b.organization_id=x.organization_id and b.id=x.billing_agreement_id\n where x.organization_id=$1 and x.customer_id=$2 and x.billing_context->>'procedure'='advance' and x.billing_issued and x.archived_at is null and x.status not in ('draft','cancelled') and (b.terms->>'model' in ('time','quantity') or b.terms->>'model'='mixed' and b.terms->>'amount' is null)) select * from sources where (calculation->>'total')::numeric-allocated_amount-credited_amount>0 order by issue_date,id,agreement_id limit 100`,[s.organizationId,customer,draft])).rows",
+            "{snapshot:true}"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 11,
+          "arguments": [
+            "`with sources as(select i.issue_date,x.id,x.billing_agreement_id agreement_id,i.invoice_no number,x.currency,x.calculation,b.terms,billing_agreement_label(x.organization_id,x.billing_agreement_id) agreement_label,\n coalesce((select json_agg(a.snapshot->'taxGroups') from invoice_advance_allocations a join invoices t on t.organization_id=a.organization_id and t.id=a.invoice_id where a.reversed_at is null and a.organization_id=x.organization_id and a.advance_invoice_id=x.id and a.agreement_id=x.billing_agreement_id and (t.billing_issued or t.archived_at is null and t.status<>'cancelled') and ($3::uuid is null or t.id<>$3::uuid)),'[]'::json) prior_allocations,\n coalesce((select sum(a.amount) from invoice_advance_allocations a join invoices t on t.organization_id=a.organization_id and t.id=a.invoice_id where a.reversed_at is null and a.organization_id=x.organization_id and a.advance_invoice_id=x.id and a.agreement_id=x.billing_agreement_id and (t.billing_issued or t.archived_at is null and t.status<>'cancelled') and ($3::uuid is null or t.id<>$3::uuid)),0) allocated_amount,\n coalesce((select sum(n.amount) from credit_notes n where n.organization_id=x.organization_id and n.invoice_id=x.id),0) credited_amount\n from billing_scope_invoices x join invoices i on i.organization_id=x.organization_id and i.id=x.id join billing_agreements b on b.organization_id=x.organization_id and b.id=x.billing_agreement_id\n where x.organization_id=$1 and x.customer_id=$2 and x.billing_context->>'procedure'='advance' and x.billing_issued and x.archived_at is null and x.status not in ('draft','cancelled') and (b.terms->>'model' in ('time','quantity') or b.terms->>'model'='mixed' and b.terms->>'amount' is null)) select * from sources where (calculation->>'total')::numeric-allocated_amount-credited_amount>0 order by issue_date,id,agreement_id limit 100`",
+            "[s.organizationId,customer,draft]"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "app/api/documents/billing-agreements/[id]/route.ts",
+      "path": "/api/documents/billing-agreements/[id]",
+      "methods": [
+        "GET"
+      ],
+      "dependencies": [
+        "lib/server/session.ts",
+        "lib/server/maintenance.ts",
+        "lib/server/env.ts",
+        "lib/server/db.ts",
+        "lib/server/http.ts",
+        "lib/server/subscription-lifecycle.ts",
+        "lib/server/fresh-authentication.ts",
+        "lib/server/audit.ts",
+        "lib/server/rbac.ts",
+        "lib/permissions.ts",
+        "lib/server/billing-agreements.ts",
+        "lib/billing-model.ts",
+        "lib/money.ts"
+      ],
+      "evidence": [
+        {
+          "callee": "requireSession",
+          "line": 8,
+          "arguments": []
+        },
+        {
+          "callee": "authorize",
+          "line": 8,
+          "arguments": [
+            "s",
+            "'invoices:write'"
+          ]
+        },
+        {
+          "callee": "withTenant",
+          "line": 10,
+          "arguments": [
+            "s.organizationId",
+            "s.userId",
+            "async c=>{const a=await readBillingAgreement(c,s,id);if(a.scope_kind==='quote'&&!(await c.query(\"select 1 from quotes where organization_id=$1 and id=$2 and status='accepted' and archived_at is null\",[s.organizationId,a.scope_id])).rowCount)throw billingIssue();return {...a,billing_completed_milestones:(await c.query('select milestone_id::text from billing_milestone_completions where organization_id=$1 and agreement_id=$2',[s.organizationId,a.id])).rows.map(r=>r.milestone_id)};}",
+            "{snapshot:true}"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 10,
+          "arguments": [
+            "\"select 1 from quotes where organization_id=$1 and id=$2 and status='accepted' and archived_at is null\"",
+            "[s.organizationId,a.scope_id]"
+          ]
+        },
+        {
+          "callee": "(await c.query('select milestone_id::text from billing_milestone_completions where organization_id=$1 and agreement_id=$2',[s.organizationId,a.id])).rows.map",
+          "line": 10,
+          "arguments": [
+            "r=>r.milestone_id"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 10,
+          "arguments": [
+            "'select milestone_id::text from billing_milestone_completions where organization_id=$1 and agreement_id=$2'",
+            "[s.organizationId,a.id]"
+          ]
+        }
+      ]
+    },
+    {
       "file": "app/api/documents/preview/route.ts",
       "path": "/api/documents/preview",
       "methods": [
@@ -3269,12 +3391,20 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{\n  for(const item of items)await prepareMinuteLine(c,s,item,body.customerId,body.currency||'CHF',invoice);\n let calculation:ReturnType<typeof calculateDocument>;\n try{calculation=calculateDocument(items,String(body.currency||'CHF'),body.discount);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}\n const subtotal=Number(calculation.subtotal),vat=Number(calculation.vat),total=Number(calculation.total);\n items.forEach((item,i)=>{item.line_total=Number(calculation.lines[i].net);});\n if(!Number.isFinite(total)||total>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const customer=body.customerId?(await c.query('select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null',[s.organizationId,cleanText(body.customerId,80)])).rows[0]:{};\n  if(body.customerId&&!customer)throw new ApiError(404,'customer_missing','Kunde wurde nicht gefunden.');\n  const saved=body.sourceNumber?(await c.query(`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`,[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;\n  if(body.sourceNumber&&!saved)throw new ApiError(404,'draft_missing','Entwurf wurde nicht gefunden.');\n  if(saved?.calculation&&((saved.calculation.discount.kind!=='none'&&body.discount===undefined)||(saved.calculation.lines.some((l:Record<string,unknown>)=>(l.discount as Record<string,unknown>).kind!=='none')&&body.positions!.some(l=>l.discount===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte die gespeicherten Rabatte ausdrücklich übernehmen.');\n  if(body.output==='calculation')return {calculation,customerDiscountProposal:customer?.discount===undefined?null:{kind:'percent',value:String(customer.discount),applied:false}};\n  const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;\n  const billing=body.billingTerms?normalizeBillingTerms(body.billingTerms):null;\n  const document={billing_context:invoice&&billing?invoiceBillingContext(billing,body.billingContext??{procedure:'standard'}):undefined,document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};\n  return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));\n }"
+            "async c=>{\n  for(const item of items)await prepareMinuteLine(c,s,item,body.customerId,body.currency||'CHF',invoice);\n let calculation:ReturnType<typeof calculateDocument>;\n try{calculation=calculateBillingDocument(items,String(body.currency||'CHF'),body.discount,body.billingScopes);}catch(error){throw new ApiError(400,'discount_invalid',error instanceof Error?error.message:'Ungültiger Rabatt.');}\n const sourceDraft=body.sourceNumber&&invoice?(await c.query(\"select id,billing_agreement_id,billing_context from invoices where organization_id=$1 and invoice_no=$2 and status='draft' and archived_at is null\",[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;\n const agreements=body.billingScopes??(body.billingAgreementId?[{agreementId:body.billingAgreementId,context:body.billingContext}]:sourceDraft?.billing_agreement_id?[{agreementId:sourceDraft.billing_agreement_id,context:body.billingContext??sourceDraft.billing_context}]:[]);\n if(invoice&&agreements.length){try{calculation=await reconcileDocumentBilling(c,s,sourceDraft?.id??'',items,calculation,agreements);calculation=await applyDocumentAdvances(c,s,sourceDraft?.id??'',body.advanceApplications,calculation,{customerId:body.customerId,currency:body.currency||'CHF',agreements,invoiceId:sourceDraft?.id,issueDate:issue});}catch(error){if(error instanceof RangeError)throw new ApiError(409,'billing_preview_invalid',error.message);throw error;}}\n const subtotal=Number(calculation.subtotal),vat=Number(calculation.vat),total=Number(calculation.total);\n items.forEach((item,i)=>{item.line_total=Number(calculation.lines[i].net);});\n if(!Number.isFinite(total)||total>999999999.99)throw new ApiError(400,'total_invalid','Bitte die Positionsbeträge prüfen.');\n  const company=(await c.query('select * from organizations where id=$1',[s.organizationId])).rows[0];\n  const customer=body.customerId?(await c.query('select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null',[s.organizationId,cleanText(body.customerId,80)])).rows[0]:{};\n  if(body.customerId&&!customer)throw new ApiError(404,'customer_missing','Kunde wurde nicht gefunden.');\n  const saved=body.sourceNumber?(await c.query(`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`,[s.organizationId,cleanText(body.sourceNumber,80)])).rows[0]:null;\n  if(body.sourceNumber&&!saved)throw new ApiError(404,'draft_missing','Entwurf wurde nicht gefunden.');\n  if(saved?.calculation&&((saved.calculation.discount.kind!=='none'&&body.discount===undefined)||(saved.calculation.lines.some((l:Record<string,unknown>)=>(l.discount as Record<string,unknown>).kind!=='none')&&body.positions!.some(l=>l.discount===undefined))))throw new ApiError(409,'discount_confirmation_required','Bitte die gespeicherten Rabatte ausdrücklich übernehmen.');\n  if(body.output==='calculation')return {calculation,customerDiscountProposal:customer?.discount===undefined?null:{kind:'percent',value:String(customer.discount),applied:false}};\n  const snapshot=saved?{...saved.document_snapshot,intro:cleanText(body.note,12000)||saved.intro_text||saved.document_snapshot.default_intro||''}:undefined;\n  const billing=body.billingTerms?normalizeBillingTerms(body.billingTerms):null;\n  const document={billing_context:invoice&&billing?invoiceBillingContext(billing,body.billingContext??{procedure:'standard'}):undefined,document_snapshot:snapshot,kind:invoice?'invoice':'offer',status:'draft',number:cleanText(body.number,80)||'Entwurf',issue_date:issue,due_date:invoice?due:null,valid_until:invoice?null:due,note:cleanText(body.note,12000),currency:body.currency==='EUR'?'EUR':'CHF',customer,items,calculation,subtotal,vat_amount:vat,total};\n  return documentPdf(document,company,await documentLogo(c,s.organizationId,document,company));\n }"
           ]
         },
         {
           "callee": "c.query",
-          "line": 29,
+          "line": 26,
+          "arguments": [
+            "\"select id,billing_agreement_id,billing_context from invoices where organization_id=$1 and invoice_no=$2 and status='draft' and archived_at is null\"",
+            "[s.organizationId,cleanText(body.sourceNumber,80)]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 32,
           "arguments": [
             "'select * from organizations where id=$1'",
             "[s.organizationId]"
@@ -3282,7 +3412,7 @@
         },
         {
           "callee": "c.query",
-          "line": 30,
+          "line": 33,
           "arguments": [
             "'select name,address as street,zip as postal_code,city,country,discount from customers where organization_id=$1 and id::text=$2 and archived_at is null'",
             "[s.organizationId,cleanText(body.customerId,80)]"
@@ -3290,7 +3420,7 @@
         },
         {
           "callee": "c.query",
-          "line": 32,
+          "line": 35,
           "arguments": [
             "`select document_snapshot,intro_text,calculation from ${invoice?'invoices':'quotes'} where organization_id=$1 and ${invoice?'invoice_no':'quote_no'}=$2 and status='draft' and archived_at is null`",
             "[s.organizationId,cleanText(body.sourceNumber,80)]"
@@ -3372,7 +3502,7 @@
           "line": 55,
           "arguments": [
             "\"create_document_atomic\"",
-            "{\n      ...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_idempotency_key:requestKey,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
+            "{\n      ...(body.billingAgreementId===undefined?{}:{p_billing_agreement_id:body.billingAgreementId}),...(body.advanceApplications===undefined?{}:{p_advance_applications:body.advanceApplications}),...(body.billingScopes===undefined?{}:{p_billing_scopes:body.billingScopes}),...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),\n      p_discount:body.discount,\n      p_discount_origin:body.discountOrigin,\n      p_calculation_revision:body.calculationRevision,\n      p_source_offer:cleanText(body.sourceOffer,80)||null,\n      p_customer_id:customer.id,\n      p_kind:kind,\n      p_idempotency_key:requestKey,\n      p_issue_date:issueDate,\n      p_due_date:kind===\"invoice\"?(cleanText(body.dueDate,20)||null):null,\n      p_valid_until:kind===\"offer\"?(cleanText(body.validUntil,20)||null):null,\n      p_vat_rate:Number(body.vatRate)||0,\n      p_note:cleanText(body.note,4000)||null,\n      p_currency:cleanText(body.currency,3)||\"CHF\",\n      p_items:items,\n    }"
           ]
         }
       ]
@@ -9110,14 +9240,14 @@
           "arguments": [
             "s.organizationId",
             "s.userId",
-            "async c=>{const items=(await c.query(`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`,[s.organizationId,ids,minutes,draft])).rows;\n      const agreementIds=[...new Set(items.map(row=>row.billing_agreement_id).filter(Boolean))];\n      const agreements=agreementIds.length?(await c.query('select id,terms,commercial_snapshot,currency from billing_agreements where organization_id=$1 and id=any($2::uuid[])',[s.organizationId,agreementIds])).rows:[];\n      const plans=new Map<string,{terms:BillingTerms;currency:string;options:BillingRateOption[];documentDiscount?:unknown}>(agreements.map(a=>[String(a.id),{documentDiscount:a.commercial_snapshot?.calculation?.discount,currency:String(a.currency),terms:billingTerms(a.terms),options:billingRateOptions(billingTerms(a.terms),a.commercial_snapshot)}]));\n      return items.flatMap(item=>{const plan=plans.get(item.billing_agreement_id);if(!plan)return [item];if(!billingTermsReady(plan.terms))return [];const options=plan.options;const first=options[0],uniform=first&&options.every(o=>o.unitPrice===first.unitPrice&&o.vatRate===first.vatRate&&o.taxExempt===first.taxExempt);return [{...item,price_currency:plan.currency,...(!item.external_resource_id&&uniform?{sales_rate:first.unitPrice,vat_rate:first.vatRate,tax_treatment:first.taxExempt?'exempt':'taxable',billing_discount:first.discount,billing_source_position:first.position}:{}),...(ids.length?{billing_terms:plan.terms,billing_rate_options:options,billing_document_discount:(plan as {documentDiscount?:unknown}).documentDiscount}:{})}];});\n    }"
+            "async c=>{const items=(await c.query(`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,coalesce((ps.source_snapshot->>'unitMinutes')::integer,60) price_base_quantity,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`,[s.organizationId,ids,minutes,draft])).rows;\n      const agreementIds=[...new Set(items.map(row=>row.billing_agreement_id).filter(Boolean))];\n      const agreements=agreementIds.length?(await c.query('select id,terms,commercial_snapshot,currency from billing_agreements where organization_id=$1 and id=any($2::uuid[])',[s.organizationId,agreementIds])).rows:[];\n      const plans=new Map<string,{terms:BillingTerms;currency:string;options:BillingRateOption[];documentDiscount?:unknown;conditions?:string}>(agreements.map(a=>[String(a.id),{conditions:a.commercial_snapshot?.note,documentDiscount:a.commercial_snapshot?.calculation?.discount,currency:String(a.currency),terms:billingTerms(a.terms),options:billingRateOptions(billingTerms(a.terms),a.commercial_snapshot)}]));\n      return items.flatMap(item=>{const plan=plans.get(item.billing_agreement_id);if(!plan)return [item];if(!billingTermsReady(plan.terms))return [];const options=plan.options;const first=options[0],uniform=first&&options.every(o=>o.unitPrice===first.unitPrice&&o.vatRate===first.vatRate&&o.taxExempt===first.taxExempt);return [{...item,price_currency:plan.currency,...(!item.external_resource_id&&uniform?{sales_rate:first.unitPrice,vat_rate:first.vatRate,tax_treatment:first.taxExempt?'exempt':'taxable',billing_discount:first.discount,billing_source_position:first.position}:{}),...(ids.length?{billing_terms:plan.terms,billing_rate_options:options,billing_conditions:plan.conditions,billing_document_discount:(plan as {documentDiscount?:unknown}).documentDiscount}:{})}];});\n    }"
           ]
         },
         {
           "callee": "c.query",
           "line": 17,
           "arguments": [
-            "`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`",
+            "`\n      select t.id,p.billing_agreement_id,t.hours,t.description,case when t.external_resource_id is null then t.sales_rate else (ps.source_snapshot->>'unitPrice')::numeric end sales_rate,t.work_date,t.customer_id,t.project_id,t.external_resource_id,ps.id price_source_id,coalesce((ps.source_snapshot->>'unitMinutes')::integer,60) price_base_quantity,ps.source_snapshot->>'currency' price_currency,ps.source_snapshot->>'vatRate' vat_rate,ps.source_snapshot->>'taxTreatment' tax_treatment,\n        case when t.external_resource_id is null then null else (select coalesce(sum(x.allocated_minutes),0)::int from invoice_line_time_entries x where x.organization_id=t.organization_id and x.time_entry_id=t.id) end allocated_minutes,\n        case when t.external_resource_id is null then null else t.recorded_duration_minutes-(${reserved}) end remaining_minutes,\n        c.name customer_name,coalesce(p.name,t.project_label,'Arbeitszeit') project_name\n      from time_entries t\n      join customers c on c.id=t.customer_id and c.organization_id=t.organization_id\n      left join projects p on p.id=t.project_id and p.organization_id=t.organization_id\n      left join time_price_sources ps on ps.organization_id=t.organization_id and ps.time_entry_id=t.id and ps.side='sale' and ps.is_current\n      where (t.external_resource_id is null or ($3::boolean and ps.id is not null and t.recorded_duration_minutes>(${reserved}))) and t.organization_id=$1 and t.archived_at is null and c.archived_at is null and t.billable=true and t.approved=true and t.invoiced_invoice_id is null and (p.billing_agreement_id is null or exists(select 1 from billing_agreements ba where ba.organization_id=p.organization_id and ba.id=p.billing_agreement_id and (ba.terms->>'model'='time' or (ba.terms->>'model'='mixed' and ba.terms->>'additionalTime'='true'))))\n        and (cardinality($2::uuid[])=0 or t.id=any($2::uuid[]))\n      order by c.name,project_name,t.work_date,t.created_at`",
             "[s.organizationId,ids,minutes,draft]"
           ]
         },
@@ -10084,14 +10214,14 @@
         },
         {
           "callee": "useApiQuery",
-          "line": 106,
+          "line": 107,
           "arguments": [
             "'/api/contracts/'+encodeURIComponent(contractId)"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 117,
+          "line": 118,
           "arguments": [
             "path",
             "body",
@@ -10101,7 +10231,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 117,
+          "line": 118,
           "arguments": [
             "path",
             "body",
@@ -10261,105 +10391,112 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 100,
+          "line": 105,
           "arguments": [
             "enabled?(\"/api/customers?limit=50\"):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 101,
+          "line": 106,
           "arguments": [
             "enabled&&selectedId&&true?\"/api/customers/\"+encodeURIComponent(selectedId):null"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then(payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);})\n      .catch",
-          "line": 260,
+          "line": 289,
           "arguments": [
             "error=>{if(active){setLoading(false);setError(error instanceof Error?error.message:\"Dokument konnte nicht geladen werden.\");}}"
           ]
         },
         {
           "callee": "apiGet<{item?:Record<string,unknown>;items?:Array<Record<string,unknown>>}>(url)\n      .then",
-          "line": 260,
+          "line": 289,
           "arguments": [
             "payload=>{if(!active)return;const item=payload.item??payload.items?.[0];if(!item)throw new Error(\"Dokument wurde nicht gefunden.\");setDraft(remoteDraftFromItem(item,kind));setLoading(false);setError(null);}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 260,
+          "line": 289,
           "arguments": [
             "url"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then(s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}).catch",
-          "line": 309,
+          "line": 338,
           "arguments": [
             "()=>{}"
           ]
         },
         {
           "callee": "apiGet<{demo?:boolean;tenant?:{role?:string;readOnly?:boolean}}>(\"/api/auth/session\").then",
-          "line": 309,
+          "line": 338,
           "arguments": [
             "s=>{setDocumentRole(s.tenant?.role??\"\");setDocumentReadOnly(s.tenant?.readOnly===true);setDemoDocument(s.demo===true)}"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 309,
+          "line": 338,
           "arguments": [
             "\"/api/auth/session\""
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 330,
+          "line": 359,
           "arguments": [
             "selectedProductId?\"/api/products/\"+encodeURIComponent(selectedProductId):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 338,
+          "line": 368,
+          "arguments": [
+            "!existing&&sourceAgreement?'/api/documents/billing-agreements/'+encodeURIComponent(sourceAgreement):null"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 372,
           "arguments": [
             "!existing&&sourceProject?'/api/projects/'+encodeURIComponent(sourceProject):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 343,
+          "line": 377,
           "arguments": [
             "!existing&&sourceOffer?(\"/api/documents/\"+encodeURIComponent(sourceOffer)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 345,
+          "line": 379,
           "arguments": [
             "sourceItem?.customer_id&&sourceOffer?\"/api/customers/\"+encodeURIComponent(String(sourceItem.customer_id)):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 362,
+          "line": 396,
           "arguments": [
             "kind==='Rechnung'&&sourceTimeEntriesParam&&true?'/api/time-entries/billing?minuteAllocations=1&ids='+encodeURIComponent(sourceTimeEntriesParam):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 363,
+          "line": 397,
           "arguments": [
             "kind==='Rechnung'&&sourceExpenseParam&&true?'/api/expenses/billing?ids='+encodeURIComponent(sourceExpenseParam):null"
           ]
         },
         {
           "callee": "apiPatch",
-          "line": 411,
+          "line": 449,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)",
             "payload",
@@ -10369,7 +10506,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 411,
+          "line": 449,
           "arguments": [
             "\"/api/documents\"",
             "payload",
@@ -10378,14 +10515,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 428,
+          "line": 466,
           "arguments": [
             "\"/api/settings/readiness?\"+new URLSearchParams({action:\"issue_invoice\",number})"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 428,
+          "line": 466,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/status\"",
             "{action}"
@@ -10393,14 +10530,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 428,
+          "line": 466,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiDelete",
-          "line": 432,
+          "line": 470,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)",
             "{expectedUpdatedAt:draft.updatedAt}",
@@ -10409,7 +10546,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 437,
+          "line": 475,
           "arguments": [
             "'/api/documents/'+encodeURIComponent(documentKey??draft.number)+'/revision'",
             "{}",
@@ -10418,7 +10555,7 @@
         },
         {
           "callee": "apiPost",
-          "line": 438,
+          "line": 476,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+(adjustmentIsRefund?\"/refunds\":\"/credits\")",
             "{amount:Number(creditAmount),reason:creditReason,...(adjustmentIsRefund?{date:refundDate}:{})}",
@@ -10427,14 +10564,14 @@
         },
         {
           "callee": "apiGet",
-          "line": 438,
+          "line": 476,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 439,
+          "line": 477,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)+\"/send\"",
             "{recipient,requestKey:sendKey,purpose:sendPurpose,...(sendPurpose===\"document\"?{subject:mailSubject,message:mailMessage,issueConfirmed:kind===\"Angebot\"&&draft.status===\"draft\"}:{})}"
@@ -10442,23 +10579,37 @@
         },
         {
           "callee": "apiGet",
-          "line": 439,
+          "line": 477,
           "arguments": [
             "\"/api/documents/\"+encodeURIComponent(documentKey??draft.number)"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 628,
+          "line": 672,
           "arguments": [
             "sourceIds?'/api/time-entries/billing?'+new URLSearchParams({minuteAllocations:'1',ids:sourceIds,...(draft.id?{draft:draft.number}:{})}):null"
           ]
         },
         {
           "callee": "useApiQuery",
-          "line": 685,
+          "line": 731,
           "arguments": [
             "'/api/settings/company'"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 742,
+          "arguments": [
+            "projectId?'/api/projects/'+encodeURIComponent(projectId):null"
+          ]
+        },
+        {
+          "callee": "useApiQuery",
+          "line": 744,
+          "arguments": [
+            "draft.customerId?'/api/documents/advances?'+new URLSearchParams({customerId:draft.customerId,...(draft.id?{draft:draft.id}:{})}):null"
           ]
         }
       ],
@@ -12623,21 +12774,21 @@
       "calls": [
         {
           "callee": "useApiQuery",
-          "line": 24,
+          "line": 25,
           "arguments": [
             "open&&contractId?'/api/contracts/'+encodeURIComponent(contractId):null"
           ]
         },
         {
           "callee": "apiGet",
-          "line": 28,
+          "line": 29,
           "arguments": [
             "'/api/time-entries/'+encodeURIComponent(entryId)+'/pricing?side='+nextSide"
           ]
         },
         {
           "callee": "apiPost",
-          "line": 38,
+          "line": 39,
           "arguments": [
             "'/api/time-entries/'+encodeURIComponent(entryId)+'/pricing'",
             "body",
@@ -15316,6 +15467,76 @@
           "mode": "force"
         }
       ]
+    },
+    {
+      "file": "database/migrations/0111_billing_completion.sql",
+      "tables": [],
+      "relations": [],
+      "rls": []
+    },
+    {
+      "file": "database/migrations/0112_consolidated_billing.sql",
+      "tables": [
+        "invoice_billing_scopes"
+      ],
+      "relations": [
+        {
+          "table": "invoices",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "projects",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "invoice_billing_scopes",
+          "columns": "organization_id,invoice_id,agreement_id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "invoice_billing_scopes",
+          "mode": "enable"
+        },
+        {
+          "table": "invoice_billing_scopes",
+          "mode": "force"
+        }
+      ]
+    },
+    {
+      "file": "database/migrations/0113_variable_advance_allocations.sql",
+      "tables": [
+        "invoice_advance_allocations"
+      ],
+      "relations": [
+        {
+          "table": "invoices",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "invoices",
+          "columns": "organization_id,id"
+        },
+        {
+          "table": "billing_agreements",
+          "columns": "organization_id,id"
+        }
+      ],
+      "rls": [
+        {
+          "table": "invoice_advance_allocations",
+          "mode": "enable"
+        },
+        {
+          "table": "invoice_advance_allocations",
+          "mode": "force"
+        }
+      ]
     }
   ],
   "repositories": [
@@ -15603,8 +15824,16 @@
           "callee": "c.query",
           "line": 255,
           "arguments": [
-            "`select id,status,calculation,updated_at::text document_revision${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
+            "`select id,status,calculation,document_revision_token(updated_at) document_revision${invoice?',paid_amount':''} from ${table} where ${numberColumn}=$1 and organization_id=$2 and archived_at is null for update`",
             "[args.p_current_number,s.organizationId]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 260,
+          "arguments": [
+            "'delete from invoice_advance_allocations where organization_id=$1 and invoice_id=$2'",
+            "[s.organizationId,id]"
           ]
         },
         {
@@ -15667,8 +15896,8 @@
           "callee": "c.query",
           "line": 285,
           "arguments": [
-            "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate,billing_part${invoice?\",price_base_quantity,billing_source_position\":\"\"}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10${invoice?\",$11,$12\":\"\"}) returning id`",
-            "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat,raw.billing_part??null,...(invoice?[raw.price_base_quantity,raw.billing_source_position??null]:[])]"
+            "`insert into ${lineTable}(organization_id,external_id,${parentColumn},sort_order,description,quantity,unit,unit_price,vat_rate,billing_part${invoice?\",price_base_quantity,billing_source_position,billing_agreement_id,billing_scope_position\":\"\"}) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10${invoice?\",$11,$12,$13,$14\":\"\"}) returning id`",
+            "[s.organizationId,randomUUID(),id,++position,raw.description,raw.quantity,String(raw.unit??\"Stück\").slice(0,40),raw.unit_price,lineVat,raw.billing_part??null,...(invoice?[raw.price_base_quantity,raw.billing_source_position??null,raw.billing_agreement_id??null,raw.billing_scope_position??null]:[])]"
           ]
         },
         {
@@ -15699,7 +15928,7 @@
           "callee": "c.query",
           "line": 294,
           "arguments": [
-            "'select 1 from invoices where organization_id=$1 and id=$2 and billing_agreement_id is not null'",
+            "'select 1 from invoices where organization_id=$1 and id=$2 and (billing_agreement_id is not null or exists(select 1 from invoice_billing_scopes s where s.organization_id=invoices.organization_id and s.invoice_id=invoices.id))'",
             "[s.organizationId,id]"
           ]
         },
@@ -15721,7 +15950,15 @@
         },
         {
           "callee": "c.query",
-          "line": 306,
+          "line": 307,
+          "arguments": [
+            "'update invoice_billing_scopes set calculation=$4::jsonb where organization_id=$1 and invoice_id=$2 and agreement_id=$3'",
+            "[s.organizationId,id,scope.agreementId,JSON.stringify(scope.calculation)]"
+          ]
+        },
+        {
+          "callee": "c.query",
+          "line": 310,
           "arguments": [
             "'select offer_version from quotes where id=$1 and organization_id=$2'",
             "[id,s.organizationId]"
@@ -15729,7 +15966,7 @@
         },
         {
           "callee": "c.query",
-          "line": 308,
+          "line": 312,
           "arguments": [
             "`update ${table} set calculation=$3::jsonb${invoice?',subtotal=$4,vat_amount=$5,total_amount=$6':''} where id=$1 and organization_id=$2`",
             "[id,s.organizationId,JSON.stringify(calculationSnapshot),...(invoice?[calculation.subtotal,calculation.vat,calculation.total]:[])]"
@@ -15737,7 +15974,7 @@
         },
         {
           "callee": "c.query",
-          "line": 324,
+          "line": 328,
           "arguments": [
             "`select id from time_entries where organization_id=$1 and (id=any($2::uuid[]) or id in(select x.time_entry_id from invoice_line_time_entries x join invoice_lines l on l.organization_id=x.organization_id and l.id=x.invoice_line_id where x.organization_id=$1 and l.invoice_id=$3)) order by id for update`",
             "[s.organizationId,[...new Set(ids)],invoiceId]"
@@ -15745,7 +15982,7 @@
         },
         {
           "callee": "c.query",
-          "line": 332,
+          "line": 336,
           "arguments": [
             "`select t.id,t.customer_id,t.recorded_duration_minutes,p.source_snapshot from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id where t.organization_id=$1 and t.id=$2 and p.id=$3 and p.side='sale' and p.is_current and t.external_resource_id is not null and t.approved and t.submitted_at is not null and t.billable and t.archived_at is null`",
             "[s.organizationId,allocation.time_entry_id,allocation.price_source_id]"
@@ -15753,7 +15990,7 @@
         },
         {
           "callee": "c.query",
-          "line": 348,
+          "line": 352,
           "arguments": [
             "\"select m.user_id from organization_memberships m join app_users u on u.id=m.user_id join organizations o on o.id=m.organization_id where m.organization_id=$1 and m.user_id=$2 and m.status='active' and m.module_profile='standard' and m.role in ('owner','admin','finance') and u.status='active' and o.status in ('trial','active','grace_period') for share of m\"",
             "[s.organizationId,s.userId]"
@@ -15761,15 +15998,15 @@
         },
         {
           "callee": "c.query",
-          "line": 351,
+          "line": 355,
           "arguments": [
-            "'select id,status,updated_at::text revision from invoices where organization_id=$1 and invoice_no=$2 and archived_at is null for update'",
+            "'select id,status,document_revision_token(updated_at) revision from invoices where organization_id=$1 and invoice_no=$2 and archived_at is null for update'",
             "[s.organizationId,args.p_number]"
           ]
         },
         {
           "callee": "c.query",
-          "line": 355,
+          "line": 359,
           "arguments": [
             "'select 1 from invoice_versions where organization_id=$1 and invoice_id=$2 union all select 1 from payments where organization_id=$1 and invoice_id=$2 union all select 1 from document_deliveries where organization_id=$1 and document_id=$2 limit 1'",
             "[s.organizationId,row.id]"
@@ -15777,7 +16014,7 @@
         },
         {
           "callee": "c.query",
-          "line": 357,
+          "line": 361,
           "arguments": [
             "'update invoices set archived_at=now(),updated_at=now() where organization_id=$1 and id=$2'",
             "[s.organizationId,row.id]"
@@ -15785,7 +16022,7 @@
         },
         {
           "callee": "c.query",
-          "line": 358,
+          "line": 362,
           "arguments": [
             "'update time_entries set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2 and external_resource_id is null'",
             "[s.organizationId,row.id]"
@@ -15793,7 +16030,7 @@
         },
         {
           "callee": "c.query",
-          "line": 359,
+          "line": 363,
           "arguments": [
             "'update expenses set invoiced_invoice_id=null where organization_id=$1 and invoiced_invoice_id=$2'",
             "[s.organizationId,row.id]"
@@ -15986,8 +16223,8 @@
           "callee": "c.query",
           "line": 73,
           "arguments": [
-            "`insert into contract_condition_revisions(organization_id,contract_id,condition_id,revision,resource_id,starts_on,ends_on,unit,unit_price,currency,tax_treatment,vat_rate,tax_reason,expense_policy,created_by_user_id) values($1,$2,coalesce($3::uuid,gen_random_uuid()),$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) returning ${conditionColumns}`",
-            "[s.organizationId,contractId,conditionId,revision,b.resourceId,b.startsOn,b.endsOn,b.unit,b.unitPrice,b.currency,b.taxTreatment,b.vatRate,b.taxReason,b.expensePolicy,s.userId]"
+            "`insert into contract_condition_revisions(organization_id,contract_id,condition_id,revision,resource_id,starts_on,ends_on,unit,unit_price,currency,tax_treatment,vat_rate,tax_reason,expense_policy,created_by_user_id,time_unit_minutes) values($1,$2,coalesce($3::uuid,gen_random_uuid()),$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) returning ${conditionColumns}`",
+            "[s.organizationId,contractId,conditionId,revision,b.resourceId,b.startsOn,b.endsOn,b.unit,b.unitPrice,b.currency,b.taxTreatment,b.vatRate,b.taxReason,b.expensePolicy,s.userId,b.unit==='hour'?null:b.timeUnitMinutes??null]"
           ]
         },
         {
@@ -17769,7 +18006,7 @@
           "callee": "c.query",
           "line": 20,
           "arguments": [
-            "`select distinct i.invoice_no number,i.status,i.currency,i.total_amount,i.total_amount total,i.paid_amount,i.issue_date::text issue_date,i.due_date::text due_date,${invoiceCreditSql('i')} credit_amount,${invoiceRefundSql('i')} refund_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`",
+            "`select distinct i.invoice_no number,i.status,i.currency,i.total_amount,i.total_amount total,i.paid_amount,i.issue_date::text issue_date,i.due_date::text due_date,${invoiceCreditSql('i')} credit_amount,${invoiceRefundSql('i')} refund_amount from invoices i where i.organization_id=$1 and i.archived_at is null and (i.project_id::text=$2 or exists(select 1 from invoice_billing_scopes scope where scope.organization_id=i.organization_id and scope.invoice_id=i.id and scope.project_id::text=$2) or exists(select 1 from time_entries t where t.organization_id=i.organization_id and t.project_id::text=$2 and t.invoiced_invoice_id=i.id and t.archived_at is null)) order by i.invoice_no desc limit 100`",
             "[s.organizationId,id]"
           ]
         },
@@ -17793,7 +18030,7 @@
           "callee": "c.query",
           "line": 37,
           "arguments": [
-            "'select 1 from invoices where organization_id=$1 and billing_agreement_id=$2 limit 1'",
+            "'select 1 from billing_scope_invoices where organization_id=$1 and billing_agreement_id=$2 limit 1'",
             "[s.organizationId,locked.billing_agreement_id]"
           ]
         },
@@ -18236,7 +18473,7 @@
           "callee": "c.query",
           "line": 24,
           "arguments": [
-            "`select p.id price_source_id,t.id time_entry_id,t.work_date::text,t.recorded_duration_minutes minutes,t.description,pr.name project_name,p.source_snapshot->>'unitPrice' unit_price,p.source_snapshot->>'currency' currency,p.source_snapshot->>'vatRate' vat_rate\n from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id and p.side='purchase' and p.is_current and p.time_version=t.version left join projects pr on pr.organization_id=t.organization_id and pr.id=t.project_id\n where t.organization_id=$1 and t.supplier_id::text=$2 and t.approved and t.submitted_at is not null and t.external_resource_id is not null and t.archived_at is null and t.work_date between $3::date and $4::date order by t.work_date,t.id limit 101`",
+            "`select p.id price_source_id,t.id time_entry_id,t.work_date::text,t.recorded_duration_minutes minutes,t.description,pr.name project_name,p.source_snapshot->>'unitPrice' unit_price,coalesce((p.source_snapshot->>'unitMinutes')::integer,60) price_base_quantity,p.source_snapshot->>'currency' currency,p.source_snapshot->>'vatRate' vat_rate\n from time_entries t join time_price_sources p on p.organization_id=t.organization_id and p.time_entry_id=t.id and p.side='purchase' and p.is_current and p.time_version=t.version left join projects pr on pr.organization_id=t.organization_id and pr.id=t.project_id\n where t.organization_id=$1 and t.supplier_id::text=$2 and t.approved and t.submitted_at is not null and t.external_resource_id is not null and t.archived_at is null and t.work_date between $3::date and $4::date order by t.work_date,t.id limit 101`",
             "[s.organizationId,supplierId,period.from,period.until]"
           ]
         },
@@ -19027,7 +19264,7 @@
           "line": 183,
           "arguments": [
             "path",
-            "{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
+            "{method:'POST',signal,...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})}"
           ]
         },
         {

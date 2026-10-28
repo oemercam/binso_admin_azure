@@ -10,7 +10,7 @@ export async function verifyMinuteAllocations({load,db,transaction,org,other,act
  assert.equal(calculateDocument(Array.from({length:60},()=>line(1,'0.01')),'CHF').subtotal,'0.01','No rounding each minute before summing');
  const discounted=calculateDocument([line(61,'130.00',{discount:{kind:'percent',value:10}})],'CHF',{kind:'percent',value:5});assert.equal(discounted.total,'122.15');
  assert.equal(calculateDocument([line(61,'130.00',{tax_exempt:true,vat_rate:0})],'EUR').total,'132.17');
- for(const basis of [0,2,60.5,'60',false])assert.throws(()=>calculateDocument([line(1,'130.00',{price_base_quantity:basis})],'CHF'),RangeError);
+ for(const basis of [0,1441,60.5,'60',false])assert.throws(()=>calculateDocument([line(1,'130.00',{price_base_quantity:basis})],'CHF'),RangeError);
  const ordinary={quantity:2,unit_price:50,vat_rate:8.1};assert.deepEqual(calculateDocument([ordinary],'CHF'),calculateDocument([{...ordinary,price_base_quantity:1}],'CHF'),'Legacy calculation shape and results unchanged');
  const sessions=(await db.query('select id,user_id,organization_id from auth_sessions')).rows;
  const as=(role,organizationId=org,extra={})=>{const userId='employee-dossier-'+(organizationId===other?'foreign':role);return act(role,organizationId,{userId,name:'Synthetic minute actor',sessionId:sessions.find(s=>s.user_id===userId&&s.organization_id===organizationId)?.id,...extra});};

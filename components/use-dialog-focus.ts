@@ -5,6 +5,21 @@ import {lockPageScroll} from './page-scroll-lock';
 
 /** Keep modal keyboard navigation inside the dialog and restore its trigger. */
 const modalStack:HTMLElement[]=[];
+// Pointer activation need not focus a button (notably Safari/WebKit). Keep the
+// actual invoker independently of activeElement, including newly mounted panels.
+let lastDialogInvoker:HTMLElement|null=null;
+const dialogInvokers=new WeakMap<HTMLElement,HTMLElement>();
+const invokerParents=new WeakMap<HTMLElement,HTMLElement>();
+function connectedInvoker(candidate:HTMLElement|null):HTMLElement|null{
+ const visited=new Set<HTMLElement>();
+ while(candidate&&!visited.has(candidate)){
+  if(candidate.isConnected&&candidate.getClientRects().length&&!candidate.closest('[inert]'))return candidate;
+  visited.add(candidate);candidate=invokerParents.get(candidate)??null;
+ }
+ return null;
+}
+/** Shared anchor for panels that mount only after pointer activation. */
+export function getDialogInvoker(){return connectedInvoker(lastDialogInvoker);}
 const dialogPortals=new Map<HTMLElement,HTMLElement>();
 /** Only a control inside an existing modal can register its own focus surface. */
 export function registerDialogPortal(trigger:HTMLElement|null,portal:HTMLElement|null){
@@ -37,21 +52,39 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
   useEffect(() => { closeRef.current = onClose; }, [onClose]);
   useEffect(() => {
     if(open)return;
-    const rememberTrigger = () => {
-      const active = document.activeElement;
-      if(active instanceof HTMLElement && active !== document.body && active !== document.documentElement && !active.closest('[aria-modal="true"]') && !dialogRef.current?.contains(active)) triggerRef.current = active;
+    const rememberTrigger = (event?:Event) => {
+      const active = event?.target instanceof Element
+        ? event.target.closest<HTMLElement>('button,a[href],input,select,textarea,[tabindex]')
+        : document.activeElement;
+      if(event?.type==='focusin'&&active instanceof Element&&active.closest('[aria-modal="true"]'))return;
+      if(active instanceof HTMLElement && active !== document.body && active !== document.documentElement && !active.closest('[inert]') && !dialogRef.current?.contains(active)) {
+        const owner=[...modalStack].reverse().find(dialog=>dialog.contains(active));
+        const parent=owner?dialogInvokers.get(owner):undefined;
+        if(parent&&parent!==active)invokerParents.set(active,parent);
+        triggerRef.current = active;
+        lastDialogInvoker = active;
+      }
     };
     rememberTrigger();
     document.addEventListener("focusin", rememberTrigger);
-    return () => document.removeEventListener("focusin", rememberTrigger);
+    document.addEventListener("pointerdown", rememberTrigger, true);
+    document.addEventListener("click", rememberTrigger, true);
+    return () => {
+      document.removeEventListener("focusin", rememberTrigger);
+      document.removeEventListener("pointerdown", rememberTrigger, true);
+      document.removeEventListener("click", rememberTrigger, true);
+    };
   }, [open]);
   useEffect(() => {
     if (!open || !dialogRef.current) return;
     const dialog = dialogRef.current;
     // Making the page inert can move focus to body. Capture the real trigger first.
     const active = document.activeElement;
-    const trigger = active instanceof HTMLElement && active !== document.body && !dialog.contains(active) ? active : triggerRef.current;
-    if(trigger&&!trigger.closest('[aria-modal="true"]'))triggerRef.current=trigger;
+    const remembered=getDialogInvoker();
+    const invoker=remembered&&!dialog.contains(remembered)?remembered:null;
+    const trigger = invoker ?? (active instanceof HTMLElement && active !== document.body && !dialog.contains(active) ? active : triggerRef.current);
+    if(trigger)triggerRef.current=trigger;
+    if(trigger)dialogInvokers.set(dialog,trigger);
     const unlockScroll=lockPageScroll(()=>dialog);
     const unlockBackground=headerPanel?()=>{}:lockDialogBackground(dialog);
     const uncoverSheets=coverParentSheets(dialog);
@@ -116,11 +149,12 @@ export function useDialogFocus(open: boolean, onClose: () => void, headerPanel=f
       // Restore only after every owner has released it, respecting a new modal.
       queueMicrotask(()=>{
         if(modalStack.length){
-          if(trigger?.isConnected&&modalStack.at(-1)?.contains(trigger))trigger.focus({preventScroll:true});
+          const target=connectedInvoker(trigger??triggerRef.current);
+          if(target&&modalStack.at(-1)?.contains(target))target.focus({preventScroll:true});
           return;
         }
-        const returnTrigger=trigger?.isConnected?trigger:triggerRef.current;
-        if(returnTrigger?.isConnected&&!returnTrigger.closest('[inert]'))returnTrigger.focus({preventScroll:true});
+        const returnTrigger=connectedInvoker(trigger??triggerRef.current);
+        returnTrigger?.focus({preventScroll:true});
       });
     };
   }, [open,headerPanel,headerSelector]);

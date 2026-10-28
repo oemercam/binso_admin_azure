@@ -111,7 +111,10 @@
     "0107_push_dispatch_lifecycle.sql",
     "0108_passkey_assurance.sql",
     "0109_project_budget_presence.sql",
-    "0110_shared_billing_agreements.sql"
+    "0110_shared_billing_agreements.sql",
+    "0111_billing_completion.sql",
+    "0112_consolidated_billing.sql",
+    "0113_variable_advance_allocations.sql"
   ],
   "tables": [
     {
@@ -1972,6 +1975,11 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "required": true
+        },
+        {
+          "name": "time_unit_minutes",
+          "type": "integer",
+          "required": false
         }
       ],
       "policies": [
@@ -4815,6 +4823,146 @@
       ]
     },
     {
+      "name": "invoice_advance_allocations",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "invoice_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "advance_invoice_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "agreement_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "required": true
+        },
+        {
+          "name": "created_by_user_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "reversed_at",
+          "type": "timestamp with time zone",
+          "required": false
+        },
+        {
+          "name": "reversed_by_user_id",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "amount",
+          "type": "numeric(12,2)",
+          "required": true
+        },
+        {
+          "name": "net_amount",
+          "type": "numeric(12,2)",
+          "required": true
+        },
+        {
+          "name": "vat_amount",
+          "type": "numeric(12,2)",
+          "required": true
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "advance_application_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(false) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'reader'::text])))",
+          "with_check": null
+        },
+        {
+          "policyname": "advance_application_write",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text])))",
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text])))"
+        }
+      ]
+    },
+    {
+      "name": "invoice_billing_scopes",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "invoice_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "agreement_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "project_id",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "billing_context",
+          "type": "jsonb",
+          "required": true
+        },
+        {
+          "name": "calculation",
+          "type": "jsonb",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "invoice_scope_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(false) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text, 'reader'::text])))",
+          "with_check": null
+        },
+        {
+          "policyname": "invoice_scope_write",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text])))",
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND app_billing_actor(true) AND (app_workforce_role() = ANY (ARRAY['owner'::text, 'admin'::text, 'finance'::text])))"
+        }
+      ]
+    },
+    {
       "name": "invoice_line_expenses",
       "rls": true,
       "forced": false,
@@ -4965,6 +5113,16 @@
         },
         {
           "name": "billing_source_position",
+          "type": "integer",
+          "required": false
+        },
+        {
+          "name": "billing_agreement_id",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "billing_scope_position",
           "type": "integer",
           "required": false
         }

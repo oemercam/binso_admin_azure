@@ -16,6 +16,7 @@ DO $$ DECLARE t record; BEGIN
     EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.%I TO binso_runtime',t.tablename);
   END LOOP;
 END $$;
+GRANT SELECT ON public.billing_scope_invoices,public.billing_scope_lines TO binso_runtime;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO binso_runtime;
 GRANT EXECUTE ON FUNCTION public.bootstrap_organization(text,text,text,text,text) TO binso_runtime;
 GRANT EXECUTE ON FUNCTION public.runtime_schema_versions() TO binso_runtime;

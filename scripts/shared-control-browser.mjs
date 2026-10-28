@@ -165,9 +165,10 @@ async function verifyAnimationStabilityRegression(page){
 }
 
 export async function assertMobileHeaderTargets(page){
- await waitForFiniteAnimations(page);
  const selector='.mobile-header .icon-button,.mobile-header .mobile-notification-button,.mobile-header .avatar-button,.mobile-header .mobile-back';
  const targets=page.locator(selector).filter({visible:true});
+ await targets.first().waitFor({state:'visible'});
+ await waitForFiniteAnimations(page);
  // Playwright resolves evaluateAll's array before its separate evaluation task.
  // Query, visibility and dimensions must share one task: hydration can replace
  // an otherwise valid header and leave a previously resolved element detached.
@@ -200,6 +201,7 @@ export async function assertMobileDetailHeaderGeometry(page,width,route,{timeout
 }
 
 export async function assertChatTargets(page){
+ await page.locator('.thread-composer').waitFor({state:'visible'});
  const targets=page.locator('.thread-composer>label,.thread-composer>button').filter({visible:true});
  const measured=await targets.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {label:el.getAttribute('aria-label'),width:r.width,height:r.height}}));
  assert.ok(measured.length>=2,'Chat exposes attachment and send controls');

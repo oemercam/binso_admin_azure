@@ -135,7 +135,7 @@ export function ListSearch({ value, onChange, placeholder = "Suchen ...", ariaLa
 }
 
 export function RowActions({ label = "Weitere Aktionen", onClick, disabled = false }: { label?: string; onClick: () => void; disabled?: boolean }) {
-  return <LocalizedElement as="button" className="bo-row-actions" type="button" onClick={onClick} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></LocalizedElement>;
+  return <LocalizedElement as="button" className="bo-row-actions" type="button" onClick={event=>{event.currentTarget.focus({preventScroll:true});onClick()}} aria-label={label} title={label} disabled={disabled}><Icon name="more" size={20}/></LocalizedElement>;
 }
 
 function sheetValues(root:HTMLElement|null){return formControlSnapshot(root);}
@@ -229,7 +229,9 @@ export function FormPage({label,open,onClose,children,busy=false,dirty=false,des
  const [host,setHost]=useState<HTMLElement|null>(null);
  useEffect(()=>{let active=true;if(open)queueMicrotask(()=>{if(active)setHost(anchor.current?.closest<HTMLElement>('main.page-container')??document.querySelector<HTMLElement>('main.page-container'))});return()=>{active=false}},[open]);
  useEffect(()=>{if(!open)return;trigger.current=document.activeElement instanceof HTMLElement?document.activeElement:null;return()=>{const previous=trigger.current;requestAnimationFrame(()=>{if(previous?.isConnected&&previous.getClientRects().length)previous.focus({preventScroll:true})})}},[open]);
- useEffect(()=>{if(!open||!host)return;const frame=requestAnimationFrame(()=>{if(root.current&&!root.current.contains(document.activeElement))root.current.focus({preventScroll:true})});return()=>cancelAnimationFrame(frame)},[open,host]);
+ // Establish page focus in the portal commit, before explicit field recovery's
+ // animation frame. A delayed root focus must not overwrite a requested field.
+ useLayoutEffect(()=>{if(open&&host&&root.current&&!root.current.contains(document.activeElement))root.current.focus({preventScroll:true})},[open,host]);
  const [discard,setDiscard]=useState(false),[destination,setDestination]=useState<string|null>(null),[backDiscard,setBackDiscard]=useState(false);
  const leave=useBrowserBackGuard(open&&guarded&&(dirty||busy),()=>{if(!busy){setBackDiscard(true);setDiscard(true)}},open&&guarded&&(dirty||busy),href=>{if(!busy){setDestination(href);setDiscard(true)}});
  useEffect(()=>{

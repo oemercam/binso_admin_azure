@@ -21823,5 +21823,84 @@
   "Bereits in Rechnung gestellt": ["Previously invoiced", "Déjà facturé", "Già fatturato", "Daha önce faturalandırıldı"],
   "Bitte wählen": ["Please choose", "Veuillez choisir", "Scegli", "Lütfen seçin"],
   "Keine Zahlung erforderlich.": ["No payment is required.", "Aucun paiement n’est nécessaire.", "Non è richiesto alcun pagamento.", "Ödeme gerekmiyor."],
-  "Stundensatz": ["Hourly rate", "Tarif horaire", "Tariffa oraria", "Saatlik ücret"]
+  "Stundensatz": ["Hourly rate", "Tarif horaire", "Tariffa oraria", "Saatlik ücret"],
+  "Minuten je Preiseinheit": ["Minutes per pricing unit","Minutes par unité de prix","Minuti per unità di prezzo","Fiyat birimi başına dakika"],
+  "Bitte eine gültige Minutenbasis für die Preiseinheit angeben.": ["Enter a valid minute basis for the pricing unit.","Saisis une base valide en minutes pour l’unité de prix.","Inserisci una base in minuti valida per l’unità di prezzo.","Fiyat birimi için geçerli bir dakika değeri gir."],
+  "Diese Zeitangabe benötigt eine ausdrücklich freigegebene Minutenbasis.": ["This time entry needs an explicitly approved minute basis.","Cette saisie de temps nécessite une base en minutes explicitement approuvée.","Questa registrazione richiede una base in minuti esplicitamente approvata.","Bu zaman kaydı için açıkça onaylanmış bir dakika esası gereklidir."],
+  "Freigegebene Preiseinheit": ["Approved pricing unit","Unité de prix approuvée","Unità di prezzo approvata","Onaylı fiyat birimi"],
+  "Für dieses Leistungsdatum fehlt eine passende freigegebene Preiseinheit.": ["No matching approved pricing unit exists for this service date.","Aucune unité de prix approuvée ne correspond à cette date de prestation.","Non esiste un’unità di prezzo approvata per questa data di prestazione.","Bu hizmet tarihi için uygun onaylı fiyat birimi yok."],
+  " min": [" min"," min"," min"," dk"],
+  "Minute": ["Minute","Minute","Minuto","Dakika"]
+,
+  "Einzelpreis gemäss Lieferantenrechnung": ["Unit price according to supplier invoice","Prix unitaire selon la facture fournisseur","Prezzo unitario secondo fattura fornitore","Tedarikçi faturasındaki birim fiyat"]
+,
+  "Ungültige Abrechnungszuordnung.": ["Invalid billing allocation.","Affectation de facturation non valide.","Assegnazione di fatturazione non valida.","Geçersiz faturalandırma eşleştirmesi."]
+,
+  "Jede Position benötigt genau eine Abrechnungszuordnung.": ["Each line requires exactly one billing allocation.","Chaque position doit avoir une seule affectation de facturation.","Ogni posizione richiede una sola assegnazione di fatturazione.","Her kalem tam olarak bir faturalandırma eşleştirmesi gerektirir."]
+,
+  "Gesamtrabatte werden je Preisvereinbarung übernommen.": ["Overall discounts are carried over per pricing agreement.","Les remises globales sont reprises par accord tarifaire.","Gli sconti complessivi vengono ripresi per accordo tariffario.","Genel indirimler her fiyat anlaşması için aktarılır."]
+,
+  "Bitte einen positiven Anrechnungsbetrag angeben.": ["Enter a positive amount to apply.","Saisissez un montant positif à imputer.","Inserire un importo positivo da imputare.","Mahsup için pozitif bir tutar girin."]
+,
+  "Akonto-Steuergruppen sind nicht eindeutig.": ["Advance tax groups are ambiguous.","Les groupes fiscaux de l’acompte sont ambigus.","I gruppi fiscali dell’acconto non sono univoci.","Avansın vergi grupları belirsiz."]
+,
+  "Akonto-Anrechnung ist inkonsistent.": ["Advance application is inconsistent.","L’imputation de l’acompte est incohérente.","L’imputazione dell’acconto non è coerente.","Avans mahsubu tutarsız."]
+,
+  "Der Akontobetrag wurde bereits angerechnet.": ["The advance amount has already been applied.","Le montant de l’acompte a déjà été imputé.","L’importo dell’acconto è già stato imputato.","Avans tutarı daha önce mahsup edilmiş."]
+,
+  "Akonto-Rundung ist inkonsistent.": ["Advance rounding is inconsistent.","L’arrondi de l’acompte est incohérent.","L’arrotondamento dell’acconto non è coerente.","Avans yuvarlaması tutarsız."]
+,
+  "Ein Akonto kann pro Rechnung nur einmal angerechnet werden.": ["An advance can only be applied once per invoice.","Un acompte ne peut être imputé qu’une fois par facture.","Un acconto può essere imputato una sola volta per fattura.","Bir avans her faturada yalnızca bir kez mahsup edilebilir."]
+,
+  "Akonto übersteigt die Leistung dieser Steuergruppe.": ["The advance exceeds the services in this tax group.","L’acompte dépasse les prestations de ce groupe fiscal.","L’acconto supera le prestazioni di questo gruppo fiscale.","Avans bu vergi grubundaki hizmetleri aşıyor."]
+,
+  "Akonto und Leistung benötigen übereinstimmende Steuergruppen.": ["Advance and service tax groups must match.","Les groupes fiscaux de l’acompte et des prestations doivent correspondre.","I gruppi fiscali di acconto e prestazioni devono corrispondere.","Avans ve hizmetin vergi grupları eşleşmelidir."]
+,
+  "Schlussrechnungszuordnung ist ungültig.": ["Invalid final invoice allocation.","Affectation de la facture finale non valide.","Assegnazione della fattura finale non valida.","Son fatura eşleştirmesi geçersiz."]
+,
+  "Preis- oder Rabattabweichung vor der Schlussrechnung prüfen.": ["Review the price or discount difference before final invoicing.","Vérifiez l’écart de prix ou de remise avant la facture finale.","Verificare la differenza di prezzo o sconto prima della fattura finale.","Son faturadan önce fiyat veya indirim farkını kontrol edin."]
+,
+  "Angebotsposition fehlt.": ["Offer line is missing.","La position de l’offre est manquante.","Manca la posizione dell’offerta.","Teklif kalemi eksik."]
+,
+  "Steuergruppe der Schlussrechnung fehlt.": ["Final invoice tax group is missing.","Le groupe fiscal de la facture finale est manquant.","Manca il gruppo fiscale della fattura finale.","Son faturanın vergi grubu eksik."]
+,
+  "Schlussrechnung benötigt alle verbleibenden Steuergruppen.": ["The final invoice requires all remaining tax groups.","La facture finale doit inclure tous les groupes fiscaux restants.","La fattura finale richiede tutti i gruppi fiscali rimanenti.","Son fatura kalan tüm vergi gruplarını içermelidir."]
+,
+  "Bitte einen Auftrag mit Preisvereinbarung dieses Kunden auswählen.": ["Select an order with a pricing agreement for this customer.","Sélectionnez un mandat avec un accord tarifaire pour ce client.","Selezionare un incarico con un accordo tariffario per questo cliente.","Bu müşteri için fiyat anlaşması olan bir iş seçin."]
+,
+  "Diese Preisvereinbarung ist bereits enthalten.": ["This pricing agreement is already included.","Cet accord tarifaire est déjà inclus.","Questo accordo tariffario è già incluso.","Bu fiyat anlaşması zaten eklenmiş."]
+,
+  "Vorhandene Positionen benötigen zuerst eine Preisvereinbarung.": ["Assign a pricing agreement to the existing lines first.","Affectez d’abord un accord tarifaire aux positions existantes.","Assegnare prima un accordo tariffario alle posizioni esistenti.","Önce mevcut kalemlere bir fiyat anlaşması atayın."]
+,
+  "Auftrag hinzufügen": ["Add order","Ajouter un mandat","Aggiungi incarico","İş ekle"]
+,
+  "Akonto anrechnen": ["Apply advance","Imputer un acompte","Imputa acconto","Avansı mahsup et"]
+,
+  "Anrechnungsbetrag": ["Amount to apply","Montant à imputer","Importo da imputare","Mahsup tutarı"]
+,
+  "Angerechnetes Akonto": ["Applied advance","Acompte imputé","Acconto imputato","Mahsup edilen avans"]
+,
+  "Rundungsausgleich Schlussrechnung": ["Final invoice rounding adjustment","Ajustement d’arrondi de la facture finale","Conguaglio di arrotondamento della fattura finale","Son fatura yuvarlama düzeltmesi"]
+,
+  "Jede Position benötigt eine Preisvereinbarung.": ["Each line requires a pricing agreement.","Chaque position nécessite un accord tarifaire.","Ogni posizione richiede un accordo tariffario.","Her kalem bir fiyat anlaşması gerektirir."]
+,
+  "Der verfügbare Akontobetrag wurde überschritten.": ["The available advance amount has been exceeded.","Le montant d’acompte disponible a été dépassé.","L’importo dell’acconto disponibile è stato superato.","Kullanılabilir avans tutarı aşıldı."]
+,
+  "Kumulativer Rundungsausgleich": ["Cumulative rounding adjustment","Ajustement d’arrondi cumulé","Conguaglio di arrotondamento cumulativo","Birikimli yuvarlama düzeltmesi"]
+,
+  "Die Berechnung konnte nicht bestätigt werden.": ["The calculation could not be confirmed.","Le calcul n’a pas pu être confirmé.","Il calcolo non ha potuto essere confermato.","Hesaplama doğrulanamadı."]
+,
+  "Akonto kann nicht vor dem Rechnungsdatum angerechnet werden.": ["An advance cannot be applied before its invoice date.","Un acompte ne peut pas être imputé avant la date de sa facture.","Un acconto non può essere imputato prima della data della sua fattura.","Avans, fatura tarihinden önce mahsup edilemez."]
+,
+  "Dieses Akonto wurde bereits angerechnet. Zuerst die zugehörige Rechnung korrigieren.": ["This advance has been applied. Correct the related invoice first.","Cet acompte a été imputé. Corrigez d’abord la facture correspondante.","Questo acconto è stato imputato. Correggere prima la fattura corrispondente.","Bu avans mahsup edilmiş. Önce ilgili faturayı düzeltin."]
+,
+  "Aufgehobene Akonto-Anrechnungen": ["Reversed advance applications","Imputations d’acomptes annulées","Imputazioni di acconto annullate","İptal edilen avans mahsupları"]
+,
+  "Vereinbarte Konditionen": ["Agreed terms","Conditions convenues","Condizioni concordate","Kararlaştırılan koşullar"]
+,
+  "Schlussrechnung erstellen": ["Create final invoice","Créer une facture finale","Crea fattura finale","Kesin fatura oluştur"],
+  "Teilrechnung erstellen": ["Create partial invoice","Créer une facture partielle","Crea fattura parziale","Kısmi fatura oluştur"],
+  "min": ["min","min","min","dk"]
+,
+  "Auswählen": ["Select","Sélectionner","Seleziona","Seçin"]
 }

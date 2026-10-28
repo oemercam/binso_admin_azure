@@ -45,8 +45,8 @@ try{
   });
   await page.goto(base+'/kunden?lang='+locale);
   if(width>=1024){await page.getByRole('heading',{name:text('Kunden'),exact:true}).waitFor();assert.equal(await page.locator('.desktop-appbar .workspace-location').count(),0,'Revision7 keeps the title in the content instead of repeating workspace breadcrumbs');assert.equal(await page.locator('.desktop-appbar .desktop-navigation-toggle').isVisible(),true,'Desktop navigation remains available');}
-  await page.getByRole('button',{name:text('Listenwerkzeuge'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const dialog=page.getByRole('dialog',{name:text('Kundendubletten zusammenführen'),exact:true});await dialog.waitFor();
-  await dialog.getByRole('combobox',{name:text('Dublette'),exact:true}).click();
+  await page.getByRole('button',{name:text('Listenwerkzeuge'),exact:true}).click();directoryPhase='fail';await page.getByRole('button',{name:text('Dubletten zusammenführen'),exact:true}).click();const mergePage=page.getByRole('region',{name:text('Kundendubletten zusammenführen'),exact:true});await mergePage.waitFor();
+  await mergePage.getByRole('combobox',{name:text('Dublette'),exact:true}).click();
   const popup=page.locator('.app-select-popup');await popup.getByText(text('Die Anfrage konnte nicht verarbeitet werden.'),{exact:true}).waitFor();
   directoryPhase='hold';await popup.getByRole('button',{name:text('Erneut versuchen'),exact:true}).click();await directoryReceived;
   const loading=popup.getByRole('status');await loading.waitFor({state:'attached'});assert.equal((await loading.innerText()).trim(),text('Daten werden geladen …'));
@@ -54,18 +54,18 @@ try{
   directoryPhase='success';releaseDirectory();await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).waitFor();
   for(const label of ['Zurück','Weiter'])assert.equal(await popup.getByRole('button',{name:text(label),exact:true}).count(),0,'A complete two-customer directory needs no pagination');
   await page.getByRole('option',{name:'Synthetic duplicate',exact:true}).click();
-  await dialog.getByRole('combobox',{name:text('Zielkunde'),exact:true}).click();await page.getByRole('option',{name:'Synthetic retained',exact:true}).click();
-  await dialog.getByRole('button',{name:text('Vorschau prüfen'),exact:true}).click();await dialog.getByText(text('Keine geschützten Verknüpfungen gefunden'),{exact:true}).waitFor();assert.equal(writes,0);
-  assert.equal(await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).isDisabled(),true);
-  const confirmation=dialog.locator('.form-field').filter({has:page.getByRole('checkbox')});await confirmation.scrollIntoViewIfNeeded();
-  const visibility=await confirmation.evaluate(field=>{const area=field.closest('.sheet-body').getBoundingClientRect(),rect=field.getBoundingClientRect();return {top:rect.top,bottom:rect.bottom,areaTop:area.top,areaBottom:area.bottom};});
+  await mergePage.getByRole('combobox',{name:text('Zielkunde'),exact:true}).click();await page.getByRole('option',{name:'Synthetic retained',exact:true}).click();
+  await mergePage.getByRole('button',{name:text('Vorschau prüfen'),exact:true}).click();await mergePage.getByText(text('Keine geschützten Verknüpfungen gefunden'),{exact:true}).waitFor();assert.equal(writes,0);
+  assert.equal(await mergePage.getByRole('button',{name:text('Zusammenführen'),exact:true}).isDisabled(),true);
+  const confirmation=mergePage.locator('.form-field').filter({has:page.getByRole('checkbox')});await confirmation.scrollIntoViewIfNeeded();
+  const visibility=await confirmation.evaluate(field=>{const area=field.closest('.sheet-form-content,.form-page-body').getBoundingClientRect(),rect=field.getBoundingClientRect();return {top:rect.top,bottom:rect.bottom,areaTop:area.top,areaBottom:area.bottom};});
   assert.ok(visibility.top>=visibility.areaTop-1&&visibility.bottom<=visibility.areaBottom+1,'The entire translated confirmation label can be read above the fixed footer');
-  await dialog.getByRole('checkbox').check();
+  await mergePage.getByRole('checkbox').check();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await page.screenshot({path:path.join(output,`${theme}-${width}-preview.png`),animations:'disabled'});
-  await dialog.getByRole('button',{name:text('Zusammenführen'),exact:true}).click();await dialog.getByText('Synthetic unknown response',{exact:true}).waitFor();assert.equal(writes,1,'No automatic retry after an uncertain response');
-  await dialog.getByRole('button',{name:text('Status prüfen'),exact:true}).click();await dialog.getByRole('button',{name:text('Erneut bestätigen'),exact:true}).waitFor();assert.equal(statusReads,1);assert.equal(writes,1,'Status reads cannot repeat a mutation');
-  await dialog.getByRole('button',{name:text('Abbrechen'),exact:true}).click();await page.getByRole('button',{name:text('Verwerfen'),exact:true}).click();
-  await dialog.waitFor({state:'hidden'});assert.equal(keys.length,2);assert.equal(keys[0],keys[1],'Cancellation settles exactly the original uncertain intent');
+  await mergePage.getByRole('button',{name:text('Zusammenführen'),exact:true}).click();await mergePage.getByText('Synthetic unknown response',{exact:true}).waitFor();assert.equal(writes,1,'No automatic retry after an uncertain response');
+  await mergePage.getByRole('button',{name:text('Status prüfen'),exact:true}).click();await mergePage.getByRole('button',{name:text('Erneut bestätigen'),exact:true}).waitFor();assert.equal(statusReads,1);assert.equal(writes,1,'Status reads cannot repeat a mutation');
+  await mergePage.getByRole('button',{name:text('Abbrechen'),exact:true}).click();await page.getByRole('button',{name:text('Verwerfen'),exact:true}).click();
+  await mergePage.waitFor({state:'hidden'});assert.equal(keys.length,2);assert.equal(keys[0],keys[1],'Cancellation settles exactly the original uncertain intent');
   results.push({theme,width,locale,passed:true,scope:'Synthetic transport; real migrated persistence and runtime RLS are verified separately'});await context.close();
  }
  await fs.writeFile(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log('Customer merge browser: explicit preview/confirmation, responsive light/dark, uncertain response, status without writes and same-intent cancellation passed.');

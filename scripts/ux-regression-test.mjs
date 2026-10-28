@@ -314,11 +314,13 @@ console.log('Project-linked idle timer context survives synchronization without 
   const inspect=node=>{if(ts.isVariableDeclaration(node)&&node.name.getText(ast)===variable)initializer=node.initializer;else ts.forEachChild(node,inspect)};
   inspect(fn);assert.ok(initializer,'Actual mutation handler must exist');
   const compiled=ts.transpileModule('const run='+initializer.getText(ast)+';', {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
-  return Function(...Object.keys(scope),compiled+'\nreturn run;')(...Object.values(scope));
+  const bindings=scope.calculateDraft?{...scope,calculationTotals:scope.calculationTotals??scope.calculateDraft(scope.draft)}:scope;
+  return Function(...Object.keys(bindings),compiled+'\nreturn run;')(...Object.values(bindings));
  };
  const documentAst=ts.createSourceFile('documents.tsx',read('components/documents.tsx'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
  const calculationHelpers=documentAst.statements.filter(node=>ts.isFunctionDeclaration(node)&&['decimalInput','cleanDiscount','calculateDraft'].includes(node.name?.text)).map(node=>node.getText(documentAst)).join('\n');
- const calculateDraft=Function('calculateDocument',ts.transpileModule(calculationHelpers,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText+'\nreturn calculateDraft;')((await import(moneyModuleUrl)).calculateDocument);
+ const actualMoney=await import(moneyModuleUrl);
+ const calculateDraft=Function(...Object.keys(actualMoney),ts.transpileModule(calculationHelpers,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText+'\nreturn calculateDraft;')(...Object.values(actualMoney));
  const makeWrite=()=>{let calls=0,resolve,reject;return {write:()=>{calls++;return new Promise((ok,fail)=>{resolve=ok;reject=fail})},calls:()=>calls,resolve:()=>resolve({item:{id:'saved',number:'TEST-1',total:108.1}}),reject:()=>reject(new Error('offline'))}};
  const noop=()=>{};
  const docScope=()=>({calculateDraft,billingLoading:false,billingError:null,sourceQuery:{loading:false},sourceLoading:false,sourceError:null,recovery:{ready:true,persist:()=>{},clear:()=>{}},wizardStep:0,setDraftReplay:()=>{},resolveCustomer:()=>({id:"customer"}),createRequest:{current:null},crypto:{randomUUID:()=>"fixture-create-key"},draftBaseline:{current:null},documentSavePending:{current:false},companyPending:false,company:{error:null},documentLoad:{loading:false,error:null},customersLoading:false,customersError:null,isProductionBackendEnabled:()=>true,draft:{customer:'Test',number:'',vatRate:'8.1',currency:'CHF',positions:[{id:'one',quantity:'1',price:'100'}]},show:noop,paymentIssue:null,setSaving:noop,kind:'Angebot',documentPayload:()=>({}),sourceOffer:null,sourceProject:null,directory:{Test:{id:'customer'}},existing:false,documentKey:null,setDraft:noop,remoteDraftFromItem:x=>x,setDirty:noop,setEditing:noop,window:{setTimeout:noop},router:{push:noop},plural:'angebote'});
@@ -329,7 +331,7 @@ console.log('Project-linked idle timer context survives synchronization without 
   const retry=makeWrite();const retryScope=scopeFactory();retryScope.apiPost=retry.write;retryScope.apiPatch=retry.write;
   const retryRun=handler(file,fn,'save',retryScope);const failure=retryRun();retry.reject();await failure;const next=retryRun();assert.equal(retry.calls(),2,fn+' releases the lock after failure');retry.resolve();await next;
  }
- for(const blocked of [{company:{error:'Company unavailable'}},{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'}]){
+ for(const blocked of [{company:{error:'Company unavailable'}},{sourceLoading:true},{sourceError:'Source unavailable'},{customersLoading:true},{customersError:'Customer unavailable'},{calculationTotals:{pending:true,error:null}},{calculationTotals:{pending:false,error:'Calculation unavailable'}}]){
   const pending=makeWrite(),scope={...docScope(),...blocked,apiPost:pending.write,apiPatch:pending.write};
   await handler('components/documents.tsx','DocumentPage','save',scope)();
   assert.equal(pending.calls(),0,'Source/customer loading or failure must block document writes');

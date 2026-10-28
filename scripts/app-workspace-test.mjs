@@ -14,10 +14,10 @@ const ast=ts.createSourceFile('workspace.tsx',withoutLocalization(read('componen
 const source="const Fragment=require('react').Fragment;\n"+ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
 const exports={},root={current:null};let state=0,guard,pageMounted=false;
 const control=({children,...props})=>React.createElement('button',props,children);
-Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','createPortal','document','mainNavigation','moreNavigation','createActions','useLocale','LocalizedText',compile(source))(
+Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','useLayoutEffect','createPortal','document','mainNavigation','moreNavigation','createActions','useLocale','LocalizedText',compile(source))(
  require,exports,React.Children,React.isValidElement,React.cloneElement,
  initial=>[pageMounted&&state===0?(state++,{}):state++===1?true:initial,()=>{}],()=>root,()=>{},()=>({push(){}}),()=>root,(active,blocked,unload)=>{guard={active,unload};return()=>{}},()=>null,
- ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}},catalogs.mainNavigation,catalogs.moreNavigation,catalogs.createActions,()=>({translate:value=>value}),({children})=>children);
+ ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),React.useLayoutEffect,children=>children,{body:{}},catalogs.mainNavigation,catalogs.moreNavigation,catalogs.createActions,()=>({translate:value=>value}),({children})=>children);
 function render(workspace,dirty=true,busy=false,children=React.createElement('input',{defaultValue:'Unsaved'})){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},children));}
 const inline=render(true),modal=render(false);
 const fragmented=render(true,true,false,React.createElement(React.Fragment,null,React.createElement('input'),React.createElement('div',{className:'filter-sheet-actions'},'Save')));
