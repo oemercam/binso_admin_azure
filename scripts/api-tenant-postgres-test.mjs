@@ -3,6 +3,8 @@ import {verifyConcurrentTrialExpiry} from './session-expiry-native-test.mjs';
 import assert from 'node:assert/strict';
 import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {createHash,createHmac,createCipheriv,randomBytes} from 'node:crypto';
 import pg from 'pg';
@@ -13,7 +15,7 @@ if(!address)throw new Error('Explicit isolated PostgreSQL URL required');
 const url=new URL(address);
 assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/binso_v213_test'&&url.username==='binso_test','Refuses any other database');
 const pool=new pg.Pool({connectionString:address,max:8});
-let server;
+let server,probeDirectory;
 try{
  const pgVersion=Number((await pool.query("select current_setting('server_version_num') version")).rows[0].version);assert.ok(pgVersion>=180000&&pgVersion<190000,'Gate requires PostgreSQL 18');
  assert.equal((await pool.query("select count(*)::int n from information_schema.tables where table_schema='public'")).rows[0].n,0,'Never resets an existing database');
@@ -49,7 +51,9 @@ try{
  const testEncryptionKey='synthetic-v25-http-encryption-key';
  const serverEnv={...process.env,APP_URL:base,DATABASE_URL:runtimeUrl.href,DATABASE_SSL:'false',APP_ENCRYPTION_KEY:testEncryptionKey,SESSION_COOKIE_NAME:'binso_v213_test_session'};
  for(const key of Object.keys(serverEnv))if(key.startsWith('STRIPE_')||key.startsWith('GRAPH_'))delete serverEnv[key];
- server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3218'],{stdio:['ignore','pipe','pipe'],env:serverEnv});
+ probeDirectory=await fs.mkdtemp(path.join(os.tmpdir(),'binso-api-sql-'));
+ const probeFile=path.join(probeDirectory,'document.json');serverEnv.BINSO_ISOLATED_SQL_LOG=probeFile;
+ server=spawn(process.execPath,['--import',new URL('./isolated-sql-probe.mjs',import.meta.url).href,'node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3218'],{stdio:['ignore','pipe','pipe'],env:serverEnv});
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let i=0;;i++){if(server.exitCode!==null)throw new Error('Synthetic HTTP server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>80)throw new Error('Synthetic server unavailable');await new Promise(resolve=>setTimeout(resolve,250));}
  const get=async(path,cookie)=>{
@@ -60,13 +64,13 @@ try{
    try{
     const activity=(await pool.query("select pid,state,wait_event_type,wait_event,extract(epoch from clock_timestamp()-query_start) seconds,pg_blocking_pids(pid) blockers,query from pg_stat_activity where datname=current_database() and pid<>pg_backend_pid() and state<>'idle'")).rows;
     console.error('Isolated database activity',JSON.stringify(activity));
-    const query=activity.find(row=>row.query.startsWith('select *,count(*) over()::int total_count')&&row.query.includes('billing_predecessors'))?.query;
-    if(query&&actor){
+    const captured=await fs.readFile(probeFile,'utf8').then(JSON.parse).catch(()=>null);
+    if(captured&&actor){
      const [tenant,role]=actor.split(':'),c=await pool.connect();
      try{await c.query('begin');await c.query('set local role binso_runtime');await c.query("set local statement_timeout='5s'");await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizations[Number(tenant)],'http-'+tenant+'-'+role]);
-      const explained=(await c.query('explain (format json) '+query,[organizations[Number(tenant)],new Date().toISOString().slice(0,10)])).rows[0]['QUERY PLAN'][0];
+      const explained=(await c.query('explain (format json) '+captured.text,captured.values)).rows[0]['QUERY PLAN'][0];
       console.error('Isolated document plan',JSON.stringify({cost:explained.Plan['Total Cost'],rows:explained.Plan['Plan Rows'],jit:explained.JIT}));
-     }finally{await c.query('rollback');c.release();}
+     }finally{try{await c.query('rollback');}finally{c.release();}}
     }
    }catch(diagnosticError){console.error('Isolated HTTP diagnostics unavailable',diagnosticError.message);}
   };
@@ -467,4 +471,4 @@ try{
  await verifyConcurrentTrialExpiry({base,pool,cookie:cookies.get('0:owner'),organizationId:organizations[0]});
  await pool.query("update auth_sessions set expires_at=now()-interval '1 second' where user_id='http-0-owner'");assert.equal((await get('/api/customers',cookies.get('0:owner'))).status,401,'Expired real database session is denied');
  console.log('Real HTTP + PostgreSQL: two isolated tenants, direct IDs in '+positive.join(', ')+', customer snapshot, legal same-number documents, all eight payment roles, operator boundary and actual session expiry passed. Synthetic sessions only.');
-}finally{server?.kill();await pool.end();}
+}finally{server?.kill();await pool.end();if(probeDirectory&&path.dirname(probeDirectory)===os.tmpdir()&&path.basename(probeDirectory).startsWith('binso-api-sql-'))await fs.rm(probeDirectory,{recursive:true,force:true});}
