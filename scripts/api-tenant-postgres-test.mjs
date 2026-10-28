@@ -52,7 +52,28 @@ try{
  server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port','3218'],{stdio:['ignore','pipe','pipe'],env:serverEnv});
  let logs='';server.stdout.on('data',data=>{logs+=data});server.stderr.on('data',data=>{logs+=data});
  for(let i=0;;i++){if(server.exitCode!==null)throw new Error('Synthetic HTTP server exited: '+logs);try{if((await fetch(base+'/api/health')).ok)break;}catch{}if(i>80)throw new Error('Synthetic server unavailable');await new Promise(resolve=>setTimeout(resolve,250));}
- const get=async(path,cookie)=>{const response=await fetch(base+path,{headers:{cookie},redirect:'manual',signal:AbortSignal.timeout(15000)});return {status:response.status,data:response.headers.get('content-type')?.includes('json')?await response.json():await response.arrayBuffer()};};
+ const get=async(path,cookie)=>{
+  try{const response=await fetch(base+path,{headers:{cookie},redirect:'manual',signal:AbortSignal.timeout(15000)});return {status:response.status,data:response.headers.get('content-type')?.includes('json')?await response.json():await response.arrayBuffer()};}
+  catch(error){
+   // Diagnose this disposable database only; never print cookies or extend the
+   // HTTP/server deadlines. Preserve the original failure even if diagnostics fail.
+   const actor=[...cookies].find(([,value])=>value===cookie)?.[0];
+   console.error('Isolated HTTP read failed',{path,actor,error:error.message});
+   try{
+    const activity=(await pool.query("select pid,state,wait_event_type,wait_event,extract(epoch from clock_timestamp()-query_start) seconds,pg_blocking_pids(pid) blockers,query from pg_stat_activity where datname=current_database() and pid<>pg_backend_pid() and state<>'idle'")).rows;
+    console.error('Isolated database activity',JSON.stringify(activity));
+    const query=activity.find(row=>row.query.startsWith('select *,count(*) over()::int total_count')&&row.query.includes('billing_predecessors'))?.query;
+    if(query&&actor){
+     const [tenant,role]=actor.split(':'),c=await pool.connect();
+     try{await c.query('begin');await c.query('set local role binso_runtime');await c.query("set local statement_timeout='5s'");await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizations[Number(tenant)],'http-'+tenant+'-'+role]);
+      const explained=(await c.query('explain (format json) '+query,[organizations[Number(tenant)],new Date().toISOString().slice(0,10)])).rows[0]['QUERY PLAN'][0];
+      console.error('Isolated document plan',JSON.stringify({cost:explained.Plan['Total Cost'],rows:explained.Plan['Plan Rows'],jit:explained.JIT}));
+     }finally{await c.query('rollback');c.release();}
+    }
+   }catch(diagnosticError){console.error('Isolated HTTP diagnostics unavailable',diagnosticError.message);}
+   console.error('Isolated server tail',logs.slice(-4000));throw error;
+  }
+ };
  const positive=[];
  for(const [path,table] of [['customers','customers'],['employees','employees'],['products','products_services'],['expenses','expenses'],['payments','payments']]){
   const own=(await pool.query('select id from '+table+' where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];assert.ok(own,path+' fixture');
