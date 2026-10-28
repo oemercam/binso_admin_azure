@@ -55,3 +55,17 @@ zeigte aktive Verarbeitung ohne blockierende Transaktion. Die nur im isolierten
 Testserver geladene SQL-Sonde erhält unveränderte Zeitlimits und erfasst bei einem
 erneuten langsamen Aufruf den tatsächlichen SQL-Plan. Diese Einschränkung bleibt
 im abschliessenden Release-Nachweis sichtbar.
+
+Auf Stand 4361d9e0 bestanden erneut Build/native HTTP-Prüfung und die vollständigen
+Pflichtprogramme. Die breitere Browsersteuerung deckte danach dieselbe fehlende
+Fixture-Verknüpfung für neu erstellte Kunden auf: Der gespeicherte Replay-Datensatz
+wurde im Detail-GET bisher nicht gefunden. Der Detail-GET verwendet nun den
+tatsächlich zuvor erstellten synthetischen Kunden aus demselben Replay-Speicher.
+Die Warte-, Fehler-, Wiederholungs- und Doppelanlageprüfungen bleiben unverändert.
+Der gezielte Kundenablauf besteht mit dieser Korrektur in Chromium und WebKit
+(customer-created-{chromium,webkit}.log, jeweils Exit 0).
+Im abgeschlossenen GitHub-Lauf 40746218475 waren beide funktionalen Browsergruppen,
+vier der sechs breiten Seitenmatrixgruppen, Build, Pflichtprogramme, Sicherheit,
+Avatar, Rabatt/Rechnungsprüfung und UX-Compliance grün. Nur die beiden Gruppen mit
+dem oben nachgewiesenen Kunden-Fixture-Fehler und damit der Quality-Aggregator
+waren rot. Diese Ergebnisse werden nicht rückwirkend als bestanden umgeschrieben.
