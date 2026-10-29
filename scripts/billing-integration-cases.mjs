@@ -23,6 +23,7 @@ export async function verifyBillingIntegration({db:database,load,request,current
  const project=(await db.query("insert into projects(organization_id,external_id,name,customer_id,status,billing_agreement_id) values($1,gen_random_uuid()::text,'V8 fixed source',$2,'planned',$3) returning id",[org,customer,agreement])).rows[0].id;
  const duplicate=await create({sourceProject:project,billingContext:{procedure:'partial'},items:[line(61)]});assert.equal(duplicate.status,400,JSON.stringify(duplicate.body));
  const final=await create({sourceProject:project,billingContext:{procedure:'final'},items:[line(60)]});assert.equal(final.status,201,JSON.stringify(final.body));
+ assert.ok(final.body.item.billing_predecessors.some(prior=>prior.number===fixed.body.item.number&&Number(prior.subtotal)===40),'A direct agreement retains its actual partial-invoice predecessor');
  assert.equal((await create({sourceProject:project,billingContext:{procedure:'partial'},items:[line(1)]})).status,400);
  const t=(await db.query("insert into time_entries(organization_id,external_id,customer_id,project_id,person_name,worker_type,work_date,hours,description,billable,approved,sales_rate) values($1,gen_random_uuid()::text,$2,$3,'Fixture','employee','2026-10-27',1,'Included time',true,true,100) returning id",[org,customer,project])).rows[0].id;
  assert.notEqual((await create({items:[line(100,'time',{timeEntryIds:[t]})]})).status,201,'Omitting agreement metadata cannot invoice included project hours');
@@ -194,6 +195,13 @@ export async function verifyBillingIntegration({db:database,load,request,current
  assert.equal((await transition(collection.body.item.number,'issue')).status,200,'Consolidated invoice follows the existing issue/PDF/receivable pipeline');
  assert.notEqual((await create({sourceProject:consolidatedProjects[0].id,items:[line(100)]})).status,201,'A conventional invoice must see consolidated reservations too');
  console.log('Consolidated invoice: two project agreements, preserved mixed VAT, original capacity reservations, complete DTO, issuance and legacy/consolidated duplicate denial passed.');
+  const predecessorProjects=[];
+  for(const amount of ['100','200']){const response=await projects.POST(request('POST',{name:'Scoped predecessor '+amount,customerId:customer,billingTerms:terms('fixed',{amount})},'https://example.invalid/api/projects'));assert.equal(response.status,201);const p=(await response.json()).item;predecessorProjects.push({id:p.id,agreementId:(await db.query('select billing_agreement_id from projects where id=$1',[p.id])).rows[0].billing_agreement_id});}
+  const scopedClaim=(procedure,fraction)=>({billingScopes:predecessorProjects.map(p=>({agreementId:p.agreementId,projectId:p.id,context:{procedure}})),items:predecessorProjects.map((p,i)=>line((i+1)*100*fraction,'fixed',{billingAgreementId:p.agreementId,vatRate:i?2.6:8.1}))});
+  const scopedPartial=await create(scopedClaim('partial',0.4));assert.equal(scopedPartial.status,201,JSON.stringify(scopedPartial.body));
+  const scopedFinal=await create(scopedClaim('final',0.6));assert.equal(scopedFinal.status,201,JSON.stringify(scopedFinal.body));
+  assert.equal(scopedFinal.body.item.billing_agreement_id,null,'A consolidated claim uses its actual scope relations');
+  assert.ok(scopedFinal.body.item.billing_predecessors.some(prior=>prior.number===scopedPartial.body.item.number&&Number(prior.subtotal)===120),'Scope-only predecessors aggregate both actual agreement amounts exactly once');
  const discountedScopes=[];
  for(const [model,amount,price,quantity,positionDiscount,headerDiscount,vatRate] of [['fixed','171',100,2,{kind:'percent',value:'10'},{kind:'percent',value:'5'},8.1],['quantity',null,20,3,{kind:'fixed',value:'3',currency:'CHF'},{kind:'fixed',value:'2',currency:'CHF'},2.6]]){
   const offer=await create({kind:'offer',validUntil:'2099-12-31',billingTerms:terms(model,amount?{amount}:{}),discount:headerDiscount,items:[line(price,model==='fixed'?'fixed':'quantity',{quantity,discount:positionDiscount,vatRate})]});assert.equal(offer.status,201,JSON.stringify(offer.body));assert.equal((await transition(offer.body.item.number,'issue')).status,200);assert.equal((await transition(offer.body.item.number,'accept')).status,200);
