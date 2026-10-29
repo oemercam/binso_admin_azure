@@ -90,6 +90,7 @@ try{
  assert.equal((await get('/api/documents/'+invoice.invoice_no,cookies.get('0:owner'))).status,200);
  // Numbers may repeat legally in separate tenants: compare the returned object ID.
  const ownDocument=await get('/api/documents/'+invoice.invoice_no,cookies.get('0:owner'));
+ assert.deepEqual(ownDocument.data.item.billing_predecessors,[],'Historical invoices without an agreement retain an empty predecessor list');
  const otherDocument=await get('/api/documents/'+invoice.invoice_no,cookies.get('1:owner'));
  if(otherDocument.status===200)assert.notEqual(otherDocument.data.item.id,ownDocument.data.item.id);
  const customer=(await pool.query('select id,name from customers where organization_id=$1 order by id limit 1',[organizations[0]])).rows[0];
