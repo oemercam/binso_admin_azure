@@ -1,0 +1,709 @@
+
+node scripts/production-acceptance-test.mjs
+Production acceptance blocks missing/removed requirements, wrong SHA, traversal, altered evidence, future dates and absent reviewer.
+
+node scripts/prepare-runtime-settings-test.mjs
+Runtime settings enforce effective verified TLS and explicit scanner activation; runner firewall rejects broad or injected ranges.
+
+node scripts/schema-contract-test.mjs
+Schema gate rejects missing latest migration, changed checksum, missing columns/policies, disabled RLS/FORCE and unclassified tables.
+
+node scripts/employee-dossier-test.mjs
+Supplier: actual routes, safe DTO, central numbering, persistence/replay/stale revision, duplicate review, roles/plan/RLS and atomic audit/counter rollback passed. Bank changes/payments remain unavailable.
+Expense payment source: actual routes, persistence/legacy preservation, review separation, private-only claims, DB bypass protection, replay, roles/tenant RLS and atomic audit rollback passed. No transfer or payroll action.
+Supplier bank: actual GET/PATCH, central Swiss IBAN validation, fresh proof/expiry, stale/replay, public DTO/audit redaction, DB role guard, tenant isolation, clearing and atomic audit rollback passed. No payment initiated; non-CH/LI bank input remains unsupported.
+Employee identity: actual explicit binding, active same-tenant membership, one dossier per identity, no silent relink/account/project grant, freshness/replay/roles/plan and audit rollback passed. Invitation rotation remains separate.
+AP drafts: actual incomplete persistence, exact decimal consistency, supplier/reference duplicates, immutable legacy, optimistic revision/replay, roles/tenant RLS, audit rollback and no approval/payment transition passed. File attachment and multi-order allocation remain separate.
+AP receipts: actual central upload/list/download/archive, content/MIME/HEIC denial, pending quarantine, synthetic clean enforcement, tenant/role/content RLS, entitlement and owner immutability/replay passed. Real antivirus/provider qualification remains external.
+External resources: actual resource/assignment routes, multiple people/projects, role/project/tenant scope, expiry/revocation/overlap, no employee/login, fresh proof, replay/version conflicts and audit rollback passed. Time-owner integration remains P17.
+Sensitive grants: default deny including owner/admin, explicit HR/family/payroll separation, role eligibility, current DB revocation, fresh session proof, stale/replay, role/status reset, tenant/read-only and atomic audit rollback passed. Self-service payslips remain a separate policy.
+Wage definitions: actual routes/runtime RLS, default deny, explicit grants, exact money, all wage/annual bases, separate payout metadata, immutable revisions, overlap, replay/stale, fresh auth, tenant/tariff/read-only and audit rollback passed. No net payroll or invented legacy conversion.
+Family/allowance decisions: real runtime routes/RLS, separate explicit grants, no child-to-money inference, exact authority amount, independent review, immutable/revoked revisions, changed source, overlap, replay confidentiality, tenant, fresh/read-only and audit rollback passed. No statutory entitlement calculation or payroll payment.
+Absences: actual self-service without dossier permissions, explicit HR scope, independent review with fresh DB proof, exact declared days, overlap, withdrawal, replay confidentiality, tenant/tariff/read-only/time-only and atomic audit rollback passed. No inferred working days, holiday balance or payroll posting.
+Commercial contracts: actual routes/RLS, partial financial drafts, independent fresh review, root/revision locks, exact purchase versus sale, dated approved snapshots, no draft replacement, immutable history, overlap, stale/replay/audit rollback, role/project/tenant/Pro and replay confidentiality passed. No billing, legal certification or historical document recalculation.
+Contract documents: actual central upload/content checks, strict pending quarantine, manifest/revision conflicts, exact immutable bytes, private file/content/replay RLS, controlled removal, retained review evidence, deferred snapshot integrity and audit rollback passed. Clean verdict is synthetic; no real malware or legal-signature qualification.
+External time: actual create/correct/submit/reject/independent approval, exact minutes, no payroll or automatic billing, replay, current assignments, role/tenant/plan boundaries and audit rollback passed.
+Contractual unit integration: minute/15-minute/explicit-day approved sources, exact invoice/VAT, wrong basis denial, controlled draft release and unchanged original time passed.
+Time price sources: actual dated approved purchase/sale binding, exact immutable snapshots and explicit revisions, no draft/contract auto-repricing, fresh/replay/stale/field/role/tenant/plan boundaries, deferred current-source integrity and audit rollback passed. No invoice calculation, partial allocation or FX conversion.
+Minute allocations: actual APIs/runtime RLS, exact 1/61/120-minute and discount math, draft/partial/replay/reservation/overflow/replacement/audit rollback, controlled discard/release, real issuance and immutable PDF, cancelled/issued retention, direct SQL history protection and role/tenant boundaries passed. Native overlapping-transaction execution and rendered device acceptance remain open.
+AP comparison: real20x6h approved/purchase-bound sources,120h x80 =9600+777.60=10377.60; exact minute/rate/currency/tax/total mismatches, missing receipt, immutable DB-derived snapshots, stale header, no one-cent tolerance/FX, replay/audit rollback and actual roles/RLS/tenant passed. No approval/payment.
+PASS AP policy native: actual GET/POST/replay/conflict, strict role/currency/decimal schema, DB fresh actor/revision, foreign tenant, readonly, audit rollback, optional four-eyes/solo exception and exact caps. Configuration alone cannot approve or pay any invoice.
+PASS AP review native: unresolved differences/inquiry, explicit correction/new match, current policy/fresh actor/role/tenant, optional four-eyes and true solo exception, gross cap, replay, atomic audit/source allocations, DB transition/deferred completeness, immutable reviewed invoice/purchase price, and no payment.
+Invitations: real runtime auth routes/SQL, GET non-consumption, seven-day token rotation, full-seat replacement, role/profile preservation, single-use activation, retry/outbox deduplication, revoke, tenant/roles and atomic rollback passed. External delivery is synthetic and remains unqualified.
+Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.
+Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.
+Supplier pages: actual proxy matcher/anonymous redirect and private no-store/noindex headers passed.
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'e099ee04-362e-4a4a-928f-b7208ce32481'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'bc13eb96-110f-48b0-97bd-a4f960fc2027'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '5aabf42e-2eb5-47a7-a915-99da451d97c5'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '0e4c8054-d75a-4697-8959-cec3f2e24eca'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '519ef4cf-7f20-43fa-95c4-48f6474a3959'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '71abf503-0d4a-4a11-abf1-f2c7d63d78e0'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '88eca29b-2dd0-4460-bb69-3910e045b6c7'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '3d349105-733f-4f3a-a9a7-16c20c177dbb'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'ef6a322a-438e-4ef8-b295-0fde793219ed'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '4c656b66-0bad-41ac-b46e-1b6412b8e319'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'b08da154-507a-4eef-ad53-88755983e501'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'a51cef8a-f7d9-49b3-a8f8-6b5ef11a4b7b'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '5dfde521-4ac5-4c39-a51d-41f0fcf68d99'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'c0ca77ca-af6c-4662-99fb-0dc4994b3af0'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'f5038d82-a329-47f6-bc0b-a2629d1f41d7'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'a6f85555-2aff-46c7-a702-1741c67e14ac'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'b4750843-787f-4d31-a818-1c7dc5fb4299'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '325cfa63-34b2-4a0f-8b91-5ce57f9ea5cf'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '8a1dd156-e41c-4ba6-8511-a3d1f63f273a'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '66e67907-0915-4320-ab79-7a0643af22bf'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'abe89bd4-4df1-419f-abe4-33f34838809d'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'c9866555-92bd-4d02-8e16-a7c914307717'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'c726a43b-99fd-41ab-911e-f18f863e4e37'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '2d778863-24ed-449f-936b-d193d528af88'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'e76b604a-4912-4503-88b6-a7a064ebb5d3'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'e723eed4-9f08-4b0c-8ee0-fa1e6d367a51'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '4c1f40a4-4220-42e9-8397-97a430d54f77'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '2f9696b2-3a3d-4dd6-9f96-bc9865cf7e3f'
+}
+
+node scripts/deployed-assets-test.mjs
+Deployed asset identity: static HTML and dynamic localized manifests, ancestor styles, deduplication and missing-artifact rejection passed.
+
+node scripts/deployed-auth-test.mjs
+Production auth verification: retired URL/cookie refusal and protected API denial positives and negatives, GET-only requests passed.
+
+node scripts/localization-test.mjs
+Actual document navigation: outstanding and late requests block switches, failures remain visible, timeout/close reject, and no navigation begins pending.
+Actual common select feedback/paging: all four locale renders, localized error/retry/status, and pending action locks passed. DOM interaction is separately tested in the browser.
+Locale catalogues: complete EN/FR/IT/TR tuples, preserved template tokens, server-rendered language, native attributes and unchanged user data passed.
+Password recovery: translated mail/link locale and uniform unknown-account/delivery-failure response passed.
+Shared rows/headings preserve colliding user titles while menu labels and document prefixes translate.
+Localized metadata binds canonical alternatives and social-image URLs to the selected language.
+Actual legal documents: stable unique TOC anchors, preserved contact deep link, translated control labels, short-document omission and unchanged version dates passed. Legal language/substance approval remains separate.
+Language selector V5: five short triggers and full native option names passed; persistence owner unchanged.
+
+node scripts/locale-catalogue-test.mjs
+Selected catalogues: exact five-language server parity, first-render data, no mixed-language flash, offline retry, concurrent choice order, cache reuse and unmount isolation passed.
+
+node scripts/localization-coverage-test.mjs
+Application source copy coverage passed.
+Raw JSX localization boundaries passed; brand-neutral text and dynamic user data are preserved.
+Static public API validation copy coverage passed; internal diagnostics and dynamic record values are excluded.
+Data-driven tenant/operator navigation labels and group headings have catalogue coverage.
+All five languages: tenant, operator, account and shared settings menu names have translations and no ampersand pairs.
+
+node scripts/maintenance-test.mjs
+Maintenance: authorization, duration validation, activation, expiry, deactivation and atomic audit rollback passed.
+
+node scripts/readiness-integrity-test.mjs
+Monitoring validates exact cross-subscription target, enabled rules, action binding, receivers and denied reads; never claims delivery.
+Runtime role, inherited bypass/ownership, public-schema creation denial, pinned Azure issuer and real Bash monitoring failure gates passed.
+
+node scripts/security-exception-test.mjs
+Next glob dependency: exact scoped replacement, real directories/braces/Unicode/arrays/defaults, enabled Next link rule positive/negative and deep-pattern stack-exhaustion regression passed.
+Full dependency gate: no high/critical exceptions; exact former advisory, production paths, unknown findings and malformed reports remain blocking.
+
+node scripts/runtime-integrity-test.mjs
+Production patch packaging: exact declared bytes only; empty, malformed, traversal, absolute, Windows and missing paths rejected.
+Bounded chunked/UTF-8/declared-size/JSON reads, sensitive-log suppression and service-worker owned-cache cleanup passed.
+
+node scripts/runtime-launcher-test.mjs
+Actual runtime launcher: normal exit, unexpected signal, graceful SIGTERM, SIGINT and bounded stubborn-worker shutdown without orphans passed.
+
+node scripts/production-package-test.mjs
+Production package guard: required runtime files, exact built/source identity, private-file exclusion and dev-dependency rejection passed.
+
+node scripts/web-vitals-consent-test.mjs
+Consent refusal, opt-in, withdrawal, duplicate/invalid metrics, private-route minimization and obsolete observer isolation passed.
+
+node scripts/rate-limit-test.mjs
+Actual rate limiter: bounded new-key capacity, no active-key eviction, expiry reuse, retry delays and atomic production database path passed.
+
+node scripts/demo-session-test.mjs
+Demo retirement: all six URLs reject legacy access; demo cookies cannot authenticate; normal sessions and operator authorization remain validated.
+
+node scripts/public-demo-flow-test.mjs
+Actual Next configuration resolves the legacy demo before streamed page rendering.
+
+node scripts/file-scan-test.mjs
+node:net:2368
+      const error = new UVExceptionWithHostPort(rval, 'listen', address, port);
+                    ^
+
+Error: listen EPERM: operation not permitted /tmp/binso-scan-xZFFFj/s0.sock
+    at Server.setupListenHandle [as _listen2] (node:net:2368:21)
+    at listenInCluster (node:net:2499:12)
+    at Server.listen (node:net:2641:5)
+    at scanFile.socketPath.socketPath (file:///workspace/scratch/861a20112d10/binso_admin_azure/scripts/file-scan-test.mjs:60:79)
+    at new Promise (<anonymous>)
+    at peer (file:///workspace/scratch/861a20112d10/binso_admin_azure/scripts/file-scan-test.mjs:60:13)
+    at file:///workspace/scratch/861a20112d10/binso_admin_azure/scripts/file-scan-test.mjs:70:8 {
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '/tmp/binso-scan-xZFFFj/s0.sock',
+  port: -1
+}
+
+Node.js v24.22.1
+
+node scripts/receipt-scan-test.mjs
+Receipt scan: actual owner/route, credential-bound URL and redirect denial, bounded JSON/polls/cancellation, typed uncertain suggestions, CSRF/RBAC/read-only/profile/rate denial and malformed-upload boundaries passed. No real provider called or expense booked.
+
+node scripts/billing-model-test.mjs
+Shared billing terms: six strict draft models, absent/zero amounts, activation readiness, explicit extra-time eligibility, anchored calendar periods, bounded milestones and malformed payload denials passed. Persistence, invoice capacity and concurrent billing integration are not qualified by this unit suite.
+
+node scripts/contract-time-unit-test.mjs
+Contract time units: exact minute/15-minute/explicit-day amounts and VAT, CHF/EUR parity, no hourly-price rounding, explicit basis and invalid-unit denials passed. Original durations are never changed.
+
+node scripts/billing-completion-test.mjs
+Consolidated canonical calculations: independent price bases, negotiated line/header discounts, mixed VAT, stable positions, currency and duplicate-position denials passed.
+Advance allocation: cumulative VAT cents, variable partial amounts, exact exhaustion, duplicate/overapplication and mismatched-tax denial, zero final and immutable history passed.
+Final cumulative rounding: immutable agreed cents minus actual prior net/VAT, explicit bounded residuals, exact final total and non-rounding price mismatch denial passed.
+Cumulative partials and split source positions: deterministic shared-cent allocation, unchanged prices, historical rounding carry and exact original final net/VAT passed.
+Historical mixed VAT: omitted net/VAT and tax-only remainders are rejected; explicit original-price zero-quantity carry restores the exact original claim without changing old invoices.
+
+node scripts/project-budget-migration-test.mjs
+Actual budget migration upgrade: historical zero/positive/legacy amounts retained, new absence is NULL, outlier blocks atomically with no rewriting. In-memory PostgreSQL evidence; no production migration executed.
+
+node scripts/file-rescan-test.mjs
+Isolated rescan: tenant isolation, hash-bound selection, rejection, retry, scanner outage and atomic audit rollback passed.
+
+node scripts/auth-integrity-test.mjs
+{"probe":"stale-login-after-committed-password-reset","status":401,"persistedSessionsAfterReset":0,"synthetic":true}
+{"probe":"stale-password-change-after-committed-reset","status":409,"resetPasswordPreserved":true,"synthetic":true}
+Actual server session: expired token rejected, presented session revoked, cookie removed, repeated logout without a token safe.
+Isolated PGlite: auth races, upload replay, strict/default quarantine, explicit development access without verdict mutation, rejected/auth/tenant denial, standard/time-only support attachment boundaries and branding policy passed.
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'a74bc2b0-7fa0-4ea4-96c4-5902127b2eb2'
+}
+
+node scripts/notification-read-test.mjs
+Notification receipts: migrated schema, real restricted RLS, two-user shared/read-all isolation, personal legacy reads, replay and cross-user/tenant denial passed.
+
+node scripts/auth-request-test.mjs
+Auth requests: bounded AbortSignal, no external target, timeout/offline distinction, no automatic mutation retry and preserved HTTP conflicts passed.
+
+node scripts/deployment-settings-test.mjs
+Actual deployment predicate: present, absent, empty, later entry and name/value/suffix countercases passed without an undeclared jq dependency.
+
+node scripts/passkey-test.mjs
+Passkey: real P-256 signatures, RP/origin/UV/challenge/counter/user-handle negatives, UV strong sessions without extra TOTP, password login without legacy enrollment gate, session-bound step-up, rename, last-method protection, email plus single-use recovery, RLS, replay/expiry, notices and revoke guards passed. Physical authenticators remain untested.
+Unhandled API error {
+  category: 'error',
+  correlationId: '01a793f8-6d26-4c31-90f6-5a29abf07b21'
+}
+
+node scripts/mail-message-test.mjs
+Graph MIME: actual plain/HTML/PDF roundtrip, single-envelope/header guards, no file/URL transport, exact Graph 202, no retry/fallback, missing-config failure, localized Light/Dark template and safe logs passed. Real client rendering/delivery remains open.
+
+node scripts/v25-5-traceability.mjs --check
+V25.5: 390 unique PL/BP/UX/gate IDs retained; no automated complete-acceptance claims.
+
+node scripts/phase1-identity-test.mjs
+Phase 1 Entra proof: multifactor claims accepted; password/OTP/device/role/context-only and malformed claims denied.
+
+node scripts/phase1-time-status-test.mjs
+Phase 1 time statuses: actual review evidence, resubmission precedence, disjoint states, internal classification and remote/local filter correspondence passed.
+
+node scripts/registration-test.mjs
+Single-page company completion: actual API/RLS, fresh-proof and canonical validation, optional-field preservation, role/tenant denial and atomic rollback passed.
+V8 project budgets: actual routes, absent/zero/omitted values, exact input bounds, stale versions, roles/read-only, tenant RLS and atomic audit rollback passed. No legacy value rewritten.
+Six-model full chain fixed
+Six-model full chain time
+Six-model full chain quantity
+Six-model full chain mixed
+Six-model full chain recurring
+Six-model full chain milestone
+Combined quoted chain: immutable 100.01/8.1 quote, variable advance, cumulative 0.33/0.33 partials with two applications, 0.34 final and exact 108.11 total passed.
+Credited mixed-tax advance: actual open-source GET, gross credit, picker exclusion, API denial and explicit DB rejection preserve original gross-only history without guessing VAT passed.
+Variable advance APIs: two independent issued advances, partial and final applications, exact net/VAT/claim, overapplication denial and immutable original invoices passed.
+Final rounding APIs: quoted quantity 0.33/0.33/0.34, exact original net and VAT cents, explicit final adjustment and actual issuance passed.
+Direct variable agreement: source read, explicit inheritance without an order, date/replay guards, used-source cancellation denial, atomic audit rollback, one-way attributed reversal, irreversible canceled target, safe reuse and original history passed.
+Consolidated invoice: two project agreements, preserved mixed VAT, original capacity reservations, complete DTO, issuance and legacy/consolidated duplicate denial passed.
+Negotiated consolidated discounts: original position percentage/fixed discounts and independent header percentage/fixed discounts, mixed VAT and immutable quote prices passed.
+Invoice-reader facts: complete consolidated scopes and attributed advance history, denied writes and foreign-tenant fact exclusion passed.
+Native concurrent HTTP reservation race prepared but not executed by PGlite.
+V8 six-model integration: actual document/project APIs, fixed partial/final capacity, included-time denial despite omitted metadata, quantity, recurring period reservations, completed/unfinished milestone, approved time and duplicate-source denial, mixed components, idempotency and persisted DTO passed. No real provider or productive migration.
+Customer password-login policy: legacy enrollment no longer blocks valid sessions; stale writes, RBAC and tenant isolation verified.
+Phase 1 time review: real scoped atomic batch, audit, duplicate/foreign selection, role and self-approval denials passed.
+Web Push: actual migrated RLS/API, encrypted registration, SSRF denials, private payload, concurrent committed claims, uncertain/crash non-retry and expired endpoint cleanup passed; no external provider contacted.
+PGlite restricted runtime registration integration passed: server plan/contract checks, actual isolated tenant creation, delivery failure, pending receipt, duplicate replay, independent equal names, five locale catalogues, cross-browser link, consumed/expired link, trial start, OTP, ordinary password login without email-MFA dependency, session-bound fresh email/TOTP/recovery proof, optional-MFA revocation, direct dashboard handoff, explicit company completion, reader rejection, tenant preservation, generic public resend, direct bootstrap denial, helper ACL/ownership/path boundary, duplicate-account denial, temporary-table shadowing resistance, scoped identity-only lookup, pooled-context cleanup, revoked membership/organization denial and scoped trial expiration.
+Unhandled API error {
+  category: 'error',
+  correlationId: 'a9dab934-1b4c-4bb2-8949-74587fb88867'
+}
+Unhandled API error {
+  category: 'error',
+  correlationId: '3a1ae804-0146-45ff-9bf1-9d9395d50ea4'
+}
+Isolated billing fixture diagnostic Agreed service capacity exceeded PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 85 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+Isolated billing fixture diagnostic Final invoice already reserves this service PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 74 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Agreed service capacity exceeded PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 85 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Mindestens ein Zeiteintrag ist nicht mehr verrechenbar. Bitte Auswahl aktualisieren.
+Isolated billing fixture diagnostic Die Anfragekennung wurde für andere Angaben verwendet.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Issue preceding partial invoices before final settlement PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 77 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+Isolated billing fixture diagnostic Für diesen Auftrag können momentan keine Zeiten erfasst werden.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Mindestens ein Zeiteintrag ist nicht mehr verrechenbar. Bitte Auswahl aktualisieren.
+Isolated billing fixture diagnostic isolated billing audit failure PL/pgSQL function v8_billing_audit_fail() line 1 at RAISE
+Unhandled API error {
+  category: 'error',
+  correlationId: 'df8fa0d1-a3a2-4ad1-b303-ca989bf5498f'
+}
+Isolated billing fixture diagnostic Der verfügbare Akontobetrag wurde überschritten.
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Akonto kann nicht vor dem Rechnungsdatum angerechnet werden.
+Isolated billing fixture diagnostic Dieses Akonto wurde bereits angerechnet. Zuerst die zugehörige Rechnung korrigieren.
+Isolated billing fixture diagnostic isolated cancellation audit failure PL/pgSQL function v8_cancel_audit_fail() line 1 at RAISE
+Unhandled API error {
+  category: 'error',
+  correlationId: '9a710043-fdc4-410d-aeb1-bbb621d94c25'
+}
+Isolated billing fixture diagnostic Applied advances require a traceable correction before crediting PL/pgSQL function protect_applied_advance_credit() line 8 at RAISE
+Isolated billing fixture diagnostic Agreed service capacity exceeded PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 85 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+Isolated billing fixture diagnostic Die Angaben zum Abrechnungsmodell sind ungültig.
+Isolated billing fixture diagnostic Agreed service capacity exceeded PL/pgSQL function check_billing_scope(uuid,uuid,uuid,boolean) line 85 at RAISE
+SQL statement "SELECT check_billing_scope(new.organization_id,new.id,scope.billing_agreement_id,was_issued)"
+PL/pgSQL function check_billing_capacity() line 23 at PERFORM
+
+node scripts/statistics-test.mjs
+Central statistics: presets, inclusive dates, invalid dates, UTC/DST-independent groups, decimal precision, bounded long periods and cash mapping passed.
+Actual chart and shared KPI foundation: pointer/Enter/Space, zero segments, selected status/amount, drilldown, four primary metrics, negative values and accessible disclosure passed.
+Actual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate. Session timezone: UTC
+Actual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate. Session timezone: Pacific/Kiritimati
+Actual PostgreSQL metric queries: CHF/tenant/date/status/archive scope, credits on their own dates, partial payments, current due balance, credit liability and ring reconciliation passed. Whitelisted list drilldowns passed. Real external runtime-role testing remains separate. Session timezone: Etc/GMT+12
+Signed time-series geometry preserves negative/zero/positive ordering and a true zero baseline, centers a sole observation and rejects invalid values.
+Actual shared line chart: signed plotted coordinates, accessible negative values, keyboard/pointer selection and full-chart nearest-observation hit testing passed.
+Selected-language chart totals, percentages and actual signed currency formatting passed in DE/FR/IT/EN; arithmetic/source values unchanged.
+
+node scripts/finance-analysis-final-test.mjs
+Finance Final V1: actual four KPI order, ledger values/trends, unknown comparisons, shared period, normalized bars, negative balance, real offer counts, accordion/scroll restoration, status links, empty ring and five locale renders passed.
+Actual shared accordion controlled open/close contract and Turkish no-fallback assertions passed.
+
+node scripts/period-control-test.mjs
+Period control: platform cash/chart window adapter preserves calculations and inclusive bounds; five-language period catalogue complete.
+
+node scripts/ux-master-v3-test.mjs
+V3: equal calendar windows, evidence/zero baseline, negative baseline and business trend direction passed.
+V3: local greeting boundaries, invalid-zone fallback and DST transition scheduling passed.
+
+node scripts/ux-master-v4-test.mjs
+V4 tools and approved guided setup: five-language tools, three required targets, active missing area, actual progress and complete/dismissed negatives passed.
+
+node scripts/ux-master-v4-1-test.mjs
+V4.1: separate personal/company navigation, permissions, actual consent opt-in/withdrawal, corrupt storage and write-failure behavior passed.
+
+node scripts/ux-master-v5-test.mjs
+V5: one language selector across mobile-menu states; exact minimal footer; authenticated legal route guard and prototype rejection; eight viewport-safe dropdown geometries passed.
+
+node scripts/customer-financial-projection-test.mjs
+Customer financial projection matches the canonical financial metrics across currencies, credits/refunds, year/date bounds, draft/cancel/archive exclusions and tenants; permission gates and pre-pagination filtering passed.
+
+node scripts/payment-reminder-test.mjs
+Reminder prerequisites, credit/payment balance, sequential manual stages, inclusive stored deadlines, failed-delivery history and DST passed.
+
+node scripts/v23-2-ux-test.mjs
+V23.2: legacy/demo references, race-safe untruncated numbering, native form draft/submit preservation, quick-create permissions and honest decimal ring segments passed.
+Actual PDF viewer: bounded module/worker startup, late-result suppression, successful load and unmount cleanup passed.
+Actual Sheet: component-based FormActions has a separate shared footer.
+Actual search: selected type and module permissions filter results and scope controls together.
+Actual operator send: same-frame lock, late-completion draft preservation, successful clear and failure retention passed.
+App light/dark themes: primary text, secondary labels and accent meet 4.5:1 contrast on all three surfaces.
+
+node scripts/creation-chrome-test.mjs
+Shared creation: permission paths, context ordering, no duplicate destinations, independent support access and encoded return context passed.
+Actual shared dock renders only navigation and rejects retired compact mode; obsolete creation injection is ignored.
+
+node scripts/app-workspace-test.mjs
+Actual workspace/modal rendering, guarded-exit presence, unchanged-access adversaries and Swiss chat-day boundaries passed.
+Actual role dashboard: owner/employee/HR focus, legitimate zeroes and forbidden section negatives passed.
+
+node scripts/lab-readiness-test.mjs
+Lab readiness: pending/missing hydration and failed fonts stay blocking; confirmed readiness passes without global network idleness.
+
+node scripts/global-ux-startup-test.mjs
+Global UX/startup: normalized dirty values/files/nested forms, stable first identity, restored period readiness, verified profile session reuse, and tenant-scoped PostgreSQL counts passed.
+
+node scripts/task-focused-ux-test.mjs
+Navigation cache TTL/domain/session/bounds, required contact validation, legacy edit safety, Swiss activity groups and nested background scroll locks passed.
+Exact page orientation routes and compact edit/detail/chat exclusions passed.
+Timer resume: authoritative state, one check per visit, paused/offline negatives, stale replies, timer changes and listener cleanup passed.
+Company/customer draft defaults, explicit zeroes, invalid values and session/revision-fenced stale navigation passed.
+Modal background ownership: nested dialogs, out-of-order close and pre-existing inert state passed.
+Remote selection: encoded search, stable paging beyond 1000 and exact selected/context IDs passed.
+Offer conversion: central zero/customer/company terms, negotiated content, new identity and immutable source passed.
+Time history query: bounded pages, full context, encoded search and separate own/review modes passed.
+
+node scripts/query-navigation-test.mjs
+Actual query hook: immediate returns, refresh, mutation/session fences, intent preloading and access-denial eviction passed.
+
+node scripts/ui-build-cache-test.mjs
+UI build guard: stale/unknown style identity purges derived output; unchanged styles retain cache; source files remain intact.
+
+node scripts/architecture-selfcheck.mjs
+Architecture entry points and package scripts passed.
+
+node scripts/permission-selfcheck.mjs
+Finance and operator permission matrix passed.
+Search respects member record ownership.
+Expense approval/rejection rejects unauthorized roles before either mutation writes.
+Related-record links respect the AppShell context and retain a text fallback.
+
+node scripts/module-profile-test.mjs
+Module profile navigation: positive/negative permission and shell wiring checks passed.
+Actual server authorization: time-only and read-only positive/negative guards passed.
+
+node scripts/plan-catalog-test.mjs
+V25.4 tariffs: unchanged prices, Start order flow, Pro-only independent documents, unlimited Pro and capped-plan negatives passed.
+
+node scripts/theme-selfcheck.mjs
+Theme ownership, reload resolver and stale profile response checks passed.
+
+node scripts/client-session-test.mjs
+No demo entry point; real session-cache isolation and confirmed logout with retry passed.
+Confirmed operator logout clears the shared private session fence; unconfirmed logout preserves state and simultaneous clicks share one request.
+Expired database demo is unauthenticated; static cookie preview remains unauthenticated.
+Confirmed logout remains successful when browser storage or BroadcastChannel is blocked.
+Support correlation: exact header/body agreement, UUID boundary and negative privacy cases passed.
+Image upload receipts: explicit availability/verdict/UUID contract before success and preserved retry identity passed.
+Customer merge client receipts: exact identities, counts and completed result required before mutation publication.
+Language preference: exact confirmed profile storage, five languages, no false broadcasts and session-change fence passed.
+File exports: verified CSV content/name, private request, HTTP errors, expired sessions, wrong MIME and tenant changes before/after headers passed.
+Fresh confirmation: explicit continuation only, one replay, cancellation and network denial without retry, and stable identity fence passed.
+
+node scripts/session-navigation-test.mjs
+Session lifecycle: expiry, periodic checks, resume, bfcache, other tabs, offline, concurrency, unmount and actual tenant/operator redirect effects passed.
+
+node scripts/startup-performance-test.mjs
+Actual session/lifecycle: one transaction and five serial statements; active/expired trials, membership denial and standalone tenant scope passed.
+
+node scripts/migration-test.mjs
+Operator dashboard: migrated schema and real CHF payment isolation passed.
+V22 statistics: real cash dates, expense reimbursement day, currency-separated invoice totals and role/tenant isolation passed.
+Document snapshots: creation defaults, individual replacement/reset, later template changes, invoice/offer issue and immutable payment/history passed.
+V24 demo: 12 months, exact payments, at least three negative cash months, declined/expired offers, inactive customer, idempotent restricted-role seed and non-demo/template denial passed.
+Customer duplicate review: normalized UID/email/name, literal matching, tenant scope, explicit override and idempotent confirmed creation passed.
+50 independently provisioned trial tenants: read/write/delete isolation passed (non-superuser RLS).
+Stripe signature, persisted checkout retries, duplicate/stale events, rollback, billing ledger, entitlements and tenant mapping passed (HTTP fixtures).
+Timer customer-only start/reload/pause/finish, context lock and internal work passed.
+Customer/contact imports: real validation, file duplicates, transaction rollback, exact replay, altered-key denial, primary-contact preservation and cross-tenant parent rejection passed.
+Contact structured names, primary replacement, edit/archive, tenant isolation and manual time rates passed.
+Offer revisions: stable number/identity, real immutable PDF/content, version increment, replay, draft/accepted denial, role/tenant/read-only guards passed.
+Offer response outbox: atomic decision/intent, queued crash recovery, definite-failure replay, accepted/ambiguous deduplication, current opt-out, RLS and single decision passed. No real mail delivery.
+Public offers: real restricted-role RLS, hashed/encrypted capabilities, no read decisions, recipient/action-bound single-use codes, committed failed attempts, idempotent decisions/questions, expiry/revocation and immutable version replacement passed.
+Atomic invitation identity/membership/token/outbox, same-key replay, failed-delivery recovery, ambiguous-delivery protection, roles and database rollback passed.
+Actual reminder endpoint: role/tenant/read-only, net balance, French mail, outbox/history/audit, replay/purpose conflicts, manual stages/deadlines, paid denial, concurrent payment and uncertain-provider handling passed.
+PDF/QR generation, send idempotency/failure/demo guards, cancellation release and new/existing/revoked invitation acceptance passed with synthetic fixtures only.
+Team schema, entitlement limits, document status/locks/conversion, expense approval/reimbursement/billing and tenant isolation passed.
+Authenticated employee offer reply: atomic existing-outbox persistence, definite-failure retry, stable actor binding, exact replay and altered-payload denial passed. No live provider.
+Project workspace: paged search, filter validation, optimistic versions, tenant direct-ID denial, role denial and time/invoice masking passed.
+Offer report: real quote/list precision+expiry parity, dates/archive/currency, projection/role/tenant/Start entitlement and explicit decision denominator passed.
+Invoice tax report: actual recorded issued/archive amounts, credit-date gross-only uncertainty, separate currencies, periods/roles/tariffs/tenant projection and translated CSV disclaimer passed. Not a tax-return calculation.
+Report mail: exact real PDF attachment, escaped HTML, accepted≠delivered, unavailable/failed/ambiguous/replay, role/tenant/read-only and size boundaries passed with isolated transport only.
+Report shares: real restricted-runtime RLS, encrypted/replay-safe capability, recipient-bound code, committed attempts/lockout, exact PDF, expiry/revocation and publisher-rights denial passed. Isolated transport only.
+Immutable report snapshots: real PDF/hash, replay/conflict, creator/tenant/role/plan, scope and expiry boundaries passed. No outbound mail.
+Reports: bounded periods, role masking, company isolation and private formula-safe CSV export passed.
+All ten canonical business repository sources reject foreign direct IDs with positive source fixtures.
+Customer consolidation: actual migrated persistence, missing proof, roles, fill-only preservation, contacts/activity, replay/cancellation, stale preview, UID conflict and business-reference guards passed.
+V21.3 document idempotency/payload conflict, immutable server numbers, transaction/counter rollback, quote precision and cash/open-balance parity passed.
+Actual file upload/list/download, content signature, cross-tenant association/download denial and role denial passed.
+Monthly report: 198-hour draft, actual associated file upload, scan/evidence gates, no self-review, reasoned return, correction, resubmission and independent approval passed.
+Full customer/offer/project/time/invoice/partial-payment process, direct customer work, internal time, enforced independent approval, exact completion date, overpayment and double-billing protection passed.
+V22 search: real 1000-record boundary, normalized invoice/customer numbers, Swiss text, punctuation safety and full-population tenant scope passed.
+Refund ledger: date/amount/rights/tenant guards, original receipt preservation, replay/audit, net cash, credit-liability reconciliation, no double revenue adjustment and restricted-role RLS passed.
+Credit-adjusted list/detail/payment parity, future-credit exclusion, exact balance limit, payment replay and cancellation integrity passed.
+Independent invoice axes: partial + overdue, today, paid, actual overpayment/refund, full credit, missing/invalid dates, exact SQL/JS parity, local/remote filter semantics and internal SQL-identifier rejection passed.
+Actual invoice overpayments: explicit exact-balance consent, no ordinary overbooking, dates/roles/RLS, audit rollback, replay, unchanged revenue, dated refund and credit liability passed. No bank transfer or production data.
+Business readiness: real migrated/RLS personal preference, role/read-only/demo boundaries, audit rollback/replay, missing-bank draft, final issuance rejection and corrected-record recovery passed.
+Personal offer followups: explicit opt-in, preview inputs, scope/RLS/role/read-only, cancellation, replay, terminal/expired/revised offers, preferences, atomic audit rollback passed. No mail transport or production data used.
+PostgreSQL migrations, deterministic fixtures and tenant/platform RLS passed.
+
+node scripts/workforce-regression-test.mjs
+Time-only: actual minimal picker, role/profile constraints, assignment/direct-ID/tenant negatives and file RLS passed.
+Actual solo-owner monthly API: missing signed evidence denied, team self-approval denied and signed solo submit approved under runtime RLS.
+Workforce: real runtime RLS, direct-ID/tenant denial, exact order scope, write/revocation guards, monthly overlap, independent approval and immutable history passed.
+
+node scripts/data-lifecycle-schema-test.mjs
+Report retention: actual migrated/runtime-RLS dry-run, expiry-only bounded deletion, remaining counts, capability/code cascade, retained active/foreign copies and mail history, replay and audit rollback passed. No production cleanup enabled.
+Organization data lifecycle schema and deletion safeguards passed.
+
+node scripts/single-company-preflight-test.mjs
+Read-only release preflight: all four conflict blockers, no repair/provider changes, expired/inactive negatives, malformed evidence and RLS false-zero denial passed; production approval remains mandatory.
+
+node scripts/test-data-reset-inventory-test.mjs
+Read-only reset inventory: all company scopes, dependent counts, private-reference redaction, retained accounts, deterministic manifest, drift, review bounds and RLS denial passed.
+
+node scripts/test-data-reset-test.mjs
+Complete-schema reset: real table-owner/FORCE-RLS behavior, exact scope, retained owner/identity/session, wrong identity/confirmation, plan tampering, drift rollback, all target tables empty, unchanged policies/constraints/configuration passed.
+
+node scripts/ux-regression-test.mjs
+Auth and onboarding handoffs preserve local paths and reject URL-normalization redirect attacks.
+Recent document/payment ordering preserves tenant scope and rejects SQL sort injection.
+Search results use visible labels, canonical record IDs and existing detail routes.
+Apple and PWA installation icons use the Binso One artwork with One wordmark.
+Invoice and offer details are operational workspaces; customer-document rendering exists only in preview.
+Finance and dashboard consume one statistics owner with required custom dates and shared KPI/chart aggregation.
+Desktop customer and time-tracking processes preserve canonical entity identity.
+Finance month comparison includes the final month and excludes values outside partial date ranges.
+Time query, today-only period, project/customer context and approval filters passed.
+Desktop, tablet, mobile and PWA share business routes; viewport logic is presentation-only.
+Shared customer-finance type filters match singular rows and plural tabs; payment filters retain partial support.
+Project-linked idle timer context survives synchronization without changing active or already recorded time.
+Actual record rendering: status column filtering, reset visibility, Swiss numeric/date sorting and mobile column selection passed.
+Real form handlers prevent double saves, permit failure retries, preserve return context and render error toasts.
+Unknown server failures stay errors across 13 form, document, time and billing feedback paths.
+Actual document and expense handlers prevent same-frame double writes, retain successful navigation locks and allow retries after failures.
+Quantity/price units, fractional values, numeric sorting and distinct time metadata passed.
+Central action row preserves write/route permissions and explicit navigation/destructive intent.
+Actual avatar identity, neutral fallback, stable color and light/dark text contrast passed.
+Company logo sources reject executable and unscoped URLs; authenticated file and local preview identities remain valid.
+Row presentation: explicit two-line documents and compact information rows; wrong line, third line, overlap, clipping, hidden status and undersized controls rejected.
+Dialog trigger: actual hook preserves the original control across synchronous inert blur and restores background/focus on close.
+
+node scripts/pwa-preview-test.mjs
+Generated Swiss QR payment slip scales as a complete 210 × 105 mm viewport without altering its content.
+
+node scripts/pwa-lifecycle-test.mjs
+Actual PWA worker: online success, offline/stalled/cancelled navigation, bounded timeout cleanup and private/build-cache exclusions passed.
+PWA lifecycle: silent updates, no draft reload, safe activation, theme-independent chat viewport resume/fallback and cleanup passed.
+
+node scripts/pwa-transition-test.mjs
+Actual PWA transition owners: pre-paint list restoration, malformed/forbidden state, safe explicit version switching, resume throttling and complete mutation lifecycle passed.
+Actual dashboard handler: one snapshot connection, unchanged plan denial before domain reads and restricted financial projection passed.
+Actual persistent shell: destination-specific toolbar retention, pending interaction lock and session eviction passed.
+Actual loading HTTP fixture: relative, absolute and protocol-relative requests retain the fixed local upstream; foreign target receives zero requests.
+
+node scripts/v7-navigation-test.mjs
+V7 actual owners: scoped/global list boundaries, safe return/reset, eight-row hub, real bounded counts, permission/foreign-tenant negatives, one-row semantics and support detail-before-chat passed.
+V7 nested return chains: customer-scoped list → project → related record, unique return parameter, fragment preservation and foreign-return denial passed.
+
+node scripts/revision7-inventory-test.mjs
+Revision7 inventory: all56 chapters, every route, explicit roles/states and no unsupported completion claim passed.
+
+node scripts/import-table-test.mjs
+Bounded imports: UTF-8/delimiters/quoted multiline/escaped quotes, malformed/oversized rejection, actual XLSX/conditional-format compatibility, formula/external-link denial passed.
+
+node scripts/profile-image-test.mjs
+Profile images: PNG/JPEG/WebP real decoding, exact selected crop after EXIF orientation, logo proportions, metadata removal, corrupt/HEIC/HEIF/pixel-bomb/crop/mismatched-content rejection passed.
+
+node scripts/pdf-gestures-test.mjs
+PDF gestures: bounded pinch zoom, fit-page swipes, edge bounds, pan/multitouch/vertical rejection passed.
+
+node scripts/document-lines-test.mjs
+Document lines: required/custom units, immutable ordering, unique duplication, linked-charge denial and numbering passed.
+
+node scripts/document-presentation-test.mjs
+Actual multilingual PDFs/Swiss QR: DE/FR/IT/EN labels, captured language, unchanged authored content, credit-adjusted QR and separate refund history passed.
+Production PDF: A4 pages, company texts, items, dates, totals, remaining-balance QR, paid/cancelled/draft suppression and multipage QR passed.
+Operational document details: real paid date, no fabricated legacy date, derived open/overdue/partial/paid states, cancellation and mobile quantity/unit/unit-price/amount passed.
+Optional outstanding lists retain scoped filters; the full invoice list retains all main filters.
+QR debtor structured address, exact remaining amount, valid SCOR/invalid references and shared employee validation passed.
+SaaS billing uses its real connected portal and ships no fake invoice history or demo PDFs.
+Central discount snapshot PDF: original unit price, both discount stages, tax group and authoritative total passed.
+Actual editor adapters: persisted discount hydration, payload, central preview parity, removal and invalid input passed.
+Discount preview/issued PDF/QR parity and multipage last-A4 QR amount passed.
+Minute UI: actual persisted mapping, central exact totals, save/preview provenance and basis, partial quantities, invalid/over-capacity denial and rendered hourly-price basis passed. Device/browser interaction remains separately required.
+Minute editor handlers: integer allocation/available quantity, protected rate/unit, saved-source preservation and discard failure/retry with stable idempotency passed.
+Consolidated actual PDF: canonical reduced claim, original line prices, both tax rates, numbered advance reference and unchanged authored agreement conditions passed.
+
+node scripts/qa-acceptance-test.mjs
+QA acceptance: full coverage preserved, strict production default, explicit development gate, profile mismatch and invalid profiles rejected.
+
+node scripts/qa-plan-test.mjs
+QA scope covers changed modules, shared dependencies, unknown files and forced releases without unsafe skips.
+
+node scripts/browser-shards-test.mjs
+Browser sharding preserves full route/interaction coverage, isolated servers and blocking failure status.
+
+node scripts/navigation-contract-test.mjs
+Phase 1 navigation: exact V2 catalogue, owning routes, permission filtering and unchanged dock/FAB geometry/material with negative probes passed. Visual acceptance remains separate.
+
+node scripts/navigation-return-test.mjs
+Navigation return: real hook, native/header back, route isolation and no restoration on forward navigation passed.
+
+node scripts/audit-corrections-test.mjs
+Audit corrections: real editor return callbacks, remote empty/error/loading states, paging, duration display and historical version links passed.
+Single-page company setup: all required areas, atomic save intent, optional-field preservation, safe return, clean/dirty exit, invalid/read-only denial and confirmed completion passed.
+
+node scripts/ui-foundation-test.mjs
+Reference foundation: route-local CSS, JSX styles, arbitrary inline presentation and copied controls rejected; measured variables/shared composition accepted.
+Presentation cascade: safe pruning, preserved progressive fallbacks/conditions and all current CSS owners passed.
+Cross-route presentation ownership: headings, file chrome and empty/permission results passed.
+Actual dialog hook: pointer/keyboard Escape, X, selection and replaced-menu lineage passed.
+Actual field recovery: delayed portal, inert release and one-shot focus without timer polling passed.
+UI foundation: rejecting copied controls/wrappers/states/imports; field validation association; read-only permissions; native types; cascade fallback/context; route/layout/operator/API inventory passed.
+Wizard first/middle/final actions and architecture ownership passed.
+Contact URIs retain fixed schemes, encode address delimiters and reject control/query/dial-command injection.
+
+node scripts/navigation-foundation-test.mjs
+Phase 1 navigation: exact V2 catalogue, owning routes, permission filtering and unchanged dock/FAB geometry/material with negative probes passed. Visual acceptance remains separate.
+
+node scripts/data-foundation-test.mjs
+V21.3: decimal/PostgreSQL precision, partial/full balances, finance/calendar parity, targeted payment invalidation, read deduplication, mutation failures, old-session fencing, cross-tab logout/reconnect, safe API errors and file signatures passed.
+Query hook: manual/periodic refresh, error retry, superseded replies, tenant fence, route changes and hidden/offline polling passed.
+Role overview invalidation: work/review/context changes refresh the overview without unrelated chat reloads.
+Real data inventory: platform-neutral API paths, relative/alias imports and page consumers passed.
+
+node scripts/foundation-integration-test.mjs
+Integration architecture: no local runtime-import cycles, retired barrel protection and complete current route matrix passed.
+
+node scripts/process-draft-test.mjs
+Production SSR draft recovery: actual Next transform passes; shadowed-process red control fails as expected.
+Process recovery: editable input/step/replay retained; user/tenant/role isolation, expiry, corruption, quota handling and session-fence purge passed.
+Draft ownership: app visibility revalidates queries without changing the private-session fence; actual session changes purge input.
+Actual draft hook: initial recovery, genuine revert/no resurrection, later edits, confirmed clear, late identity input, role/read-only denial and session-fenced writes passed.
+
+node scripts/observability-test.mjs
+Observability: migrated SQL, demo/currency isolation, role masking, genuine history, missing/stale/future data, boundaries, deduplication, recovery and database outage passed.
+
+node scripts/operator-announcement-test.mjs
+Announcement API: actual RBAC/origin/validation, migrated persistence+audit, real transaction rollback on audit failure passed.
+Unhandled API error {
+  category: 'Error',
+  correlationId: '75d7a8bd-84d5-4097-b35c-585e78a82b13'
+}
+
+node scripts/operator-contract-test.mjs
+Operator preference: all5 roles, exact four languages, own identity only, unchanged privileges, cross-origin/extra fields/suspension denial and audit rollback passed. Native session boundary is verified separately.
+Admin contracts: page access, actual migrated ticket/account responses, chronological messages, restriction precedence, expiry validation, role denial and atomic audit rollback passed.
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'c3c19580-e5b9-4290-ae5d-dea1abb4d04e'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '09c2f564-da76-4aae-b62d-4494ad34b2e6'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'b0c09faf-6242-4436-95b6-c5309686cc4a'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'ca92380a-5850-4922-a517-0dbfc8c557c4'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'a7e85379-876d-4537-8265-f33debdcb328'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '1233fc24-e924-45da-b103-0a2166c39ab9'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '31604968-9731-418d-aef4-405b5a927776'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: '5c0020b0-e12c-4801-8db3-7d18cfec1e49'
+}
+Unhandled API error {
+  category: 'Error',
+  correlationId: 'ccd749c5-90da-4c32-8c7e-58606c8e98f3'
+}
+
+node scripts/ux-style-contract-test.mjs
+UX style contract adversaries: raw values, aliases, fallback overrides, missing definitions/owners, duplicates and token drift rejected.
+
+node scripts/ux-contract-check.mjs
+UX contract: 40 owners, 88 source pages; control focus ownership passed. Static coverage is not visual acceptance.

@@ -85,7 +85,7 @@ html[data-theme="dark"] .searchbox>input{height:100%;min-width:0;padding:0;borde
 .desktop-record-head button{min-width:0;padding:0 10px;border:0;background:transparent;color:var(--color-muted);font-size:var(--type-secondary);font-weight:700;text-align:left;white-space:nowrap;cursor:pointer}
 .desktop-record-head button:first-child,.desktop-record-head>[role="columnheader"]:first-child,.desktop-record-row>span:first-child{padding-left:4px}
 .desktop-record-head .align-right{text-align:right}
-.desktop-record-row{min-height:var(--record-row-min);align-items:center;border-bottom:1px solid var(--color-line);color:var(--color-fg);text-decoration:none;grid-template-columns:var(--record-grid);padding-block:14px}
+.desktop-record-row{min-height:var(--record-row-min);align-items:center;border-bottom:1px solid var(--color-line);color:var(--color-fg);text-decoration:none;grid-template-columns:var(--record-grid);padding-block:8px}
 .desktop-record-row:last-child{border-bottom:0}
 .desktop-record-row:hover{background:var(--color-subtle)}
 .desktop-record-row>span{min-width:0;padding:0 10px;font-size:var(--type-label);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

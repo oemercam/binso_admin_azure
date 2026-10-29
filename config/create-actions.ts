@@ -12,7 +12,12 @@ export const createActions=[
  {section:"support",title:"Support-Anfrage",href:"/support/neu",icon:"support",permissionPath:"/support/neu"},
 ] as const;
 
+/** The overview exposes frequent business tasks; specialist creation stays in its module. */
+const overviewSections=['kunden','angebote','projekte','rechnungen','zeit','spesen'] as const;
+const overviewLabels:Partial<Record<typeof overviewSections[number],string>>={zeit:'Zeiteintrag',spesen:'Ausgabe'};
+
 export function permittedCreateActions(section:string,canOpen:(href:string)=>boolean){
+ if(section==='dashboard')return overviewSections.flatMap(section=>createActions.filter(action=>action.section===section&&canOpen(action.permissionPath)).map(action=>({...action,title:overviewLabels[section]??action.title})));
  return createActions.filter(action=>canOpen(action.permissionPath)).sort((a,b)=>Number(b.section===section)-Number(a.section===section));
 }
 

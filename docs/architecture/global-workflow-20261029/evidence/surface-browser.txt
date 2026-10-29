@@ -1,0 +1,5 @@
+Surface case chromium 390 light de
+Surface case chromium 390 dark de
+Surface case chromium 1440 light de
+Surface case chromium 1440 dark de
+Surface standard: 4 cases, engines chromium, widths 390/1440, locales de, light/dark passed. Physical iOS/PWA acceptance remains separate.

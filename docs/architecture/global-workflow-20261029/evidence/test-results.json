@@ -1,0 +1,378 @@
+[
+  {
+    "command": "node scripts/production-acceptance-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/prepare-runtime-settings-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/schema-contract-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/employee-dossier-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/deployed-assets-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/deployed-auth-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/localization-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/locale-catalogue-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/localization-coverage-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/maintenance-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/readiness-integrity-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/security-exception-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/runtime-integrity-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/runtime-launcher-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/production-package-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/web-vitals-consent-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/rate-limit-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/demo-session-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/public-demo-flow-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/file-scan-test.mjs",
+    "status": 1
+  },
+  {
+    "command": "node scripts/receipt-scan-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/billing-model-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/contract-time-unit-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/billing-completion-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/project-budget-migration-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/file-rescan-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/auth-integrity-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/notification-read-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/auth-request-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/deployment-settings-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/passkey-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/mail-message-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/v25-5-traceability.mjs --check",
+    "status": 0
+  },
+  {
+    "command": "node scripts/phase1-identity-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/phase1-time-status-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/registration-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/statistics-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/finance-analysis-final-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/period-control-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-master-v3-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-master-v4-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-master-v4-1-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-master-v5-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/customer-financial-projection-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/payment-reminder-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/v23-2-ux-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/creation-chrome-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/app-workspace-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/lab-readiness-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/global-ux-startup-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/task-focused-ux-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/query-navigation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ui-build-cache-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/architecture-selfcheck.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/permission-selfcheck.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/module-profile-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/plan-catalog-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/theme-selfcheck.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/client-session-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/session-navigation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/startup-performance-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/migration-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/workforce-regression-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/data-lifecycle-schema-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/single-company-preflight-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/test-data-reset-inventory-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/test-data-reset-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-regression-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/pwa-preview-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/pwa-lifecycle-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/pwa-transition-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/v7-navigation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/revision7-inventory-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/import-table-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/profile-image-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/pdf-gestures-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/document-lines-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/document-presentation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/qa-acceptance-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/qa-plan-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/browser-shards-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/navigation-contract-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/navigation-return-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/audit-corrections-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ui-foundation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/navigation-foundation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/data-foundation-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/foundation-integration-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/process-draft-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/observability-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/operator-announcement-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/operator-contract-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-style-contract-test.mjs",
+    "status": 0
+  },
+  {
+    "command": "node scripts/ux-contract-check.mjs",
+    "status": 0
+  }
+]

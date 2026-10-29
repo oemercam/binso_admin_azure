@@ -1,0 +1,86 @@
+{
+  "base": "c357eb59e7698db7ba37707d2c6919c2b0867036",
+  "changedCode": [
+    {
+      "path": "AGENTS.md",
+      "gitBlob": "3529bc1da2dc635aee07ee736871af17621b30c9"
+    },
+    {
+      "path": "README.md",
+      "gitBlob": "098ebc30861c52ffa30affd8911c71dac4d4498a"
+    },
+    {
+      "path": "app/design-system/collections.css",
+      "gitBlob": "2993a2e90bac5cdbaa50d204796af302931aebca"
+    },
+    {
+      "path": "app/design-system/documents.css",
+      "gitBlob": "f4b8654b294e71709fbc4297a5de83d84044d62d"
+    },
+    {
+      "path": "app/design-system/theme.css",
+      "gitBlob": "79cb46f06fefd1542c64ff6c5353eb468b1a51b7"
+    },
+    {
+      "path": "components/documents.tsx",
+      "gitBlob": "15388e9ddfae645ad63834f5c26fc4246c4ea73e"
+    },
+    {
+      "path": "components/pages/customers.tsx",
+      "gitBlob": "c4bacc87e02c110377a8d1cdfa36c7c067150193"
+    },
+    {
+      "path": "components/pages/projects.tsx",
+      "gitBlob": "38b72b83a56323e02a6bb7c301d85adaa0977221"
+    },
+    {
+      "path": "config/create-actions.ts",
+      "gitBlob": "4b58aa1911cacc0882a9c8ea489ea53ff50ea27d"
+    },
+    {
+      "path": "lib/locales/generated/en.json",
+      "gitBlob": "3d1b778134dc092e1be0bb50bdcea8fd3f16928b"
+    },
+    {
+      "path": "lib/locales/generated/fr.json",
+      "gitBlob": "4022f626d51570669487265f37d0bf45a914e490"
+    },
+    {
+      "path": "lib/locales/generated/it.json",
+      "gitBlob": "50be5bc3f91ca7430a54fb5fe1ae6c3f5004d743"
+    },
+    {
+      "path": "lib/locales/generated/tr.json",
+      "gitBlob": "e40160475b27ad13a102adbb09794a33944a4f38"
+    },
+    {
+      "path": "lib/locales/messages.json",
+      "gitBlob": "ff818e37913aeacf7723eefe7becaa746a372b1d"
+    },
+    {
+      "path": "scripts/audit-corrections-test.mjs",
+      "gitBlob": "067cd04a0d27a29dd70222b77d7f075d962aa618"
+    },
+    {
+      "path": "scripts/creation-chrome-test.mjs",
+      "gitBlob": "9d8649b71c2274f74529cb1a9f81904d9bc5bfd5"
+    },
+    {
+      "path": "scripts/page-source.mjs",
+      "gitBlob": "fb7e039f4da850a2b0d96abf683e9851733de6fa"
+    },
+    {
+      "path": "scripts/ux-browser-test.mjs",
+      "gitBlob": "e1ca78772037b774ae786db8ea1f203c899a588e"
+    },
+    {
+      "path": "components/customer-form.tsx",
+      "gitBlob": "09f3f192060fc697023499abf4615a3b08449856"
+    },
+    {
+      "path": "scripts/global-workflow-browser.mjs",
+      "gitBlob": "bd16185cff328a3733fa036bd506b21f4246b83d"
+    }
+  ],
+  "scope": "Unchanged source files inherit from the verified base. Evidence files do not self-qualify release acceptance."
+}

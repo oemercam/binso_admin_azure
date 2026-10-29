@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "light",
+      "locale": "de",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "dark",
+      "locale": "de",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "light",
+      "locale": "de",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "dark",
+      "locale": "de",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    }
+  ],
+  "limitations": [
+    "Browser emulation is not physical Safari/iOS-PWA or a real software keyboard."
+  ]
+}

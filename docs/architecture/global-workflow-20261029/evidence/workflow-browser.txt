@@ -1,0 +1,1 @@
+Global workflow: 20 inline-customer and three-step offer cases passed.

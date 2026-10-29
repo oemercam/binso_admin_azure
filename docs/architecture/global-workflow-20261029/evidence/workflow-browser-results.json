@@ -1,0 +1,187 @@
+{
+  "results": [
+    {
+      "width": 390,
+      "theme": "light",
+      "locale": "de",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "locale": "fr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "locale": "it",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "locale": "en",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "locale": "tr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "locale": "de",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "locale": "fr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "locale": "it",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "locale": "en",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "locale": "tr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "locale": "de",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "locale": "fr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "locale": "it",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "locale": "en",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "locale": "tr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "locale": "de",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "locale": "fr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "locale": "it",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "locale": "en",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "locale": "tr",
+      "inlineCustomer": true,
+      "threeSteps": true,
+      "sixCreateActions": true,
+      "compactList": true
+    }
+  ],
+  "limits": [
+    "Synthetic HTTP fixtures; backend/RLS/PDF parity is tested separately. Chromium is not physical Safari/iOS/PWA acceptance."
+  ]
+}

@@ -1,0 +1,1 @@
+Integration architecture: no local runtime-import cycles, retired barrel protection and complete current route matrix passed.
