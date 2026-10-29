@@ -13,7 +13,7 @@ export function json(data:unknown,status=200,headers?:HeadersInit){
 }
 
 /** Enforce byte limits while reading, including chunked bodies without Content-Length. */
-export async function readBoundedBody(request:Request,maxBytes:number):Promise<Buffer>{
+export async function readBoundedBody(request:Pick<Request,'headers'|'body'>,maxBytes:number):Promise<Buffer>{
   const length=Number(request.headers.get("content-length")??"0");
   if(length>maxBytes)throw new ApiError(413,"request_too_large","Die Anfrage ist zu gross.");
   if(!request.body)return Buffer.alloc(0);

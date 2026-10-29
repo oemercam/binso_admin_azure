@@ -16,6 +16,7 @@ export function useProcessDraft<T>({process:rawProcess,value,dirty,enabled,onRes
  const latest=useRef({value,dirty,onRestore});
  useEffect(()=>{latest.current={value,dirty,onRestore}},[value,dirty,onRestore]);
  const restored=useRef<string|null>(null),discarded=useRef(false);
+ const dirtyKey=useRef<string|null>(null);
  const scopeRevision=useRef<string|null>(null);
  useEffect(()=>{
   if(!enabled){restored.current=null;discarded.current=false;return;}
@@ -42,7 +43,14 @@ export function useProcessDraft<T>({process:rawProcess,value,dirty,enabled,onRes
  },[enabled,ready,key]);
  const persist=useCallback((next:T)=>{if(key&&!discarded.current)writeProcessDraft(window.sessionStorage,key,next)},[key]);
  const clear=useCallback(()=>{discarded.current=true;if(key)removeProcessDraft(window.sessionStorage,key)},[key]);
- useEffect(()=>{if(enabled&&ready&&dirty&&key&&!discarded.current)persist(value)},[enabled,ready,dirty,key,value,persist]);
+ useEffect(()=>{
+  if(!enabled||!ready||!key||discarded.current)return;
+  if(dirty){dirtyKey.current=key;persist(value)}
+  // A real revert to the pristine value must not resurrect an earlier edit on
+  // reload. Initial hydration/restoration never sets dirtyKey, so it cannot
+  // erase a pending draft before the identity-scoped restore has run.
+  else if(dirtyKey.current===key){removeProcessDraft(window.sessionStorage,key);dirtyKey.current=null;}
+ },[enabled,ready,dirty,key,value,persist]);
  useEffect(()=>{
   if(!key)return;
   const flush=()=>{if(latest.current.dirty&&!discarded.current)writeProcessDraft(window.sessionStorage,key,latest.current.value)};

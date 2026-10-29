@@ -6,7 +6,7 @@ import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {formatQuantity} from '@/lib/display-format';
 import {childInputIssue,allowanceInputIssue,type ChildInput,type AllowanceInput} from '@/lib/employee-family';
-import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
+import {ActionRow,ActionsMenu,FormPage} from './binso-ux';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select,Status,Toggle} from './ui';
 type Child={id:string;child_id:string;revision:number;is_current:boolean;display_name:string;birth_date:string;active:boolean};
 type Claim={id:string;claim_id:string;revision:number;is_current:boolean;child_revision_id:string;employment_revision_id:string;allowance_type:'child'|'education';starts_on:string;ends_on:string;authority:string;canton:string;decision_reference:string;monthly_amount:string;currency:'CHF';status:AllowanceInput['status'];claim_current:boolean;requested_by_user_id:string;created_by_user_id:string};
@@ -47,7 +47,7 @@ export function EmployeeFamily({employeeId,mayWrite,actorId}:{employeeId:string;
    <SectionTitle title="Kinder"/>{!query.data?.children.length?<EmptyState title="Keine Kinder erfasst"/>:<div className="action-list">{query.data.children.map(c=><div className="assignment-row" key={c.id}><div><b>{c.display_name}</b><p>{c.birth_date}</p></div><Status tone={c.is_current&&c.active?'info':'neutral'}><LocalizedText>{c.is_current?(c.active?'Aktiv':'Inaktiv'):'Frühere Revision'}</LocalizedText>{' · '}{c.revision}</Status>{mayWrite&&c.is_current&&<ActionsMenu label="Familienaktionen"><ActionRow requiresWrite icon="edit" title="Kinderdaten korrigieren" onClick={()=>openChild(c)}/></ActionsMenu>}</div>)}</div>}
    <SectionTitle title="Zulagenentscheide"/>{!query.data?.claims.length?<EmptyState title="Keine Zulagenentscheide"/>:<div className="action-list">{query.data.claims.map(c=><div className="assignment-row" key={c.id}><div><b><LocalizedText>{allowanceLabel[c.allowance_type]}</LocalizedText>{' · '}{formatQuantity(c.monthly_amount,'CHF',localeTags[locale])}</b><p>{c.starts_on}{' – '}{c.ends_on}</p><small>{c.authority}{' · '}{c.canton}{' · '}{c.decision_reference}</small>{c.is_current&&c.status==='verified'&&!c.claim_current&&<ErrorState><LocalizedText>{'Entscheid aktuell nicht wirksam: Zeitraum oder Quellrevision prüfen.'}</LocalizedText></ErrorState>}</div><Status tone={c.status==='verified'&&c.claim_current?'info':'neutral'}><LocalizedText>{c.is_current?statusLabel[c.status]:'Frühere Revision'}</LocalizedText>{' · '}{c.revision}</Status><Button variant="secondary" onClick={()=>openClaim(c)}><LocalizedText>{'Details'}</LocalizedText></Button></div>)}</div>}
   </>}
-  <FormSheet open={mode!==null} onClose={()=>setMode(null)} label={mode==='child'?(child?'Kinderdaten korrigieren':'Kind erfassen'):'Kassenentscheid'} busy={busy} dirty={JSON.stringify(mode==='child'?childDraft:draft)!==initial}>
+  <FormPage open={mode!==null} onClose={()=>setMode(null)} label={mode==='child'?(child?'Kinderdaten korrigieren':'Kind erfassen'):'Kassenentscheid'} busy={busy} dirty={JSON.stringify(mode==='child'?childDraft:draft)!==initial}>
    <form id={formId} onSubmit={e=>{e.preventDefault();void save();}}>
     {mode==='child'?<div className="form-grid two"><Field label="Name des Kindes"><Input required maxLength={160} value={childDraft.displayName} onChange={e=>setChildDraft(d=>({...d,displayName:e.target.value}))}/></Field><Field label="Geburtsdatum"><Input required type="date" value={childDraft.birthDate} onChange={e=>setChildDraft(d=>({...d,birthDate:e.target.value}))}/></Field><Toggle label="Aktiv" checked={childDraft.active} onChange={()=>setChildDraft(d=>({...d,active:!d.active}))}/></div>:<>
      {periods.error&&<ErrorState onRetry={periods.refresh}>{periods.error}</ErrorState>}
@@ -71,6 +71,6 @@ export function EmployeeFamily({employeeId,mayWrite,actorId}:{employeeId:string;
     {mayWrite&&claim?.is_current&&claim.status==='draft'&&canReview&&<><Button requiresWrite variant="secondary" disabled={busy||JSON.stringify(draft)!==initial} onClick={()=>void save('rejected')}><LocalizedText>{'Ablehnen'}</LocalizedText></Button><Button requiresWrite disabled={busy||JSON.stringify(draft)!==initial} onClick={()=>void save('verified')}><LocalizedText>{'Kassenentscheid geprüft bestätigen'}</LocalizedText></Button></>}
     {mayWrite&&claim?.is_current&&claim.status==='verified'&&actorId&&actorId!==claim.requested_by_user_id&&<Button requiresWrite variant="secondary" disabled={busy} onClick={()=>void save('revoked')}><LocalizedText>{'Entscheid widerrufen'}</LocalizedText></Button>}
    </FormActions>
-  </FormSheet>
+  </FormPage>
  </section>;
 }

@@ -1,0 +1,324 @@
+{
+  "buildId": "Mx-l0TY2tlwPBJCfyDUqh",
+  "conditions": "Local compiled production build; Chromium, five fresh contexts per route/width; synthetic identical HTTP responses; service workers blocked; no provider or real API latency measured",
+  "summary": [
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "medianReadyMs": 900,
+      "minReadyMs": 849,
+      "maxReadyMs": 1118,
+      "identityRequests": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "medianReadyMs": 928,
+      "minReadyMs": 880,
+      "maxReadyMs": 981,
+      "identityRequests": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "medianReadyMs": 977,
+      "minReadyMs": 960,
+      "maxReadyMs": 1043,
+      "identityRequests": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "medianReadyMs": 1058,
+      "minReadyMs": 939,
+      "maxReadyMs": 1138,
+      "identityRequests": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  ],
+  "results": [
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 0,
+      "readyMs": 1118,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 1,
+      "readyMs": 900,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 2,
+      "readyMs": 872,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 3,
+      "readyMs": 1025,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 4,
+      "readyMs": 849,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "sample": 0,
+      "readyMs": 928,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "sample": 1,
+      "readyMs": 981,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "sample": 2,
+      "readyMs": 880,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "sample": 3,
+      "readyMs": 883,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 390,
+      "route": "/kunden/neu",
+      "sample": 4,
+      "readyMs": 964,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 0,
+      "readyMs": 979,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 1,
+      "readyMs": 960,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 2,
+      "readyMs": 1043,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 3,
+      "readyMs": 972,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/einstellungen/firma?setup=1",
+      "sample": 4,
+      "readyMs": 977,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "sample": 0,
+      "readyMs": 1058,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "sample": 1,
+      "readyMs": 961,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "sample": 2,
+      "readyMs": 1109,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "sample": 3,
+      "readyMs": 1138,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    },
+    {
+      "width": 1440,
+      "route": "/kunden/neu",
+      "sample": 4,
+      "readyMs": 939,
+      "requests": {
+        "/api/auth/session": 1,
+        "/api/settings/profile": 1,
+        "/api/time-tracker": 1,
+        "/api/settings/company": 1,
+        "/api/notifications": 1
+      }
+    }
+  ]
+}

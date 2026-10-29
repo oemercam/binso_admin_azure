@@ -41,7 +41,7 @@ async function tenantTables(client){
   const result=await client.query(
     `select distinct table_name
        from information_schema.columns
-      where table_schema='public' and column_name='organization_id'
+      where table_schema='public' and column_name='organization_id' and exists(select 1 from information_schema.tables t where t.table_schema=columns.table_schema and t.table_name=columns.table_name and t.table_type='BASE TABLE')
       order by table_name`
   );
   return result.rows.map(row=>String(row.table_name)).filter(name=>/^[a-zA-Z0-9_]+$/.test(name));

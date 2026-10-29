@@ -1,3 +1,4 @@
+import {billingAgreementModuleUrl,billingModelModuleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
@@ -34,17 +35,17 @@ try{
  const qr=await compile('lib/qr-bill.ts',{'swissqrbill/utils':import.meta.resolve('swissqrbill/utils')});
  const replay=await compile('lib/server/business-idempotency.ts',{'./http':http});
  const expensePayment=await compile('lib/expense-payment.ts');
- const business=await compile('lib/server/repositories/business-api.ts',{'@/lib/expense-payment':expensePayment,'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
+ const business=await compile('lib/server/repositories/business-api.ts',{'../billing-agreements':billingAgreementModuleUrl,'./billing-agreements':billingAgreementModuleUrl,'@/lib/server/billing-agreements':billingAgreementModuleUrl,'@/lib/billing-model':billingModelModuleUrl,'@/lib/expense-payment':expensePayment,'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
  globalThis.__readinessClient=client;
  const scopedDb=moduleUrl('export const withTenant=async(_org,_user,fn)=>fn(globalThis.__readinessClient); export const query=(...args)=>globalThis.__readinessClient.query(...args)');
  const plans=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':planAccessModuleUrl,'@/config/plans':planCatalogModuleUrl,'./http':http});
  const navigation=await compile('lib/navigation.ts'),actions=await compile('lib/action-readiness.ts',{'./navigation':navigation});
- const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation});
- const readiness=await import(await compile('lib/server/business-readiness.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
+ const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation,'./action-readiness':actions});
+ const readiness=await import(await compile('lib/server/business-readiness.ts',{'./billing-agreements':billingAgreementModuleUrl,'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
  const pdf=await compile('lib/server/document-pdf.ts',{'@/lib/document-lines':moduleUrl(await fs.readFile('lib/document-lines.ts','utf8')),'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
  const logo=moduleUrl('export async function documentLogo(){return undefined}'); // Synthetic fixture has no company logo; rendering and issuance remain real.
  const versions=await compile('lib/server/offer-versions.ts',{'./http':http,'./repositories/business-api':business,'./document-pdf':pdf,'./document-logo':logo});
- const process=await import(await compile('lib/server/document-process.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./offer-versions':versions,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':plans}));
+ const process=await import(await compile('lib/server/document-process.ts',{'./billing-agreements':billingAgreementModuleUrl,'./http':http,'./rbac':rbac,'./audit':audit,'./offer-versions':versions,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':plans}));
  const {mutateApiBusiness}=await import(business);
  const session={organizationId:'00000000-0000-4000-8000-000000000099',userId:'demo-readonly',role:'owner',sessionId:randomUUID()};
  await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional'",[session.organizationId]);

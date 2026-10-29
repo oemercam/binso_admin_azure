@@ -1,3 +1,6 @@
+import {verifyBillingIntegration} from './billing-integration-cases.mjs';
+import {verifySinglePageCompanySetup} from './company-setup-cases.mjs';
+import {verifyProjectBudgets} from './project-budget-cases.mjs';
 import {verifyWebPush} from './phase1-push-cases.mjs';
 import {pathToFileURL} from 'node:url';
 import {createRequire} from 'node:module';
@@ -23,6 +26,10 @@ if(native){
 const jar=new Map(),sent=[];
 const data=source=>'data:text/javascript;base64,'+Buffer.from(source).toString('base64');
 const adapters={
+ 'pdfkit':import.meta.resolve('pdfkit'),
+ 'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),
+ 'sharp':import.meta.resolve('sharp'),
+ 'swissqrbill/utils':import.meta.resolve('swissqrbill/utils'),
  'web-push':pathToFileURL(createRequire(import.meta.url).resolve('web-push')).href,
  'server-only':data(''),
  'next/server':data('export class NextResponse{static json(value,init){return Response.json(value,init)}}'),
@@ -240,6 +247,9 @@ try{
  assert.equal(await actualSession.getSession(),null,'Unknown bearer cannot establish tenant context');
  jar.set('binso_session',validSessionCookie);
  const current=await actualSession.getSession();assert.ok(current);
+ await verifySinglePageCompanySetup({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
+  await verifyProjectBudgets({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
+ await verifyBillingIntegration({db,load,request,current,foreignOrganizationId:secondSession.organizationId,native});
  await verifyCompanyMfaPolicy({db,load,actualSession,request,jar,current,foreignOrganizationId:secondSession.organizationId});
  await verifyTimeReview({db,load,request,current,foreignOrganizationId:secondSession.organizationId});
  await verifyWebPush({db,load,request,current,foreignOrganizationId:secondSession.organizationId});

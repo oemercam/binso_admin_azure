@@ -1,5 +1,15 @@
 # Aktueller Microsoft-App-Standard
 
+Die Ergänzung vom 27.10.2026 hat Vorrang vor der älteren pauschalen FormSheet-Regel:
+Umfangreiche Formulare, mehrstufige Prozesse und vollständige Detailansichten
+verwenden ganze Seiten mit dem vorhandenen Shell-Header. Kurze kontextbezogene
+Eingaben, Auswahlen und Filter behalten die zentralen Sheets; auf Desktop sind
+kompakte Dialoge oder Menüs vorgesehen. Die Firmenvervollständigung ist genau
+eine Seite, optionale Einstellungen bleiben ausserhalb. Bestehende funktionierende
+Darstellungen werden fachlich bewertet, nicht pauschal ersetzt. Navigation und
+Floating-Plus bleiben unverändert. Siehe [Umsetzung und Prüfstand](global-surfaces-20261027.md).
+Dieser Auftrag autorisiert lokale Umsetzung, keine Produktionsfreigabe.
+
 V25.1 ist zur Codekorrektur freigegeben: [Anforderungen](v25-1-requirements.md),
 [Abnahmematrix](v25-1-acceptance.md). Navigation und blauer Plus-Button bleiben
 unverändert. Vollständige Ringbeträge dürfen zugunsten der Lesbarkeit ausserhalb
@@ -9,7 +19,7 @@ Merge- oder Deployment-Freigabe aus diesem Auftrag.
 
 V25-Freigabe vom 19.10.2026: [vollständige Anforderungen](v25-requirements.md).
 Navigation und bestehender blauer Plus-Button bleiben unverändert. Die aktuellen
-FormSheet-Workspaces sind modal mit Scrim und Fokusführung. Sekundäre Dokument-
+Kurze FormSheet-Aktionen sind modal mit Scrim und Fokusführung. Sekundäre Dokument-
 und Dateiaktionen gehören in die vorhandenen Menüs; kurze Leerzustände ohne
 Dekoration/Zusatzaktion, vollständiger Umbruch bei Zoom. Diese Entscheidungen
 ersetzen widersprechende ältere Workspace-/Aktions-/Leerzustandsregeln.
@@ -44,9 +54,9 @@ Dark Mode und Operator-Varianten sind abgeleitet, keine behauptete Originalfreig
   von Kunde und erstem Kontakt erfolgt atomar. Bestehende Kunden ohne strukturierte
   Kontakte bleiben bearbeitbar, ohne Namen zu erfinden. Registrierung verlangt
   einen eigenen Kontaktnamen zusätzlich zur Firma.
-- Alle Erfassungen/Bearbeitungen verwenden den bestehenden modalen FormSheet-
-  Owner: Mobile von unten, Desktop zentriert. Lange Formulare erweitern denselben
-  Dialog; Inhalt scrollt, Aktionen bleiben am unteren Rand. X und Abbrechen teilen
+- Kurze Erfassungen/Bearbeitungen verwenden den bestehenden modalen FormSheet-
+  Owner: Mobile von unten, Desktop zentriert. Umfangreiche Formulare verwenden
+  FormPage; Inhalt scrollt, Aktionen bleiben erreichbar. X und Abbrechen teilen
   die Rückfrage nur bei ungespeicherten Eingaben. Browser-Zurück, Entwurfs-Recovery,
   Validierung, Replay-Schutz und Rollen bleiben verbindlich.
 - Rechnung/Angebot: Kunde und Datum, Positionen, Bedingungen, App-Zusammenfassung.

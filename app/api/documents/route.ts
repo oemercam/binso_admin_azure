@@ -5,8 +5,9 @@ import { NextRequest } from "next/server";
 import { apiError, assertSameOrigin, cleanText, json, readJson } from "@/lib/server/http";
 import { tenantList, tenantListPage, tenantRpc } from "@/lib/server/database";
 
-type Line={timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
+type Line={billingAgreementId?:unknown;billingSourcePosition?:unknown;billingPart?:unknown;timeAllocations?:unknown;priceBaseQuantity?:unknown;discount?:unknown;taxExempt?:unknown;unit?:unknown;description?:unknown;quantity?:unknown;unitPrice?:unknown;vatRate?:unknown;expenseIds?:unknown;timeEntryIds?:unknown};
 type DocumentBody={
+  billingAgreementId?:unknown;advanceApplications?:unknown;billingScopes?:unknown;billingTerms?:unknown;billingContext?:unknown;sourceProject?:unknown;
   discountOrigin?:unknown;discount?:unknown;calculationRevision?:unknown;sourceOffer?:unknown;kind?:unknown;customerName?:unknown;customerId?:unknown;number?:unknown;issueDate?:unknown;dueDate?:unknown;validUntil?:unknown;
   vatRate?:unknown;note?:unknown;currency?:unknown;items?:unknown;
 };
@@ -36,7 +37,7 @@ export async function POST(request:NextRequest){
     if(customers.length!==1) return json({error:"customer_not_found",message:"Kunde wurde nicht gefunden."},400);
 
     const items=rawItems.map(item=>({
-      time_allocations:minuteAllocations(item.timeAllocations,true),price_base_quantity:item.priceBaseQuantity??1,
+      billing_agreement_id:item.billingAgreementId,billing_source_position:item.billingSourcePosition,billing_part:item.billingPart,time_allocations:minuteAllocations(item.timeAllocations,true),price_base_quantity:item.priceBaseQuantity??1,
       discount:item.discount,
       tax_exempt:item.taxExempt,
       description:cleanText(item.description,500),
@@ -52,6 +53,7 @@ export async function POST(request:NextRequest){
     }
 
     const result=await tenantRpc("create_document_atomic",{
+      ...(body.billingAgreementId===undefined?{}:{p_billing_agreement_id:body.billingAgreementId}),...(body.advanceApplications===undefined?{}:{p_advance_applications:body.advanceApplications}),...(body.billingScopes===undefined?{}:{p_billing_scopes:body.billingScopes}),...(body.billingTerms===undefined?{}:{p_billing_terms:body.billingTerms}),...(body.billingContext===undefined?{}:{p_billing_context:body.billingContext}),...(body.sourceProject===undefined?{}:{p_source_project:body.sourceProject}),
       p_discount:body.discount,
       p_discount_origin:body.discountOrigin,
       p_calculation_revision:body.calculationRevision,

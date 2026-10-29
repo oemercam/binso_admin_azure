@@ -69,3 +69,4 @@ try{
  eventModule.resetClientData(false);assert.notEqual(eventModule.dataRevision([]),sessionBefore);assert.equal(storage.getItem(key),null,'An actual identity/tenant/role fence still clears private drafts');
  console.log('Draft ownership: app visibility revalidates queries without changing the private-session fence; actual session changes purge input.');
 }finally{globalThis.BroadcastChannel=channel;delete globalThis.window;delete globalThis.document}
+await import('./process-draft-revert-test.mjs');

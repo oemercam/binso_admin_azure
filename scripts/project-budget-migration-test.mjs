@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {PGlite} from '@electric-sql/pglite';
+import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
+const db=new PGlite({extensions:{pgcrypto}});
+try{
+ await db.exec('create extension pgcrypto;create role schema_owner;grant usage,create on schema public to schema_owner;set role schema_owner');
+ const migration='0109_project_budget_presence.sql';
+ for(const file of (await fs.readdir('database/migrations')).filter(file=>file.endsWith('.sql')&&file<migration).sort())await db.exec(await fs.readFile('database/migrations/'+file,'utf8'));
+ await db.exec('reset role');
+ const org=(await db.query("insert into organizations(name,slug) values('Isolated budget upgrade','isolated-budget-upgrade') returning id")).rows[0].id;
+ const zero=(await db.query("insert into projects(organization_id,external_id,name,budget) values($1,'zero','Old zero',123.45) returning id",[org])).rows[0].id;
+ const positive=(await db.query("insert into projects(organization_id,external_id,name,hours_budget) values($1,'positive','Old positive',25.50) returning id",[org])).rows[0].id;
+ const outlier=(await db.query("insert into projects(organization_id,external_id,name,hours_budget) values($1,'outlier','Old outlier',1000000.01) returning id",[org])).rows[0].id;
+ const sql=await fs.readFile('database/migrations/'+migration,'utf8');
+ await db.exec('set role schema_owner;begin');
+ await assert.rejects(()=>db.exec(sql),error=>error.code==='23514','Out-of-range history must block the migration rather than be rewritten');
+ await db.exec('rollback;reset role');
+ const column=(await db.query("select is_nullable,column_default from information_schema.columns where table_name='projects' and column_name='hours_budget'")).rows[0];
+ assert.equal(column.is_nullable,'NO','The entire failed migration rolls back');assert.ok(column.column_default);
+ assert.equal(Number((await db.query('select hours_budget from projects where id=$1',[outlier])).rows[0].hours_budget),1000000.01);
+ assert.equal((await db.query("select to_regclass('public.project_financial_budgets') name")).rows[0].name,null);
+ await db.query('delete from projects where id=$1',[outlier]);
+ await db.exec('set role schema_owner;begin');await db.exec(sql);await db.exec('commit;reset role');
+ const oldZero=(await db.query('select hours_budget,budget from projects where id=$1',[zero])).rows[0];
+ assert.equal(Number(oldZero.hours_budget),0);assert.equal(Number(oldZero.budget),123.45,'Unused legacy money is not reinterpreted');
+ assert.equal(Number((await db.query('select hours_budget from projects where id=$1',[positive])).rows[0].hours_budget),25.5);
+ const fresh=(await db.query("insert into projects(organization_id,external_id,name) values($1,'new','New absent budget') returning hours_budget",[org])).rows[0];assert.equal(fresh.hours_budget,null);
+ assert.equal((await db.query('select count(*)::int n from project_financial_budgets')).rows[0].n,0,'No historical monetary budget is invented');
+ console.log('Actual budget migration upgrade: historical zero/positive/legacy amounts retained, new absence is NULL, outlier blocks atomically with no rewriting. In-memory PostgreSQL evidence; no production migration executed.');
+}finally{await db.close();}

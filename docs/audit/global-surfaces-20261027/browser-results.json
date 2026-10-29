@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "sourceFingerprint": "cef10de32e8b10e5e35ea2b187d55aaeabe5bd919e787e0dc2c84525ff3919ad",
+  "baseSha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+  "scenarios": [
+    "single-page company completion",
+    "customer wizard and native back draft retention",
+    "short password action and keyboard focus restoration",
+    "manual time full page and dirty discard",
+    "320x400 reduced viewport actions"
+  ],
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 820,
+      "height": 1180,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 820,
+      "height": 1180,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "chromium",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "height": 844,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 820,
+      "height": 1180,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 820,
+      "height": 1180,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "light",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    },
+    {
+      "engine": "webkit",
+      "width": 1440,
+      "height": 1000,
+      "colorScheme": "dark",
+      "wholePage": true,
+      "footerVisible": true,
+      "atomicSave": true
+    }
+  ],
+  "limitations": [
+    "Browser emulation is not physical Safari/iOS-PWA or a real software keyboard."
+  ],
+  "fullRouteMatrix": "blocked: local native PostgreSQL unavailable",
+  "physicalDeviceAcceptance": "pending"
+}

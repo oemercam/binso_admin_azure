@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import {apiPost,apiReadPost,ClientApiError} from '@/lib/client/backend';
 import {LocalizedText} from '@/lib/client/locale';
 import {isCustomerMergePreview,isCustomerMergeReceipt,isCustomerMergeCancellation,type CustomerMergePreview,type CustomerMergeReceipt} from '@/lib/customer-merge';
-import {FormSheet,ListRow} from './binso-ux';
+import {FormPage,ListRow} from './binso-ux';
 import {DirectorySelect} from './directory-select';
 import {Button,Checkbox,Field,FormActions,ErrorState,Status} from './ui';
 
@@ -49,7 +49,7 @@ export function CustomerMergeSheet({onClose}:{onClose:()=>void}){
   });
  };
  const choose=(which:'source'|'target',value:string)=>{if(pending.current||intent)return;if(which==='source')setSource(value);else setTarget(value);setPreview(null);setConfirmed(false);setError('');};
- return <FormSheet label="Kundendubletten zusammenführen" description="Nur noch nicht geschäftlich verwendete Dubletten. Bestehende Zieldaten bleiben erhalten; fehlende Angaben werden ergänzt." open onClose={close} busy={busy} dirty={!!sourceId||!!targetId}>
+ return <FormPage label="Kundendubletten zusammenführen" description="Nur noch nicht geschäftlich verwendete Dubletten. Bestehende Zieldaten bleiben erhalten; fehlende Angaben werden ergänzt." open onClose={close} busy={busy} dirty={!!sourceId||!!targetId}>
   <Field label="Dublette"><DirectorySelect endpoint="/api/customers" value={sourceId} onChange={value=>choose('source',value)} label="Dublette" required disabled={busy||!!intent} selectedLabel={preview?.source.name}/></Field>
   <Field label="Zielkunde"><DirectorySelect endpoint="/api/customers" value={targetId} onChange={value=>choose('target',value)} label="Zielkunde" required disabled={busy||!!intent} selectedLabel={preview?.target.name}/></Field>
   {preview&&<>
@@ -60,5 +60,5 @@ export function CustomerMergeSheet({onClose}:{onClose:()=>void}){
   {error&&<ErrorState>{error}</ErrorState>}
   {intent&&<p><LocalizedText>Bei unklarer Antwort zuerst den Status prüfen. Abbrechen setzt keinen abgeschlossenen Vorgang zurück.</LocalizedText></p>}
   <FormActions sheet><Button data-sheet-dismiss variant="secondary" disabled={busy}><LocalizedText>Abbrechen</LocalizedText></Button>{intent?<Button disabled={busy} onClick={()=>void (retry?commit():status())}><LocalizedText>{retry?'Erneut bestätigen':'Status prüfen'}</LocalizedText></Button>:preview?<Button disabled={busy||!preview.eligible||!confirmed} onClick={()=>void commit()}><LocalizedText>Zusammenführen</LocalizedText></Button>:<Button disabled={busy||!sourceId||!targetId||sourceId===targetId} onClick={()=>void review()}><LocalizedText>Vorschau prüfen</LocalizedText></Button>}</FormActions>
- </FormSheet>;
+ </FormPage>;
 }

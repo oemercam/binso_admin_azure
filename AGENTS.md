@@ -10,6 +10,20 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # BINso One — binding product and UI rules
 
+## V8 Global Simple UX & Workflow (27 October 2026)
+
+The full owner reply in docs/architecture/v8-global-simple-workflow/source-full.md
+supersedes the truncated original V8 attachment; see contract.md, the pre-change
+inventory and matrix. The owner separately confirmed keeping the existing
+password-only customer login. V8 does not reintroduce customer login MFA/passkeys.
+The owner explicitly authorized local implementation and isolated tests for the
+six shared billing models and absent-versus-zero budgets described in that folder's
+critical-changes.md. Preserve the existing financial engines and immutable historic
+documents; no inferred repricing or second financial/permission implementation.
+Existing V7.1 navigation/FAB, central UI and five-language owners remain binding.
+No productive migration, GitHub push/merge, Azure deployment or new paid service
+is authorized. Keep actual QA/device/provider gaps explicit.
+
 The user's original ZIP in docs/audit/v24/reference/ is the binding visual source.
 Read docs/audit/v24/reference/IMPLEMENTIERUNG.md and
 docs/architecture/reference-foundation.md before UI work.
@@ -29,9 +43,14 @@ permanent-toolbox instructions. Historical audit reports are evidence, not rules
   AppStart with the original BINSO icon is for initial session bootstrap only.
 - No route-local CSS, JSX style blocks or literal inline presentation. Dynamic
   measurements may pass CSS custom properties into the owning component.
-- Business creation/editing uses the existing FormSheet modal owner: bottom sheet on
-  mobile, centered dialog on desktop; expanded editors retain a scrollable body
-  and bottom actions. Stable labeled navigation, contextual
+- The 27 October global surface instruction supersedes the blanket FormSheet rule:
+  extensive forms, multistep business processes and full details use FormPage or
+  existing routes; short contextual inputs/selections use the existing FormSheet
+  (mobile bottom sheet, compact desktop dialog/menu). Company completion is one
+  full page, with optional preferences outside that process. Reuse the existing
+  shell header, common spacing and safe-area/keyboard-aware scrolling/actions.
+  Evaluate existing surfaces by business scope, preserve working flows and avoid
+  nested visible sheets. Stable labeled navigation, contextual
   headers follow ux-current-approval.md. Creation belongs to the common content
   command bar beside search/filter on desktop, never the global header or navigation.
   The approved 19 October mobile CreateAction is one blue floating plus above the

@@ -8,9 +8,10 @@ import {usePageAccess} from '@/lib/client/page-access';
 import {LocalizedText,useTranslation} from '@/lib/client/locale';
 import {ListRow,SettingsGroup} from './binso-ux';
 import {LoadingState,ErrorState,Toggle,ProgressBar,Icon} from './ui';
-export function SetupProgress({tasks,active}:{tasks:SetupGuide['tasks'];active?:string}){
+export function SetupProgress({tasks,active,compact=false}:{tasks:SetupGuide['tasks'];active?:string;compact?:boolean}){
  const t=useTranslation();
  const required=tasks.filter(task=>task.importance==='required'),complete=required.filter(task=>task.complete).length;
+ if(compact)return <div><p className="settings-note"><LocalizedText>Vollständige Pflichtbereiche</LocalizedText> · {complete} / {required.length}</p><ProgressBar value={complete} max={required.length} label="Vollständige Pflichtbereiche"/></div>;
  return <section className="bo-setup-card" aria-label={t('Rechnungsangaben')}><div className="bo-setup-card-head"><h2><LocalizedText>Bereit für deine erste Rechnung</LocalizedText></h2><span>{complete} / {required.length}</span></div><p className="settings-note"><LocalizedText>Vollständige Pflichtbereiche</LocalizedText></p><ProgressBar value={complete} max={required.length} label="Vollständige Pflichtbereiche"/><nav aria-label={t('Einrichtungsbereiche')}>{required.map(task=><Link key={task.id} href={task.href} className="setup-progress-row" aria-current={active===task.id?'step':undefined}><Icon name={task.complete?'check':'arrow'}/><LocalizedText>{task.title}</LocalizedText><span><LocalizedText>{task.complete?'Vollständig':'Ergänzen'}</LocalizedText></span></Link>)}</nav></section>;
 }
 export function SetupGuideView({item}:{item:SetupGuide}){

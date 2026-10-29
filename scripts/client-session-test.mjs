@@ -41,6 +41,11 @@ try{
  const backendSource=(await fs.readFile('lib/client/backend.ts','utf8')).replace('import { useEffect, useState } from "react";','').replace('"./session-cache"',JSON.stringify(cacheUrl)).replace('"./data-events"',JSON.stringify(eventsUrl));
  const backendUrl=moduleUrl(backendSource),backend=await import(backendUrl);
  assert.equal(backend.startDemoClientSession,undefined,'Demo provisioning is absent');
+ const previewEvents=await import(eventsUrl),beforeCalculationRevision=previewEvents.dataRevision(['/api/documents']);
+ globalThis.fetch=async()=>Response.json({calculation:{total:'1.00'}});
+ assert.equal((await backend.apiReadPost('/api/documents/preview',{output:'calculation'})).calculation.total,'1.00');
+ assert.equal(previewEvents.dataRevision(['/api/documents']),beforeCalculationRevision,'Read-only authoritative calculation must never publish a business mutation');
+
  assert.equal(backend.isProductionBackendEnabled(),true);
  local.setItem('binso.demo.session','1');local.setItem('binso.demo.database','1');
  local.setItem('binso.theme.mode','light');

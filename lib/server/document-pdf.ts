@@ -1,11 +1,11 @@
 import "server-only";
 import {asLocale,localeTags,translateMessage} from "@/lib/locales";
-import {documentUnits} from "@/lib/document-lines";
+import {documentUnits,isMinuteDocumentLine} from "@/lib/document-lines";
 import PDFDocument from "pdfkit";
 import {readFile} from "node:fs/promises";
 import {join} from "node:path";
 import {SwissQRBill} from "swissqrbill/pdf";
-import {openAmount} from "@/lib/financial-status";
+import {openAmount,moneyMinor} from "@/lib/financial-status";
 import {createQrBillData,qrPaymentAccount} from "@/lib/qr-bill";
 type Row=Record<string,unknown>;
 const record=(value:unknown):Row=>value&&typeof value==='object'?value as Row:{};
@@ -46,9 +46,12 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  pdf.y=Math.max(124,pdf.y+24);
  heading(t('EMPFÄNGER'));
  paragraph([customer.name,customer.contact_name,customer.address_lines||[customer.street||customer.address,customer.building_number].filter(Boolean).join(' '),customer.address_lines?'':[customer.postal_code||customer.zip,customer.city].filter(Boolean).join(' '),customer.country&& !['CH','Schweiz','Switzerland','Suisse'].includes(String(customer.country))?customer.country:''].filter(Boolean).join('\n'));
- ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(t(invoice?'RECHNUNG':'ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
+ const procedure=record(document.billing_context).procedure;const invoiceTitle=procedure==='advance'?'Akonto':procedure==='partial'?'Teilrechnung':procedure==='final'?'Schlussrechnung':'RECHNUNG';
+ ensure(104);pdf.moveDown(.5);pdf.font('Liberation Sans-Bold').fontSize(22).text(invoice?t(invoiceTitle).toLocaleUpperCase(localeTags[locale]):t('ANGEBOT'),left,pdf.y,{width});pdf.moveDown(.35);
  paragraph(t(invoice?'Rechnung Nr. ':'Angebot Nr. ')+String(document.number),11);
  if(!invoice&&Number.isInteger(document.published_version)&&Number(document.published_version)>0)paragraph(t('Version')+' '+document.published_version,9);
+ if(invoice&&procedure==='final'&&Array.isArray(document.billing_predecessors)){for(const previous of document.billing_predecessors){const value=record(previous);paragraph(t('Bereits in Rechnung gestellt')+': '+String(value.number)+' · '+String(value.currency)+' '+money(value.subtotal)+' '+t('Netto'),9);}}
+ if(invoice&&procedure==='final'&&total===0)paragraph(t('Keine Zahlung erforderlich.'),10);
  if(draft)paragraph(t('ENTWURF - nicht zur Zahlung / nicht versenden'),10);
  if(cancelled)paragraph(t('STORNIERT - keine Zahlung erforderlich'),10);
  const issueDate=date(document.issue_date),dueDate=date(invoice?document.due_date:document.valid_until);
@@ -61,7 +64,7 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
  tableHead();
  for(const item of (document.items||[]) as Row[]){
   const discount=record(item.discount);const description=String(item.description||'')+(discount.kind&&discount.kind!=='none'?'\n'+t('Rabatt')+': '+String(discount.value)+(discount.kind==='percent'?' %':' '+String(discount.currency)):'');pdf.font('Liberation Sans').fontSize(10).fillColor('#111');
-  const minutePrice=Number(item.price_base_quantity)===60,rowHeight=minutePrice?48:34;
+  const minutePrice=isMinuteDocumentLine(item),rowHeight=minutePrice?48:34;
   const h=pdf.heightOfString(description,{width:235,lineGap:2});
   if(h<bottom-80&&pdf.y+Math.max(h,rowHeight)+12>bottom){pdf.addPage();tableHead();}
   // A repeated table header changes PDFKit's shared drawing state.
@@ -70,8 +73,8 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   const storedUnit=String(item.unit||''),standardUnit=({hour:'Std.',piece:'Stück',flat:'Pauschal'} as Record<string,string>)[storedUnit]??(documentUnits.some(unit=>unit===storedUnit)||storedUnit==='Stunde'?storedUnit:null);
   const quantity=Number(item.quantity||0).toLocaleString(localeTags[locale],{maximumFractionDigits:3})+' '+(standardUnit?t(standardUnit):storedUnit);
   const amount=item.line_total,price=money(item.unit_price);
-  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text(t('/ 60 min'),366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
-  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' '+t('/ 60 min'):''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
+  if(pdf.page===startPage){pdf.fontSize(9).text(quantity,291,y,{width:65,align:'right'});pdf.text(price,366,y,{width:83,align:'right'});pdf.text(money(amount),459,y,{width:right-459,align:'right'});if(minutePrice)pdf.fontSize(8).fillColor('#555').text(('/ '+String(item.price_base_quantity??60)+t(' min')),366,y+13,{width:83,align:'right'});pdf.fontSize(8).fillColor('#555').text(t('MWST')+' '+Number(item.vat_rate||0).toLocaleString(localeTags[locale])+' %',366,y+(minutePrice?25:15),{width:83,align:'right'});pdf.y=Math.max(after,y+rowHeight)+12;}
+  else{pdf.y=after;paragraph(`${quantity} × ${price}${minutePrice?' '+('/ '+String(item.price_base_quantity??60)+t(' min')):''} · ${t('MWST')} ${item.vat_rate}% · ${t('Betrag')} ${money(amount)}`,9);}
  }
  ensure(98);const summary=(label:string,value:unknown,bold=false)=>{if(record(document.calculation).revision===1)ensure(bold?32:25);const y=pdf.y;pdf.font(bold?'Liberation Sans-Bold':'Liberation Sans').fontSize(bold?12:10).fillColor('#111').text(label,300,y,{width:145});pdf.text(money(value),459,y,{width:right-459,align:'right'});pdf.y=y+(bold?27:21)};
  pdf.moveTo(left,pdf.y).lineTo(right,pdf.y).strokeColor('#aaa').stroke();pdf.y+=14;
@@ -80,12 +83,15 @@ export async function documentPdf(document:Row,liveCompany:Row,logo?:Buffer){
   summary(t('Zwischentotal'),calculation.raw);
   if(((calculation.lines??[]) as Row[]).some(line=>record(line.discount).kind!=='none'))summary(t('Positionsrabatte'),'-'+String(calculation.positionDiscountDisplay));
   const discount=record(calculation.discount);
-  if(discount.kind!=='none')summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
+  if(discount.kind!=='none'||Array.isArray(calculation.billingScopes)&&Number(calculation.discountDisplay)>0)summary(t('Gesamtrabatt')+(discount.kind==='percent'?' '+String(discount.value)+' %':''),'-'+String(calculation.discountDisplay));
+  for(const application of (calculation.advanceApplications??[]) as Row[]){const groups=application.taxGroups as Row[];summary(t('Angerechnetes Akonto'),'-'+String(groups.reduce((n,g)=>n+moneyMinor(g.net),0)/100));paragraph([application.advanceNumber,application.agreementLabel].filter(Boolean).join(' · '),8);paragraph(t('Anrechnungsbetrag')+': '+String(document.currency)+' '+money(application.amount),8);}
+  if(calculation.settlementAdjustment)summary(t(record(calculation.settlementAdjustment).kind==='cumulative'?'Kumulativer Rundungsausgleich':'Rundungsausgleich Schlussrechnung'),record(calculation.settlementAdjustment).net);
   for(const group of (calculation.taxGroups??[]) as Row[])summary(group.exempt?t('Steuerbefreit'):t('MWST')+' '+Number(group.rate)+' %',group.tax);
   if(calculation.positionRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Positionen')+': '+String(calculation.positionRoundingCents)+' × 0.01 '+String(document.currency),8);
   if(calculation.discountRoundingCents!=='0')paragraph(t('Rundung')+' · '+t('Gesamtrabatt')+': '+String(calculation.discountRoundingCents)+' × 0.01 '+String(document.currency),8);
  }else{summary(t('Zwischentotal'),document.subtotal);summary(t('MWST'),document.vat_amount??document.vat);}
  summary(t('Gesamtbetrag')+' '+String(document.currency||'CHF'),total,true);
+ for(const scope of (document.billing_scopes??[]) as Row[]){if(typeof scope.conditions==='string'&&scope.conditions.trim()){heading(t('Vereinbarte Konditionen'));if(scope.label)paragraph(String(scope.label),9);paragraph(scope.conditions,9);}}
  // Validate before adding a page; an invalid setup never creates a phantom page.
  let bill:SwissQRBill|null=null,qrError='';
  let paymentData:ReturnType<typeof createQrBillData>|null=null;

@@ -12,12 +12,12 @@ const catalogs={};
 for(const file of ['config/workspace-navigation.ts','config/create-actions.ts'])Function('require','exports',compile(read(file)))(require,catalogs);
 const ast=ts.createSourceFile('workspace.tsx',withoutLocalization(read('components/binso-ux.tsx')),99,true,4);
 const source="const Fragment=require('react').Fragment;\n"+ast.statements.filter(n=>!ts.isImportDeclaration(n)).map(n=>n.getText(ast)).join('\n');
-const exports={},root={current:null};let state=0,guard;
+const exports={},root={current:null};let state=0,guard,pageMounted=false;
 const control=({children,...props})=>React.createElement('button',props,children);
-Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','createPortal','document','mainNavigation','moreNavigation','createActions',compile(source))(
+Function('require','exports','Children','isValidElement','cloneElement','useState','useRef','useEffect','useRouter','useDialogFocus','useBrowserBackGuard','ConfirmDialog','FormActions','Button','Icon','useLayoutEffect','createPortal','document','mainNavigation','moreNavigation','createActions','useLocale','LocalizedText',compile(source))(
  require,exports,React.Children,React.isValidElement,React.cloneElement,
- initial=>[state++===1?true:initial,()=>{}],()=>root,()=>{},()=>({push(){}}),()=>root,(active,blocked,unload)=>{guard={active,unload};return()=>{}},()=>null,
- ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),children=>children,{body:{}},catalogs.mainNavigation,catalogs.moreNavigation,catalogs.createActions);
+ initial=>[pageMounted&&state===0?(state++,{}):state++===1?true:initial,()=>{}],()=>root,()=>{},()=>({push(){}}),()=>root,(active,blocked,unload)=>{guard={active,unload};return()=>{}},()=>null,
+ ({children})=>React.createElement('footer',null,children),control,()=>React.createElement('svg'),React.useLayoutEffect,children=>children,{body:{}},catalogs.mainNavigation,catalogs.moreNavigation,catalogs.createActions,()=>({translate:value=>value}),({children})=>children);
 function render(workspace,dirty=true,busy=false,children=React.createElement('input',{defaultValue:'Unsaved'})){state=0;return renderToStaticMarkup(React.createElement(exports.FormSheet,{label:'Task',open:true,workspace,onClose(){},description:'Details',dirty,busy},children));}
 const inline=render(true),modal=render(false);
 const fragmented=render(true,true,false,React.createElement(React.Fragment,null,React.createElement('input'),React.createElement('div',{className:'filter-sheet-actions'},'Save')));
@@ -27,6 +27,11 @@ assert.match(inline,/value="Unsaved"/);assert.match(inline,/aria-label="Schliess
 assert.match(modal,/role="dialog"/);assert.match(modal,/aria-modal="true"/);assert.match(modal,/sheet-layer/,'Short contextual forms retain actual modal behavior');
 render(true,false,true);assert.deepEqual(guard,{active:true,unload:true},'A pending pristine save protects browser back/unload too');
 render(true,false,false);assert.deepEqual(guard,{active:false,unload:false},'A pristine idle workspace does not trap back/unload');
+state=0;const pendingPage=renderToStaticMarkup(React.createElement(exports.FormPage,{label:'Task',open:true,onClose(){}},React.createElement('input')));assert.doesNotMatch(pendingPage,/<input/,'Inputs never become editable before stable page placement');
+pageMounted=true;state=0;const fullPage=renderToStaticMarkup(React.createElement(exports.FormPage,{label:'Task',open:true,onClose(){},dirty:true},React.createElement('form',null,React.createElement('input',{defaultValue:'Retained'}))));pageMounted=false;
+assert.match(fullPage,/class="form-page"/);assert.doesNotMatch(fullPage,/role="dialog"|aria-modal|sheet-layer|sheet-header/,'Whole-page editors reuse the shell rather than a modal or a duplicate header');assert.match(fullPage,/value="Retained"/);assert.deepEqual(guard,{active:true,unload:true});
+pageMounted=true;state=0;const pendingSavePage=renderToStaticMarkup(React.createElement(exports.FormPage,{label:'Task',open:true,busy:true,onClose(){}},React.createElement('input')));assert.match(pendingSavePage,/class="form-page-body" inert=""/,'Pending writes lock the editable body');assert.deepEqual(guard,{active:true,unload:true});
+state=0;renderToStaticMarkup(React.createElement(exports.FormPage,{label:'Task',open:true,guarded:false,dirty:true,onClose(){}},React.createElement('input')));pageMounted=false;assert.deepEqual(guard,{active:false,unload:false},'A process with its own guard never registers a duplicate boundary');
 const access=navigationAccess(read);
 const discardConditions=[];
 const findDiscard=node=>{if(ts.isIfStatement(node)&&node.thenStatement.getText(ast).includes('binso-draft-discard'))discardConditions.push(node.expression.getText(ast));ts.forEachChild(node,findDiscard)};

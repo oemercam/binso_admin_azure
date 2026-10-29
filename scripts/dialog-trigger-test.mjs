@@ -21,7 +21,7 @@ const trigger=new Element('trigger'),close=new Element('close'),dialog=new Eleme
 background.children=[trigger];dialog.children=[close];layer.children=[dialog];body.children=[background,layer];
 document={body,activeElement:trigger,querySelectorAll:()=>[],addEventListener(){},removeEventListener(){},documentElement:{dataset:{},style:{setProperty(){},removeProperty(){}}}};
 const effects=[],microtasks=[],refs=[{current:dialog},{current:()=>{}},{current:trigger}];let refIndex=0;
-const sandbox={exports:{},HTMLElement:Element,Node:Element,document,window:{innerHeight:900,visualViewport:null,dispatchEvent(){}},Event,queueMicrotask:callback=>microtasks.push(callback),requestAnimationFrame:()=>1,cancelAnimationFrame(){},require:name=>name==='react'?{useRef:()=>refs[refIndex++],useEffect:effect=>effects.push(effect)}:{lockPageScroll:()=>()=>{}}};
+const sandbox={exports:{},Element,HTMLElement:Element,Node:Element,document,window:{innerHeight:900,visualViewport:null,dispatchEvent(){}},Event,queueMicrotask:callback=>microtasks.push(callback),requestAnimationFrame:()=>1,cancelAnimationFrame(){},require:name=>name==='react'?{useRef:()=>refs[refIndex++],useEffect:effect=>effects.push(effect)}:{lockPageScroll:()=>()=>{}}};
 const source=fs.readFileSync('components/use-dialog-focus.ts','utf8');
 vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,sandbox);
 document.activeElement=body;

@@ -1,3 +1,4 @@
+import {billingAgreementModuleUrl,billingModelModuleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
@@ -11,8 +12,8 @@ import {verifyBusinessReadiness} from './business-readiness-contract.mjs';
 // A FormSheet portal can appear after the recovery effect's first frame. Keep
 // the real hook and metadata; only React lifecycle and DOM timing are synthetic.
 {
- const globals=['window','document','HTMLInputElement','requestAnimationFrame','cancelAnimationFrame'],saved=new Map(globals.map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
- const effects=[],frames=new Map();let frameId=0,input=null,scrolls=0;
+ const globals=['window','document','HTMLInputElement','MutationObserver','requestAnimationFrame','cancelAnimationFrame'],saved=new Map(globals.map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
+ const effects=[],frames=new Map(),observers=[];let frameId=0,input=null,scrolls=0;
  const react=moduleUrl('export const useRef=value=>({current:value});export const useEffect=callback=>globalThis.__setupFocusEffects.push(callback);');
  const search=moduleUrl("export const useSearchParams=()=>new URLSearchParams('setupField=iban&returnTo=%2Frechnungen%2FRE-TEST');");
  const navigation=moduleUrl(await fs.readFile('lib/navigation.ts','utf8'));
@@ -20,16 +21,17 @@ import {verifyBusinessReadiness} from './business-readiness-contract.mjs';
  let source=await fs.readFile('components/use-setup-field.ts','utf8');
  for(const [specifier,target] of Object.entries({'react':react,'next/navigation':search,'@/lib/action-readiness':metadata,'@/lib/navigation':navigation}))source=source.replaceAll("'"+specifier+"'",JSON.stringify(target));
  try{
-  globalThis.__setupFocusEffects=effects;globalThis.window=new EventTarget();globalThis.document={activeElement:null,getElementById:id=>id==='setup-iban'?input:null};
-  globalThis.HTMLInputElement=class{hidden=false;closest(){return null;}focus(){globalThis.document.activeElement=this;}scrollIntoView(){scrolls++;}};
+  globalThis.__setupFocusEffects=effects;globalThis.window=new EventTarget();globalThis.document={body:{},activeElement:null,getElementById:id=>id==='setup-iban'?input:null};
+  globalThis.MutationObserver=class{connected=false;constructor(callback){this.callback=callback;observers.push(this);}observe(target,options){assert.equal(target,globalThis.document.body);assert.equal(options.subtree,true);this.connected=true;}disconnect(){this.connected=false;}};
+  globalThis.HTMLInputElement=class{hidden=false;getClientRects(){return [{}];}closest(){return null;}focus(){globalThis.document.activeElement=this;}scrollIntoView(){scrolls++;}};
   globalThis.requestAnimationFrame=callback=>{frames.set(++frameId,callback);return frameId;};globalThis.cancelAnimationFrame=id=>frames.delete(id);
   const advance=()=>{const pending=[...frames.values()];frames.clear();for(const callback of pending)callback();};
   const hook=await import(moduleUrl(source));
   const recovery=hook.useSetupField(['iban'],true,true,()=>{throw Error('An open recovery form must not open again');},true);
   assert.equal(recovery.returnTo,'/rechnungen/RE-TEST');const cleanups=effects.map(effect=>effect()).filter(Boolean);
-  advance();assert.equal(globalThis.document.activeElement,null,'A not-yet-mounted portal is not focused');
+  advance();assert.equal(globalThis.document.activeElement,null,'A not-yet-mounted portal is not focused');assert.equal(observers[0].connected,true,'Recovery observes the late portal until focus succeeds');
   input=new globalThis.HTMLInputElement();globalThis.window.dispatchEvent(new Event('binso-modal-open'));advance();
-  assert.equal(globalThis.document.activeElement,input,'The requested bank field gains focus after the actual modal opens');assert.equal(scrolls,1);
+  assert.equal(globalThis.document.activeElement,input,'The requested bank field gains focus after the actual modal opens');assert.equal(scrolls,1);assert.equal(observers[0].connected,false,'Successful recovery disconnects the observer');
   const other={};globalThis.document.activeElement=other;globalThis.window.dispatchEvent(new Event('binso-modal-open'));advance();assert.equal(globalThis.document.activeElement,other,'Later dialogs do not steal focus back to a completed recovery');
   for(const cleanup of cleanups)cleanup();globalThis.window.dispatchEvent(new Event('binso-modal-open'));assert.equal(frames.size,0,'Unmount removes the modal listener and pending focus work');
  }finally{delete globalThis.__setupFocusEffects;for(const [key,descriptor] of saved){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];}}
@@ -57,17 +59,17 @@ try{
  const qr=await compile('lib/qr-bill.ts',{'swissqrbill/utils':import.meta.resolve('swissqrbill/utils')});
  const replay=await compile('lib/server/business-idempotency.ts',{'./http':http});
  const expensePayment=await compile('lib/expense-payment.ts');
- const business=await compile('lib/server/repositories/business-api.ts',{'@/lib/expense-payment':expensePayment,'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
+ const business=await compile('lib/server/repositories/business-api.ts',{'../billing-agreements':billingAgreementModuleUrl,'./billing-agreements':billingAgreementModuleUrl,'@/lib/server/billing-agreements':billingAgreementModuleUrl,'@/lib/billing-model':billingModelModuleUrl,'@/lib/expense-payment':expensePayment,'../http':http,'../audit':audit,'../business-idempotency':replay,'../document-amount-sql':documentAmountSqlModuleUrl,'@/lib/financial-status':financialModuleUrl,'@/lib/permissions':permissions,'@/lib/qr-bill':qr});
  globalThis.__readinessClient=client;
  const scopedDb=moduleUrl('export const withTenant=async(_org,_user,fn)=>fn(globalThis.__readinessClient); export const query=(...args)=>globalThis.__readinessClient.query(...args)');
  const plans=await compile('lib/server/plan-access.ts',{'@/lib/server/db':scopedDb,'@/config/plan-access':planAccessModuleUrl,'@/config/plans':planCatalogModuleUrl,'./http':http});
  const navigation=await compile('lib/navigation.ts'),actions=await compile('lib/action-readiness.ts',{'./navigation':navigation});
- const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation});
- const readiness=await import(await compile('lib/server/business-readiness.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
+ const setupReadiness=await compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':navigation,'./action-readiness':actions});
+ const readiness=await import(await compile('lib/server/business-readiness.ts',{'./billing-agreements':billingAgreementModuleUrl,'./http':http,'./rbac':rbac,'./audit':audit,'./plan-access':plans,'@/lib/permissions':permissions,'@/config/plans':planCatalogModuleUrl,'@/config/plan-access':planAccessModuleUrl,'@/lib/qr-bill':qr,'@/lib/action-readiness':actions,'@/lib/setup-readiness':setupReadiness}));
  const pdf=await compile('lib/server/document-pdf.ts',{'@/lib/document-lines':moduleUrl(await fs.readFile('lib/document-lines.ts','utf8')),'@/lib/locales':await localeTestModuleUrl(),'pdfkit':import.meta.resolve('pdfkit'),'swissqrbill/pdf':import.meta.resolve('swissqrbill/pdf'),'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl});
  const logo=moduleUrl('export async function documentLogo(){return undefined}'); // Synthetic fixture has no company logo; rendering and issuance remain real.
  const versions=await compile('lib/server/offer-versions.ts',{'./http':http,'./repositories/business-api':business,'./document-pdf':pdf,'./document-logo':logo});
- const process=await import(await compile('lib/server/document-process.ts',{'./http':http,'./rbac':rbac,'./audit':audit,'./offer-versions':versions,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':plans}));
+ const process=await import(await compile('lib/server/document-process.ts',{'./billing-agreements':billingAgreementModuleUrl,'./http':http,'./rbac':rbac,'./audit':audit,'./offer-versions':versions,'@/lib/qr-bill':qr,'@/lib/financial-status':financialModuleUrl,'@/lib/server/plan-access':plans}));
  const {mutateApiBusiness}=await import(business);
  const session={organizationId:'00000000-0000-4000-8000-000000000099',userId:'demo-readonly',role:'owner',sessionId:randomUUID()};
  await db.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional'",[session.organizationId]);

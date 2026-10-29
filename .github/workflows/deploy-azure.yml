@@ -21,6 +21,10 @@ on:
         description: 'Explicit approval for the qualified scanner using already approved capacity and registry'
         type: boolean
         default: false
+      apply_v8_runtime_grants:
+        description: 'Explicitly approve reviewed grants on the four V8 billing objects for the existing restricted runtime role'
+        type: boolean
+        default: false
       production_evidence_run_id:
         description: Reviewed exact-SHA evidence run used by production qualification
         type: string
@@ -159,6 +163,23 @@ jobs:
           pnpm db:migrate
           pnpm db:check
           RETENTION_DRY_RUN=true pnpm retention:cleanup
+
+      - name: Apply explicitly approved V8 runtime object grants
+        if: ${{ inputs.apply_v8_runtime_grants == true }}
+        shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs/promises';
+          import pg from 'pg';
+          const client=new pg.Client({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:true}});
+          await client.connect();
+          try{await client.query(await fs.readFile('database/operations/grant-v8-billing-completion.sql','utf8'));}
+          finally{await client.end();}
+          console.log('Explicitly approved V8 object grants applied to the existing restricted runtime role.');
+          NODE
 
       - name: Verify actual HTTPS and EasyAuth configuration without changing it
         shell: bash

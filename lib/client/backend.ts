@@ -178,9 +178,9 @@ export async function apiGet<T>(path:string):Promise<T>{
 }
 
 /** Explicit read-only POST for bounded previews; never broadcasts a business mutation. */
-export async function apiReadPost<T>(path:string,body:unknown):Promise<T>{
+export async function apiReadPost<T>(path:string,body:unknown,signal?:AbortSignal):Promise<T>{
  const revision=dataRevision([]),multipart=body instanceof FormData;
- const response=await fetchApi(path,{method:'POST',...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
+ const response=await fetchApi(path,{method:'POST',signal,...(multipart?{body}:{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})});
  const result=await parseResponse<T>(response,'Daten konnten nicht geladen werden.');
  if(revision!==dataRevision([]))throw new ClientApiError('Die Sitzung wurde geändert. Bitte erneut versuchen.','session_changed',401);
  return result;

@@ -101,7 +101,7 @@ export function SupportTicketForm() {
     }
   };
   return <AppShell title="Neue Support-Anfrage" editing unsavedChanges={false} subtitle="Beschreibe dein Anliegen. Antworten erhältst du im Ticket." active="support" backHref={returnTo} backLabel="Support">
-    <FormSheet workspace label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
+    <FormSheet label="Neue Support-Anfrage" open={open} onClose={close} busy={submitting} dirty={dirty&&!saved}>
     <form onSubmit={event=>{event.preventDefault();void save()}}>
       <div className="form-grid">
         <Field label="Betreff" className="full"><Input required minLength={3} maxLength={160} disabled={submitting||!!createdId} autoFocus value={subject} onChange={e=>setSubject(e.target.value)} placeholder="Worum geht es?"/></Field>

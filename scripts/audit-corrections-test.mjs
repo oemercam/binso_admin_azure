@@ -140,7 +140,7 @@ assert.equal(historyView.props.children[1].props.fileUrl,'/api/documents/AN-1/ve
 
 // Guided setup uses the actual canonical validator and real component handlers.
 const qr=compile('lib/qr-bill.ts',{'swissqrbill/utils':require('swissqrbill/utils')});
-const readiness=compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':{safeAppPath}});
+const readiness=compile('lib/setup-readiness.ts',{'./qr-bill':qr,'./navigation':{safeAppPath},'./action-readiness':compile('lib/action-readiness.ts',{'./navigation':{safeAppPath}})});
 const original={name:'Fixture Company',street:'',building_number:'',postal_code:'',city:'',country_code:'CH',iban:'',qr_iban:'',vat_rate:0,payment_terms_days:0,invoice_intro_text:'Keep authored text'};
 assert.equal(readiness.requiredSetupTasks(original).filter(task=>task.complete).length,1);
 assert.equal(readiness.setupStepIssues({...original,street:'Testweg'},'address')[0].field,'postalCode');
@@ -149,46 +149,39 @@ assert.ok(readiness.setupProcessDestination('bank','https://evil.invalid').inclu
 const walk=node=>Array.isArray(node)?node.flatMap(walk):node&&typeof node==='object'&&node.props?[node,...walk(node.props.children)]:[];
 const oldDocument=globalThis.document;globalThis.document={getElementById:()=>({focus(){}})};
 try{
- for(const scenario of ['partial','address','invalid-bank','bank','bank-read-error','bank-stale-address','logo-return','clean-exit','dirty-exit']){
+ for(const scenario of ['incomplete','invalid-bank','complete','save-error','stale-response','clean-exit','dirty-exit','read-only']){
   let cursor=0;const cells=[],calls=[],routes=[];
   const hooks={useState:initial=>{const i=cursor++;if(!(i in cells))cells[i]=typeof initial==='function'?initial():initial;return [cells[i],next=>{cells[i]=typeof next==='function'?next(cells[i]):next}]},useRef:value=>{const i=cursor++;return cells[i]??=({current:value})},useEffect:()=>{}};
-  const bank=scenario.includes('bank'),base={...original,...(bank?{street:'Testweg',postal_code:'8000',city:'Zürich'}:{})};
-  const params=new URLSearchParams('setupStep='+(bank?'bank':'address'));if(scenario==='logo-return')params.set('returnTo','/rechnungen/neu?customerId=c1');
+  const base={...original};
+  const params=new URLSearchParams('setup=1&returnTo='+encodeURIComponent('/rechnungen/neu?customerId=c1'));
   const {SetupProcess}=compile('components/setup-process.tsx',{
    react:hooks,'next/navigation':{useSearchParams:()=>params,useRouter:()=>({push:path=>routes.push(path),replace:path=>routes.push(path)})},
    '@/lib/client/use-api-query':{useApiQuery:()=>({loading:false,data:{item:base},refresh(){}})},
-   '@/lib/client/page-access':{usePageAccess:()=>({write:true})},'@/lib/client/locale':{useTranslation:()=>value=>value},
+   '@/lib/client/page-access':{usePageAccess:()=>({write:scenario!=='read-only'})},
    '@/lib/navigation':{safeAppPath},'@/lib/setup-readiness':readiness,'@/lib/action-readiness':compile('lib/action-readiness.ts',{'./navigation':{safeAppPath}}),
-   '@/config/domain':{domainConfig:{vatRates:[0,8.1]}},'./use-browser-back-guard':{allowDraftNavigation(){},useBrowserBackGuard:()=>()=>{}},
-   '@/lib/client/backend':{apiGet:async()=>{if(scenario==='bank-read-error')throw Error('Reload failed');return {item:{...base,iban:'CH9300762011623852957',...(scenario==='bank-stale-address'?{street:''}:{})}}},apiPatch:async(path,payload)=>{calls.push({path,payload});return {item:{...base,...(bank?{iban:payload.iban}:{name:payload.name,street:payload.street,postal_code:payload.postalCode,city:payload.city})}}}},
+   './use-browser-back-guard':{allowDraftNavigation(){},useBrowserBackGuard:()=>()=>{}},'./use-process-draft':{useProcessDraft:()=>({ready:true,clear(){}})},
+   '@/lib/client/backend':{apiPatch:async(path,payload)=>{calls.push({path,payload});if(scenario==='save-error')throw Error('Save failed');return {item:{...base,name:payload.name,street:scenario==='stale-response'?'':payload.street,postal_code:payload.postalCode,city:payload.city,country_code:payload.countryCode,iban:payload.iban,qr_iban:payload.qrIban}}}},
   });
-  const render=()=>{cursor=0;return SetupProcess()};
-  let tree=render();assert.equal(tree.props.orientationText,null,'Guided steps omit the unrelated generic settings description');
-  if(scenario==='logo-return'){const href=walk(tree).find(node=>node.props.title==='Firmenlogo').props.href;const back=new URL(href,'https://fixture.invalid').searchParams.get('returnTo');assert.equal(new URL(back,'https://fixture.invalid').searchParams.get('returnTo'),'/rechnungen/neu?customerId=c1');continue;}
+  const render=()=>{cursor=0;return SetupProcess()};let tree=render();
+  assert.equal(tree.props.title,'Firma vervollständigen');assert.equal(tree.props.orientationText,null);
+  assert.equal(walk(tree).filter(n=>n.type==='form').length,1,'Company completion is one form');
+  assert.equal(walk(tree).some(n=>n.props.title==='Firmenlogo'),false,'Optional settings are outside company completion');
   const input=(id,value)=>{const node=walk(tree).find(node=>node.props.id===id);assert.ok(node,id);node.props.onChange({target:{value}});tree=render()};
+  for(const id of ['setup-company-name','setup-street','setup-postal-code','setup-city','setup-iban'])assert.ok(walk(tree).some(n=>n.props.id===id),'All required areas are present together: '+id);
   if(scenario==='clean-exit'||scenario==='dirty-exit'){
-   if(scenario==='dirty-exit')input('setup-street','Changed');
-   walk(tree).find(node=>node.props.children==='Später fortsetzen').props.onClick();tree=render();
-   assert.equal(routes.length,scenario==='clean-exit'?1:0);
-   if(scenario==='dirty-exit')assert.ok(walk(tree).some(node=>node.props.open===true&&node.props.title==='Änderungen verwerfen?'));
-   continue;
+   if(scenario==='dirty-exit')input('setup-street','Changed');walk(tree).find(n=>n.props.children==='Abbrechen').props.onClick();tree=render();assert.equal(routes.length,scenario==='clean-exit'?1:0);if(scenario==='dirty-exit')assert.ok(walk(tree).some(n=>n.props.open===true&&n.props.title==='Änderungen verwerfen?'));continue;
   }
-  if(bank)input('setup-iban',scenario==='invalid-bank'?'CH123':'CH9300762011623852957');
-  else{input('setup-street','Testweg');if(scenario==='address'){input('setup-postal-code','8000');input('setup-city','Zürich')}}
-  const submit=walk(tree).find(node=>node.type==='form').props.onSubmit;await Promise.all([submit({preventDefault(){}}),submit({preventDefault(){}})]);tree=render();
-  if(scenario==='invalid-bank'){assert.equal(calls.length,0,'Invalid IBAN never opens fresh authentication');assert.equal(routes.length,0);continue;}
-  assert.equal(calls.length,1);
-  if(scenario==='partial'){assert.equal(routes.length,0,'Partial address remains in its area');assert.ok(walk(tree).some(node=>Array.isArray(node.props.children)&&node.props.children.some(child=>child?.props?.children==='Teilstand gespeichert. Für Rechnungen fehlen noch gültige Pflichtangaben.')))}
-  if(scenario==='address')assert.ok(routes[0].includes('setupStep=bank'));
-  if(scenario==='bank-read-error'){assert.equal(routes.length,0);assert.equal(tree.props.title,'Zahlungskonto');assert.ok(walk(tree).some(node=>node.props.children==='Reload failed'));}
-  if(scenario==='bank-stale-address'){assert.ok(routes[0].includes('setupStep=address'));assert.notEqual(tree.props.title,'Rechnungsangaben vollständig');}
-  if(scenario==='bank'){
-   assert.equal(calls[0].path,'/api/settings/documents');assert.equal(calls[0].payload.vatRate,0);assert.equal(calls[0].payload.paymentTermsDays,0);assert.equal(calls[0].payload.invoiceIntroText,'Keep authored text');
-   assert.equal(tree.props.title,'Rechnungsangaben vollständig','Completion is shown only after confirmed persistence');
-  }
+  if(scenario!=='incomplete'){input('setup-street','Testweg');input('setup-postal-code','8000');input('setup-city','Zürich');input('setup-iban',scenario==='invalid-bank'?'CH123':'CH9300762011623852957');}
+  const submit=walk(tree).find(n=>n.type==='form').props.onSubmit;await Promise.all([submit({preventDefault(){}}),submit({preventDefault(){}})]);tree=render();
+  if(['incomplete','invalid-bank','read-only'].includes(scenario)){assert.equal(calls.length,0,'Invalid or read-only completion cannot initiate a save');continue;}
+  assert.equal(calls.length,1,'Concurrent submits create one atomic save');assert.equal(calls[0].path,'/api/settings/company');assert.equal(calls[0].payload.completeCompanySetup,true);assert.equal(calls[0].payload.completeOnboarding,true);
+  for(const key of ['vatRate','paymentTermsDays','invoiceIntroText','uid','email','phone'])assert.equal(Object.hasOwn(calls[0].payload,key),false,'Optional preferences are not overwritten: '+key);
+  assert.equal(routes.length,0,'Completion never advances to an intermediate page');
+  if(scenario==='complete')assert.ok(walk(tree).some(n=>n.props.children==='Deine Rechnungsangaben sind vollständig'));
+  else {assert.ok(walk(tree).some(n=>n.type==='form'),'Failed or stale persistence preserves the form');assert.equal(walk(tree).find(n=>n.props.id==='setup-street').props.value,'Testweg');}
  }
 }finally{globalThis.document=oldDocument;}
-console.log('Guided setup: canonical area readiness, partial/complete saves, safe return, actual clean/dirty exit, invalid-bank preflight and confirmed completion passed; no security bypass.');
+console.log('Single-page company setup: all required areas, atomic save intent, optional-field preservation, safe return, clean/dirty exit, invalid/read-only denial and confirmed completion passed.');
 
 // Optional setup content starts collapsed even on desktop and remains operable.
 {

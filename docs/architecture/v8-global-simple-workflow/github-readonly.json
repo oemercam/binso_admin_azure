@@ -1,0 +1,132 @@
+{
+  "main": {
+    "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+    "protected": true
+  },
+  "openPullRequests": [],
+  "recentRuns": [
+    {
+      "id": 40576219241,
+      "name": "Operations Watch",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "schedule",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40576219241",
+      "createdAt": "2026-10-27T20:14:15Z"
+    },
+    {
+      "id": 40555849824,
+      "name": "Deploy Azure App Service",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40555849824",
+      "createdAt": "2026-10-27T18:00:13Z"
+    },
+    {
+      "id": 40551616654,
+      "name": "Quality • workflow_dispatch • full • development",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40551616654",
+      "createdAt": "2026-10-27T17:32:51Z"
+    },
+    {
+      "id": 40546860806,
+      "name": "Quality • workflow_dispatch • full • development",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "workflow_dispatch",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40546860806",
+      "createdAt": "2026-10-27T17:03:01Z"
+    },
+    {
+      "id": 40546835958,
+      "name": "CodeQL",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40546835958",
+      "createdAt": "2026-10-27T17:02:52Z"
+    },
+    {
+      "id": 40546835928,
+      "name": "Quality • push • standard",
+      "sha": "f0b01b727204965555c57bfcf1eb74113b6ec7fd",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40546835928",
+      "createdAt": "2026-10-27T17:02:52Z"
+    },
+    {
+      "id": 40542925225,
+      "name": "CodeQL",
+      "sha": "5e80faa862fe2cd30ed41cee644c6a1686073530",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40542925225",
+      "createdAt": "2026-10-27T16:38:38Z"
+    },
+    {
+      "id": 40542925186,
+      "name": "Quality • pull_request • standard",
+      "sha": "5e80faa862fe2cd30ed41cee644c6a1686073530",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40542925186",
+      "createdAt": "2026-10-27T16:38:38Z"
+    },
+    {
+      "id": 40541188533,
+      "name": "Quality • pull_request • standard",
+      "sha": "f8b86b7c814db33df1b6580d20e2b9853964d6c3",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40541188533",
+      "createdAt": "2026-10-27T16:28:03Z"
+    },
+    {
+      "id": 40541188422,
+      "name": "CodeQL",
+      "sha": "f8b86b7c814db33df1b6580d20e2b9853964d6c3",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40541188422",
+      "createdAt": "2026-10-27T16:28:03Z"
+    },
+    {
+      "id": 40540511850,
+      "name": "Quality • pull_request • standard",
+      "sha": "528a624c07b0386838a56d0e74dad1029989ab57",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40540511850",
+      "createdAt": "2026-10-27T16:23:56Z"
+    },
+    {
+      "id": 40540511796,
+      "name": "CodeQL",
+      "sha": "528a624c07b0386838a56d0e74dad1029989ab57",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/oemercam/binso_admin_azure/actions/runs/40540511796",
+      "createdAt": "2026-10-27T16:23:56Z"
+    }
+  ],
+  "branchProtectionRead": "Connector returned 403; detailed settings not verified.",
+  "rulesets": [],
+  "scope": "Read-only snapshot; no writes, reruns, pushes or merges. Earlier failed/cancelled history is retained; later full Quality and deployment succeeded for the same main SHA. Not evidence for local V8 changes."
+}

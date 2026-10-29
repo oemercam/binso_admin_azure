@@ -6,7 +6,7 @@ import {LocalizedText,useLocale,useTranslation} from '@/lib/client/locale';
 import {localeTags} from '@/lib/locales/config';
 import {formatQuantity} from '@/lib/display-format';
 import {wageDefinitionIssue,type AnnualBasis,type WageDefinitionInput,type WageModel} from '@/lib/wage-definition';
-import {ActionRow,ActionsMenu,FormSheet} from './binso-ux';
+import {ActionRow,ActionsMenu,FormPage} from './binso-ux';
 import {Button,EmptyState,ErrorState,Field,FormActions,Input,LoadingState,SectionTitle,Select,Status} from './ui';
 
 type Wage={id:string;definition_id:string;revision:number;is_current:boolean;employment_revision_id:string;employment_current:boolean;starts_on:string;ends_on:string|null;model:WageModel;amount:string;currency:'CHF'|'EUR';annual_basis:AnnualBasis|null;thirteenth_entitled:boolean;payout_day:number|null;payout_last_day:boolean;thirteenth_payout_month:number|null};
@@ -49,7 +49,7 @@ export function WageDefinitions({employeeId,mayWrite}:{employeeId:string;mayWrit
    </div><Status tone={item.is_current?'info':'neutral'}><LocalizedText>{item.is_current?'Aktueller Vertragsstand':'Frühere Revision'}</LocalizedText>{' · '}{item.revision}</Status>
    {mayWrite&&item.is_current&&<ActionsMenu label="Lohnvertragsaktionen"><ActionRow requiresWrite icon="edit" title="Lohndefinition korrigieren" onClick={()=>edit(item)}/></ActionsMenu>}
   </div>)}</div>}
-  <FormSheet open={open} onClose={()=>setOpen(false)} label={selected?'Lohndefinition korrigieren':'Lohndefinition hinzufügen'} busy={busy} dirty={JSON.stringify(draft)!==initial}>
+  <FormPage open={open} onClose={()=>setOpen(false)} label={selected?'Lohndefinition korrigieren':'Lohndefinition hinzufügen'} busy={busy} dirty={JSON.stringify(draft)!==initial}>
    {periods.error?<ErrorState onRetry={periods.refresh}>{periods.error}</ErrorState>:periods.loading?<LoadingState/>:<form id={formId} onSubmit={e=>{e.preventDefault();void save();}}><div className="form-grid two">
     <Field label="Anstellungsrevision"><Select required value={draft.employmentRevisionId} onChange={e=>field('employmentRevisionId',e.target.value)}><option value="">{t('Bitte wählen')}</option>{!currentPeriods.some(p=>p.id===draft.employmentRevisionId)&&draft.employmentRevisionId&&<option value={draft.employmentRevisionId} disabled>{t('Frühere Revision')}</option>}{currentPeriods.map(p=><option key={p.id} value={p.id}>{p.job_title}{' · '}{p.starts_on}{' · '}{p.revision}</option>)}</Select></Field>
     <Field label="Lohnmodell"><Select required value={draft.model} onChange={e=>setDraft(d=>({...d,model:e.target.value,annualBasis:'',entitlement:'',thirteenthPayoutMonth:''}))}><option value="">{t('Bitte wählen')}</option>{Object.entries(modelLabels).map(([value,label])=><option key={value} value={value}>{t(label)}</option>)}</Select></Field>
@@ -61,6 +61,6 @@ export function WageDefinitions({employeeId,mayWrite}:{employeeId:string;mayWrit
    </div></form>}
    {error&&<ErrorState>{error}</ErrorState>}
    <FormActions sheet><Button variant="secondary" disabled={busy} onClick={()=>setOpen(false)}><LocalizedText>{'Abbrechen'}</LocalizedText></Button><Button requiresWrite type="submit" form={formId} disabled={busy||!mayWrite||periods.loading||!!periods.error||!currentPeriods.length}><LocalizedText>{'Speichern'}</LocalizedText></Button></FormActions>
-  </FormSheet>
+  </FormPage>
  </section>;
 }

@@ -35,13 +35,14 @@ export async function POST(request:NextRequest){
     const requestKey=request.headers.get("Idempotency-Key");
     const item=await withTenant(s.organizationId,s.userId,async c=>{const write=async()=>{
       const project=cleanText(body.projectName,200),projectId=cleanText(body.projectId,80),customerId=cleanText(body.customerId,80);
-      const found=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query("select id,name,customer_id,status from projects where organization_id=$1 and id=$2 and archived_at is null for share",[s.organizationId,projectId]):await c.query("select id,name,customer_id,status from projects where organization_id=$1 and name=$2 and archived_at is null for share",[s.organizationId,project]);
+      const found=body.projectId===null?{rows:[],rowCount:0}:projectId?await c.query("select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and id=$2 and archived_at is null for share",[s.organizationId,projectId]):await c.query("select id,name,customer_id,status,billing_agreement_id from projects where organization_id=$1 and name=$2 and archived_at is null for share",[s.organizationId,project]);
       if(found.rowCount&&found.rowCount>1)throw new ApiError(409,"ambiguous_project","Bitte einen eindeutigen Auftrag auswählen.");
       if(projectId&&found.rowCount!==1)throw new ApiError(400,"project_invalid","Bitte einen gültigen Auftrag auswählen.");
       if(found.rows[0]&&!projectAllowsTime(found.rows[0].status))throw new ApiError(409,"project_not_active","Für diesen Auftrag können momentan keine Zeiten erfasst werden.");
       const customers=customerId?await c.query("select id from customers where organization_id=$1 and id=$2 and archived_at is null",[s.organizationId,customerId]):null;
       if(customerId&&customers?.rowCount!==1)throw new ApiError(400,"customer_invalid","Bitte einen gültigen Kunden auswählen.");
       if(customerId&&found.rows[0]?.customer_id&&String(found.rows[0].customer_id)!==customerId)throw new ApiError(400,"project_customer_mismatch","Der Auftrag gehört nicht zum gewählten Kunden.");
+      if(body.billable!==false&&found.rows[0]?.billing_agreement_id&&(await c.query('select 1 from billing_closures where organization_id=$1 and agreement_id=$2',[s.organizationId,found.rows[0].billing_agreement_id])).rowCount)throw new ApiError(409,'project_not_active','Für diesen Auftrag können momentan keine Zeiten erfasst werden.');
       const resolvedCustomer=customers?.rows[0]?.id??found.rows[0]?.customer_id??null;
       if(body.billable===true&&!resolvedCustomer)throw new ApiError(400,"billable_customer_required","Verrechenbare Zeiten benötigen einen Kunden.");
       await assertTimeAssignment(c,s,resolvedCustomer,found.rows[0]?.id??null,workDate.toISOString().slice(0,10));
