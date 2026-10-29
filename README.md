@@ -1,5 +1,7 @@
 # Binso One
 
+Aktueller Modul-/Workflow-Abgleich vom 29. Oktober: [Ist–Soll, zentrale Umsetzung und offene Abnahme](docs/architecture/global-workflow-20261029/matrix.md).
+
 Aktueller Einstieg: [Release, Regelrangfolge und offene Abnahmen](docs/current-state.md).
 Historische Lieferberichte sind datierte Nachweise; aktuellen Main und Live-SHA getrennt prüfen.
 

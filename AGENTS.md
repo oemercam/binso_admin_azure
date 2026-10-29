@@ -10,6 +10,19 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # BINso One — binding product and UI rules
 
+## Global module and workflow alignment (29 October 2026)
+
+The current owner assignment is byte-preserved in
+`docs/architecture/global-workflow-20261029/source-original.txt.gz`; the readable
+`source.md` normalizes line endings/whitespace only. Implementation and gaps
+are in `matrix.md` and `validation.md`. Work uses the verified GitHub main on an
+isolated branch in a cloud environment, including a reviewable draft PR. The
+owner cannot install tools on their notebook. Preserve the existing mobile
+navigation and blue FAB, canonical financial/permission engines, historical
+documents and tenant boundaries. No merge, productive migration or deployment
+without separate explicit approval. Historical local-only delivery restrictions
+below describe their dated assignments, not the current cloud work authorization.
+
 ## V8 Global Simple UX & Workflow (27 October 2026)
 
 The full owner reply in docs/architecture/v8-global-simple-workflow/source-full.md

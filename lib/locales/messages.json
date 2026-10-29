@@ -1,4 +1,6 @@
 {
+  "Produkt übernehmen": ["Use product", "Reprendre un produit", "Usa prodotto", "Ürün kullan"],
+  "Ausgabe": ["Expense", "Dépense", "Spesa", "Gider"],
   "Firma vervollständigen": ["Complete company details", "Compléter les informations de l’entreprise", "Completa i dati dell’azienda", "Şirket bilgilerini tamamla"],
   "Bitte melde dich mit E-Mail und Passwort an.": ["Please sign in with email and password.", "Veuillez vous connecter avec votre e-mail et votre mot de passe.", "Accedi con e-mail e password.", "Lütfen e-posta ve parolayla giriş yap."],
   "Die Kundenanmeldung verwendet E-Mail und Passwort.": ["Customer sign-in uses email and password.", "La connexion des clients utilise l’e-mail et le mot de passe.", "L’accesso dei clienti usa e-mail e password.", "Müşteri girişi e-posta ve parolayla yapılır."],

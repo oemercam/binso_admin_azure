@@ -2,6 +2,8 @@
 :is(a,button).document-summary-row{transition:background-color var(--motion-fast) var(--motion-ease)}
 :is(a,button).document-summary-row:active{background:var(--color-subtle)}
 .document-review{max-width:840px;margin-inline:auto}
+.document-review>.form-section{padding-block:var(--space-12)}
+.document-review>.form-section>.section-title{margin-bottom:var(--space-8)}
 .document-review-positions>div{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-block:12px;border-bottom:1px solid var(--color-line)}
 .document-review-positions>div:last-child{border-bottom:0}
 .document-review-positions>div>span{min-width:0;overflow-wrap:anywhere}

@@ -13,10 +13,10 @@ const compile=(file,deps={})=>{
 const react={useState:initial=>[typeof initial==='function'?initial():initial,()=>{}],useRef:value=>({current:value}),useEffect:()=>{},useLayoutEffect:()=>{},useId:()=>':audit:'};
 const {safeAppPath}=compile('lib/navigation.ts');
 let params=new URLSearchParams(),destination;
-const {CustomerForm}=compile('components/pages/customers.tsx',{
+const {CustomerForm}=compile('components/customer-form.tsx',{
  react,'next/navigation':{useSearchParams:()=>params,useRouter:()=>({push:value=>{destination=value}})},
- '@/lib/navigation':{safeAppPath},'../use-dirty-snapshot':{useDirtySnapshot:()=>({dirty:false,markPristine:()=>{}})},
- '../use-process-draft':{useProcessDraft:()=>({ready:true,clear:()=>{}})},
+ '@/lib/navigation':{safeAppPath},'./use-dirty-snapshot':{useDirtySnapshot:()=>({dirty:false,markPristine:()=>{}})},
+ './use-process-draft':{useProcessDraft:()=>({ready:true,clear:()=>{}})},
  '@/lib/client/use-api-query':{useApiQuery:()=>({loading:false,data:undefined,error:null})}
 });
 for(const [id,query,expected] of [
