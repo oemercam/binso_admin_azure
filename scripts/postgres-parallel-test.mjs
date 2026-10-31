@@ -1,4 +1,5 @@
-import {billingAgreementModuleUrl,billingModelModuleUrl} from './data-test-modules.mjs';
+import {reconcileFixtureQuotas} from './fixtures/template-access.mjs';
+import {billingAgreementModuleUrl,billingModelModuleUrl,timerDaysModuleUrl} from './data-test-modules.mjs';
 import {expensePaymentModuleUrl} from './data-test-modules.mjs';
 import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
 import assert from 'node:assert/strict';
@@ -66,6 +67,9 @@ try{
  const session={organizationId,userId:'v213-parallel-fixture',name:'Concurrency fixture',role:'owner'};
  await pool.query("insert into app_users(id,email,display_name,status) values($1,'parallel@fixture.invalid','Concurrency fixture','active')",[session.userId]);
  await pool.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,'parallel@fixture.invalid','owner','active')",[organizationId,session.userId]);
+ const {planCatalog}=await import(planCatalogModuleUrl),limits=planCatalog.pro.limits;
+ await pool.query('insert into organization_entitlements(organization_id,features,max_users,max_storage_mb,max_monthly_documents,max_api_requests_per_month) values($1,$2,$3,$4,$5,$6) on conflict(organization_id) do update set features=excluded.features,max_users=excluded.max_users,max_storage_mb=excluded.max_storage_mb,max_monthly_documents=excluded.max_monthly_documents,max_api_requests_per_month=excluded.max_api_requests_per_month',[organizationId,planCatalog.pro.features,limits.users,limits.storageMb,limits.monthlyDocuments,limits.monthlyApiRequests]);
+ await reconcileFixtureQuotas(pool,organizationId);
  const customer=(await pool.query('select id from customers where organization_id=$1 and archived_at is null order by id limit 1',[organizationId])).rows[0];assert.ok(customer);
  const txn=async fn=>{const c=await pool.connect();try{await c.query('begin');await c.query("select set_config('app.organization_id',$1,true),set_config('app.user_id',$2,true)",[organizationId,session.userId]);const result=await fn(c);await c.query('commit');return result;}catch(error){await c.query('rollback');throw error;}finally{c.release();}};
  // Six physical clients retry the same customer request; the counter advances once.
@@ -128,7 +132,7 @@ try{
  globalThis.__parallelTimerSession={...session,email:'timer@fixture.invalid'};
  const timerHttp=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}} export const assertSameOrigin=()=>{};export const cleanText=v=>typeof v==="string"?v:"";export const readJson=async r=>r.body;export const json=data=>data;export const apiError=e=>{throw e}');
  const workforce=await compile('lib/server/workforce-access.ts',{'./http':timerHttp,'./rbac':rbac});
- const timer=await import(await compile('app/api/time-tracker/route.ts',{'@/lib/financial-status':financialModuleUrl,'@/lib/server/workforce-access':workforce,'@/lib/projects':moduleUrl(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelTimerSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':timerHttp}));
+ const timer=await import(await compile('app/api/time-tracker/route.ts',{'@/lib/timer-days':timerDaysModuleUrl,'@/lib/server/audit':audit,'@/lib/financial-status':financialModuleUrl,'@/lib/server/workforce-access':workforce,'@/lib/projects':moduleUrl(await fs.readFile('lib/projects.ts','utf8')),'@/lib/server/session':moduleUrl('export async function requireSession(){return globalThis.__parallelTimerSession}'),'@/lib/server/rbac':rbac,'@/lib/server/db':scopedDb,'@/lib/server/http':timerHttp}));
  const baseline=(await pool.query('select count(*)::int n from time_entries where organization_id=$1 and created_by_user_id=$2',[organizationId,session.userId])).rows[0].n;
  await Promise.all([0,1].map(()=>timer.POST({body:{action:'start',project:'Interne Planung',customerId:null,projectId:null}})));
  assert.equal((await pool.query('select count(*)::int n from active_time_trackers where organization_id=$1 and user_id=$2',[organizationId,session.userId])).rows[0].n,1,'Concurrent devices share exactly one timer');
