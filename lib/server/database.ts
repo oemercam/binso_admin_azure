@@ -85,7 +85,8 @@ export async function tenantUpdate<T extends Row>(table:string,id:string,data:T)
   if(['approved','rejected'].includes(next)){
    if(!['owner','admin','project_manager','manager'].includes(s.role))throw new ApiError(403,"approval_forbidden","Keine Berechtigung zur Freigabe.");
    if(current.status!=='submitted')throw new ApiError(409,"submission_required","Die Spese muss zuerst eingereicht werden.");
-   if(current.created_by_user_id===s.userId)throw new ApiError(403,"self_approval_forbidden","Eigene Spesen müssen durch eine andere berechtigte Person geprüft werden.");
+   const beneficiary=(await c.query('select user_id from employees where organization_id=$1 and id=$2',[s.organizationId,current.employee_id])).rows[0]?.user_id;
+   if(current.created_by_user_id===s.userId||beneficiary===s.userId)throw new ApiError(403,"self_approval_forbidden","Eigene Spesen müssen durch eine andere berechtigte Person geprüft werden.");
    await c.query("update expenses set reviewed_at=now(),reviewed_by_user_id=$3 where organization_id=$1 and id=$2",[s.organizationId,current.id,s.userId]);
   }
   await audit(c,{organizationId:s.organizationId,userId:s.userId,action:'expense.updated',entityType:'expenses',entityId:current.id,metadata:{previous:current.status,status:next,previousPaymentKind:current.payment_kind,paymentKind:translated.data.payment_kind??current.payment_kind}});

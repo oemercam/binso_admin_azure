@@ -8,7 +8,7 @@ import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {createHash,createHmac,createCipheriv,randomBytes} from 'node:crypto';
 import pg from 'pg';
-import {moduleUrl,financialModuleUrl} from './data-test-modules.mjs';
+import {moduleUrl,financialModuleUrl,planCatalogModuleUrl} from './data-test-modules.mjs';
 
 const address=process.env.BINSO_DB_PARALLEL_TEST_URL;
 if(!address)throw new Error('Explicit isolated PostgreSQL URL required');
@@ -24,12 +24,15 @@ try{
  await prepareHistoricalFixtureOwner(pool);
  const http=moduleUrl('export class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code}}');
  const demo=await import(moduleUrl((await fs.readFile('scripts/fixtures/business-data.ts','utf8')).replace('import "server-only";','').replace("'../../lib/server/http'",JSON.stringify(http))));
+ const {planCatalog}=await import(planCatalogModuleUrl);
+ const limits=planCatalog.pro.limits;
  const roles=['owner','admin','finance','hr','project_manager','manager','member','reader'];
  const organizations=['00000000-0000-4000-8000-000000000071','00000000-0000-4000-8000-000000000072'];
  const cookies=new Map();
  for(const [index,organizationId] of organizations.entries()){
   await pool.query("insert into organizations(id,name,slug,is_demo,status) values($1,$2,$3,true,'active')",[organizationId,'HTTP synthetic '+index,'http-synthetic-'+index]);
   await pool.query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active')",[organizationId]);
+  await pool.query('insert into organization_entitlements(organization_id,features,max_users,max_storage_mb,max_monthly_documents,max_api_requests_per_month) values($1,$2,$3,$4,$5,$6)',[organizationId,planCatalog.pro.features,limits.users,limits.storageMb,limits.monthlyDocuments,limits.monthlyApiRequests]);
   for(const role of roles){
    const user='http-'+index+'-'+role,token=randomBytes(32).toString('base64url');
    await pool.query("insert into app_users(id,email,display_name,status,mfa_enabled) values($1,$2,$1,'active',true)",[user,user+'@fixture.invalid']);

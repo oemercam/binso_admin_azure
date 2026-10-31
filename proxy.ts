@@ -2,6 +2,8 @@ import {maintenanceState} from "./lib/server/maintenance";
 import {asLocale,localeCookie,locales} from "./lib/locales/config";
 import { NextRequest, NextResponse } from "next/server";
 import {validOperatorSection} from './lib/operator-pages';
+import {isBudgetedApi,requireApiBudget} from './lib/server/api-budget';
+import {apiError} from './lib/server/http';
 
 const protectedPrefixes=[
   "/dashboard","/kunden","/angebote","/rechnungen","/zahlungen","/produkte",
@@ -25,6 +27,9 @@ function routeProxy(request:NextRequest,headers:Headers){
 }
 
 export async function proxy(request:NextRequest){
+ if(isBudgetedApi(request.nextUrl.pathname)){
+  try{await requireApiBudget(request.cookies.get(process.env.SESSION_COOKIE_NAME||'binso_session')?.value);return NextResponse.next();}catch(error){return apiError(error);}
+ }
  const requested=request.nextUrl.searchParams.get('lang');
  const explicit=locales.includes(requested as typeof locales[number]);
  const headers=new Headers(request.headers);
@@ -38,6 +43,7 @@ export async function proxy(request:NextRequest){
 
 export const config={
   matcher:[
+    "/api/:path*",
     "/","/angebot","/bericht","/opengraph-image","/produkt","/preise","/login","/registrieren","/portal/:path*","/demo","/agb","/datenschutz","/impressum","/auftragsbearbeitung","/unterauftragsbearbeiter","/email-bestaetigen","/einladung","/passwort-vergessen","/passwort-zuruecksetzen",
     "/operator/:path*","/dev/:path*","/dashboard/:path*","/kunden/:path*","/angebote/:path*","/rechnungen/:path*",
     "/zahlungen/:path*","/produkte/:path*","/mitarbeiter/:path*","/abwesenheiten/:path*","/spesen/:path*",

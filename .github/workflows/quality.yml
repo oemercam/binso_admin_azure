@@ -145,6 +145,12 @@ jobs:
           node scripts/auth-integrity-test.mjs --postgres
           node scripts/registration-test.mjs --postgres
           node scripts/passkey-test.mjs --postgres
+      - name: Native resource quota concurrency
+        env:
+          BINSO_QUOTA_TEST_URL: postgres://binso_test:binso_test@127.0.0.1:5432/binso_quota_review_test
+        run: |
+          node --input-type=module -e "import pg from 'pg';const c=new pg.Client({connectionString:new URL('/postgres',process.env.BINSO_QUOTA_TEST_URL).href});await c.connect();try{await c.query('create database binso_quota_review_test')}finally{await c.end()}"
+          node scripts/resource-quota-test.mjs
       - run: pnpm lint
       - run: pnpm css:check
       - run: pnpm typecheck

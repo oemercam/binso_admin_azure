@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {moduleUrl} from './data-test-modules.mjs';
+const {timerDays,confirmLegacyTimerDays}=await import(moduleUrl(await fs.readFile('lib/timer-days.ts','utf8')));
+const running=(start,end,days={},accumulated=0)=>timerDays({state:'running',active_since:start,day_seconds:days,accumulated_seconds:accumulated},Date.parse(end));
+assert.deepEqual(running('2026-10-31T22:50:00Z','2026-10-31T23:10:00Z').days,{'2026-10-31':600,'2026-11-01':600});
+assert.deepEqual(running('2026-12-31T22:50:00Z','2026-12-31T23:10:00Z').days,{'2026-12-31':600,'2027-01-01':600});
+assert.deepEqual(running('2026-03-28T23:00:00Z','2026-03-29T22:00:00Z').days,{'2026-03-29':23*3600});
+assert.deepEqual(running('2026-10-24T22:00:00Z','2026-10-25T23:00:00Z').days,{'2026-10-25':25*3600});
+const paused=timerDays({state:'paused',active_since:null,accumulated_seconds:600,day_seconds:{'2026-10-31':600}},Date.parse('2026-11-01T10:00:00Z'));
+assert.equal(paused.seconds,600,'A pause across midnight accrues no time');
+assert.deepEqual(running('2026-11-01T09:00:00Z','2026-11-01T09:10:00Z',paused.days,600).days,{'2026-10-31':600,'2026-11-01':600});
+assert.equal(running('2026-11-01T09:00:00Z','2026-11-01T09:10:00Z',{},1800).legacySeconds,1800,'Never invent the dates of legacy pauses');
+assert.deepEqual(confirmLegacyTimerDays([{date:'2026-10-30',seconds:600},{date:'2026-10-31',seconds:1200}],1800,'2026-10-30','2026-10-31'),{'2026-10-30':600,'2026-10-31':1200});
+for(const values of [[{date:'2026-02-30',seconds:1800}],[{date:'2026-10-29',seconds:1800}],[{date:'2026-10-30',seconds:1799}],[{date:'2026-10-30',seconds:900},{date:'2026-10-30',seconds:900}]])assert.throws(()=>confirmLegacyTimerDays(values,1800,'2026-10-30','2026-10-31'));
+console.log('Timer: Swiss midnight/month/year, 23/25-hour DST days, pauses, conserved seconds and explicit legacy dates passed.');

@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import './portable-paths-test.mjs';
 
 const root=process.cwd();
 const retiredBackend=["sup","abase"].join("");

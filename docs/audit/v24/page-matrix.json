@@ -18310,6 +18310,7 @@
         "components/statistic-period-picker.tsx#StatisticPeriodPicker",
         "components/statistic-period-picker.tsx#labels",
         "components/timer-controls.tsx#TimerControls",
+        "components/timer-date-confirmation.tsx#TimerDateConfirmation",
         "components/ui.tsx#Toast",
         "components/ui.tsx#subscribeToastHost",
         "components/ui.tsx#toastHost",

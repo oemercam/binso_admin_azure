@@ -1,4 +1,4 @@
-import {billingAgreementModuleUrl,billingModelModuleUrl} from './data-test-modules.mjs';
+import {billingAgreementModuleUrl,billingModelModuleUrl,timerDaysModuleUrl} from './data-test-modules.mjs';
 import {expensePaymentModuleUrl} from './data-test-modules.mjs';
 import {planCatalogModuleUrl,planAccessModuleUrl} from './data-test-modules.mjs';
 import {prepareHistoricalFixtureOwner} from './fixtures/template-access.mjs';
@@ -68,7 +68,7 @@ try{
  const before=(await db.query('select count(*)::int n from payments')).rows[0].n;
  await db.exec('begin');await db.exec(await fs.readFile('database/migrations/0023_finance_and_demo_fixture.sql','utf8'));await db.exec('commit');
  assert.equal((await db.query('select count(*)::int n from payments')).rows[0].n,before);
- const dataModule=source=>{const compiled=ts.transpileModule(source.replaceAll("'../billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'./billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'@/lib/billing-model'",JSON.stringify(billingModelModuleUrl)).replaceAll("'@/lib/server/billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'@/config/plan-access'",JSON.stringify(planAccessModuleUrl)).replaceAll('"@/config/plan-access"',JSON.stringify(planAccessModuleUrl)).replaceAll("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)).replaceAll('"@/config/plans"',JSON.stringify(planCatalogModuleUrl)),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;const unresolved=compiled.match(/from ["'](@[/][^"']+)["']/);if(unresolved)throw new Error('Unmapped test dependency: '+unresolved[1]);return 'data:text/javascript;base64,'+Buffer.from(compiled).toString('base64')};
+ const dataModule=source=>{const compiled=ts.transpileModule(source.replaceAll("'@/lib/timer-days'",JSON.stringify(timerDaysModuleUrl)).replaceAll('"@/lib/timer-days"',JSON.stringify(timerDaysModuleUrl)).replaceAll("'../billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'./billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'@/lib/billing-model'",JSON.stringify(billingModelModuleUrl)).replaceAll("'@/lib/server/billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replaceAll("'@/config/plan-access'",JSON.stringify(planAccessModuleUrl)).replaceAll('"@/config/plan-access"',JSON.stringify(planAccessModuleUrl)).replaceAll("'@/config/plans'",JSON.stringify(planCatalogModuleUrl)).replaceAll('"@/config/plans"',JSON.stringify(planCatalogModuleUrl)),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;const unresolved=compiled.match(/from ["'](@[/][^"']+)["']/);if(unresolved)throw new Error('Unmapped test dependency: '+unresolved[1]);return 'data:text/javascript;base64,'+Buffer.from(compiled).toString('base64')};
  const permissions=dataModule(await fs.readFile('lib/permissions.ts','utf8'));
  const audit=dataModule((await fs.readFile('lib/server/audit.ts','utf8')).replace("'../billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replace("'./billing-agreements'",JSON.stringify(billingAgreementModuleUrl)).replace("'@/lib/billing-model'",JSON.stringify(billingModelModuleUrl)).replace('import "server-only";',''));
  const http=dataModule('export class ApiError extends Error {constructor(status,code,message){super(message);this.status=status;this.code=code}}');
@@ -471,15 +471,15 @@ try{
  const workforceSource=(await fs.readFile('lib/server/workforce-access.ts','utf8')).replace("import 'server-only';",'').replace("'./http'",JSON.stringify(timerHttp)).replace("'./rbac'",JSON.stringify(dataModule('export const authorize=()=>{};')));
  const workforceModule=dataModule(workforceSource);
  let timerSource=await fs.readFile('app/api/time-tracker/route.ts','utf8');
- const timerDependencies={"@/lib/financial-status":financialModule,"@/lib/server/workforce-access":workforceModule,"@/lib/projects":dataModule(await fs.readFile("lib/projects.ts","utf8")),"@/lib/server/session":dataModule('export const requireSession=async()=>globalThis.__timerSession;'),"@/lib/server/rbac":dataModule('export const authorize=()=>{};'),"@/lib/server/db":dataModule('export const withTenant=(...args)=>globalThis.__timerTenant(...args);'),"@/lib/server/http":timerHttp};
- for(const [key,url] of Object.entries(timerDependencies))timerSource=timerSource.replaceAll(JSON.stringify(key),JSON.stringify(url));
+ const timerDependencies={"@/lib/timer-days":dataModule(await fs.readFile('lib/timer-days.ts','utf8')),"@/lib/server/audit":audit,"@/lib/financial-status":financialModule,"@/lib/server/workforce-access":workforceModule,"@/lib/projects":dataModule(await fs.readFile("lib/projects.ts","utf8")),"@/lib/server/session":dataModule('export const requireSession=async()=>globalThis.__timerSession;'),"@/lib/server/rbac":dataModule('export const authorize=()=>{};'),"@/lib/server/db":dataModule('export const withTenant=(...args)=>globalThis.__timerTenant(...args);'),"@/lib/server/http":timerHttp};
+ for(const [key,url] of Object.entries(timerDependencies))timerSource=timerSource.replaceAll(JSON.stringify(key),JSON.stringify(url)).replaceAll("'"+key+"'",JSON.stringify(url));
  const timer=await import(dataModule(timerSource));
  await db.query("select set_config('app.organization_id',$1,false)",[timerSession.organizationId]);
  const timerCustomer=(await db.query('select id from customers where organization_id=$1 order by id limit 1',[timerSession.organizationId])).rows[0].id;
  const started=await timer.POST({body:{action:'start',project:'Direct customer work',customerId:timerCustomer,projectId:null}});
  assert.equal(started.tracker.customer_id,timerCustomer);
  assert.equal((await timer.GET()).tracker.customer_id,timerCustomer,'Reload retains customer without a project');
- await db.query('update active_time_trackers set accumulated_seconds=3600,active_since=now() where organization_id=$1 and user_id=$2',[timerSession.organizationId,timerSession.userId]);
+ await db.query("update active_time_trackers set accumulated_seconds=3600,day_seconds=jsonb_build_object((now() at time zone 'Europe/Zurich')::date::text,3600),active_since=now() where organization_id=$1 and user_id=$2",[timerSession.organizationId,timerSession.userId]);
  assert.equal((await timer.POST({body:{action:'project',project:'Other work',customerId:null,projectId:null}})).error,'tracker_context_locked');
  const paused=await timer.POST({body:{action:'pause'}});assert.equal(paused.tracker.customer_id,timerCustomer);assert.equal(paused.tracker.state,'paused');
  const finished=await timer.POST({body:{action:'finish'}});assert.ok(finished.item.id);
@@ -488,7 +488,7 @@ try{
  assert.equal((await timer.GET()).tracker,null);
  const internal=await timer.POST({body:{action:'start',project:'Internal work',customerId:null,projectId:null}});assert.equal(internal.tracker.billable,false);
  const invalid=await timer.POST({body:{action:'project',project:'Invalid',customerId:'00000000-0000-4000-8000-000000000001',projectId:null}});assert.equal(invalid.error,'customer_invalid');
- await db.query("update active_time_trackers set state='paused', accumulated_seconds=1,active_since=null where organization_id=$1 and user_id=$2",[timerSession.organizationId,timerSession.userId]);
+ await db.query("update active_time_trackers set state='paused', accumulated_seconds=1,day_seconds=jsonb_build_object((now() at time zone 'Europe/Zurich')::date::text,1),active_since=null where organization_id=$1 and user_id=$2",[timerSession.organizationId,timerSession.userId]);
  const shortFinished=await timer.POST({body:{action:'finish'}});
  assert.ok(shortFinished.item.id,'A one-second timer must create a valid entry');
  assert.ok(Math.abs(Number(shortFinished.item.hours)*3600-1)<0.002,'Timer seconds must survive database persistence');
@@ -1098,7 +1098,7 @@ try{
  const startedProjectTimer=await projectTimer.POST({body:{action:'start',project:'Cloud Migration',projectId:projectCreated.data.item.id}});assert.equal(startedProjectTimer.status,200,JSON.stringify(startedProjectTimer));
  const closingBody={...updateBody,version:updatedProject.data.item.version,status:'completed'};
  assert.equal((await projectDetailHandler.PATCH({body:closingBody},projectParams)).status,409,'A running timer prevents closing the project');
- await db.query('update active_time_trackers set accumulated_seconds=60,active_since=now() where organization_id=$1 and user_id=$2',[demo,savedProjectSession.userId]);assert.equal((await projectTimer.POST({body:{action:'finish'}})).status,200);
+ await db.query("update active_time_trackers set accumulated_seconds=60,day_seconds=jsonb_build_object((now() at time zone 'Europe/Zurich')::date::text,60),active_since=now() where organization_id=$1 and user_id=$2",[demo,savedProjectSession.userId]);assert.equal((await projectTimer.POST({body:{action:'finish'}})).status,200);
  const closedProject=await projectDetailHandler.PATCH({body:closingBody},projectParams);assert.equal(closedProject.status,200);
  assert.equal((await manualTimeHandler.POST({headers:new Headers(),body:{projectId:projectCreated.data.item.id,durationMinutes:60,startedAt:'2026-10-01'}})).status,409,'Closed projects cannot receive new manual time');
  assert.equal((await projectTimer.POST({body:{action:'start',project:'Cloud Migration',projectId:projectCreated.data.item.id}})).status,409,'Closed projects cannot start new timers');
