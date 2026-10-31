@@ -43,6 +43,27 @@ export async function verifyExpensePaymentContract({load,db,transaction,org,othe
  assert.equal((await pay(privateId,'DIFFERENT-PAYMENT')).status,409);
  item=(await (await read(privateId)).json()).item;assert.equal(item.claim_status,'reimbursed');
  assert.equal(item.reimbursement_paid_on,'2026-10-22');assert.equal(Number(item.reimbursement_amount),42.35);assert.equal(item.reimbursement_currency,'CHF');
+ const finance=load('lib/server/repositories/finance.ts');
+ const cash=await transaction(org,'employee-dossier-finance',c=>finance.cashStatisticsData(c,org));
+ assert.equal(Number(cash.outflows.find(row=>row.payment_date==='2026-10-22')?.amount),42.35,'Cash uses the real payment date, not the later confirmation timestamp');
+ const reports=load('lib/server/repositories/reports.ts'),reportActor=as('finance');
+ const report=await transaction(org,reportActor.userId,c=>reports.reportSummary(c,reportActor,{from:'2026-10-22',to:'2026-10-22'},'business'));
+ assert.equal(Number(report.expenses.find(row=>row.currency==='CHF')?.amount),42.35,'Report periods use the same real payment evidence');
+
+ // The beneficiary must not review an expense created on their behalf.
+ const beneficiary=(await db.query("insert into employees(organization_id,external_id,name,role,employment_type,user_id) values($1,$2,'Review beneficiary','employee','salary','employee-dossier-admin') returning id",[org,randomUUID()])).rows[0].id;
+ as('owner');const delegated=await post({...input,paymentKind:'private',employeeId:beneficiary});assert.equal(delegated.status,201,await delegated.clone().text());
+ const delegatedId=(await delegated.json()).item.id;as('admin');
+ assert.equal((await patch(delegatedId,{...input,employeeId:beneficiary,status:'approved',paymentKind:'private'})).status,403,'Beneficiary cannot review a delegated claim');
+ await assert.rejects(()=>transaction(org,'employee-dossier-admin',c=>c.query("update expenses set status='approved' where id=$1",[delegatedId])),e=>e.code==='42501','Database independently excludes the beneficiary');
+ const reviewer='expense-independent-reviewer';
+ await db.query("insert into app_users(id,email,display_name,status) values($1,$2,'Independent reviewer','active')",[reviewer,reviewer+'@example.invalid']);
+ await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,'admin','active')",[org,reviewer,reviewer+'@example.invalid']);
+ as('admin',org,{userId:reviewer});
+ assert.equal((await patch(delegatedId,{...input,employeeId:beneficiary,status:'approved',paymentKind:'private'})).status,200,'An independent authorized reviewer can still approve');
+ await db.query('update employees set archived_at=now() where id=$1',[beneficiary]);
+ await db.query("update organization_memberships set status='suspended' where organization_id=$1 and user_id=$2",[org,reviewer]);
+ as('finance');
  for(const change of ["reimbursed_at=null","reimbursement_reference='ALTERED'","reimbursement_amount=1","reimbursement_paid_on='2026-10-21'"])await assert.rejects(()=>transaction(org,'employee-dossier-finance',c=>c.query('update expenses set '+change+' where id=$1',[privateId])),e=>e.code==='23514','Recorded evidence cannot be rewritten');
  for(const kind of ['company_card','company_direct','unknown']){
   const id=await create(kind);await approve(id,kind);as('finance');

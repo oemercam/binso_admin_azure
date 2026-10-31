@@ -114,7 +114,10 @@
     "0110_shared_billing_agreements.sql",
     "0111_billing_completion.sql",
     "0112_consolidated_billing.sql",
-    "0113_variable_advance_allocations.sql"
+    "0113_variable_advance_allocations.sql",
+    "0114_expense_beneficiary_review.sql",
+    "0115_resource_quotas.sql",
+    "0116_timer_calendar_days.sql"
   ],
   "tables": [
     {
@@ -422,6 +425,11 @@
           "name": "customer_id",
           "type": "uuid",
           "required": false
+        },
+        {
+          "name": "day_seconds",
+          "type": "jsonb",
+          "required": true
         }
       ],
       "policies": [
@@ -6709,6 +6717,51 @@
           "roles": "{public}",
           "qual": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
           "with_check": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)"
+        }
+      ]
+    },
+    {
+      "name": "organization_quota_usage",
+      "rls": true,
+      "forced": true,
+      "columns": [
+        {
+          "name": "organization_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "period",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "used",
+          "type": "bigint",
+          "required": true
+        },
+        {
+          "name": "api_requests",
+          "type": "bigint",
+          "required": true
+        }
+      ],
+      "policies": [
+        {
+          "policyname": "quota_accounting",
+          "cmd": "ALL",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (CURRENT_USER = pg_get_userbyid(( SELECT pg_class.relowner\n   FROM pg_class\n  WHERE (pg_class.oid = ('organization_quota_usage'::regclass)::oid)))))",
+          "with_check": "((organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid) AND (CURRENT_USER = pg_get_userbyid(( SELECT pg_class.relowner\n   FROM pg_class\n  WHERE (pg_class.oid = ('organization_quota_usage'::regclass)::oid)))))"
+        },
+        {
+          "policyname": "quota_read",
+          "cmd": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": "{public}",
+          "qual": "(organization_id = (NULLIF(current_setting('app.organization_id'::text, true), ''::text))::uuid)",
+          "with_check": null
         }
       ]
     },

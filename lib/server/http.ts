@@ -75,6 +75,10 @@ export function apiError(error:unknown){
   }
   if(error instanceof ApiError) return json({error:error.code,message:error.message},error.status,error.headers);
   const code=error&&typeof error==='object'&&'code' in error?String(error.code):'';
+  if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error){
+    if(error.constraint==='organization_storage_quota')return json({error:'storage_quota_exceeded',message:'Das Speicherkontingent ist ausgeschöpft oder muss vor weiteren Uploads geprüft werden.'},409);
+    if(error.constraint==='organization_document_quota')return json({error:'document_quota_exceeded',message:'Das monatliche Dokumentkontingent ist ausgeschöpft.'},409);
+  }
   if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error&&error.constraint==='monthly_time_no_overlap')return json({error:'time_overlap',message:'Für diesen Mitarbeiter und Kunden bestehen bereits Zeiten im gewählten Monat. Einzelzeiten und Monatsrapport dürfen sich nicht überschneiden.'},409);
   if(code==='23514'&&error&&typeof error==='object'&&'constraint' in error&&error.constraint==='time_minutes_available')return json({error:'time_minutes_reserved',message:'Die gewählten Minuten sind bereits reserviert. Bitte die Restmenge neu laden.'},409);
   const databaseErrors:Record<string,{status:number;code:string;message:string}>={

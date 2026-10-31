@@ -44,7 +44,14 @@ assert.deepEqual(await operator.requireOperator(),{role:actual.role,identity:{na
 const previousCookieName=process.env.SESSION_COOKIE_NAME;process.env.SESSION_COOKIE_NAME='normal_session';
 try{
  const response=kind=>({kind,headers:new Headers(kind==='next'?{'x-middleware-next':'1'}:{}),cookies:{set(){}}});
+ let budgetAllowed=true,budgetCalls=0;
+ const budget=await load('lib/server/api-budget.ts',{
+  'server-only':{},'./session':{getSessionByToken:async token=>token==='valid-budget-token'?{organizationId:'budget-org',userId:'budget-user'}:null},
+  './db':{withTenant:async(org,user,fn)=>{assert.equal(org,'budget-org');assert.equal(user,'budget-user');return fn({query:async sql=>{assert.equal(sql,'select consume_organization_api_request() allowed');budgetCalls++;return {rows:[{allowed:budgetAllowed}]};}});}},
+  './http':{ApiError:class extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code;}}},
+ });
  const proxyModule=await load('proxy.ts',{
+  './lib/server/api-budget':budget,'./lib/server/http':{apiError:error=>({kind:'error',status:error.status,code:error.code})},
   './lib/server/maintenance':{maintenanceState:async()=>({enabled:false})},
   './lib/locales/config':{asLocale:x=>x,localeCookie:'fixture_locale',locales:['de','fr','it','en']},
   './lib/operator-pages':{validOperatorSection:()=>true},
@@ -57,5 +64,11 @@ try{
   assert.equal((await proxyModule.proxy(request(route,new Map([['normal_session','opaque-server-validated-session']])))).kind,'next','Normal cookie presence reaches authoritative server validation');
  }
  assert.equal((await proxyModule.proxy(request('/produkt',legacy))).kind,'next','Public product access remains public');
+ const budgetCookie=new Map([['normal_session','valid-budget-token']]);
+ assert.equal((await proxyModule.proxy(request('/api/customers',budgetCookie))).kind,'next');assert.equal(budgetCalls,1,'One charge at the business request boundary');
+ budgetAllowed=false;const exhausted=await proxyModule.proxy(request('/api/customers',budgetCookie));assert.equal(exhausted.status,429);assert.equal(exhausted.code,'api_quota_exceeded');
+ const charges=budgetCalls;
+ for(const route of ['/api/auth/login','/api/auth/password','/api/billing/checkout','/api/settings/profile','/api/support/tickets','/api/health','/api/public/offer','/api/operator/dashboard'])assert.equal((await proxyModule.proxy(request(route,budgetCookie))).kind,'next','Exhaustion cannot lock out recovery, billing, support or operators');
+ await proxyModule.proxy(request('/api/customers',new Map()));assert.equal(budgetCalls,charges,'Anonymous requests are left to authoritative route authentication, never charged');
 }finally{if(previousCookieName===undefined)delete process.env.SESSION_COOKIE_NAME;else process.env.SESSION_COOKIE_NAME=previousCookieName;}
 console.log('Demo retirement: all six URLs reject legacy access; demo cookies cannot authenticate; normal sessions and operator authorization remain validated.');

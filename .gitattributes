@@ -1,0 +1,7 @@
+# Workflow source parsers use LF on every platform. Keep migration checksums and
+# executable test fixtures byte-for-byte, including deliberate CRLF countercases.
+# Preserve archived source/evidence bytes so their integrity hashes are portable.
+/.github/** text eol=lf
+/scripts/** -text
+/database/migrations/** -text
+/docs/** -text

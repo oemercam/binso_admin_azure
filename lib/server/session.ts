@@ -76,6 +76,11 @@ export async function endDemoSession(){
 export async function getSession(_options:{allowMfaEnrollment?:boolean}={}):Promise<SessionUser|null>{
  const jar=await cookies();
  const token=jar.get(env.sessionCookieName)?.value;
+ return getSessionByToken(token);
+}
+
+/** Proxy has a NextRequest, not the route's next/headers request scope. */
+export async function getSessionByToken(token:string|undefined):Promise<SessionUser|null>{
  if(!token)return null;
  const result=await withTransaction(async client=>{
    const context=(await client.query<{user_id:string;organization_id:string}>("select user_id,organization_id from auth_sessions where token_hash=$1 and expires_at>now() limit 1",[tokenHash(token)])).rows[0];

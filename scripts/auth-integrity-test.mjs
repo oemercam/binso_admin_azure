@@ -147,6 +147,15 @@ try{
  recorded.length=0;const legacyResponse=await finance.GET(new Request('https://fixture.invalid/api/finance'));assert.equal(legacyResponse.status,200);assert.ok((await legacyResponse.json()).payments,'Default external API contract preserved');assert.equal(recorded.filter(sql=>sql.startsWith('select')&&!sql.includes('set_config')).length,9);
  await query("insert into organization_subscriptions(organization_id,plan,status) values($1,'professional','active') on conflict(organization_id) do update set plan='professional'",[sessionInput.organizationId]);
  const files=await import(await load('app/api/files/route.ts'));
+ // The historical fixture acquires its first real owner only after migrations.
+ // Reconcile its existing retained bytes before exercising authenticated uploads.
+ await query(`insert into organization_quota_usage(organization_id,period,used)
+ select $1,'storage',coalesce(sum(n),0) from (
+  select octet_length(body)::bigint n from file_contents where organization_id=$1
+  union all select octet_length(pdf)::bigint from offer_versions where organization_id=$1
+  union all select octet_length(pdf)::bigint from invoice_versions where organization_id=$1
+  union all select octet_length(pdf)::bigint from report_exports where organization_id=$1
+ ) inventory on conflict(organization_id,period) do nothing`,[org]);
  const upload=(text,key)=>{const form=new FormData();form.append('file',new File([text],'synthetic.txt',{type:'text/plain'}));form.append('purpose','document');return new Request('https://fixture.invalid/api/files',{method:'POST',headers:{'idempotency-key':key},body:form});};
  const first=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(first.status,201);const uploaded=(await first.json()).item;assert.equal(uploaded.available,false);
  const replay=await files.POST(upload('synthetic bytes','synthetic-upload-replay'));assert.equal(replay.status,201);assert.equal((await replay.json()).item.id,uploaded.id);

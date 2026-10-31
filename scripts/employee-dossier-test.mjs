@@ -14,6 +14,7 @@ import {PGlite} from '@electric-sql/pglite';
 import {pgcrypto} from '@electric-sql/pglite/contrib/pgcrypto';
 import {verifySupplierContract} from './supplier-contract.mjs';
 import {verifyExpensePaymentContract} from './expense-payment-contract.mjs';
+import {verifyTimerCalendar} from './timer-calendar-contract.mjs';
 import {verifySupplierBankContract} from './supplier-bank-contract.mjs';
 import {verifyEmployeeIdentityContract} from './employee-identity-contract.mjs';
 import {verifyInvitationContract} from './invitation-contract.mjs';
@@ -47,7 +48,8 @@ function load(file){
 const mock=(file,exports)=>overrides.set(path.resolve(file),exports),unavailable=()=>{throw Error('Unrelated platform operation must not be called');};
 const db=new PGlite({extensions:{pgcrypto}}),org=randomUUID(),other=randomUUID();
 // Match pg.PoolClient's result shape; PGlite names command counts affectedRows.
-const client={query:async(...args)=>{const result=await db.query(...args);return {...result,rowCount:result.rows.length||result.affectedRows||0};}};
+let lastSqlError,timerClock=null;
+const client={query:async(...args)=>{try{const result=await db.query(...args);if(timerClock!==null&&args[0].includes('now() as measured_at'))for(const row of result.rows)row.measured_at=new Date(timerClock);return {...result,rowCount:result.rows.length||result.affectedRows||0};}catch(error){lastSqlError={code:error.code,message:error.message,query:args[0]};throw error;}}};
 let session,auditFailure=false,tenantDepth=0;
 const transaction=async(organizationId,userId,fn,options={})=>{
  // PGlite has one connection. Emulate a separate nested READ transaction's
@@ -108,12 +110,17 @@ try{
  for(const id of [org,other]){
   await db.query("insert into organizations(id,name,slug) values($1,'Synthetic dossier',$2)",[id,'dossier-'+id]);
   await db.query("insert into organization_subscriptions(organization_id,plan,status,billing_interval,unit_amount_chf) values($1,'business','active','monthly',69)",[id]);
+  const limits=load('lib/subscription-plans.ts').subscriptionEntitlements('business');
+  await db.query('insert into organization_entitlements(organization_id,features,max_users,max_storage_mb,max_monthly_documents,max_api_requests_per_month) values($1,$2,$3,$4,$5,$6)',[id,limits.features,limits.users,limits.storageMb,limits.monthlyDocuments,limits.monthlyApiRequests]);
  }
  for(const role of ['owner','admin','hr','finance','project_manager','manager','member','reader']){
   const id='employee-dossier-'+role;
   await db.query("insert into app_users(id,email,display_name,status) values($1,$2,'Synthetic','active')",[id,id+'@example.invalid']);
   await db.query("insert into organization_memberships(organization_id,user_id,email,role,status) values($1,$2,$3,$4,'active')",[org,id,id+'@example.invalid',role]);
  }
+ if(process.argv.includes('--timer-only')){
+  await verifyTimerCalendar({load,db,transaction,act,request,setAuditFailure:value=>{auditFailure=value;},getSqlError:()=>lastSqlError,setTimerClock:value=>{timerClock=value;}});
+ }else{
  const identityBefore=(await db.query('select count(*)::int n from app_users')).rows[0].n;
  act('owner');const key=randomUUID();
  const first=await routes.POST(request(input,key));assert.equal(first.status,201,await first.clone().text());
@@ -216,8 +223,10 @@ try{
  assert.ok(supplierHeaders?.some(header=>header.key==='Cache-Control'&&header.value.includes('no-store')));
  assert.ok(supplierHeaders?.some(header=>header.key==='X-Robots-Tag'&&header.value.includes('noindex')));
  for(const source of ['/abwesenheiten/:path*','/einstellungen/:path*','/vertraege/:path*']){const protectedHeaders=headers.find(rule=>rule.source===source)?.headers;assert.ok(protectedHeaders?.some(h=>h.key==='Cache-Control'&&h.value.includes('no-store')));assert.ok(protectedHeaders?.some(h=>h.key==='X-Robots-Tag'&&h.value.includes('noindex')));}
+ await verifyTimerCalendar({load,db,transaction,act,request,setAuditFailure:value=>{auditFailure=value;},getSqlError:()=>lastSqlError,setTimerClock:value=>{timerClock=value;}});
  session=null;assert.equal((await read(id)).status,401);
  console.log('Employee dossier: actual POST/PATCH/GET, optional email/account, persistence, replay/conflict, legacy field preservation, eight roles, plans, tenants/RLS, date constraints and atomic audit rollback passed.');
  console.log('Employment: separate reentry, immutable revisions, replay/stale conflict, database overlap protection, restricted RLS and supersede/audit rollback passed; no payroll or identity mutation.');
  console.log('Supplier pages: actual proxy matcher/anonymous redirect and private no-store/noindex headers passed.');
+ }
 }finally{await db.close();}
