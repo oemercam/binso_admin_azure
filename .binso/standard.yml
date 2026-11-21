@@ -1,0 +1,10 @@
+# Binso-Standard: vorgeschlagene Einstufung, noch nicht vollstaendig aktiviert
+standard: "1.0"
+stufe: kritisch
+ci:
+  pflicht: [basis, lint, typecheck, tests, build, sicherheit, integration]
+  aktivierung: nach-bestandspruefung
+  browser: relevante-benutzerwege
+deployment:
+  strategie: bestehender-workflow
+  freigabe: manuell-mit-releasepruefung

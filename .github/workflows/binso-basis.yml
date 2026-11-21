@@ -1,0 +1,32 @@
+name: Binso Basispruefung
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: binso-basis-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  grundpruefung:
+    name: Schnelle Repository-Pruefung
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 2
+      - name: Git-Format und Konfliktmarker pruefen
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            git diff --check HEAD^ HEAD
+          else
+            git diff --check
+          fi
+          if git grep -n -E '^(<<<<<<< |=======|>>>>>>> )' -- '*.yml' '*.yaml' '*.json' '*.ts' '*.tsx' '*.js' '*.jsx' '*.html' '*.css'; then
+            echo "::error::Merge-Konfliktmarker in Quelldateien"
+            exit 1
+          fi
